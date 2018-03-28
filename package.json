@@ -19,7 +19,7 @@
     "tslint-sonarts": "^1.6.0",
     "typestrict": "^0.0.6",
     "italia-pagopa-ts":
-      "https://github.com/teamdigitale/italia-pagopa-ts#v0.0.3"
+      "https://github.com/teamdigitale/italia-pagopa-ts#v0.0.4"
   },
   "dependencies": {}
 }

@@ -623,9 +623,9 @@ isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
-"italia-pagopa-ts@https://github.com/teamdigitale/italia-pagopa-ts#v0.0.3":
-  version "0.0.3"
-  resolved "https://github.com/teamdigitale/italia-pagopa-ts#7eec929fda3384e334462fb7b257a24532766178"
+"italia-pagopa-ts@https://github.com/teamdigitale/italia-pagopa-ts#v0.0.4":
+  version "0.0.4"
+  resolved "https://github.com/teamdigitale/italia-pagopa-ts#a3fd354f680fa67cd6177babe7a89cb68bf573a9"
   dependencies:
     "@types/soap" "^0.21.0"
     soap "^0.23.0"
