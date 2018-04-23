@@ -21,34 +21,25 @@ server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 
-function normalizePort(val: number | string): number | string | boolean
-{
+function normalizePort(val: number | string): number | string | boolean {
     const xport: number = typeof val === "string" ? parseInt(val, 10) : val;
-    if (isNaN(xport))
-    {
+    if (isNaN(xport)) {
         return val;
-    }
-    else if (xport >= 0)
-    {
+    } else if (xport >= 0) {
         return xport;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
 
-function onError(error: NodeJS.ErrnoException): void
-{
-    if (error.syscall !== "listen")
-    {
+function onError(error: NodeJS.ErrnoException): void {
+    if (error.syscall !== "listen") {
         throw error;
     }
     const stringPort = String(port);
-    const bind = typeof port === "string" ? "Pipe " +
-        stringPort : "Port " + stringPort;
-    switch (error.code)
-    {
+    const bind =
+        typeof port === "string" ? "Pipe " + stringPort : "Port " + stringPort;
+    switch (error.code) {
         case "EACCES":
             console.error(`${bind} requires elevated privileges`);
             process.exit(1);
@@ -62,9 +53,9 @@ function onError(error: NodeJS.ErrnoException): void
     }
 }
 
-function onListening(): void
-{
+function onListening(): void {
     const addr = server.address();
-    const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
+    const bind =
+        typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
     debug(`Listening on ${bind}`);
 }
