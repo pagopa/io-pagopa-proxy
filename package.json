@@ -9,8 +9,8 @@
   "devDependencies": {
     "prettier": "^1.12.1",
     "tslint": "^5.9.1",
-    "typescript": "^2.8.1",
     "danger": "^3.5.1",
+    "typescript": "^2.8.3",
     "danger-plugin-digitalcitizenship":
       "https://github.com/teamdigitale/danger-plugin-digitalcitizenship#v0.0.4",
     "tslint-config-prettier": "^1.12.0",
