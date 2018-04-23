@@ -5,8 +5,11 @@
  */
 
 import * as Mocked from "../MockedData";
-import { ICreditCard } from "../types/CreditCard";
-import { IPaymentMethod, PaymentMethodType } from "../types/PaymentMethod";
+
+import { Option, some, none } from "fp-ts/lib/Option";
+
+import { CreditCard } from "../types/CreditCard";
+import { PaymentMethod, PaymentMethodType } from "../types/PaymentMethod";
 import { ITransaction } from "../types/Transaction";
 import { IUser } from "../types/User";
 
@@ -14,41 +17,41 @@ import { IUser } from "../types/User";
  * User Controller
  */
 export class UserController {
-    constructor(public user: IUser) {}
+    constructor(public user: IUser) { }
 
-    public getWallet(): ReadonlyArray<IPaymentMethod> {
+    public getWallet(): ReadonlyArray<PaymentMethod> {
         return Mocked.wallet;
     }
 
-    public getCreditCards(): ReadonlyArray<ICreditCard> {
+    public getCreditCards(): ReadonlyArray<CreditCard> {
         return Mocked.wallet
-            .filter(method => method.type === PaymentMethodType.CREDIT_CARD)
-            .map(card => card as ICreditCard);
+            .filter(method => method.type === PaymentMethodType.decode("CREDIT_CARD").value)
+            .map(card => card as CreditCard);
     }
 
-    public getCreditCard(id: string): ICreditCard | undefined {
+    public getCreditCard(id: string): Option<CreditCard> {
         const paymentMethod = Mocked.wallet.filter(
             method =>
                 method.id === id &&
-                method.type === PaymentMethodType.CREDIT_CARD
+                method.type === PaymentMethodType.decode("CREDIT_CARD").value
         )[0];
 
         if (paymentMethod === undefined) {
-            return undefined;
+            return none;
         }
 
-        return paymentMethod as ICreditCard;
+        return some(paymentMethod as CreditCard);
     }
 
-    public getOperations(
-        paymentMethod: IPaymentMethod
+    public getTransactions(
+        paymentMethod: PaymentMethod
     ): ReadonlyArray<ITransaction> {
         return Mocked.operations.filter(
             operation => operation.method.id === paymentMethod.id
         );
     }
 
-    public getLatestOperations(
+    public getLatestTransactions(
         maxOperations: number
     ): ReadonlyArray<ITransaction> {
         return Mocked.operations.slice(1, maxOperations + 1);

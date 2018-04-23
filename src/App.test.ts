@@ -9,19 +9,22 @@ import * as express from "express";
 import * as http from "http";
 import * as request from "request";
 
-import App from "./App";
-import { ICreditCard } from "./types/CreditCard";
+import { newApp } from "./App";
+import { CreditCard } from "./types/CreditCard";
 import { PaymentMethodType } from "./types/PaymentMethod";
 
-const WS_URL = "http://localhost:3000";
+const HOST = "localhost";
+const PORT = 3000;
+const WS_URL = `http://${HOST}:${PORT}`;
 let server: http.Server; // tslint:disable-line
 let app: express.Application; // tslint:disable-line
 
+
 beforeAll(() => {
-    app = new App(true).express;
-    app.set("port", 3000);
+    app = newApp(true);
+    app.set("port", PORT);
     server = http.createServer(app);
-    server.listen(3000);
+    server.listen(PORT);
 });
 
 describe("App", () => {
@@ -34,7 +37,7 @@ describe("App", () => {
             expect(error).toBe(null); // tslint:disable-line
             expect(response.headers[contentTypeHeader]).toContain("json");
             expect(JSON.parse(body)).toEqual({
-                message: "Welcome to AwesomePAPI!",
+                message: "Welcome to italia-pagopa-proxy!",
                 version: "0.0.11"
             });
             done();
@@ -72,8 +75,8 @@ describe("App", () => {
             expect(obj).toHaveProperty(ccListProperty);
             expect(obj[ccListProperty].length).toBeGreaterThan(1);
             const countCC = obj[ccListProperty].reduce(
-                (i: number, v: ICreditCard) =>
-                    v.type === PaymentMethodType.CREDIT_CARD ? i + 1 : i,
+                (i: number, v: CreditCard) =>
+                    v.type === PaymentMethodType.decode("CREDIT_CARD").value ? i + 1 : i,
                 0
             );
             expect(obj[ccListProperty].length).toBe(countCC);
@@ -93,7 +96,7 @@ describe("App", () => {
             expect(obj).toHaveProperty(ccProperty);
             expect(obj[ccProperty]).toEqual({
                 id: "3",
-                type: PaymentMethodType.CREDIT_CARD,
+                type: PaymentMethodType.decode("CREDIT_CARD").getOrElse(-1),
                 issuer: "Mastercard",
                 number: "Non ci sono nuove transazioni",
                 message: "5412 7556 7890 0000"

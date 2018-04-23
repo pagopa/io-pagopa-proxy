@@ -4,8 +4,8 @@
  *
  */
 
-import { ICreditCard } from "./types/CreditCard";
-import { IPaymentMethod, PaymentMethodType } from "./types/PaymentMethod";
+import { CreditCard } from "./types/CreditCard";
+import { PaymentMethod, PaymentMethodType } from "./types/PaymentMethod";
 import { ITransaction } from "./types/Transaction";
 
 /**
@@ -14,17 +14,17 @@ import { ITransaction } from "./types/Transaction";
  * @param {string} issuer
  * @param {string} num
  * @param {string} message
- * @returns {ICreditCard}
+ * @returns {CreditCard}
  */
 function genCC(
     id: string,
     issuer: string,
     num: string,
     message: string
-): ICreditCard {
+): CreditCard {
     return {
         id,
-        type: PaymentMethodType.CREDIT_CARD,
+        type: PaymentMethodType.decode("CREDIT_CARD").getOrElse(-1),
         issuer,
         number: num,
         message
@@ -33,9 +33,9 @@ function genCC(
 
 /**
  * Selection of payment methods
- * @type {ICreditCard[]}
+ * @type {CreditCard[]}
  */
-export const wallet: ReadonlyArray<IPaymentMethod> = [
+export const wallet: ReadonlyArray<PaymentMethod> = [
     genCC(
         "1",
         "American Express",

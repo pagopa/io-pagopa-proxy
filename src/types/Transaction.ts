@@ -4,13 +4,13 @@
  *
  */
 
-import { IPaymentMethod } from "./PaymentMethod";
+import { PaymentMethod } from "./PaymentMethod";
 
 /**
  *
  */
 export interface ITransaction {
-    readonly method: IPaymentMethod;
+    readonly method: PaymentMethod;
     readonly fee: number;
     readonly amount: number;
     readonly currency: string;

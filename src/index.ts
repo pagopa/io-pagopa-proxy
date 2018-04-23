@@ -7,12 +7,12 @@
 import * as debug from "debug";
 import * as http from "http";
 
-import App from "./App";
+import { newApp } from "./App";
 
 debug("ts-express:server");
 
 const port = normalizePort(process.env.PORT || 3000);
-const app = new App().express;
+const app = newApp();
 
 app.set("port", port);
 

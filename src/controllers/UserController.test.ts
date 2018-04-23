@@ -4,7 +4,8 @@
  *
  */
 
-import { IPaymentMethod } from "../types/PaymentMethod";
+import { CreditCard } from "../types/CreditCard";
+import { PaymentMethod, PaymentMethodType } from "../types/PaymentMethod";
 import { IUser } from "../types/User";
 import { UserController } from "./UserController";
 
@@ -28,20 +29,27 @@ describe("User controller", () => {
 
     test("should get credit cards' transactions", () => {
         const userController: UserController = new UserController(user);
-        const creditCard: IPaymentMethod = userController.getCreditCard(
-            "1"
-        ) as IPaymentMethod;
-        const creditCards = userController.getOperations(creditCard);
-        expect(creditCards).toBeTruthy();
-        expect(creditCards.length).toBe(3);
+        const optionalCC = userController.getCreditCard("1");
+        const mockCard: CreditCard = {
+            id: "1",
+            type: PaymentMethodType.decode("CREDIT_CARD").getOrElse(-1),
+            issuer: "American Express",
+            message: "Ultimo utilizzo ieri alle 07:34",
+            number: "3759 876543 21001"
+        };
+        expect(optionalCC.isSome()).toBeTruthy();
+        const creditCard: PaymentMethod = optionalCC.getOrElse(mockCard) as PaymentMethod;
+        const transactions = userController.getTransactions(creditCard);
+        expect(transactions).toBeTruthy();
+        expect(transactions.length).toBe(3);
     });
 
     test("should get latest transactions", () => {
         const userController: UserController = new UserController(user);
-        const MAX_OPERATIONS = 5;
-        const operations = userController.getLatestOperations(MAX_OPERATIONS);
-        expect(operations).toBeTruthy();
-        expect(operations).toHaveLength(MAX_OPERATIONS);
+        const MAX_TRANSACTIONS = 5;
+        const transactions = userController.getLatestTransactions(MAX_TRANSACTIONS);
+        expect(transactions).toBeTruthy();
+        expect(transactions).toHaveLength(MAX_TRANSACTIONS);
     });
 
     test("should get user's token", () => {
