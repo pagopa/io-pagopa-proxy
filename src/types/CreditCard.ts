@@ -8,7 +8,6 @@ import * as t from "io-ts";
 import { string } from "io-ts";
 import { PaymentMethod } from "./PaymentMethod";
 
-
 export const CreditCard = t.intersection([
     PaymentMethod,
     t.interface({

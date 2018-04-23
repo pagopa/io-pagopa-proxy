@@ -21,12 +21,6 @@ export const PaymentMethodType = enumType<PaymentMethodEnum>(
     "PaymentMethodType"
 );
 
-// export interface IPaymentMethod {
-//     readonly id: string; // ID of the specific payment method, ie: 2 credit cards
-//     // have different ids but same PaymentMethodType
-//     readonly type: PaymentMethodType;
-// }
-
 export const PaymentMethod = t.interface({
     id: string,
     type: PaymentMethodType

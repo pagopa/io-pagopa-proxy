@@ -38,7 +38,7 @@ describe("User controller", () => {
             number: "3759 876543 21001"
         };
         expect(optionalCC.isSome()).toBeTruthy();
-        const creditCard: PaymentMethod = optionalCC.getOrElse(mockCard) as PaymentMethod;
+        const creditCard: PaymentMethod = optionalCC.getOrElse(mockCard);
         const transactions = userController.getTransactions(creditCard);
         expect(transactions).toBeTruthy();
         expect(transactions.length).toBe(3);
@@ -47,7 +47,9 @@ describe("User controller", () => {
     test("should get latest transactions", () => {
         const userController: UserController = new UserController(user);
         const MAX_TRANSACTIONS = 5;
-        const transactions = userController.getLatestTransactions(MAX_TRANSACTIONS);
+        const transactions = userController.getLatestTransactions(
+            MAX_TRANSACTIONS
+        );
         expect(transactions).toBeTruthy();
         expect(transactions).toHaveLength(MAX_TRANSACTIONS);
     });

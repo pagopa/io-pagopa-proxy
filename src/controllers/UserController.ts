@@ -6,7 +6,7 @@
 
 import * as Mocked from "../MockedData";
 
-import { Option, some, none } from "fp-ts/lib/Option";
+import { none, Option, some } from "fp-ts/lib/Option";
 
 import { CreditCard } from "../types/CreditCard";
 import { PaymentMethod, PaymentMethodType } from "../types/PaymentMethod";
@@ -24,9 +24,16 @@ export class UserController {
     }
 
     public getCreditCards(): ReadonlyArray<CreditCard> {
-        return Mocked.wallet
-            .filter(method => method.type === PaymentMethodType.decode("CREDIT_CARD").value)
-            .map(card => card as CreditCard);
+        return (
+            Mocked.wallet
+                .filter(
+                    method =>
+                        method.type ===
+                        PaymentMethodType.decode("CREDIT_CARD").value
+                )
+                // tslint:disable-next-line
+                .map(card => card as CreditCard)
+        );
     }
 
     public getCreditCard(id: string): Option<CreditCard> {
@@ -39,7 +46,7 @@ export class UserController {
         if (paymentMethod === undefined) {
             return none;
         }
-
+        // tslint:disable-next-line
         return some(paymentMethod as CreditCard);
     }
 

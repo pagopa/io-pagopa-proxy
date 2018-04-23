@@ -19,7 +19,6 @@ const WS_URL = `http://${HOST}:${PORT}`;
 let server: http.Server; // tslint:disable-line
 let app: express.Application; // tslint:disable-line
 
-
 beforeAll(() => {
     app = newApp(true);
     app.set("port", PORT);
@@ -76,7 +75,9 @@ describe("App", () => {
             expect(obj[ccListProperty].length).toBeGreaterThan(1);
             const countCC = obj[ccListProperty].reduce(
                 (i: number, v: CreditCard) =>
-                    v.type === PaymentMethodType.decode("CREDIT_CARD").value ? i + 1 : i,
+                    v.type === PaymentMethodType.decode("CREDIT_CARD").value
+                        ? i + 1
+                        : i,
                 0
             );
             expect(obj[ccListProperty].length).toBe(countCC);

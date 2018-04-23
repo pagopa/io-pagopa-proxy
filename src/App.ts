@@ -8,13 +8,12 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as morgan from "morgan";
 
-import { Option, none, some } from "fp-ts/lib/Option";
+import { none, Option, some } from "fp-ts/lib/Option";
 
 import { UserController } from "./controllers/UserController";
 import { CreditCard } from "./types/CreditCard";
 import { PaymentMethod, PaymentMethodType } from "./types/PaymentMethod";
-import { IUser } from "./types/User"
-
+import { IUser } from "./types/User";
 
 const VERSION: string = "0.0.11";
 const NAME: string = "italia-pagopa-proxy";
@@ -43,7 +42,6 @@ export function newApp(
     /* TODO: receive env to decide whether to enable ssl */
     testMode: boolean = false
 ): express.Express {
-
     const app = express(); // create app
 
     // setup Express app
@@ -66,10 +64,9 @@ export function newApp(
     });
 
     app.get("/wallet", (req, res) => {
-        const wallet: Option<ReadonlyArray<PaymentMethod>>
-            = getUserAndThen<ReadonlyArray<PaymentMethod>>
-                (req, res,
-                (user: UserController) => some(user.getWallet()));
+        const wallet: Option<ReadonlyArray<PaymentMethod>> = getUserAndThen<
+            ReadonlyArray<PaymentMethod>
+        >(req, res, (user: UserController) => some(user.getWallet()));
         if (wallet.isSome()) {
             res.json({
                 status: "OK",
@@ -79,10 +76,9 @@ export function newApp(
     });
 
     app.get("/cards", (req, res) => {
-        const cards: Option<ReadonlyArray<PaymentMethod>>
-            = getUserAndThen<ReadonlyArray<CreditCard>>(
-                req, res,
-                (user: UserController) => some(user.getCreditCards()));
+        const cards: Option<ReadonlyArray<PaymentMethod>> = getUserAndThen<
+            ReadonlyArray<CreditCard>
+        >(req, res, (user: UserController) => some(user.getCreditCards()));
         if (cards.isSome()) {
             res.json({
                 status: "OK",
@@ -92,10 +88,11 @@ export function newApp(
     });
 
     app.get("/cards/:cardid", (req, res) => {
-        const card: Option<CreditCard>
-            = getUserAndThen<CreditCard>
-                (req, res,
-                (user: UserController) => user.getCreditCard(req.params.cardid));
+        const card: Option<CreditCard> = getUserAndThen<CreditCard>(
+            req,
+            res,
+            (user: UserController) => user.getCreditCard(req.params.cardid)
+        );
         if (card.isSome()) {
             // TODO: find out whether Option<T> offers a .get() method
             // that either returns "some" or throws an error (i.e. no
