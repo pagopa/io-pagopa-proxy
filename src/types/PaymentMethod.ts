@@ -9,21 +9,21 @@ import { string } from "io-ts";
 import { enumType } from "italia-ts-commons/lib/types";
 
 export enum PaymentMethodEnum {
-    BANK_ACCOUNT,
-    CREDIT_CARD,
-    OTHER
+  BANK_ACCOUNT = "BANK_ACCOUNT",
+  CREDIT_CARD = "CREDIT_CARD",
+  OTHER = "OTHER"
 }
 
-export type PaymentMethodType = t.TypeOf<typeof PaymentMethod>;
+export type PaymentMethodType = t.TypeOf<typeof PaymentMethodType>;
 
 export const PaymentMethodType = enumType<PaymentMethodEnum>(
-    PaymentMethodEnum,
-    "PaymentMethodType"
+  PaymentMethodEnum,
+  "PaymentMethodType"
 );
 
 export const PaymentMethod = t.interface({
-    id: string,
-    type: PaymentMethodType
+  id: string,
+  type: PaymentMethodType
 });
 
 export type PaymentMethod = t.TypeOf<typeof PaymentMethod>;

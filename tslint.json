@@ -1,28 +1,39 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-      "typestrict",
-      "tslint:recommended",
-      "tslint-immutable",
-      "tslint-sonarts",
-      "tslint-plugin-prettier",
-      "tslint-config-prettier"
+  "defaultSeverity": "error",
+  "extends": [
+    "typestrict",
+    "tslint:recommended",
+    "tslint-immutable",
+    "tslint-sonarts",
+    "tslint-plugin-prettier",
+    "tslint-config-prettier"
+  ],
+  "jsRules": {},
+  "rules": {
+    "no-null-keyword": true,
+    "no-any": true,
+    "no-var-keyword": true,
+    "typedef": [
+      true,
+      "call-signature"
     ],
-    "jsRules": {},
-    "rules": {
-      "no-null-keyword": true,
-      "no-any": true,
-      "no-var-keyword": true,
-      "typedef": [true, "call-signature"],
-      "readonly-keyword": true,
-      "readonly-array": true,
-      "no-let": true,
-      "no-method-signature": true,
-      "no-mixed-interface": false,
-      "prettier": false,
-      "no-console": false,
-      "no-object-mutation": [true, {"ignore-prefix": ["this."]}],
-      "object-literal-sort-keys": false
-    },
-    "rulesDirectory": []
+    "readonly-keyword": true,
+    "readonly-array": true,
+    "no-let": true,
+    "no-method-signature": true,
+    "no-mixed-interface": false,
+    "prettier": true,
+    "no-console": false,
+    "no-object-mutation": [
+      true,
+      {
+        "ignore-prefix": [
+          "this.",
+          "req."
+        ]
+      }
+    ],
+    "object-literal-sort-keys": false
+  },
+  "rulesDirectory": []
 }

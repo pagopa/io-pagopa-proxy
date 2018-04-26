@@ -4,165 +4,233 @@
  *
  */
 
-import { CreditCard } from "./types/CreditCard";
-import { PaymentMethod, PaymentMethodType } from "./types/PaymentMethod";
-import { ITransaction } from "./types/Transaction";
+import { NonEmptyString } from "italia-ts-commons/lib/strings";
+
+import { DateFromString } from "italia-ts-commons/lib/dates";
+import { NonNegativeNumber } from "italia-ts-commons/lib/numbers";
+
+import { CreditCard, CreditCardNumber } from "./types/CreditCard";
+import {
+  PaymentMethod,
+  PaymentMethodEnum,
+  PaymentMethodType
+} from "./types/PaymentMethod";
+import { CountryCurrencyCode, Transaction } from "./types/Transaction";
+import { User } from "./types/User";
 
 /**
  * Generate Credit Card
  * @param {string} id
- * @param {string} issuer
- * @param {string} num
+ * @param {NonEmptyString} issuer
+ * @param {CreditCardNumber} num
  * @param {string} message
  * @returns {CreditCard}
  */
 function genCC(
-    id: string,
-    issuer: string,
-    num: string,
-    message: string
+  id: string,
+  issuer: NonEmptyString,
+  num: CreditCardNumber,
+  message: string
 ): CreditCard {
-    return {
-        id,
-        type: PaymentMethodType.decode("CREDIT_CARD").getOrElse(-1),
-        issuer,
-        number: num,
-        message
-    };
+  return {
+    id,
+    type: PaymentMethodType.decode("CREDIT_CARD").getOrElse(
+      PaymentMethodEnum.OTHER
+    ),
+    issuer,
+    number: num,
+    message
+  };
 }
+
+export const NO_CARD: CreditCard = genCC(
+  "-1",
+  "N/A" as NonEmptyString,
+  "0000 0000 0000 0000" as CreditCardNumber,
+  "N/A"
+);
+
+export const MOCK_USER: User = { token: "0123456789abcdef" as NonEmptyString };
 
 /**
  * Selection of payment methods
  * @type {CreditCard[]}
  */
 export const wallet: ReadonlyArray<PaymentMethod> = [
-    genCC(
-        "1",
-        "American Express",
-        "Ultimo utilizzo ieri alle 07:34",
-        "3759 876543 21001"
-    ),
-    genCC(
-        "2",
-        "VISA",
-        "Ultimo utilizzo ieri alle 10:20",
-        "4000 1234 5678 9010"
-    ),
-    genCC(
-        "3",
-        "Mastercard",
-        "Non ci sono nuove transazioni",
-        "5412 7556 7890 0000"
-    ),
-    genCC(
-        "4",
-        "RedCard",
-        "Ultimo utilizzo oggi alle 09:03",
-        "4000 1234 5678 9010"
-    )
+  genCC(
+    "1",
+    "American Express" as NonEmptyString,
+    "3759 8765 1233 1001" as CreditCardNumber,
+    "Ultimo utilizzo ieri alle 07:34"
+  ),
+  genCC(
+    "2",
+    "VISA" as NonEmptyString,
+    "4000 1234 5678 9010" as CreditCardNumber,
+    "Ultimo utilizzo ieri alle 10:20"
+  ),
+  genCC(
+    "3",
+    "Mastercard" as NonEmptyString,
+    "5412 7556 7890 0000" as CreditCardNumber,
+    "Non ci sono nuove transazioni"
+  ),
+  genCC(
+    "4",
+    "RedCard" as NonEmptyString,
+    "4000 1234 5678 9010" as CreditCardNumber,
+    "Ultimo utilizzo oggi alle 09:03"
+  )
 ];
 
 /**
  * List of transactions
  */
-export const operations: ReadonlyArray<ITransaction> = [
-    {
-        method: wallet[0],
-        date: "17/04/2018",
-        time: "07:34",
-        description: "Certificato di residenza",
-        recipient: "Comune di Gallarate",
-        amount: -20.02,
-        currency: "EUR",
-        fee: 0.5,
-        isNew: true
+const now = new Date();
+
+export const transactions: ReadonlyArray<Transaction> = [
+  {
+    method: wallet[0],
+    date: DateFromString.decode("2018-04-24T10:26:02.818Z").getOrElse(now),
+    description: "Certificato di residenza",
+    recipient: "Comune di Gallarate" as NonEmptyString,
+    amount: {
+      quantity: 22.2,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
     },
-    {
-        method: wallet[1],
-        date: "16/04/2018",
-        time: "15:01",
-        description: "Spesa Supermarket",
-        recipient: "Segrate",
-        amount: -74.1,
-        currency: "EUR",
-        fee: 0.5,
-        isNew: true
-    },
-    {
-        method: wallet[3],
-        date: "15/04/2018",
-        time: "08:56",
-        description: "Prelievo contante",
-        recipient: "Busto Arsizio", // tslint:disable-line
-        amount: -200.0,
-        currency: "EUR",
-        fee: 0.5,
-        isNew: true
-    },
-    {
-        method: wallet[1],
-        date: "14/02/2018",
-        time: "10:21",
-        description: "Accredito per storno",
-        recipient: "Banca Sella",
-        amount: 100.1,
-        currency: "USD",
-        fee: 0.5,
-        isNew: false
-    },
-    {
-        method: wallet[3],
-        date: "22/01/2018",
-        time: "14:54",
-        description: "Esecuzione atti notarili",
-        recipient: "Comune di Legnano",
-        fee: 0.5,
-        amount: -56.0,
-        currency: "EUR",
-        isNew: false
-    },
-    {
-        method: wallet[3],
-        date: "01/01/2018",
-        time: "23:34",
-        description: "Pizzeria Da Gennarino",
-        recipient: "Busto Arsizio",
-        amount: -45.0,
-        currency: "EUR",
-        fee: 0.5,
-        isNew: false
-    },
-    {
-        method: wallet[0],
-        date: "22/12/2017",
-        time: "14:23",
-        description: "Rimborso TARI 2012",
-        recipient: "Comune di Gallarate",
-        amount: 150.2,
-        currency: "EUR",
-        fee: 0,
-        isNew: false
-    },
-    {
-        method: wallet[0],
-        date: "17/12/2017",
-        time: "12:34",
-        description: "Ristorante I Pini",
-        recipient: "Busto Arsizio",
-        fee: 0,
-        amount: -134.0,
-        currency: "EUR",
-        isNew: false
-    },
-    {
-        method: wallet[2],
-        date: "13/12/2017",
-        time: "10:34",
-        description: "Estetista Estella",
-        recipient: "Milano - via Parini 12",
-        fee: 0.5,
-        amount: -100.0,
-        currency: "EUR",
-        isNew: false
+    fee: {
+      quantity: 0.5,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
     }
+  },
+  {
+    method: wallet[1],
+    date: DateFromString.decode("2018-04-23T10:26:02.818Z").getOrElse(now),
+    description: "Spesa Supermarket",
+    recipient: "Segrate" as NonEmptyString,
+    amount: {
+      quantity: -74.1,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    },
+    fee: {
+      quantity: 0.5,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    }
+  },
+  {
+    method: wallet[3],
+    date: DateFromString.decode("2018-03-23T10:26:02.810Z").getOrElse(now),
+    description: "Prelievo contante",
+    recipient: "Busto Arsizio" as NonEmptyString,
+    amount: {
+      quantity: -200,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    },
+    fee: {
+      quantity: 0.5,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    }
+  },
+  {
+    method: wallet[1],
+    date: DateFromString.decode("2018-03-14T23:26:02.810Z").getOrElse(now),
+    description: "Accredito per storno",
+    recipient: "Banca Sella" as NonEmptyString,
+    amount: {
+      quantity: 100.1,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    },
+    fee: {
+      quantity: 0.5,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    }
+  },
+  {
+    method: wallet[3],
+    date: DateFromString.decode("2018-03-20T10:33:02.810Z").getOrElse(now),
+    description: "Esecuzione atti notarili",
+    recipient: "Comune di Legnano" as NonEmptyString,
+    amount: {
+      quantity: -56.0,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    },
+    fee: {
+      quantity: 0.5,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    }
+  },
+  {
+    method: wallet[3],
+    date: DateFromString.decode("2018-03-23T10:26:02.810Z").getOrElse(now),
+    description: "Aperitivo",
+    recipient: "Birrificio Lambrate" as NonEmptyString,
+    amount: {
+      quantity: -45.0,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    },
+    fee: {
+      quantity: 0.5,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    }
+  },
+  {
+    method: wallet[0],
+    date: DateFromString.decode("2017-02-21T10:20:02.810Z").getOrElse(now),
+    description: "Rimborso TARI 2012",
+    recipient: "Comune di Gallarate" as NonEmptyString,
+    amount: {
+      quantity: 150.2,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    },
+    fee: {
+      quantity: 0,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    }
+  },
+  {
+    method: wallet[0],
+    date: DateFromString.decode("2018-03-23T10:26:01.810Z").getOrElse(now),
+    description: "Ristorante I Pini",
+    recipient: "Busto Arsizio" as NonEmptyString,
+    amount: {
+      quantity: -134.0,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    },
+    fee: {
+      quantity: 0,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    }
+  },
+  {
+    method: wallet[2],
+    date: DateFromString.decode("2018-03-23T20:26:02.810Z").getOrElse(now),
+    description: "Estetista Estella",
+    recipient: "Milano - via Parini 12" as NonEmptyString,
+    amount: {
+      quantity: -100.0,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    },
+    fee: {
+      quantity: 0.5,
+      precision: 2 as NonNegativeNumber,
+      currency: "EUR" as CountryCurrencyCode
+    }
+  }
 ];

@@ -4,67 +4,87 @@
  *
  */
 
-import * as Mocked from "../MockedData";
-
-import { none, Option, some } from "fp-ts/lib/Option";
+import * as express from "express";
 
 import { CreditCard } from "../types/CreditCard";
-import { PaymentMethod, PaymentMethodType } from "../types/PaymentMethod";
-import { ITransaction } from "../types/Transaction";
-import { IUser } from "../types/User";
+import { PaymentMethodEnum } from "../types/PaymentMethod";
+import { StatusCode } from "../types/StatusCode";
+import { extractUserFromRequest } from "../types/User";
+
+import * as Mocked from "../MockedData";
+
+interface IStatusObject {
+  readonly status: StatusCode;
+  readonly message?: string;
+}
+
+function genOKStatus(): IStatusObject {
+  return { status: StatusCode.OK };
+}
+
+function genErrorStatus(err: Error): IStatusObject {
+  return { status: StatusCode.ERROR, message: err.message };
+}
 
 /**
  * User Controller
  */
 export class UserController {
-    constructor(public user: IUser) { }
-
-    public getWallet(): ReadonlyArray<PaymentMethod> {
-        return Mocked.wallet;
+  public getWallet(req: express.Request, res: express.Response): void {
+    const errorOrUser = extractUserFromRequest(req);
+    if (errorOrUser.isLeft()) {
+      const error: Error = errorOrUser.value;
+      res.status(500).json(genErrorStatus(error));
+    } else {
+      res.status(200).json({
+        ...genOKStatus(),
+        wallet: Mocked.wallet
+      });
     }
+  }
 
-    public getCreditCards(): ReadonlyArray<CreditCard> {
-        return (
-            Mocked.wallet
-                .filter(
-                    method =>
-                        method.type ===
-                        PaymentMethodType.decode("CREDIT_CARD").value
-                )
-                // tslint:disable-next-line
-                .map(card => card as CreditCard)
-        );
+  public getCreditCards(req: express.Request, res: express.Response): void {
+    const errorOrUser = extractUserFromRequest(req);
+    if (errorOrUser.isLeft()) {
+      const error: Error = errorOrUser.value;
+      res.status(500).json(genErrorStatus(error));
+    } else {
+      res.status(200).json({
+        ...genOKStatus(),
+        credit_cards: Mocked.wallet
+          .filter(method => method.type === PaymentMethodEnum.CREDIT_CARD)
+          // tslint:disable-next-line
+          .map(card => card as CreditCard)
+      });
     }
+  }
 
-    public getCreditCard(id: string): Option<CreditCard> {
-        const paymentMethod = Mocked.wallet.filter(
-            method =>
-                method.id === id &&
-                method.type === PaymentMethodType.decode("CREDIT_CARD").value
-        )[0];
-
-        if (paymentMethod === undefined) {
-            return none;
-        }
-        // tslint:disable-next-line
-        return some(paymentMethod as CreditCard);
+  public getCreditCard(req: express.Request, res: express.Response): void {
+    const errorOrUser = extractUserFromRequest(req);
+    if (errorOrUser.isLeft()) {
+      const error: Error = errorOrUser.value;
+      res.status(500).json(genErrorStatus(error));
+    } else {
+      const cardOrNot = CreditCard.decode(
+        Mocked.wallet.find(
+          method =>
+            method.id === req.params.cardid &&
+            method.type === PaymentMethodEnum.CREDIT_CARD
+        )
+      );
+      if (cardOrNot.isRight()) {
+        const card = cardOrNot.value;
+        res.status(200).json({
+          ...genOKStatus(),
+          credit_card: card
+        });
+      } else {
+        res
+          .status(500)
+          .json(genErrorStatus(new Error("Credit card not found")));
+      }
     }
+  }
 
-    public getTransactions(
-        paymentMethod: PaymentMethod
-    ): ReadonlyArray<ITransaction> {
-        return Mocked.operations.filter(
-            operation => operation.method.id === paymentMethod.id
-        );
-    }
-
-    public getLatestTransactions(
-        maxOperations: number
-    ): ReadonlyArray<ITransaction> {
-        return Mocked.operations.slice(1, maxOperations + 1);
-    }
-
-    public getToken(): string {
-        return this.user.token;
-    }
+  // TODO: implement getTransactions(paymentMethod) and getLatestTransactions(from, limit)
 }
