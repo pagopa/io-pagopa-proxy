@@ -6,12 +6,12 @@
  */
 import * as debug from "debug";
 import * as http from "http";
-
 import { newApp } from "./App";
+import { CONFIG } from "./configuration";
 
 debug("ts-express:server");
 
-const port = normalizePort(process.env.PORT || 3000);
+const port = normalizePort(process.env.PORT || CONFIG.CONTROLLER.PORT);
 const app = newApp();
 
 app.set("port", port);

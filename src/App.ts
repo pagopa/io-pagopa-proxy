@@ -7,7 +7,8 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as morgan from "morgan";
-
+import { CONFIG } from "./configuration";
+import { TransactionController } from "./controllers/TransactionController";
 import { UserController } from "./controllers/UserController";
 
 export function newApp(
@@ -24,25 +25,25 @@ export function newApp(
   app.use(bodyParser.urlencoded({ extended: false }));
 
   const userController = new UserController();
+  const transactionController = new TransactionController();
 
   // setup routes
-  app.get("/", (_, res) => {
+  app.get(CONFIG.CONTROLLER.MAPPING.INDEX, (_, res) => {
     res.json({
       message: `Welcome!`
     });
   });
 
-  app.get("/wallet", (req, res) => {
+  app.get(CONFIG.CONTROLLER.MAPPING.GET_WALLETS, (req, res) => {
     userController.getWallet(req, res);
   });
 
-  app.get("/cards", (req, res) => {
+  app.get(CONFIG.CONTROLLER.MAPPING.GET_CARDS, (req, res) => {
     userController.getCreditCards(req, res);
   });
 
-  app.get("/cards/:cardid", (req, res) => {
-    userController.getCreditCard(req, res);
-    console.log(req.path);
+  app.get(CONFIG.CONTROLLER.MAPPING.GET_TRANSACTIONS, (req, res) => {
+    transactionController.getTransactions(req, res);
   });
 
   return app;
