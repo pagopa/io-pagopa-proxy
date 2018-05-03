@@ -9,7 +9,7 @@
   "scripts": {
     "build": "npm run lint && tsc",
     "start": "node lib/index.js",
-    "test": "tsc jest",
+    "test": "tsc && jest",
     "lint": "tslint --project ."
   },
   "devDependencies": {
