@@ -30,7 +30,7 @@ describe("App", () => {
 
   test("should return a wallet", () => {
     return request
-      .get(CONFIG.CONTROLLER.MAPPING.GET_WALLETS + tokenTestParam)
+      .get(CONFIG.CONTROLLER.ROUTES.WALLETS + tokenTestParam)
       .then(response => {
         expect(response.status).toBe(200);
         expect(response.error).toBeFalsy();
@@ -53,7 +53,7 @@ describe("App", () => {
 
   test("should return credit cards", () => {
     return request
-      .get(CONFIG.CONTROLLER.MAPPING.GET_CARDS + tokenTestParam)
+      .get(CONFIG.CONTROLLER.ROUTES.CARDS + tokenTestParam)
       .then(response => {
         expect(response.status).toBe(200);
         expect(response.error).toBeFalsy();
@@ -77,7 +77,7 @@ describe("App", () => {
   test("should return a SINGLE credit card", () => {
     const testedCardId = "3";
     return request
-      .get(CONFIG.CONTROLLER.MAPPING.GET_CARDS + tokenTestParam + "&cardId=" + testedCardId) // tslint:disable-line
+      .get(CONFIG.CONTROLLER.ROUTES.CARDS + testedCardId + tokenTestParam) // tslint:disable-line
       .then(response => {
         expect(response.status).toBe(200);
         expect(response.error).toBeFalsy();
@@ -95,7 +95,7 @@ describe("App", () => {
 
   test("should return transactions", () => {
     return request
-      .get(CONFIG.CONTROLLER.MAPPING.GET_TRANSACTIONS + tokenTestParam)
+      .get(CONFIG.CONTROLLER.ROUTES.TRANSACTIONS + tokenTestParam)
       .then(response => {
         expect(response.status).toBe(200);
         expect(response.error).toBeFalsy();

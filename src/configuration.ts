@@ -7,11 +7,11 @@
 export const CONFIG = {
   CONTROLLER: {
     PORT: 3000,
-    MAPPING: {
+    ROUTES: {
       INDEX: "/",
-      GET_WALLETS: "/getWallets",
-      GET_CARDS: "/getCards",
-      GET_TRANSACTIONS: "/getTransactions"
+      WALLETS: "/wallets/",
+      CARDS: "/cards/",
+      TRANSACTIONS: "/transactions/"
     }
   }
 };

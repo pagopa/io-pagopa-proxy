@@ -90,6 +90,7 @@ const now = new Date();
 
 export const transactions: ReadonlyArray<Transaction> = [
   {
+    id: "1",
     method: wallet[0],
     date: DateFromString.decode("2018-04-24T10:26:02.818Z").getOrElse(now),
     description: "Certificato di residenza",
@@ -106,6 +107,7 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   },
   {
+    id: "2",
     method: wallet[1],
     date: DateFromString.decode("2018-04-23T10:26:02.818Z").getOrElse(now),
     description: "Spesa Supermarket",
@@ -122,6 +124,7 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   },
   {
+    id: "3",
     method: wallet[3],
     date: DateFromString.decode("2018-03-23T10:26:02.810Z").getOrElse(now),
     description: "Prelievo contante",
@@ -138,6 +141,7 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   },
   {
+    id: "4",
     method: wallet[1],
     date: DateFromString.decode("2018-03-14T23:26:02.810Z").getOrElse(now),
     description: "Accredito per storno",
@@ -154,6 +158,7 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   },
   {
+    id: "5",
     method: wallet[3],
     date: DateFromString.decode("2018-03-20T10:33:02.810Z").getOrElse(now),
     description: "Esecuzione atti notarili",
@@ -170,6 +175,7 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   },
   {
+    id: "6",
     method: wallet[3],
     date: DateFromString.decode("2018-03-23T10:26:02.810Z").getOrElse(now),
     description: "Aperitivo",
@@ -186,6 +192,7 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   },
   {
+    id: "7",
     method: wallet[0],
     date: DateFromString.decode("2017-02-21T10:20:02.810Z").getOrElse(now),
     description: "Rimborso TARI 2012",
@@ -202,6 +209,7 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   },
   {
+    id: "8",
     method: wallet[0],
     date: DateFromString.decode("2018-03-23T10:26:01.810Z").getOrElse(now),
     description: "Ristorante I Pini",
@@ -218,6 +226,7 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   },
   {
+    id: "9",
     method: wallet[2],
     date: DateFromString.decode("2018-03-23T20:26:02.810Z").getOrElse(now),
     description: "Estetista Estella",

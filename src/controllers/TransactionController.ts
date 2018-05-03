@@ -5,6 +5,7 @@
 
 import * as express from "express";
 import * as Mocked from "../MockedData";
+import { Transaction } from "../types/Transaction";
 import { extractUserFromRequest } from "../types/User";
 import { ControllerUtils } from "../utils/ControllerUtils";
 
@@ -17,22 +18,23 @@ export class TransactionController {
       ControllerUtils.setErrorResponse(res, errorOrUser.value);
       return;
     }
-
-    // Check if optional parameters are set
-    if (req.query.transactionId !== undefined) {
-      // TODO: use it
+    if (req.params.transactionId === undefined) {
+      ControllerUtils.setSuccessResponse(res, {
+        transactions: Mocked.transactions
+      });
+      return;
     }
-    if (req.query.startDate !== undefined) {
-      // TODO: use it
-    }
-    if (req.query.endDate !== undefined) {
-      // TODO: use it
-    }
-    if (req.query.limit !== undefined) {
-      // TODO: use it and use a default max value
+    const singleTransaction = Transaction.decode(
+      Mocked.transactions.find(method => method.id === req.params.transactionId)
+    );
+    if (!singleTransaction.isRight()) {
+      ControllerUtils.setErrorResponse(
+        res,
+        new Error("Transactions not found")
+      );
     }
     ControllerUtils.setSuccessResponse(res, {
-      transactions: Mocked.transactions
+      transactions: singleTransaction
     });
   }
 }

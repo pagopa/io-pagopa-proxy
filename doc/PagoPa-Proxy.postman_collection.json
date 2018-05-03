@@ -29,14 +29,42 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:3000/getTransactions?token=test",
+					"raw": "http://localhost:3000/transactions/?token=test",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"getTransactions"
+						"transactions",
+						""
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTransactions (Single)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:3000/transactions/3?token=test",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"transactions",
+						"3"
 					],
 					"query": [
 						{
@@ -55,14 +83,14 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:3000/getWallets?token=test",
+					"raw": "http://localhost:3000/wallets?token=test",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"getWallets"
+						"wallets"
 					],
 					"query": [
 						{
@@ -81,14 +109,14 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:3000/getCards?token=test",
+					"raw": "http://localhost:3000/cards?token=test",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"getCards"
+						"cards"
 					],
 					"query": [
 						{
@@ -101,29 +129,26 @@
 			"response": []
 		},
 		{
-			"name": "getCards for single card",
+			"name": "getCards (Single)",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:3000/getCards?token=test&cardId=3",
+					"raw": "http://localhost:3000/cards/3?token=test",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"getCards"
+						"cards",
+						"3"
 					],
 					"query": [
 						{
 							"key": "token",
 							"value": "test"
-						},
-						{
-							"key": "cardId",
-							"value": "3"
 						}
 					]
 				}

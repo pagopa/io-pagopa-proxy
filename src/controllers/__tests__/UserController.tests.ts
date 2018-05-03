@@ -16,7 +16,8 @@ describe("User controller", () => {
 
   test("should get user's specific card", () => {
     const req = mockReq();
-    req.query = { token: MOCK_USER.token, cardId: "1" };
+    req.query = { token: MOCK_USER.token };
+    req.params = { cardId: "1" };
     const res = mockRes();
     userController.getCreditCards(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
@@ -26,6 +27,7 @@ describe("User controller", () => {
   test("should get user's credit cards", () => {
     const req = mockReq();
     req.query = { token: MOCK_USER.token };
+    req.params = {};
     const res = mockRes();
     userController.getCreditCards(req, res);
     expect(res.status).toHaveBeenCalledWith(200);

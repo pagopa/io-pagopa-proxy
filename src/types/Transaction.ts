@@ -23,6 +23,7 @@ export const Amount = t.interface({
 export type Amount = t.TypeOf<typeof Amount>;
 
 export const Transaction = t.interface({
+  id: string,
   method: PaymentMethod,
   fee: Amount,
   amount: Amount,

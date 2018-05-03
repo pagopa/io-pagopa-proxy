@@ -12,7 +12,7 @@ import { ControllerUtils } from "../utils/ControllerUtils";
 
 // User Controller
 export class UserController {
-  public getWallet(req: express.Request, res: express.Response): void {
+  public getWallets(req: express.Request, res: express.Response): void {
     const errorOrUser = extractUserFromRequest(req);
     if (errorOrUser.isLeft()) {
       ControllerUtils.setErrorResponse(res, errorOrUser.value);
@@ -26,7 +26,7 @@ export class UserController {
     if (errorOrUser.isLeft()) {
       ControllerUtils.setErrorResponse(res, errorOrUser.value);
     } else {
-      if (req.query.cardId === undefined) {
+      if (req.params.cardId === undefined) {
         ControllerUtils.setSuccessResponse(res, {
           credit_cards: Mocked.wallet
             .filter(method => method.type === PaymentMethodEnum.CREDIT_CARD)
@@ -39,7 +39,7 @@ export class UserController {
         const cardOrNot = CreditCard.decode(
           Mocked.wallet.find(
             method =>
-              method.id === req.query.cardId &&
+              method.id === req.params.cardId &&
               method.type === PaymentMethodEnum.CREDIT_CARD
           )
         );
