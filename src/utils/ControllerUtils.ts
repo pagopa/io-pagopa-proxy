@@ -10,7 +10,7 @@ import { StatusCode } from "../types/StatusCode";
 export class ControllerUtils {
   // Set an error message for express response
   public static setErrorResponse(res: express.Response, error: Error): void {
-    res.status(320).json({ status: StatusCode.ERROR, message: error.message });
+    res.status(500).json({ status: StatusCode.ERROR, message: error.message });
   }
 
   // Set a success message for express response
