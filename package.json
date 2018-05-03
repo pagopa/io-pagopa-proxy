@@ -7,9 +7,9 @@
   "author": "Federico Feroldi <federico@teamdigitale.governo.it>",
   "license": "MIT",
   "scripts": {
-    "build": "npm run lint && tsc",
+    "build": "yarn lint && tsc",
     "start": "node lib/index.js",
-    "test": "tsc && jest",
+    "test": "jest",
     "lint": "tslint --project ."
   },
   "devDependencies": {
