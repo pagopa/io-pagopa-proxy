@@ -4,56 +4,88 @@
  */
 
 import * as express from "express";
-import * as Mocked from "../MockedData";
-import { CreditCard } from "../types/CreditCard";
-import { PaymentMethodEnum } from "../types/PaymentMethod";
-import { extractUserFromRequest } from "../types/User";
-import { ControllerUtils } from "../utils/ControllerUtils";
+import { ControllerError } from "../api/enums/ControllerError";
+import { UserAPI } from "../api/services/UserAPI";
+import {
+  ILoginAnonymousResponse,
+  ILoginResponse
+} from "../api/types/LoginResponse";
+import { AppResponseConverter } from "../utils/AppResponseConverter";
+import { RestfulUtils } from "../utils/RestfulUtils";
 
 // User Controller
 export class UserController {
-  public getWallets(req: express.Request, res: express.Response): void {
-    const errorOrUser = extractUserFromRequest(req);
-    if (errorOrUser.isLeft()) {
-      ControllerUtils.setErrorResponse(res, errorOrUser.value);
-    } else {
-      ControllerUtils.setSuccessResponse(res, { wallet: Mocked.wallet });
+  // Login existing user with username and password
+  public static login(req: express.Request, res: express.Response): void {
+    // Check input
+    if (req.query.username === undefined || req.query.password === undefined) {
+      RestfulUtils.setErrorResponse(
+        res,
+        new Error(ControllerError.ERROR_INVALID_INPUT)
+      );
+      return;
     }
+
+    // Try to login using PagoPaAPI
+    UserAPI.login(
+      res,
+      UserController.errorCallback,
+      (response: express.Response, loginResponse: ILoginResponse) => {
+        // Success callback
+        RestfulUtils.setSuccessResponse(
+          response,
+          AppResponseConverter.getLoginFromAPIResponse(loginResponse)
+        );
+      },
+      req.query.username,
+      req.query.password
+    );
   }
 
-  public getCreditCards(req: express.Request, res: express.Response): void {
-    const errorOrUser = extractUserFromRequest(req);
-    if (errorOrUser.isLeft()) {
-      ControllerUtils.setErrorResponse(res, errorOrUser.value);
-    } else {
-      if (req.params.cardId === undefined) {
-        ControllerUtils.setSuccessResponse(res, {
-          credit_cards: Mocked.wallet
-            .filter(method => method.type === PaymentMethodEnum.CREDIT_CARD)
-            // tslint:disable-next-line
-            .map(card => card as CreditCard)
-        });
+  // Login existing user with username and password
+  public static loginAnonymous(
+    req: express.Request,
+    res: express.Response
+  ): void {
+    // Check input
+    if (req.query.email === undefined || req.query.idPayment === undefined) {
+      RestfulUtils.setErrorResponse(
+        res,
+        new Error(ControllerError.ERROR_INVALID_INPUT)
+      );
+      return;
+    }
 
-        // CASE 2: CardId specified
-      } else {
-        const cardOrNot = CreditCard.decode(
-          Mocked.wallet.find(
-            method =>
-              method.id === req.params.cardId &&
-              method.type === PaymentMethodEnum.CREDIT_CARD
+    // Try to login using PagoPaAPI
+    UserAPI.loginAnonymous(
+      res,
+      UserController.errorCallback,
+      (
+        response: express.Response,
+        loginAnonymousResponse: ILoginAnonymousResponse
+      ) => {
+        // Success callback
+        RestfulUtils.setSuccessResponse(
+          response,
+          AppResponseConverter.getLoginAnonymusFromAPIResponse(
+            loginAnonymousResponse
           )
         );
-        if (cardOrNot.isRight()) {
-          ControllerUtils.setSuccessResponse(res, {
-            credit_card: cardOrNot.value
-          });
-        } else {
-          ControllerUtils.setErrorResponse(
-            res,
-            new Error("Credit card not found")
-          );
-        }
-      }
-    }
+      },
+      req.query.email,
+      req.query.idPayment
+    );
+  }
+
+  private static errorCallback(
+    response: express.Response,
+    errorMsg: string
+  ): void {
+    // Error callback
+    console.error(errorMsg);
+    RestfulUtils.setErrorResponse(
+      response,
+      new Error(ControllerError.ERROR_LOGIN_FAILED)
+    );
   }
 }

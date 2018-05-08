@@ -1,31 +1,9 @@
+/* tslint:disable */
+
 /**
  * Italia PagoPA Proxy
  * Cittadinanza Digitale PagoPA services
- *
- */
-
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
-
-import { DateFromString } from "italia-ts-commons/lib/dates";
-import { NonNegativeNumber } from "italia-ts-commons/lib/numbers";
-
-import { CreditCard, CreditCardNumber } from "./types/CreditCard";
-import {
-  PaymentMethod,
-  PaymentMethodEnum,
-  PaymentMethodType
-} from "./types/PaymentMethod";
-import { CountryCurrencyCode, Transaction } from "./types/Transaction";
-import { User } from "./types/User";
-
-/**
- * Generate Credit Card
- * @param {string} id
- * @param {NonEmptyString} issuer
- * @param {CreditCardNumber} num
- * @param {string} message
- * @returns {CreditCard}
- */
+ 
 function genCC(
   id: string,
   issuer: NonEmptyString,
@@ -55,7 +33,7 @@ export const MOCK_USER: User = { token: "0123456789abcdef" as NonEmptyString };
 /**
  * Selection of payment methods
  * @type {CreditCard[]}
- */
+ 
 export const wallet: ReadonlyArray<PaymentMethod> = [
   genCC(
     "1",
@@ -85,7 +63,7 @@ export const wallet: ReadonlyArray<PaymentMethod> = [
 
 /**
  * List of transactions
- */
+ 
 const now = new Date();
 
 export const transactions: ReadonlyArray<Transaction> = [
@@ -243,3 +221,4 @@ export const transactions: ReadonlyArray<Transaction> = [
     }
   }
 ];
+*/

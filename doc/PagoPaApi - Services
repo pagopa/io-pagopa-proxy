@@ -1,0 +1,20 @@
+Esempi di comunicazione PagoPaProxy - PagoPaAPI
+
+*** Accesso utente registrato ***
+Request:
+  GET /login?username=XXX&password=YYY
+Response:
+  {
+      apiRequestToken: string;
+      user: User;
+  }
+
+*** Accesso utente non registrato ***
+Request:
+  GET /loginAnonymous?email=XXX&idPayment=YYY
+Response:
+  {
+    apiRequestToken: string,
+    approveTerms : ApproveTerms
+  }
+
