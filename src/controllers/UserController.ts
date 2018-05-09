@@ -4,7 +4,7 @@
  */
 
 import * as express from "express";
-import { ControllerError } from "../api/enums/ControllerError";
+import { ControllerError } from "../enums/ControllerError";
 import { UserAPI } from "../api/services/UserAPI";
 import {
   ILoginAnonymousResponse,
@@ -19,17 +19,14 @@ export class UserController {
   public static login(req: express.Request, res: express.Response): void {
     // Check input
     if (req.query.username === undefined || req.query.password === undefined) {
-      RestfulUtils.setErrorResponse(
-        res,
-        new Error(ControllerError.ERROR_INVALID_INPUT)
-      );
+      RestfulUtils.setErrorResponse(res, ControllerError.ERROR_INVALID_INPUT);
       return;
     }
 
     // Try to login using PagoPaAPI
     UserAPI.login(
       res,
-      UserController.errorCallback,
+      RestfulUtils.handleErrorCallback,
       (response: express.Response, loginResponse: ILoginResponse) => {
         // Success callback
         RestfulUtils.setSuccessResponse(
@@ -49,17 +46,14 @@ export class UserController {
   ): void {
     // Check input
     if (req.query.email === undefined || req.query.idPayment === undefined) {
-      RestfulUtils.setErrorResponse(
-        res,
-        new Error(ControllerError.ERROR_INVALID_INPUT)
-      );
+      RestfulUtils.setErrorResponse(res, ControllerError.ERROR_INVALID_INPUT);
       return;
     }
 
     // Try to login using PagoPaAPI
     UserAPI.loginAnonymous(
       res,
-      UserController.errorCallback,
+      RestfulUtils.handleErrorCallback,
       (
         response: express.Response,
         loginAnonymousResponse: ILoginAnonymousResponse
@@ -74,18 +68,6 @@ export class UserController {
       },
       req.query.email,
       req.query.idPayment
-    );
-  }
-
-  private static errorCallback(
-    response: express.Response,
-    errorMsg: string
-  ): void {
-    // Error callback
-    console.error(errorMsg);
-    RestfulUtils.setErrorResponse(
-      response,
-      new Error(ControllerError.ERROR_LOGIN_FAILED)
     );
   }
 }

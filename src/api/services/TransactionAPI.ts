@@ -7,7 +7,6 @@ import * as express from "express";
 import fetch from "node-fetch";
 import querystring = require("querystring");
 import { CONFIG } from "../../Configuration";
-import { IRestfulObject } from "../../types/BaseResponseApp";
 import { ITransactionListResponse } from "../types/TransactionResponse";
 
 // Transaction Service for PagoPA communications
@@ -21,22 +20,29 @@ export class TransactionAPI {
       transactionList: ITransactionListResponse
     ) => void,
     apiRequestToken: string,
+    id?: number,
     start?: number,
-    size?: number,
-    id?: number
+    size?: number
   ): void {
     let url; // tslint:disable-line
     if (id !== undefined) {
-      url = CONFIG.PAGOPA.HOST + CONFIG.PAGOPA.SERVICES.TRANSACTION;
-      url = url.replace(":id", String(id));
+      url =
+        CONFIG.PAGOPA.HOST +
+        ":" +
+        String(CONFIG.PAGOPA.PORT) +
+        CONFIG.PAGOPA.SERVICES.TRANSACTION.replace(":id", String(id)) + "?" + querystring.stringify({
+          apiRequestToken
+        });
     } else {
-      url = CONFIG.PAGOPA.HOST + CONFIG.PAGOPA.SERVICES.TRANSACTIONS;
-      const queryParams: IRestfulObject = {
-        apiRequestToken: { apiRequestToken },
-        start: String(start),
-        size: String(size)
-      };
-      url += querystring.stringify(queryParams);
+      url =
+        CONFIG.PAGOPA.HOST +
+        ":" +
+        String(CONFIG.PAGOPA.PORT) +
+        CONFIG.PAGOPA.SERVICES.TRANSACTIONS + "?" + querystring.stringify({
+          apiRequestToken,
+          start: String(start),
+          size: String(size)
+        });
     }
 
     fetch(url, {

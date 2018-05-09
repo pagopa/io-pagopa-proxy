@@ -6,24 +6,83 @@
 	},
 	"item": [
 		{
-			"name": "index",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "http://localhost:3000",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000"
+			"name": "errors",
+			"description": "",
+			"item": [
+				{
+					"name": "Invalid input provided",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:3000/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login failed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:3000/login?username=mario&password=wrong",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "mario"
+								},
+								{
+									"key": "password",
+									"value": "wrong"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Token is required for this request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:3000/transactions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "getTransactions",
+			"name": "transactions",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -50,13 +109,13 @@
 			"response": []
 		},
 		{
-			"name": "getTransactions (Single)",
+			"name": "transactions (single)",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:3000/transactions/3?token=test",
+					"raw": "http://localhost:3000/transactions/2/?token=test",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -64,7 +123,8 @@
 					"port": "3000",
 					"path": [
 						"transactions",
-						"3"
+						"2",
+						""
 					],
 					"query": [
 						{
@@ -77,20 +137,20 @@
 			"response": []
 		},
 		{
-			"name": "getWallets",
+			"name": "wallet",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:3000/wallets?token=test",
+					"raw": "http://localhost:3000/wallet?token=test",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"wallets"
+						"wallet"
 					],
 					"query": [
 						{
@@ -103,25 +163,29 @@
 			"response": []
 		},
 		{
-			"name": "getCards",
+			"name": "login",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:3000/cards?token=test",
+					"raw": "http://localhost:3000/login?username=mario&password=rossi",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"cards"
+						"login"
 					],
 					"query": [
 						{
-							"key": "token",
-							"value": "test"
+							"key": "username",
+							"value": "mario"
+						},
+						{
+							"key": "password",
+							"value": "rossi"
 						}
 					]
 				}
@@ -129,26 +193,31 @@
 			"response": []
 		},
 		{
-			"name": "getCards (Single)",
+			"name": "loginAnonymous",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:3000/cards/3?token=test",
+					"raw": "http://localhost:3000/login/anonymous/?idPayment=test&email=mario@mail.it",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"cards",
-						"3"
+						"login",
+						"anonymous",
+						""
 					],
 					"query": [
 						{
-							"key": "token",
+							"key": "idPayment",
 							"value": "test"
+						},
+						{
+							"key": "email",
+							"value": "mario@mail.it"
 						}
 					]
 				}

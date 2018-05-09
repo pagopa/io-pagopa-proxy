@@ -8,6 +8,7 @@ export interface IRestfulObject {
     | IRestfulObject
     | string
     | number
+    | boolean
     | ReadonlyArray<IRestfulObject>
     | ReadonlyArray<string>
     | ReadonlyArray<number>

@@ -21,12 +21,16 @@ export class WalletAPI {
     ) => void,
     apiRequestToken: string
   ): void {
-    const url = CONFIG.PAGOPA.HOST + CONFIG.PAGOPA.SERVICES.WALLET;
+    const url =
+      CONFIG.PAGOPA.HOST +
+      ":" +
+      String(CONFIG.PAGOPA.PORT) +
+      CONFIG.PAGOPA.SERVICES.WALLET;
     const queryParams = querystring.stringify({
       apiRequestToken
     });
 
-    fetch(url + queryParams, {
+    fetch(url + "?" + queryParams, {
       method: "GET",
       headers: { "Content-Type": "application/json" }
     })

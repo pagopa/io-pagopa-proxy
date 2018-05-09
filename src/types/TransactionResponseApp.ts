@@ -13,12 +13,12 @@ export interface ITransactionListResponseApp extends IRestfulObject {
 }
 
 export interface ITransactionApp extends IRestfulObject {
-  readonly id: string;
+  readonly id: number;
   readonly created: string;
   readonly statusMessage: string;
-  readonly error: string;
+  readonly error: boolean;
   readonly currency: string;
-  readonly amount: string;
-  readonly amountDecimalDigit: string;
+  readonly amount: number;
+  readonly amountDecimalDigit: number;
   readonly merchant: string;
 }

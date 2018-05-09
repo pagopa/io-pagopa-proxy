@@ -4,6 +4,7 @@
  */
 
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
+import { ControllerError } from "../enums/ControllerError";
 import {
   ILoginAnonymousResponse,
   ILoginResponse
@@ -27,7 +28,13 @@ import {
 export class AppResponseConverter {
   public static getLoginFromAPIResponse(
     loginResponse: ILoginResponse
-  ): ILoginResponseApp {
+  ): ILoginResponseApp | Error {
+    if (
+      loginResponse.apiRequestToken === undefined ||
+      loginResponse.apiRequestToken === ""
+    ) {
+      return new Error(ControllerError.ERROR_LOGIN_FAILED);
+    }
     return {
       token: loginResponse.apiRequestToken
     };
@@ -35,7 +42,13 @@ export class AppResponseConverter {
 
   public static getLoginAnonymusFromAPIResponse(
     loginAnonymousResponse: ILoginAnonymousResponse
-  ): ILoginAnonymousResponseApp {
+  ): ILoginAnonymousResponseApp | Error {
+    if (
+      loginAnonymousResponse.apiRequestToken === undefined ||
+      loginAnonymousResponse.apiRequestToken === ""
+    ) {
+      return new Error(ControllerError.ERROR_LOGIN_FAILED);
+    }
     return {
       token: loginAnonymousResponse.apiRequestToken as NonEmptyString,
       type: loginAnonymousResponse.approveTerms.type,
@@ -47,7 +60,10 @@ export class AppResponseConverter {
 
   public static getWalletFromAPIResponse(
     walletResponse: IWalletResponse
-  ): IWalletResponseApp {
+  ): IWalletResponseApp | Error {
+    if (walletResponse.data === undefined) {
+      return new Error(ControllerError.ERROR_DATA_NOT_FOUND);
+    }
     const paymentMethodList: IPaymentMethodApp[] = []; // tslint:disable-line
     for (const wallet of walletResponse.data) {
       paymentMethodList.push({
@@ -68,7 +84,10 @@ export class AppResponseConverter {
 
   public static getTransactionListFromAPIResponse(
     transactionListResponse: ITransactionListResponse
-  ): ITransactionListResponseApp {
+  ): ITransactionListResponseApp | Error {
+    if (transactionListResponse.data === undefined) {
+      return new Error(ControllerError.ERROR_DATA_NOT_FOUND);
+    }
     const transactionList: ITransactionApp[] = []; // tslint:disable-line
     for (const transaction of transactionListResponse.data) {
       transactionList.push({

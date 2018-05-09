@@ -25,13 +25,16 @@ export class UserAPI {
     username: string,
     password: string
   ): void {
-    const url = CONFIG.PAGOPA.HOST + CONFIG.PAGOPA.SERVICES.LOGIN;
+    const url =
+      CONFIG.PAGOPA.HOST +
+      ":" +
+      String(CONFIG.PAGOPA.PORT) +
+      CONFIG.PAGOPA.SERVICES.LOGIN;
     const queryParams = querystring.stringify({
-      username: { username },
-      password: { password }
+      username,
+      password
     });
-
-    fetch(url + queryParams, {
+    fetch(url + "?" + queryParams, {
       method: "GET",
       headers: { "Content-Type": "application/json" }
     })
@@ -51,13 +54,17 @@ export class UserAPI {
     email: string,
     idPayment: string
   ): void {
-    const url = CONFIG.PAGOPA.HOST + CONFIG.PAGOPA.SERVICES.LOGIN_ANONYMOUS;
+    const url =
+      CONFIG.PAGOPA.HOST +
+      ":" +
+      String(CONFIG.PAGOPA.PORT) +
+      CONFIG.PAGOPA.SERVICES.LOGIN_ANONYMOUS;
     const queryParams = querystring.stringify({
-      email: { email },
-      idPayment: { idPayment }
+      email,
+      idPayment
     });
 
-    fetch(url + queryParams, {
+    fetch(url + "?" + queryParams, {
       method: "GET",
       headers: { "Content-Type": "application/json" }
     })

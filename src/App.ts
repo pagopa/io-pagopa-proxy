@@ -16,7 +16,7 @@ import { WalletController } from "./controllers/WalletController";
 // Define server and routes
 debug("ts-express:server");
 
-class App {
+export class App {
   private readonly app?: core.Express;
   private server?: http.Server; // tslint:disable-line
   private readonly serverPort?: number | string | boolean;
@@ -31,6 +31,7 @@ class App {
   }
 
   public startServer(): boolean {
+    console.log("Starting Proxy PagoPa Server...");
     if (this.app === undefined) {
       return false;
     }
@@ -46,18 +47,23 @@ class App {
       return false;
     }
     this.app.get(CONFIG.CONTROLLER.ROUTES.LOGIN, (req, res) => {
+      console.log("Serving Login Request (GET)...");
       UserController.login(req, res);
     });
     this.app.get(CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS, (req, res) => {
+      console.log("Serving LoginAnonymous Request (GET)...");
       UserController.loginAnonymous(req, res);
     });
     this.app.get(CONFIG.CONTROLLER.ROUTES.WALLET, (req, res) => {
+      console.log("Serving Wallet Request (GET)...");
       WalletController.getWallet(req, res);
     });
     this.app.get(CONFIG.CONTROLLER.ROUTES.TRANSACTIONS, (req, res) => {
+      console.log("Serving Transactions Request (GET)...");
       TransactionController.getTransactions(req, res);
     });
     this.app.get(CONFIG.CONTROLLER.ROUTES.TRANSACTION, (req, res) => {
+      console.log("Serving Transaction Request (GET)...");
       TransactionController.getTransactions(req, res);
     });
     return true;
@@ -118,5 +124,3 @@ class App {
     return true;
   }
 }
-
-new App().startServer();

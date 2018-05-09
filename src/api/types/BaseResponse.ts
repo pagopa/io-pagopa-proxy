@@ -18,3 +18,9 @@ export interface IOs extends IRestfulObject {
   readonly type: string;
   readonly enum: ReadonlyArray<string>;
 }
+
+export interface IProperties extends IRestfulObject {
+  readonly amount: number;
+  readonly currency: string;
+  readonly decimalDigits: number;
+}

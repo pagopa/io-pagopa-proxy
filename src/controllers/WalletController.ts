@@ -4,7 +4,6 @@
  */
 
 import * as express from "express";
-import { ControllerError } from "../api/enums/ControllerError";
 import { WalletAPI } from "../api/services/WalletAPI";
 import { IWalletResponse } from "../api/types/WalletResponse";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
@@ -22,14 +21,7 @@ export class WalletController {
     // Require wallet to API
     WalletAPI.getWalletResponse(
       res,
-      (response: express.Response, errorMsg: string) => {
-        // Error callback
-        console.error(errorMsg);
-        RestfulUtils.setErrorResponse(
-          response,
-          new Error(ControllerError.ERROR_PAGOPA_API)
-        );
-      },
+      RestfulUtils.handleErrorCallback,
       (response: express.Response, walletResponse: IWalletResponse) => {
         // Success callback
         RestfulUtils.setSuccessResponse(

@@ -10,10 +10,10 @@ export interface IWalletResponseApp extends IRestfulObject {
 }
 
 export interface IPaymentMethodApp extends IRestfulObject {
-  readonly idWallet: string;
+  readonly idWallet: number;
   readonly type: string;
-  readonly favourite: string;
-  readonly lastUsage: string;
+  readonly favourite: boolean;
+  readonly lastUsage?: string;
   readonly pspBusinessName: string;
   readonly pspServiceName: string;
   readonly cardPan?: string;

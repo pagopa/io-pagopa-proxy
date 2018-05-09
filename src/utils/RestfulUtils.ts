@@ -4,8 +4,8 @@
  */
 
 import * as express from "express";
-import { ControllerError } from "../api/enums/ControllerError";
-import { StatusCode } from "../api/enums/StatusCode";
+import { ControllerError } from "../enums/ControllerError";
+import { StatusCode } from "../enums/StatusCode";
 import { IRestfulObject } from "../types/BaseResponseApp";
 
 // Utils used by Controllers
@@ -17,10 +17,7 @@ export class RestfulUtils {
   ): boolean {
     if (req.query.token === undefined) {
       if (res !== undefined) {
-        this.setErrorResponse(
-          res,
-          new Error(ControllerError.ERROR_INVALID_TOKEN)
-        );
+        this.setErrorResponse(res, ControllerError.ERROR_INVALID_TOKEN);
       }
       return false;
     }
@@ -28,17 +25,42 @@ export class RestfulUtils {
   }
 
   // Set an error message for express response
-  public static setErrorResponse(res: express.Response, error: Error): void {
-    console.error("Returning error: " + error.message);
-    res.status(500).json({ status: StatusCode.ERROR, message: error.message });
+  public static setErrorResponse(
+    res: express.Response,
+    errorMsg: string
+  ): void {
+    console.error("Controller response is an error: " + errorMsg);
+    res.status(500).json({ status: StatusCode.ERROR, message: errorMsg });
   }
 
   // Set a success message for express response
   public static setSuccessResponse(
     res: express.Response,
-    content: IRestfulObject
+    content: IRestfulObject | Error
   ): void {
-    content.status = StatusCode.OK; // tslint:disable-line
-    res.status(200).json(content);
+    if (content instanceof Error) {
+      console.error("Controller response is an error: " + content.message);
+      res.status(200).json({
+        status: StatusCode.ERROR,
+        errorMessage: content.message
+      });
+    } else {
+      res.status(200).json({
+        status: StatusCode.OK,
+        content
+      });
+    }
+  }
+
+  // A default error callback handler
+  public static handleErrorCallback(
+    response: express.Response
+    // errorMsg?: string
+  ): void {
+    // Error callback
+    RestfulUtils.setErrorResponse(
+      response,
+      ControllerError.ERROR_PAGOPA_API_UNAVAILABLE
+    );
   }
 }

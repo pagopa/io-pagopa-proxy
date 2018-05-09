@@ -4,7 +4,6 @@
  */
 
 import * as express from "express";
-import { ControllerError } from "../api/enums/ControllerError";
 import { TransactionAPI } from "../api/services/TransactionAPI";
 import { ITransactionListResponse } from "../api/types/TransactionResponse";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
@@ -24,15 +23,7 @@ export class TransactionController {
 
     TransactionAPI.getTransactionListResponse(
       res,
-      (response: express.Response, errorMsg: string) => {
-        // Error callback
-        console.error(errorMsg);
-        RestfulUtils.setErrorResponse(
-          response,
-          new Error(ControllerError.ERROR_PAGOPA_API)
-        );
-      },
-
+      RestfulUtils.handleErrorCallback,
       (
         response: express.Response,
         transactionListResponse: ITransactionListResponse

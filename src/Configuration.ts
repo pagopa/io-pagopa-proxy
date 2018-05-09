@@ -19,7 +19,8 @@ export const CONFIG = {
 
   // PagoPa Restful Configuration
   PAGOPA: {
-    HOST: "http://localhost:3001",
+    HOST: "http://localhost",
+    PORT: 3001,
     SERVICES: {
       LOGIN: "/login/",
       LOGIN_ANONYMOUS: "/loginAnonymous/",
