@@ -8,6 +8,10 @@ import {
   ILoginAnonymousResponse,
   ILoginResponse
 } from "../api/types/LoginResponse";
+import {
+  AckResult,
+  INotificationSubscriptionResponse
+} from "../api/types/NotificationSubscriptionResponse";
 import { ITransactionListResponse } from "../api/types/TransactionResponse";
 import { IWalletResponse } from "../api/types/WalletResponse";
 import { ControllerError } from "../enums/ControllerError";
@@ -15,6 +19,7 @@ import {
   ILoginAnonymousResponseApp,
   ILoginResponseApp
 } from "../types/LoginResponseApp";
+import { INotificationSubscriptionResponseApp } from "../types/NotificationSubscriptionResponseApp";
 import {
   ITransactionApp,
   ITransactionListResponseApp
@@ -103,6 +108,17 @@ export class AppResponseConverter {
       size: transactionListResponse.size,
       start: transactionListResponse.start,
       transactions: transactionList
+    };
+  }
+
+  public static getNotificationSubscriptionResponseFromAPIResponse(
+    notificationSubscriptionResponse: INotificationSubscriptionResponse
+  ): INotificationSubscriptionResponseApp | Error {
+    if (notificationSubscriptionResponse.result !== AckResult.OK) {
+      return new Error(ControllerError.REQUEST_REJECTED);
+    }
+    return {
+      result: true
     };
   }
 }

@@ -7,11 +7,11 @@
   "author": "Sergio Manetta <sergio.manetta@it.ibm.com>",
   "license": "MIT",
   "scripts": {
-    "build": "yarn lint && tsc",
+    "build": "tslint --project . && tsc",
+    "clean": "rm -r ./lib",
+    "prettify": "prettier --write './**/*.ts'",
     "start": "node lib/index.js",
-    "test": "jest",
-    "lint": "tslint --project .",
-    "prettify": "prettier --write './**/*.ts'"
+    "test": "jest"
   },
   "devDependencies": {
     "@types/debug": "0.0.30",

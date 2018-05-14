@@ -107,6 +107,20 @@ export class MockedProxyAPIApp {
         res.status(200).json(mockedProxyAPIData.getWalletResponseErrorMocked());
       }
     });
+    this.app.post(
+      CONFIG.PAGOPA.SERVICES.NOTIFICATION_UPDATE_SUBSCRIPTION,
+      (req, res) => {
+        if (req.body.user.id === "wrongFiscalCode") {
+          res
+            .status(200)
+            .json(mockedProxyAPIData.getNotificationResponseMocked(false));
+        } else {
+          res
+            .status(200)
+            .json(mockedProxyAPIData.getNotificationResponseMocked(true));
+        }
+      }
+    );
     return true;
   }
 

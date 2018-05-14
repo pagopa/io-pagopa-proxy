@@ -71,4 +71,28 @@ describe("Transaction Controllers", () => {
         done();
       });
   });
+
+  test("Transaction List should return a specific element", done => {
+    fetch(
+      (
+        CONFIG.CONTROLLER.HOST +
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        CONFIG.CONTROLLER.ROUTES.TRANSACTION
+      ).replace(":id", "2") + "?token=A123"
+    )
+      .then(fetchRes => fetchRes.json())
+      .then(response => {
+        expect(response).toHaveProperty("status");
+        expect(response.status).toBe(StatusCode.OK);
+        expect(response.errorMessage).toBeUndefined();
+        expect(response).toHaveProperty("content");
+        expect(response.content).toHaveProperty("total");
+        expect(response.content).toHaveProperty("start");
+        expect(response.content).toHaveProperty("size");
+        expect(response.content).toHaveProperty("transactions");
+        expect(response.content.transactions.length).toBe(1);
+        done();
+      });
+  });
 });

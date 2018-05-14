@@ -14,7 +14,11 @@ export const CONFIG = {
       LOGIN_ANONYMOUS: "/login/anonymous/",
       WALLET: "/wallet/",
       TRANSACTIONS: "/transactions/",
-      TRANSACTION: "/transactions/:id/"
+      TRANSACTION: "/transactions/:id/",
+      NOTIFICATION_ACTIVATION:
+        "/notifications/subscription/:fiscalCode/activation",
+      NOTIFICATION_DEACTIVATION:
+        "/notifications/subscription/:fiscalCode/deactivation"
     }
   },
 
@@ -27,7 +31,8 @@ export const CONFIG = {
       LOGIN_ANONYMOUS: "/loginAnonymous/",
       WALLET: "/wallet/",
       TRANSACTIONS: "/transactions/",
-      TRANSACTION: "/transactions/:id/"
+      TRANSACTION: "/transactions/:id/",
+      NOTIFICATION_UPDATE_SUBSCRIPTION: "/notifications/subscription/update"
     }
   }
 };

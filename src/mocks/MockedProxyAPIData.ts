@@ -213,6 +213,12 @@ export class MockedProxyAPIData {
     };
   }
 
+  public getNotificationResponseMocked(positive: boolean): IRestfulObject {
+    return {
+      result: positive === true ? "OK" : "KO"
+    };
+  }
+
   public getLoginResponseErrorMocked(): IRestfulObject {
     return {};
   }

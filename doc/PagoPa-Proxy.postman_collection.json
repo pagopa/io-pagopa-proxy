@@ -78,6 +78,29 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Request Rejected",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:3000/notifications/subscription/wrongFiscalCode/activation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"notifications",
+								"subscription",
+								"wrongFiscalCode",
+								"activation"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -219,6 +242,52 @@
 							"key": "email",
 							"value": "mario@mail.it"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notification activation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:3000/notifications/subscription/AAABBB11H11A100A/activation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"notifications",
+						"subscription",
+						"AAABBB11H11A100A",
+						"activation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notification deactivation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:3000/notifications/subscription/AAABBB11H11A100A/deactivation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"notifications",
+						"subscription",
+						"AAABBB11H11A100A",
+						"deactivation"
 					]
 				}
 			},

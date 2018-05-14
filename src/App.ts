@@ -9,9 +9,11 @@ import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
 import { CONFIG } from "./Configuration";
+import { NotificationController } from "./controllers/NotificationController";
 import { TransactionController } from "./controllers/TransactionController";
 import { UserController } from "./controllers/UserController";
 import { WalletController } from "./controllers/WalletController";
+import { NotificationSubscriptionRequestType } from "./enums/NotificationSubscriptionType";
 
 // Define server and routes
 debug("ts-express:server");
@@ -75,6 +77,28 @@ export class App {
       console.log("Serving Transaction Request (GET)...");
       TransactionController.getTransactions(req, res);
     });
+    this.app.post(
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION,
+      (req, res) => {
+        console.log("Serving Notification Activation Request (POST)...");
+        NotificationController.updateSubscription(
+          req,
+          res,
+          NotificationSubscriptionRequestType.ACTIVATION
+        );
+      }
+    );
+    this.app.post(
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION,
+      (req, res) => {
+        console.log("Serving Notification Deactivation REQUEST (POST)...");
+        NotificationController.updateSubscription(
+          req,
+          res,
+          NotificationSubscriptionRequestType.DEACTIVATION
+        );
+      }
+    );
     return true;
   }
 
