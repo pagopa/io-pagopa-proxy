@@ -42,6 +42,15 @@ export class App {
     return true;
   }
 
+  public stopServer(): boolean {
+    console.log("Stopping Proxy PagoPa Server...");
+    if (this.server === undefined) {
+      return false;
+    }
+    this.server.close();
+    return true;
+  }
+
   private setServerRoutes(): boolean {
     if (this.app === undefined) {
       return false;

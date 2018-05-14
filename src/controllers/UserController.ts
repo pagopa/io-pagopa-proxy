@@ -4,12 +4,12 @@
  */
 
 import * as express from "express";
-import { ControllerError } from "../enums/ControllerError";
 import { UserAPI } from "../api/services/UserAPI";
 import {
   ILoginAnonymousResponse,
   ILoginResponse
 } from "../api/types/LoginResponse";
+import { ControllerError } from "../enums/ControllerError";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
 import { RestfulUtils } from "../utils/RestfulUtils";
 

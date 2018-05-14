@@ -4,20 +4,16 @@
  */
 
 // tslint:disable
-
 import {
   ILoginResponse,
   ILoginAnonymousResponse
-} from "../../api/types/LoginResponse";
-import {
-  IWalletResponse,
-  IPaymentMethod
-} from "../../api/types/WalletResponse";
+} from "../api/types/LoginResponse";
+import { IWalletResponse, IPaymentMethod } from "../api/types/WalletResponse";
 import {
   ITransaction,
   ITransactionListResponse
-} from "../../api/types/TransactionResponse";
-import { IRestfulObject } from "../../types/BaseResponseApp";
+} from "../api/types/TransactionResponse";
+import { IRestfulObject } from "../types/BaseResponseApp";
 
 export class MockedProxyAPIData {
   public getLoginResponseMocked(): ILoginResponse {
@@ -218,15 +214,15 @@ export class MockedProxyAPIData {
   }
 
   public getLoginResponseErrorMocked(): IRestfulObject {
-    return {}
+    return {};
   }
   public getLoginAnonymousResponseErrorMocked(): IRestfulObject {
-    return {}
+    return {};
   }
   public getTransactionListResponseErrorMocked(): IRestfulObject {
-    return {}
+    return {};
   }
   public getWalletResponseErrorMocked(): IRestfulObject {
-    return {}
+    return {};
   }
 }

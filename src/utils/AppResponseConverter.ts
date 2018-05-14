@@ -4,13 +4,13 @@
  */
 
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
-import { ControllerError } from "../enums/ControllerError";
 import {
   ILoginAnonymousResponse,
   ILoginResponse
 } from "../api/types/LoginResponse";
 import { ITransactionListResponse } from "../api/types/TransactionResponse";
 import { IWalletResponse } from "../api/types/WalletResponse";
+import { ControllerError } from "../enums/ControllerError";
 import {
   ILoginAnonymousResponseApp,
   ILoginResponseApp
@@ -29,10 +29,7 @@ export class AppResponseConverter {
   public static getLoginFromAPIResponse(
     loginResponse: ILoginResponse
   ): ILoginResponseApp | Error {
-    if (
-      loginResponse.apiRequestToken === undefined ||
-      loginResponse.apiRequestToken === ""
-    ) {
+    if (loginResponse.apiRequestToken === undefined) {
       return new Error(ControllerError.ERROR_LOGIN_FAILED);
     }
     return {

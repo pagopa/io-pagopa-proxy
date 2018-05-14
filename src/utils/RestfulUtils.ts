@@ -30,7 +30,7 @@ export class RestfulUtils {
     errorMsg: string
   ): void {
     console.error("Controller response is an error: " + errorMsg);
-    res.status(500).json({ status: StatusCode.ERROR, message: errorMsg });
+    res.status(500).json({ status: StatusCode.ERROR, errorMessage: errorMsg });
   }
 
   // Set a success message for express response

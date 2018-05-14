@@ -4,7 +4,7 @@
   "description": "Proxy that handles interactions with pagoPA",
   "main": "index.ts",
   "repository": "https://github.com/teamdigitale/italia-pagopa-proxy",
-  "author": "Federico Feroldi <federico@teamdigitale.governo.it>",
+  "author": "Sergio Manetta <sergio.manetta@it.ibm.com>",
   "license": "MIT",
   "scripts": {
     "build": "yarn lint && tsc",
@@ -56,10 +56,11 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    "coveragePathIgnorePatterns": [
+      "/mocks/"
+    ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
-      "ts",
-      "tsx",
       "js",
       "jsx",
       "json",

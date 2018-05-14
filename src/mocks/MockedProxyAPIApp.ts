@@ -4,13 +4,12 @@
  */
 
 // tslint:disable
-
 import * as bodyParser from "body-parser";
 import * as debug from "debug";
 import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
-import { CONFIG } from "../../Configuration";
+import { CONFIG } from "../Configuration";
 import { MockedProxyAPIData } from "./MockedProxyAPIData";
 
 // Define server and routes
@@ -38,6 +37,15 @@ export class MockedProxyAPIApp {
     return true;
   }
 
+  public stopServer(): boolean {
+    console.log("Stopping PagoPa Mocked Server...");
+    if (this.server === undefined) {
+      return false;
+    }
+    this.server.close();
+    return true;
+  }
+
   private setServerRoutes(): boolean {
     if (this.app === undefined) {
       return false;
@@ -56,23 +64,40 @@ export class MockedProxyAPIApp {
         req.query.email === "mario@mail.it" &&
         req.query.idPayment === "test"
       ) {
-        res.status(200).json(mockedProxyAPIData.getLoginAnonymousResponseMocked());
+        res
+          .status(200)
+          .json(mockedProxyAPIData.getLoginAnonymousResponseMocked());
       } else {
-        res.status(200).json(mockedProxyAPIData.getLoginAnonymousResponseErrorMocked());
+        res
+          .status(200)
+          .json(mockedProxyAPIData.getLoginAnonymousResponseErrorMocked());
       }
     });
     this.app.get(CONFIG.PAGOPA.SERVICES.TRANSACTION, (req, res) => {
-      if (req.query.apiRequestToken !== undefined && req.params.id !== undefined) {
-        res.status(200).json(mockedProxyAPIData.getTransactionListResponseMocked(req.params.id));
+      if (
+        req.query.apiRequestToken !== undefined &&
+        req.params.id !== undefined
+      ) {
+        res
+          .status(200)
+          .json(
+            mockedProxyAPIData.getTransactionListResponseMocked(req.params.id)
+          );
       } else {
-        res.status(200).json(mockedProxyAPIData.getTransactionListResponseErrorMocked());
+        res
+          .status(200)
+          .json(mockedProxyAPIData.getTransactionListResponseErrorMocked());
       }
     });
     this.app.get(CONFIG.PAGOPA.SERVICES.TRANSACTIONS, (req, res) => {
       if (req.query.apiRequestToken !== undefined) {
-        res.status(200).json(mockedProxyAPIData.getTransactionListResponseMocked(undefined));
+        res
+          .status(200)
+          .json(mockedProxyAPIData.getTransactionListResponseMocked(undefined));
       } else {
-        res.status(200).json(mockedProxyAPIData.getTransactionListResponseErrorMocked());
+        res
+          .status(200)
+          .json(mockedProxyAPIData.getTransactionListResponseErrorMocked());
       }
     });
     this.app.get(CONFIG.PAGOPA.SERVICES.WALLET, (req, res) => {

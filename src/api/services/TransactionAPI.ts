@@ -30,7 +30,9 @@ export class TransactionAPI {
         CONFIG.PAGOPA.HOST +
         ":" +
         String(CONFIG.PAGOPA.PORT) +
-        CONFIG.PAGOPA.SERVICES.TRANSACTION.replace(":id", String(id)) + "?" + querystring.stringify({
+        CONFIG.PAGOPA.SERVICES.TRANSACTION.replace(":id", String(id)) +
+        "?" +
+        querystring.stringify({
           apiRequestToken
         });
     } else {
@@ -38,7 +40,9 @@ export class TransactionAPI {
         CONFIG.PAGOPA.HOST +
         ":" +
         String(CONFIG.PAGOPA.PORT) +
-        CONFIG.PAGOPA.SERVICES.TRANSACTIONS + "?" + querystring.stringify({
+        CONFIG.PAGOPA.SERVICES.TRANSACTIONS +
+        "?" +
+        querystring.stringify({
           apiRequestToken,
           start: String(start),
           size: String(size)

@@ -4,7 +4,7 @@
  */
 
 import { App } from "./App";
-import { MockedProxyAPIApp } from "./tests/mocks/MockedProxyAPIApp";
+import { MockedProxyAPIApp } from "./mocks/MockedProxyAPIApp";
 
 new MockedProxyAPIApp().startServer();
 new App().startServer();
