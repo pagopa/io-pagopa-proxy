@@ -20,6 +20,7 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^8.9.4",
     "@types/supertest": "^2.0.4",
+    "@types/winston": "^2.3.9",
     "danger": "^3.5.1",
     "danger-plugin-digitalcitizenship": "^0.2.0",
     "italia-pagopa-api": "https://github.com/teamdigitale/italia-pagopa-api#v0.0.5",
@@ -44,7 +45,8 @@
     "italia-ts-commons": "^1.3.0",
     "morgan": "^1.9.0",
     "node-fetch": "^2.1.2",
-    "querystring": "^0.2.0"
+    "querystring": "^0.2.0",
+    "winston": "^2.4.2"
   },
   "jest": {
     "globals": {

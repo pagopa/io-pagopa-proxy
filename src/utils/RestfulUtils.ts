@@ -7,6 +7,7 @@ import * as express from "express";
 import { ControllerError } from "../enums/ControllerError";
 import { StatusCode } from "../enums/StatusCode";
 import { IRestfulObject } from "../types/BaseResponseApp";
+import { logger } from "../utils/Logger";
 
 // Utils used by Controllers
 export class RestfulUtils {
@@ -29,7 +30,7 @@ export class RestfulUtils {
     res: express.Response,
     errorMsg: string
   ): void {
-    console.error("Controller response is an error: " + errorMsg);
+    logger.error("Controller response is an error: " + errorMsg);
     res.status(500).json({ status: StatusCode.ERROR, errorMessage: errorMsg });
   }
 
@@ -39,7 +40,7 @@ export class RestfulUtils {
     content: IRestfulObject | Error
   ): void {
     if (content instanceof Error) {
-      console.error("Controller response is an error: " + content.message);
+      logger.error("Controller response is an error: " + content.message);
       res.status(200).json({
         status: StatusCode.ERROR,
         errorMessage: content.message

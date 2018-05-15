@@ -11,13 +11,13 @@ import { CONFIG } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
 import { StatusCode } from "../enums/StatusCode";
 import { MockedProxyAPIApp } from "../mocks/MockedProxyAPIApp";
+import { disableConsoleLog } from "../utils/Logger";
 
 let mockedProxyAPIApp: MockedProxyAPIApp;
 let app: App;
 
 beforeAll(() => {
-  console.log = () => undefined;
-  console.error = () => undefined;
+  disableConsoleLog();
   mockedProxyAPIApp = new MockedProxyAPIApp();
   app = new App();
   mockedProxyAPIApp.startServer();

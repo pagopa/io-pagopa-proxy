@@ -3,7 +3,6 @@
  * Define response interfaces used by controllers for Login services
  */
 
-
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import { IRestfulObject } from "./BaseResponseApp";
 

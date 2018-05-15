@@ -11,6 +11,7 @@ import * as core from "express-serve-static-core";
 import * as http from "http";
 import { CONFIG } from "../Configuration";
 import { MockedProxyAPIData } from "./MockedProxyAPIData";
+import { logger } from "../utils/Logger";
 
 // Define server and routes
 debug("ts-express:server");
@@ -26,7 +27,7 @@ export class MockedProxyAPIApp {
   }
 
   public startServer(): boolean {
-    console.log("Starting PagoPa API Mocked Server...");
+    logger.info("Starting PagoPa API Mocked Server...");
     if (this.app === undefined) {
       return false;
     }
@@ -38,7 +39,7 @@ export class MockedProxyAPIApp {
   }
 
   public stopServer(): boolean {
-    console.log("Stopping PagoPa Mocked Server...");
+    logger.info("Stopping PagoPa Mocked Server...");
     if (this.server === undefined) {
       return false;
     }
@@ -141,11 +142,11 @@ export class MockedProxyAPIApp {
     const bind = "Port " + String(CONFIG.PAGOPA.PORT);
     switch (error.code) {
       case "EACCES":
-        console.error(`${bind} requires elevated privileges`);
+        logger.error(`${bind} requires elevated privileges`);
         process.exit(1);
         break;
       case "EADDRINUSE":
-        console.error(`${bind} is already in use`);
+        logger.error(`${bind} is already in use`);
         process.exit(1);
         break;
       default:

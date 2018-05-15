@@ -10,13 +10,13 @@ import { App } from "../App";
 import { CONFIG } from "../Configuration";
 import { StatusCode } from "../enums/StatusCode";
 import { MockedProxyAPIApp } from "../mocks/MockedProxyAPIApp";
+import { disableConsoleLog } from "../utils/Logger";
 
 let mockedProxyAPIApp: MockedProxyAPIApp;
 let app: App;
 
 beforeAll(() => {
-  console.log = () => undefined;
-  console.error = () => undefined;
+  disableConsoleLog();
   mockedProxyAPIApp = new MockedProxyAPIApp();
   app = new App();
   mockedProxyAPIApp.startServer();
@@ -32,10 +32,10 @@ describe("Transaction Controllers", () => {
   test("Transaction List should return more than one element", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-      ":" +
-      CONFIG.CONTROLLER.PORT +
-      CONFIG.CONTROLLER.ROUTES.TRANSACTIONS +
-      "?token=A123"
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        CONFIG.CONTROLLER.ROUTES.TRANSACTIONS +
+        "?token=A123"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {
@@ -55,9 +55,9 @@ describe("Transaction Controllers", () => {
   test("Transaction List should return a failed message (missing token)", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-      ":" +
-      CONFIG.CONTROLLER.PORT +
-      CONFIG.CONTROLLER.ROUTES.TRANSACTIONS
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        CONFIG.CONTROLLER.ROUTES.TRANSACTIONS
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {

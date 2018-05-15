@@ -4,7 +4,6 @@
  */
 
 import * as bodyParser from "body-parser";
-import * as debug from "debug";
 import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
@@ -14,10 +13,9 @@ import { TransactionController } from "./controllers/TransactionController";
 import { UserController } from "./controllers/UserController";
 import { WalletController } from "./controllers/WalletController";
 import { NotificationSubscriptionRequestType } from "./enums/NotificationSubscriptionType";
+import { logger } from "./utils/Logger";
 
 // Define server and routes
-debug("ts-express:server");
-
 export class App {
   private readonly app?: core.Express;
   private server?: http.Server; // tslint:disable-line
@@ -33,7 +31,7 @@ export class App {
   }
 
   public startServer(): boolean {
-    console.log("Starting Proxy PagoPa Server...");
+    logger.info("Starting Proxy PagoPa Server...");
     if (this.app === undefined) {
       return false;
     }
@@ -45,7 +43,7 @@ export class App {
   }
 
   public stopServer(): boolean {
-    console.log("Stopping Proxy PagoPa Server...");
+    logger.info("Stopping Proxy PagoPa Server...");
     if (this.server === undefined) {
       return false;
     }
@@ -58,29 +56,29 @@ export class App {
       return false;
     }
     this.app.get(CONFIG.CONTROLLER.ROUTES.LOGIN, (req, res) => {
-      console.log("Serving Login Request (GET)...");
+      logger.info("Serving Login Request (GET)...");
       UserController.login(req, res);
     });
     this.app.get(CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS, (req, res) => {
-      console.log("Serving LoginAnonymous Request (GET)...");
+      logger.info("Serving LoginAnonymous Request (GET)...");
       UserController.loginAnonymous(req, res);
     });
     this.app.get(CONFIG.CONTROLLER.ROUTES.WALLET, (req, res) => {
-      console.log("Serving Wallet Request (GET)...");
+      logger.info("Serving Wallet Request (GET)...");
       WalletController.getWallet(req, res);
     });
     this.app.get(CONFIG.CONTROLLER.ROUTES.TRANSACTIONS, (req, res) => {
-      console.log("Serving Transactions Request (GET)...");
+      logger.info("Serving Transactions Request (GET)...");
       TransactionController.getTransactions(req, res);
     });
     this.app.get(CONFIG.CONTROLLER.ROUTES.TRANSACTION, (req, res) => {
-      console.log("Serving Transaction Request (GET)...");
+      logger.info("Serving Transaction Request (GET)...");
       TransactionController.getTransactions(req, res);
     });
     this.app.post(
       CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION,
       (req, res) => {
-        console.log("Serving Notification Activation Request (POST)...");
+        logger.info("Serving Notification Activation Request (POST)...");
         NotificationController.updateSubscription(
           req,
           res,
@@ -91,7 +89,7 @@ export class App {
     this.app.post(
       CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION,
       (req, res) => {
-        console.log("Serving Notification Deactivation REQUEST (POST)...");
+        logger.info("Serving Notification Deactivation REQUEST (POST)...");
         NotificationController.updateSubscription(
           req,
           res,
@@ -134,11 +132,11 @@ export class App {
         : "Port " + stringPort;
     switch (error.code) {
       case "EACCES":
-        console.error(`${bind} requires elevated privileges`);
+        logger.error(`${bind} requires elevated privileges`);
         process.exit(1);
         break;
       case "EADDRINUSE":
-        console.error(`${bind} is already in use`);
+        logger.error(`${bind} is already in use`);
         process.exit(1);
         break;
       default:
@@ -153,7 +151,7 @@ export class App {
     const addr = this.server.address();
     const bind =
       typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
-    debug(`Listening on ${bind}`);
+    logger.debug(`Listening on ${bind}`);
     return true;
   }
 }
