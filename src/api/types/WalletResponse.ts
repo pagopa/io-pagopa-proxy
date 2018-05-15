@@ -3,60 +3,67 @@
  * Define response interfaces used by PagoPaAPI for Wallet services
  */
 
-import { IRestfulObject } from "../../types/BaseResponseApp";
-import { IOs, IProperties } from "./BaseResponse";
+import * as t from "io-ts";
+import { Os, Properties } from "./BaseResponse";
 
-export interface IWalletResponse extends IRestfulObject {
-  readonly data: ReadonlyArray<IPaymentMethod>;
-}
-
-export interface IPaymentMethod extends IRestfulObject {
-  readonly creditCard?: IProperties8;
-  readonly favourite: boolean;
-  readonly idPagamentoFromEC?: string;
-  readonly idPsp: string;
-  readonly idWallet: number;
-  readonly lastUsage?: string;
-  readonly psp: IProperties15;
-  readonly pspEditable: boolean;
-  readonly type: string;
-}
-
-export interface IProperties8 extends IRestfulObject {
-  readonly brandLogo: string;
-  readonly expireMonth: string;
-  readonly expireYear: string;
-  readonly flag3dsVerified?: string;
-  readonly holder: string;
-  readonly id: number;
-  readonly pan: string;
-  readonly securityCode?: string;
-}
-
-export interface IProperties15 extends IRestfulObject {
-  readonly appChannel?: string;
-  readonly businessName: string;
-  readonly cancelled?: string;
-  readonly fixedCost: IProperties;
-  readonly flagStamp?: string;
-  readonly id?: string;
-  readonly idCard?: string;
-  readonly idChannel?: string;
-  readonly idIntermediary?: string;
-  readonly idPsp: string;
-  readonly lingua?: IOs;
-  readonly logoPSP?: string;
-  readonly paymentModel?: number;
-  readonly paymentType: string;
-  readonly serviceAvailability?: string;
-  readonly serviceDescription?: string;
-  readonly serviceLogo?: string;
-  readonly serviceName: string;
-  readonly tags?: IUserStatusEnum;
-  readonly urlInfoChannel: string;
-}
-
-export interface IUserStatusEnum extends IRestfulObject {
-  readonly type: string;
-  readonly items: IOs;
-}
+export const WalletResponse = t.interface({
+  data: t.array(
+    t.intersection([
+      t.interface({
+        favourite: t.boolean,
+        idPagamentoFromEC: t.string,
+        idPsp: t.string,
+        idWallet: t.number,
+        pspEditable: t.boolean,
+        type: t.string,
+        psp: t.intersection([
+          t.interface({
+            businessName: t.string,
+            fixedCost: Properties,
+            idPsp: t.string,
+            paymentType: t.string,
+            serviceName: t.string,
+            urlInfoChannel: t.string
+          }),
+          t.partial({
+            appChannel: t.string,
+            flagStamp: t.string,
+            cancelled: t.string,
+            id: t.string,
+            lingua: Os,
+            idCard: t.string,
+            idChannel: t.string,
+            idIntermediary: t.string,
+            logoPSP: t.string,
+            paymentModel: t.number,
+            tags: t.interface({
+              type: t.string,
+              items: Os
+            }),
+            serviceLogo: t.string,
+            serviceAvailability: t.string,
+            serviceDescription: t.string
+          })
+        ])
+      }),
+      t.partial({
+        lastUsage: t.string,
+        creditCard: t.intersection([
+          t.interface({
+            brandLogo: t.string,
+            expireMonth: t.string,
+            expireYear: t.string,
+            holder: t.string,
+            id: t.number,
+            pan: t.string
+          }),
+          t.partial({
+            flag3dsVerified: t.string,
+            securityCode: t.string
+          })
+        ])
+      })
+    ])
+  )
+});
+export type WalletResponse = t.TypeOf<typeof WalletResponse>;

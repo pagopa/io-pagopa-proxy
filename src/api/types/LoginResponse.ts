@@ -3,37 +3,33 @@
  * Define response interfaces used by PagoPaAPI for Login services
  */
 
-import { IRestfulObject } from "../../types/BaseResponseApp";
+import * as t from "io-ts";
 
-export interface ILoginResponse extends IRestfulObject {
-  readonly apiRequestToken: string;
-  readonly user: IUser;
-}
+export const LoginResponse = t.interface({
+  apiRequestToken: t.string,
+  user: t.interface({
+    acceptTerms: t.boolean,
+    cellphone: t.string,
+    email: t.string,
+    name: t.string,
+    puk: t.string,
+    spidToken: t.string,
+    surname: t.string,
+    temporaryCellphone: t.string,
+    username: t.string
+  })
+});
+export type LoginResponse = t.TypeOf<typeof LoginResponse>;
 
-export interface ILoginAnonymousResponse extends IRestfulObject {
-  readonly apiRequestToken: string;
-  readonly approveTerms: IApproveTerms;
-}
-
-export interface IUser extends IRestfulObject {
-  readonly acceptTerms: boolean;
-  readonly cellphone: string;
-  readonly email: string;
-  readonly name: string;
-  readonly puk: string;
-  readonly spidToken: string;
-  readonly surname: string;
-  readonly temporaryCellphone: string;
-  readonly username: string;
-}
-
-export interface IApproveTerms extends IRestfulObject {
-  readonly type: string;
-  readonly properties: IProperties2;
-  readonly title: string;
-}
-
-export interface IProperties2 extends IRestfulObject {
-  readonly privacy: string;
-  readonly terms: string;
-}
+export const LoginAnonymousResponse = t.interface({
+  apiRequestToken: t.string,
+  approveTerms: t.interface({
+    type: t.string,
+    properties: t.interface({
+      privacy: t.string,
+      terms: t.string
+    }),
+    title: t.string
+  })
+});
+export type LoginAnonymousResponse = t.TypeOf<typeof LoginAnonymousResponse>;

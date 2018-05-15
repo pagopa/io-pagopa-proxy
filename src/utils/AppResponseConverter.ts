@@ -3,37 +3,36 @@
  * Define utils to convert data from PagoPaAPI interfaces to controller interfaces and viceversa
  */
 
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import {
-  ILoginAnonymousResponse,
-  ILoginResponse
+  LoginAnonymousResponse,
+  LoginResponse
 } from "../api/types/LoginResponse";
 import {
   AckResult,
-  INotificationSubscriptionResponse
+  NotificationSubscriptionResponse
 } from "../api/types/NotificationSubscriptionResponse";
-import { ITransactionListResponse } from "../api/types/TransactionResponse";
-import { IWalletResponse } from "../api/types/WalletResponse";
+import { TransactionListResponse } from "../api/types/TransactionResponse";
+import { WalletResponse } from "../api/types/WalletResponse";
 import { ControllerError } from "../enums/ControllerError";
 import {
-  ILoginAnonymousResponseApp,
-  ILoginResponseApp
+  LoginAnonymousResponseApp,
+  LoginResponseApp
 } from "../types/LoginResponseApp";
-import { INotificationSubscriptionResponseApp } from "../types/NotificationSubscriptionResponseApp";
+import { NotificationSubscriptionResponseApp } from "../types/NotificationSubscriptionResponseApp";
 import {
-  ITransactionApp,
-  ITransactionListResponseApp
+  TransactionApp,
+  TransactionListResponseApp
 } from "../types/TransactionResponseApp";
 import {
-  IPaymentMethodApp,
-  IWalletResponseApp
+  PaymentMethodApp,
+  WalletResponseApp
 } from "../types/WalletResponseApp";
 
 // Data converter for controllers to translate API responses to Controller responses
 export class AppResponseConverter {
   public static getLoginFromAPIResponse(
-    loginResponse: ILoginResponse
-  ): ILoginResponseApp | Error {
+    loginResponse: LoginResponse
+  ): LoginResponseApp | Error {
     if (loginResponse.apiRequestToken === undefined) {
       return new Error(ControllerError.ERROR_LOGIN_FAILED);
     }
@@ -43,8 +42,8 @@ export class AppResponseConverter {
   }
 
   public static getLoginAnonymusFromAPIResponse(
-    loginAnonymousResponse: ILoginAnonymousResponse
-  ): ILoginAnonymousResponseApp | Error {
+    loginAnonymousResponse: LoginAnonymousResponse
+  ): LoginAnonymousResponseApp | Error {
     if (
       loginAnonymousResponse.apiRequestToken === undefined ||
       loginAnonymousResponse.apiRequestToken === ""
@@ -52,7 +51,7 @@ export class AppResponseConverter {
       return new Error(ControllerError.ERROR_LOGIN_FAILED);
     }
     return {
-      token: loginAnonymousResponse.apiRequestToken as NonEmptyString,
+      token: loginAnonymousResponse.apiRequestToken,
       type: loginAnonymousResponse.approveTerms.type,
       title: loginAnonymousResponse.approveTerms.title,
       privacy: loginAnonymousResponse.approveTerms.properties.privacy,
@@ -61,12 +60,12 @@ export class AppResponseConverter {
   }
 
   public static getWalletFromAPIResponse(
-    walletResponse: IWalletResponse
-  ): IWalletResponseApp | Error {
+    walletResponse: WalletResponse
+  ): WalletResponseApp | Error {
     if (walletResponse.data === undefined) {
       return new Error(ControllerError.ERROR_DATA_NOT_FOUND);
     }
-    const paymentMethodList: IPaymentMethodApp[] = []; // tslint:disable-line
+    const paymentMethodList: PaymentMethodApp[] = []; // tslint:disable-line
     for (const wallet of walletResponse.data) {
       paymentMethodList.push({
         idWallet: wallet.idWallet,
@@ -85,12 +84,12 @@ export class AppResponseConverter {
   }
 
   public static getTransactionListFromAPIResponse(
-    transactionListResponse: ITransactionListResponse
-  ): ITransactionListResponseApp | Error {
+    transactionListResponse: TransactionListResponse
+  ): TransactionListResponseApp | Error {
     if (transactionListResponse.data === undefined) {
       return new Error(ControllerError.ERROR_DATA_NOT_FOUND);
     }
-    const transactionList: ITransactionApp[] = []; // tslint:disable-line
+    const transactionList: TransactionApp[] = []; // tslint:disable-line
     for (const transaction of transactionListResponse.data) {
       transactionList.push({
         id: transaction.id,
@@ -112,9 +111,9 @@ export class AppResponseConverter {
   }
 
   public static getNotificationSubscriptionResponseFromAPIResponse(
-    notificationSubscriptionResponse: INotificationSubscriptionResponse
-  ): INotificationSubscriptionResponseApp | Error {
-    if (notificationSubscriptionResponse.result !== AckResult.OK) {
+    notificationSubscriptionResponse: NotificationSubscriptionResponse
+  ): NotificationSubscriptionResponseApp | Error {
+    if (notificationSubscriptionResponse.result !== AckResult.keys.OK) {
       return new Error(ControllerError.REQUEST_REJECTED);
     }
     return {

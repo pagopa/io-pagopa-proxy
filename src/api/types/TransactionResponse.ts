@@ -3,33 +3,38 @@
  * Define response interfaces used by PagoPaAPI for Transaction services
  */
 
-import { IRestfulObject } from "../../types/BaseResponseApp";
-import { IProperties } from "./BaseResponse";
+import * as t from "io-ts";
+import { Properties } from "./BaseResponse";
 
-export interface ITransactionListResponse extends IRestfulObject {
-  readonly data: ReadonlyArray<ITransaction>;
-  readonly size: number;
-  readonly start: number;
-  readonly total: number;
-}
-
-export interface ITransaction extends IRestfulObject {
-  readonly amount: IProperties;
-  readonly created: string;
-  readonly description: string;
-  readonly error: boolean;
-  readonly fee: IProperties;
-  readonly grandTotal?: IProperties;
-  readonly id: number;
-  readonly idPsp?: string;
-  readonly idStatus?: string;
-  readonly idWallet?: string;
-  readonly merchant: string;
-  readonly paymentModel?: string;
-  readonly statusMessage: string;
-  readonly success?: string;
-  readonly token?: string;
-  readonly updated: string;
-  readonly urlCheckout3ds?: string;
-  readonly urlRedirectPSP?: string;
-}
+export const TransactionListResponse = t.interface({
+  size: t.number,
+  start: t.number,
+  total: t.number,
+  data: t.array(
+    t.intersection([
+      t.interface({
+        amount: Properties,
+        created: t.string,
+        description: t.string,
+        error: t.boolean,
+        fee: Properties,
+        id: t.number,
+        merchant: t.string,
+        statusMessage: t.string,
+        updated: t.string
+      }),
+      t.partial({
+        grandTotal: Properties,
+        idPsp: t.string,
+        idStatus: t.string,
+        idWallet: t.string,
+        paymentModel: t.string,
+        success: t.string,
+        token: t.string,
+        urlCheckout3ds: t.string,
+        urlRedirectPSP: t.string
+      })
+    ])
+  )
+});
+export type TransactionListResponse = t.TypeOf<typeof TransactionListResponse>;

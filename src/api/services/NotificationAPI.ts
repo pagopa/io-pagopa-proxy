@@ -7,7 +7,7 @@ import * as express from "express";
 import fetch from "node-fetch";
 import { CONFIG } from "../../Configuration";
 import { NotificationSubscriptionRequestType } from "../../enums/NotificationSubscriptionType";
-import { INotificationSubscriptionResponse } from "../types/NotificationSubscriptionResponse";
+import { NotificationSubscriptionResponse } from "../types/NotificationSubscriptionResponse";
 
 // Notification Service for PagoPA communications
 export class NotificationAPI {
@@ -17,7 +17,7 @@ export class NotificationAPI {
     errorCallback: (res: express.Response, errorMsg: string) => void,
     successCallback: (
       res: express.Response,
-      notificationSubscriptionResponse: INotificationSubscriptionResponse
+      notificationSubscriptionResponse: NotificationSubscriptionResponse
     ) => void,
     fiscalCode: string,
     requestType: NotificationSubscriptionRequestType

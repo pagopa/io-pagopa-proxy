@@ -3,8 +3,11 @@
  * Define response interfaces used by controllers for Notification services (Avvisatura)
  */
 
-import { IRestfulObject } from "./BaseResponseApp";
+import * as t from "io-ts";
 
-export interface INotificationSubscriptionResponseApp extends IRestfulObject {
-  readonly result: boolean;
-}
+export const NotificationSubscriptionResponseApp = t.interface({
+  result: t.boolean
+});
+export type NotificationSubscriptionResponseApp = t.TypeOf<
+  typeof NotificationSubscriptionResponseApp
+>;

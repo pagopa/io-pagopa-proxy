@@ -3,22 +3,26 @@
  * Define response interfaces used by controllers for Transaction services
  */
 
-import { IRestfulObject } from "./BaseResponseApp";
+import * as t from "io-ts";
 
-export interface ITransactionListResponseApp extends IRestfulObject {
-  readonly total: number;
-  readonly size: number;
-  readonly start: number;
-  readonly transactions: ReadonlyArray<ITransactionApp>;
-}
+export const TransactionApp = t.interface({
+  id: t.number,
+  created: t.string,
+  statusMessage: t.string,
+  error: t.boolean,
+  currency: t.string,
+  amount: t.number,
+  amountDecimalDigit: t.number,
+  merchant: t.string
+});
+export type TransactionApp = t.TypeOf<typeof TransactionApp>;
 
-export interface ITransactionApp extends IRestfulObject {
-  readonly id: number;
-  readonly created: string;
-  readonly statusMessage: string;
-  readonly error: boolean;
-  readonly currency: string;
-  readonly amount: number;
-  readonly amountDecimalDigit: number;
-  readonly merchant: string;
-}
+export const TransactionListResponseApp = t.interface({
+  total: t.number,
+  size: t.number,
+  start: t.number,
+  transactions: t.array(TransactionApp)
+});
+export type TransactionListResponseApp = t.TypeOf<
+  typeof TransactionListResponseApp
+>;

@@ -6,8 +6,8 @@
 import * as express from "express";
 import { UserAPI } from "../api/services/UserAPI";
 import {
-  ILoginAnonymousResponse,
-  ILoginResponse
+  LoginAnonymousResponse,
+  LoginResponse
 } from "../api/types/LoginResponse";
 import { ControllerError } from "../enums/ControllerError";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
@@ -27,7 +27,7 @@ export class UserController {
     UserAPI.login(
       res,
       RestfulUtils.handleErrorCallback,
-      (response: express.Response, loginResponse: ILoginResponse) => {
+      (response: express.Response, loginResponse: LoginResponse) => {
         // Success callback
         RestfulUtils.setSuccessResponse(
           response,
@@ -56,7 +56,7 @@ export class UserController {
       RestfulUtils.handleErrorCallback,
       (
         response: express.Response,
-        loginAnonymousResponse: ILoginAnonymousResponse
+        loginAnonymousResponse: LoginAnonymousResponse
       ) => {
         // Success callback
         RestfulUtils.setSuccessResponse(

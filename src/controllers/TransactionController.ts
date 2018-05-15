@@ -5,7 +5,7 @@
 
 import * as express from "express";
 import { TransactionAPI } from "../api/services/TransactionAPI";
-import { ITransactionListResponse } from "../api/types/TransactionResponse";
+import { TransactionListResponse } from "../api/types/TransactionResponse";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
 import { RestfulUtils } from "../utils/RestfulUtils";
 
@@ -26,7 +26,7 @@ export class TransactionController {
       RestfulUtils.handleErrorCallback,
       (
         response: express.Response,
-        transactionListResponse: ITransactionListResponse
+        transactionListResponse: TransactionListResponse
       ) => {
         // Success callback
         RestfulUtils.setSuccessResponse(

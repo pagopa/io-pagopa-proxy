@@ -3,24 +3,28 @@
  * Provide common types shared with PagoPaAPI used for communications
  */
 
-import { IRestfulObject } from "../../types/BaseResponseApp";
+import * as t from "io-ts";
 
-export interface IData {
-  readonly type: string;
-  readonly items: ISchema;
-}
+export const Schema = t.interface({
+  $ref: t.string
+});
+export type Schema = t.TypeOf<typeof Schema>;
 
-export interface ISchema extends IRestfulObject {
-  readonly $ref: string;
-}
+export const Data = t.interface({
+  type: t.string,
+  items: Schema
+});
+export type Data = t.TypeOf<typeof Data>;
 
-export interface IOs extends IRestfulObject {
-  readonly type: string;
-  readonly enum: ReadonlyArray<string>;
-}
+export const Os = t.interface({
+  type: t.string,
+  enum: t.array(t.string)
+});
+export type Os = t.TypeOf<typeof Os>;
 
-export interface IProperties extends IRestfulObject {
-  readonly amount: number;
-  readonly currency: string;
-  readonly decimalDigits: number;
-}
+export const Properties = t.interface({
+  amount: t.number,
+  currency: t.string,
+  decimalDigits: t.number
+});
+export type Properties = t.TypeOf<typeof Properties>;

@@ -7,7 +7,7 @@ import * as express from "express";
 import fetch from "node-fetch";
 import querystring = require("querystring");
 import { CONFIG } from "../../Configuration";
-import { IWalletResponse } from "../types/WalletResponse";
+import { WalletResponse } from "../types/WalletResponse";
 
 // Wallet Service for PagoPA communications
 export class WalletAPI {
@@ -17,7 +17,7 @@ export class WalletAPI {
     errorCallback: (res: express.Response, errorMsg: string) => void,
     successCallback: (
       res: express.Response,
-      walletResponse: IWalletResponse
+      walletResponse: WalletResponse
     ) => void,
     apiRequestToken: string
   ): void {

@@ -7,7 +7,7 @@ import * as express from "express";
 import fetch from "node-fetch";
 import querystring = require("querystring");
 import { CONFIG } from "../../Configuration";
-import { ITransactionListResponse } from "../types/TransactionResponse";
+import { TransactionListResponse } from "../types/TransactionResponse";
 
 // Transaction Service for PagoPA communications
 export class TransactionAPI {
@@ -17,7 +17,7 @@ export class TransactionAPI {
     errorCallback: (response: express.Response, errorMsg: string) => void,
     successCallback: (
       response: express.Response,
-      transactionList: ITransactionListResponse
+      transactionList: TransactionListResponse
     ) => void,
     apiRequestToken: string,
     id?: number,

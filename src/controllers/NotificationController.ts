@@ -5,7 +5,7 @@
 
 import * as express from "express";
 import { NotificationAPI } from "../api/services/NotificationAPI";
-import { INotificationSubscriptionResponse } from "../api/types/NotificationSubscriptionResponse";
+import { NotificationSubscriptionResponse } from "../api/types/NotificationSubscriptionResponse";
 import { ControllerError } from "../enums/ControllerError";
 import { NotificationSubscriptionRequestType } from "../enums/NotificationSubscriptionType";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
@@ -31,7 +31,7 @@ export class NotificationController {
       RestfulUtils.handleErrorCallback,
       (
         response: express.Response,
-        notificationSubscriptionResponse: INotificationSubscriptionResponse
+        notificationSubscriptionResponse: NotificationSubscriptionResponse
       ) => {
         // Success callback
         RestfulUtils.setSuccessResponse(

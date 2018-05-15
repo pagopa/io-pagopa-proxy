@@ -7,10 +7,7 @@ import * as express from "express";
 import fetch from "node-fetch";
 import querystring = require("querystring");
 import { CONFIG } from "../../Configuration";
-import {
-  ILoginAnonymousResponse,
-  ILoginResponse
-} from "../types/LoginResponse";
+import { LoginAnonymousResponse, LoginResponse } from "../types/LoginResponse";
 
 // User Service for PagoPA communications
 export class UserAPI {
@@ -20,7 +17,7 @@ export class UserAPI {
     errorCallback: (res: express.Response, errorMsg: string) => void,
     successCallback: (
       res: express.Response,
-      loginResponse: ILoginResponse
+      loginResponse: LoginResponse
     ) => void,
     username: string,
     password: string
@@ -49,7 +46,7 @@ export class UserAPI {
     errorCallback: (res: express.Response, errorMsg: string) => void,
     successCallback: (
       res: express.Response,
-      loginAnonymousResponse: ILoginAnonymousResponse
+      loginAnonymousResponse: LoginAnonymousResponse
     ) => void,
     email: string,
     idPayment: string

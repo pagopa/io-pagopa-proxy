@@ -5,7 +5,7 @@
 
 import * as express from "express";
 import { WalletAPI } from "../api/services/WalletAPI";
-import { IWalletResponse } from "../api/types/WalletResponse";
+import { WalletResponse } from "../api/types/WalletResponse";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
 import { RestfulUtils } from "../utils/RestfulUtils";
 
@@ -22,7 +22,7 @@ export class WalletController {
     WalletAPI.getWalletResponse(
       res,
       RestfulUtils.handleErrorCallback,
-      (response: express.Response, walletResponse: IWalletResponse) => {
+      (response: express.Response, walletResponse: WalletResponse) => {
         // Success callback
         RestfulUtils.setSuccessResponse(
           response,

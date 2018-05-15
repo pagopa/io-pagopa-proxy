@@ -3,17 +3,20 @@
  * Define response interfaces used by controllers for Login services
  */
 
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
-import { IRestfulObject } from "./BaseResponseApp";
+import * as t from "io-ts";
 
-export interface ILoginResponseApp extends IRestfulObject {
-  readonly token: string;
-}
+export const LoginResponseApp = t.interface({
+  token: t.string
+});
+export type LoginResponseApp = t.TypeOf<typeof LoginResponseApp>;
 
-export interface ILoginAnonymousResponseApp extends IRestfulObject {
-  readonly token: NonEmptyString;
-  readonly type: string;
-  readonly title: string;
-  readonly privacy: string;
-  readonly terms: string;
-}
+export const LoginAnonymousResponseApp = t.interface({
+  token: t.string,
+  type: t.string,
+  title: t.string,
+  privacy: t.string,
+  terms: t.string
+});
+export type LoginAnonymousResponseApp = t.TypeOf<
+  typeof LoginAnonymousResponseApp
+>;
