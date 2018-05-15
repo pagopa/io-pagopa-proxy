@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Mock for PagoPaAPI Server
+ * Start a server to Mock PagoPaAPI restful webservice
  */
 
 // tslint:disable
@@ -26,7 +26,7 @@ export class MockedProxyAPIApp {
   }
 
   public startServer(): boolean {
-    console.log("Starting PagoPa Mocked Server...");
+    console.log("Starting PagoPa API Mocked Server...");
     if (this.app === undefined) {
       return false;
     }

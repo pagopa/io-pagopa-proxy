@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Notification Subscription Response Types
+ * Define response interfaces used by controllers for Notification services (Avvisatura)
  */
 
 import { IRestfulObject } from "./BaseResponseApp";

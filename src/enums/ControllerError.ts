@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * ControllerError Enumerator
+ * Define errors returned by controllers
  */
 
 export enum ControllerError {

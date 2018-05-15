@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * WalletResponse Types
+ * Define response interfaces used by PagoPaAPI for Wallet services
  */
 
 import { IRestfulObject } from "../../types/BaseResponseApp";

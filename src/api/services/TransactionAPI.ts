@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * TransactionAPI Services
+ * Provide services related to Transaction to communicate with PagoPaAPI
  */
 
 import * as express from "express";

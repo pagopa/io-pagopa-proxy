@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Restful Utils
+ * Define common utils used by controllers
  */
 
 import * as express from "express";

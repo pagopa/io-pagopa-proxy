@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * BaseResponse Types
+ * Provide common types shared with PagoPaAPI used for communications
  */
 
 import { IRestfulObject } from "../../types/BaseResponseApp";

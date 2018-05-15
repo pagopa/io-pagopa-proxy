@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Communication Errors Tests
+ * Test errors due to communication error with PagoPaAPI
  */
 
 // tslint:disable
@@ -28,10 +28,10 @@ describe("Generic Controllers", () => {
   test("PagoPaAPI should be not available", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.LOGIN +
-        "?username=mario&password=rossi"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.LOGIN +
+      "?username=mario&password=rossi"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {

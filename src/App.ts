@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * App
+ * Define a Restful Webservice and routes controller requests
  */
 
 import * as bodyParser from "body-parser";

@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Response Converter
+ * Define utils to convert data from PagoPaAPI interfaces to controller interfaces and viceversa
  */
 
 import { NonEmptyString } from "italia-ts-commons/lib/strings";

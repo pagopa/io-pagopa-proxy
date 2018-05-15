@@ -1,9 +1,7 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Common configurations
  */
 
-// App configuration
 export const CONFIG = {
   // PagoPa-Proxy Configuration
   CONTROLLER: {

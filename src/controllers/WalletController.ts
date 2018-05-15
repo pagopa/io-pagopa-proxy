@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Tests for Wallet Controllers
+ * Send HTTP requests to Wallet Controllers and check mocked responses
  */
 
 import * as express from "express";

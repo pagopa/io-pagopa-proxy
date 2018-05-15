@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * NotificationSubscription Enumerator
+ * Define notification request types used to update a notification subscription
  */
 
 export enum NotificationSubscriptionRequestType {

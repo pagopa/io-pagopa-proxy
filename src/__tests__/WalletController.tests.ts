@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Wallet Controller Tests
+ * Test Wallet Controllers sending HTTP requests and checking responses provided by PagoPa API Mocked Server
  */
 
 // tslint:disable
@@ -32,10 +32,10 @@ describe("Wallet Controllers", () => {
   test("Wallet should return more than one element", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.WALLET +
-        "?token=A123"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.WALLET +
+      "?token=A123"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {
@@ -52,9 +52,9 @@ describe("Wallet Controllers", () => {
   test("Wallet should return a failed message (missing token)", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.WALLET
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.WALLET
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {

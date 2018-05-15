@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * NotificationSubscriptionResponse Types
+ * Define response interfaces used by PagoPaAPI for Notification services (Avvisatura)
  */
 
 export interface INotificationSubscriptionResponse {

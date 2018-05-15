@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Transaction Controller Tests
+ * Test Transaction Controllers sending HTTP requests and checking responses provided by PagoPa API Mocked Server
  */
 
 // tslint:disable
@@ -32,10 +32,10 @@ describe("Transaction Controllers", () => {
   test("Transaction List should return more than one element", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.TRANSACTIONS +
-        "?token=A123"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.TRANSACTIONS +
+      "?token=A123"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {
@@ -55,9 +55,9 @@ describe("Transaction Controllers", () => {
   test("Transaction List should return a failed message (missing token)", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.TRANSACTIONS
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.TRANSACTIONS
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {

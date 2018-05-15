@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Login Controller Tests
+ * Test Login Controllers sending HTTP requests and checking responses provided by PagoPa API Mocked Server
  */
 
 // tslint:disable
@@ -32,10 +32,10 @@ describe("Login Controllers", () => {
   test("Login should return a token", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.LOGIN +
-        "?username=mario&password=rossi"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.LOGIN +
+      "?username=mario&password=rossi"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {
@@ -52,10 +52,10 @@ describe("Login Controllers", () => {
   test("Login should return a failed login message (wrong credentials)", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.LOGIN +
-        "?username=mario&password=wrong"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.LOGIN +
+      "?username=mario&password=wrong"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {
@@ -71,10 +71,10 @@ describe("Login Controllers", () => {
   test("Login should return a failed login message (missing inputs)", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.LOGIN +
-        "?username=mario"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.LOGIN +
+      "?username=mario"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {
@@ -90,10 +90,10 @@ describe("Login Controllers", () => {
   test("LoginAnonymous should return a token", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS +
-        "?email=mario@mail.it&idPayment=test"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS +
+      "?email=mario@mail.it&idPayment=test"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {
@@ -110,10 +110,10 @@ describe("Login Controllers", () => {
   test("LoginAnonymous should return a failed login message (wrong idPayment)", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS +
-        "?email=mario@mail.it&idPayment=wrong"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS +
+      "?email=mario@mail.it&idPayment=wrong"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {
@@ -129,10 +129,10 @@ describe("Login Controllers", () => {
   test("LoginAnonymous should return a failed login message (missing inputs)", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS +
-        "?email=mario@mail.it"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS +
+      "?email=mario@mail.it"
     )
       .then(fetchRes => fetchRes.json())
       .then(response => {

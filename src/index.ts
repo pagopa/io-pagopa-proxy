@@ -1,6 +1,5 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Create and Run the server
  */
 
 import { App } from "./App";

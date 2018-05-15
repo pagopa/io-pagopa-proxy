@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Mock Data for PagoPaAPI Server
+ * Define Mocked Responses used by MockedProxyAPIApp
  */
 
 // tslint:disable

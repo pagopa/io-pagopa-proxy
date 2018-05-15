@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Tests for Notification Controllers
+ * Send HTTP requests to Notification Controllers and check mocked responses
  */
 
 import * as express from "express";

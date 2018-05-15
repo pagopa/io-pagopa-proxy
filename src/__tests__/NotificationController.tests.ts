@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * Notification Controller Tests (Avvisatura)
+ * Test Notification Controllers sending HTTP requests and checking responses provided by PagoPa API Mocked Server
  */
 
 // tslint:disable

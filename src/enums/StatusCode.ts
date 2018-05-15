@@ -1,6 +1,6 @@
 /**
- * Italia PagoPA Proxy
- * Cittadinanza Digitale PagoPA services
+ * StatusCode Enumerator
+ * Define error codes returned by controllers
  */
 
 export enum StatusCode {
