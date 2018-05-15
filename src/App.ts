@@ -19,12 +19,15 @@ import { logger } from "./utils/Logger";
 export class App {
   private readonly app?: core.Express;
   private server?: http.Server; // tslint:disable-line
-  private readonly serverPort?: number | string | boolean;
+  private readonly serverPort?: number | string;
 
   public constructor() {
     this.serverPort = this.normalizePort(
       process.env.PORT || CONFIG.CONTROLLER.PORT
     );
+    if (this.serverPort === undefined) {
+      throw Error("Cannot define a valid port to user for Server!");
+    }
     this.app = express();
     this.setGlobalSettings();
     this.setServerRoutes();
@@ -110,14 +113,14 @@ export class App {
     return true;
   }
 
-  private normalizePort(val: number | string): number | string | boolean {
+  private normalizePort(val: number | string): number | string | undefined {
     const xport: number = typeof val === "string" ? parseInt(val, 10) : val;
     if (isNaN(xport)) {
       return val;
     } else if (xport >= 0) {
       return xport;
     } else {
-      return false;
+      return undefined;
     }
   }
 

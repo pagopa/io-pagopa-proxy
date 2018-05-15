@@ -11,8 +11,11 @@ import {
   AckResult,
   NotificationSubscriptionResponse
 } from "../api/types/NotificationSubscriptionResponse";
-import { TransactionListResponse } from "../api/types/TransactionResponse";
-import { WalletResponse } from "../api/types/WalletResponse";
+import {
+  Transaction,
+  TransactionListResponse
+} from "../api/types/TransactionResponse";
+import { PaymentMethod, WalletResponse } from "../api/types/WalletResponse";
 import { ControllerError } from "../enums/ControllerError";
 import {
   LoginAnonymousResponseApp,
@@ -65,22 +68,25 @@ export class AppResponseConverter {
     if (walletResponse.data === undefined) {
       return new Error(ControllerError.ERROR_DATA_NOT_FOUND);
     }
-    const paymentMethodList: PaymentMethodApp[] = []; // tslint:disable-line
-    for (const wallet of walletResponse.data) {
-      paymentMethodList.push({
-        idWallet: wallet.idWallet,
-        type: wallet.type,
-        favourite: wallet.favourite,
-        lastUsage: wallet.lastUsage,
-        pspBusinessName: wallet.psp.businessName,
-        pspServiceName: wallet.psp.serviceName,
-        cardPan:
-          wallet.creditCard === undefined ? undefined : wallet.creditCard.pan
-      });
-    }
+
     return {
-      wallet: paymentMethodList
-    };
+      wallet: walletResponse.data.map(
+        (paymentMethod: PaymentMethod): PaymentMethodApp => {
+          return {
+            idWallet: paymentMethod.idWallet,
+            type: paymentMethod.type,
+            favourite: paymentMethod.favourite,
+            lastUsage: paymentMethod.lastUsage,
+            pspBusinessName: paymentMethod.psp.businessName,
+            pspServiceName: paymentMethod.psp.serviceName,
+            cardPan:
+              paymentMethod.creditCard === undefined
+                ? undefined
+                : paymentMethod.creditCard.pan
+          };
+        }
+      )
+    } as WalletResponseApp;
   }
 
   public static getTransactionListFromAPIResponse(
@@ -89,25 +95,26 @@ export class AppResponseConverter {
     if (transactionListResponse.data === undefined) {
       return new Error(ControllerError.ERROR_DATA_NOT_FOUND);
     }
-    const transactionList: TransactionApp[] = []; // tslint:disable-line
-    for (const transaction of transactionListResponse.data) {
-      transactionList.push({
-        id: transaction.id,
-        created: transaction.created,
-        statusMessage: transaction.statusMessage,
-        error: transaction.error,
-        currency: transaction.amount.currency,
-        amount: transaction.amount.amount,
-        amountDecimalDigit: transaction.amount.decimalDigits,
-        merchant: transaction.merchant
-      });
-    }
+
     return {
       total: transactionListResponse.total,
       size: transactionListResponse.size,
       start: transactionListResponse.start,
-      transactions: transactionList
-    };
+      transactions: transactionListResponse.data.map(
+        (transaction: Transaction): TransactionApp => {
+          return {
+            id: transaction.id,
+            created: transaction.created,
+            statusMessage: transaction.statusMessage,
+            error: transaction.error,
+            currency: transaction.amount.currency,
+            amount: transaction.amount.amount,
+            amountDecimalDigit: transaction.amount.decimalDigits,
+            merchant: transaction.merchant
+          };
+        }
+      )
+    } as TransactionListResponseApp;
   }
 
   public static getNotificationSubscriptionResponseFromAPIResponse(
