@@ -8,7 +8,6 @@
 import fetch from "node-fetch";
 import { App } from "../App";
 import { CONFIG } from "../Configuration";
-import { StatusCode } from "../enums/StatusCode";
 import { MockedProxyAPIApp } from "../mocks/MockedProxyAPIApp";
 import { disableConsoleLog } from "../utils/Logger";
 
@@ -36,17 +35,15 @@ describe("Wallet Controllers", () => {
         CONFIG.CONTROLLER.PORT +
         CONFIG.CONTROLLER.ROUTES.WALLET +
         "?token=A123"
-    )
-      .then(fetchRes => fetchRes.json())
-      .then(response => {
-        expect(response).toHaveProperty("status");
-        expect(response.status).toBe(StatusCode.OK);
-        expect(response.errorMessage).toBeUndefined();
-        expect(response).toHaveProperty("content");
-        expect(response.content).toHaveProperty("wallet");
-        expect(response.content.wallet.length).toBeGreaterThan(1);
+    ).then(response => {
+      response.json().then(jsonResp => {
+        expect(response.status).toBe(200);
+        expect(jsonResp.errorMessage).toBeUndefined();
+        expect(jsonResp).toHaveProperty("wallet");
+        expect(jsonResp.wallet.length).toBeGreaterThan(1);
         done();
       });
+    });
   });
 
   test("Wallet should return a failed message (missing token)", done => {
@@ -55,17 +52,16 @@ describe("Wallet Controllers", () => {
         ":" +
         CONFIG.CONTROLLER.PORT +
         CONFIG.CONTROLLER.ROUTES.WALLET
-    )
-      .then(fetchRes => fetchRes.json())
-      .then(response => {
-        expect(response).toHaveProperty("status");
-        expect(response).toHaveProperty("errorMessage");
-        expect(response.status).toBe(StatusCode.ERROR);
-        expect(response.errorMessage).toBe(
+    ).then(response => {
+      response.json().then(jsonResp => {
+        expect(response.status).toBe(400);
+        expect(jsonResp).toHaveProperty("errorMessage");
+        expect(jsonResp.errorMessage).toBe(
           "Token is required for this request"
         );
-        expect(response.content).toBeUndefined();
+        expect(jsonResp.wallet).toBeUndefined();
         done();
       });
+    });
   });
 });

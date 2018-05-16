@@ -17,28 +17,22 @@ import { logger } from "./utils/Logger";
 
 // Define server and routes
 export class App {
-  private readonly app?: core.Express;
-  private server?: http.Server; // tslint:disable-line
-  private readonly serverPort?: number | string;
+  private readonly app: core.Express;
+  private readonly server: http.Server;
+  private readonly serverPort: number | string;
 
   public constructor() {
     this.serverPort = this.normalizePort(
       process.env.PORT || CONFIG.CONTROLLER.PORT
     );
-    if (this.serverPort === undefined) {
-      throw Error("Cannot define a valid port to user for Server!");
-    }
     this.app = express();
     this.setGlobalSettings();
     this.setServerRoutes();
+    this.server = http.createServer(this.app);
   }
 
   public startServer(): boolean {
     logger.info("Starting Proxy PagoPa Server...");
-    if (this.app === undefined) {
-      return false;
-    }
-    this.server = http.createServer(this.app);
     this.server.listen(this.serverPort);
     this.server.on("error", this.onError);
     this.server.on("listening", this.onListening);
@@ -113,14 +107,14 @@ export class App {
     return true;
   }
 
-  private normalizePort(val: number | string): number | string | undefined {
+  private normalizePort(val: number | string): number | string {
     const xport: number = typeof val === "string" ? parseInt(val, 10) : val;
     if (isNaN(xport)) {
       return val;
     } else if (xport >= 0) {
       return xport;
     } else {
-      return undefined;
+      throw Error("Cannot define a valid port to user for Server!");
     }
   }
 

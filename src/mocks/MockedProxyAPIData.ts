@@ -11,7 +11,7 @@ import {
 import { WalletResponse } from "../api/types/WalletResponse";
 import { TransactionListResponse } from "../api/types/TransactionResponse";
 import { IRestfulObject } from "../types/BaseResponseApp";
-import { AckResult } from "../api/types/NotificationSubscriptionResponse";
+import { AckResult } from "../api/types/BaseResponse";
 
 export class MockedProxyAPIData {
   public getLoginResponseMocked(): LoginResponse {

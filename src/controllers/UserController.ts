@@ -10,6 +10,7 @@ import {
   LoginResponse
 } from "../api/types/LoginResponse";
 import { ControllerError } from "../enums/ControllerError";
+import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
 import { RestfulUtils } from "../utils/RestfulUtils";
 
@@ -19,20 +20,32 @@ export class UserController {
   public static login(req: express.Request, res: express.Response): void {
     // Check input
     if (req.query.username === undefined || req.query.password === undefined) {
-      RestfulUtils.setErrorResponse(res, ControllerError.ERROR_INVALID_INPUT);
+      RestfulUtils.sendErrorResponse(
+        res,
+        ControllerError.ERROR_INVALID_INPUT,
+        HttpErrorStatusCode.BAD_REQUEST
+      );
       return;
     }
 
     // Try to login using PagoPaAPI
     UserAPI.login(
       res,
-      RestfulUtils.handleErrorCallback,
+      RestfulUtils.sendUnavailableAPIError,
       (response: express.Response, loginResponse: LoginResponse) => {
-        // Success callback
-        RestfulUtils.setSuccessResponse(
-          response,
-          AppResponseConverter.getLoginFromAPIResponse(loginResponse)
+        // Check result
+        const requestResult = AppResponseConverter.getLoginFromAPIResponse(
+          loginResponse
         );
+        if (requestResult.isLeft()) {
+          RestfulUtils.sendErrorResponse(
+            response,
+            requestResult.value,
+            HttpErrorStatusCode.UNAUTHORIZED
+          );
+          return;
+        }
+        RestfulUtils.sendSuccessResponse(response, requestResult.value);
       },
       req.query.username,
       req.query.password
@@ -46,25 +59,35 @@ export class UserController {
   ): void {
     // Check input
     if (req.query.email === undefined || req.query.idPayment === undefined) {
-      RestfulUtils.setErrorResponse(res, ControllerError.ERROR_INVALID_INPUT);
+      RestfulUtils.sendErrorResponse(
+        res,
+        ControllerError.ERROR_INVALID_INPUT,
+        HttpErrorStatusCode.BAD_REQUEST
+      );
       return;
     }
 
     // Try to login using PagoPaAPI
     UserAPI.loginAnonymous(
       res,
-      RestfulUtils.handleErrorCallback,
+      RestfulUtils.sendUnavailableAPIError,
       (
         response: express.Response,
         loginAnonymousResponse: LoginAnonymousResponse
       ) => {
-        // Success callback
-        RestfulUtils.setSuccessResponse(
-          response,
-          AppResponseConverter.getLoginAnonymusFromAPIResponse(
-            loginAnonymousResponse
-          )
+        // Check result
+        const requestResult = AppResponseConverter.getLoginAnonymusFromAPIResponse(
+          loginAnonymousResponse
         );
+        if (requestResult.isLeft()) {
+          RestfulUtils.sendErrorResponse(
+            response,
+            requestResult.value,
+            HttpErrorStatusCode.UNAUTHORIZED
+          );
+          return;
+        }
+        RestfulUtils.sendSuccessResponse(response, requestResult.value);
       },
       req.query.email,
       req.query.idPayment

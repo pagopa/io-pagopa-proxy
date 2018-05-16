@@ -5,63 +5,55 @@
 
 import * as express from "express";
 import { ControllerError } from "../enums/ControllerError";
-import { StatusCode } from "../enums/StatusCode";
+import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { IRestfulObject } from "../types/BaseResponseApp";
 import { logger } from "../utils/Logger";
 
 // Utils used by Controllers
 export class RestfulUtils {
-  // Check if token is set into request. If token is invalid and res is provided, an error will be written
+  // Check if token is set into request. If token is invalid and res is provided, an error will be send
   public static checkTokenIntoRequest(
     req: express.Request,
     res?: express.Response
   ): boolean {
     if (req.query.token === undefined) {
       if (res !== undefined) {
-        this.setErrorResponse(res, ControllerError.ERROR_INVALID_TOKEN);
+        this.sendErrorResponse(
+          res,
+          ControllerError.ERROR_INVALID_TOKEN,
+          HttpErrorStatusCode.BAD_REQUEST
+        );
       }
       return false;
     }
     return true;
   }
 
-  // Set an error message for express response
-  public static setErrorResponse(
+  // Send an error message for express response
+  public static sendErrorResponse(
     res: express.Response,
-    errorMsg: string
+    errorMsg: ControllerError,
+    httpStatusCode: HttpErrorStatusCode
   ): void {
     logger.error("Controller response is an error: " + errorMsg);
-    res.status(500).json({ status: StatusCode.ERROR, errorMessage: errorMsg });
+    res.status(httpStatusCode).json({ errorMessage: errorMsg });
   }
 
-  // Set a success message for express response
-  public static setSuccessResponse(
+  // Send a success message for express response
+  public static sendSuccessResponse(
     res: express.Response,
-    content: IRestfulObject | Error
+    content: IRestfulObject
   ): void {
-    if (content instanceof Error) {
-      logger.error("Controller response is an error: " + content.message);
-      res.status(200).json({
-        status: StatusCode.ERROR,
-        errorMessage: content.message
-      });
-    } else {
-      res.status(200).json({
-        status: StatusCode.OK,
-        content
-      });
-    }
+    res.status(200).json(content);
   }
 
-  // A default error callback handler
-  public static handleErrorCallback(
-    response: express.Response
-    // errorMsg?: string
-  ): void {
+  // A default error callback handler for unavailable API services
+  public static sendUnavailableAPIError(res: express.Response): void {
     // Error callback
-    RestfulUtils.setErrorResponse(
-      response,
-      ControllerError.ERROR_PAGOPA_API_UNAVAILABLE
+    RestfulUtils.sendErrorResponse(
+      res,
+      ControllerError.ERROR_PAGOPA_API_UNAVAILABLE,
+      HttpErrorStatusCode.SERVICE_UNAVAILABLE
     );
   }
 }

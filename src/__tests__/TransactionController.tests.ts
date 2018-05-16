@@ -8,7 +8,6 @@
 import fetch from "node-fetch";
 import { App } from "../App";
 import { CONFIG } from "../Configuration";
-import { StatusCode } from "../enums/StatusCode";
 import { MockedProxyAPIApp } from "../mocks/MockedProxyAPIApp";
 import { disableConsoleLog } from "../utils/Logger";
 
@@ -36,20 +35,18 @@ describe("Transaction Controllers", () => {
         CONFIG.CONTROLLER.PORT +
         CONFIG.CONTROLLER.ROUTES.TRANSACTIONS +
         "?token=A123"
-    )
-      .then(fetchRes => fetchRes.json())
-      .then(response => {
-        expect(response).toHaveProperty("status");
-        expect(response.status).toBe(StatusCode.OK);
-        expect(response.errorMessage).toBeUndefined();
-        expect(response).toHaveProperty("content");
-        expect(response.content).toHaveProperty("total");
-        expect(response.content).toHaveProperty("start");
-        expect(response.content).toHaveProperty("size");
-        expect(response.content).toHaveProperty("transactions");
-        expect(response.content.transactions.length).toBeGreaterThan(1);
+    ).then(response => {
+      response.json().then(jsonResp => {
+        expect(response.status).toBe(200);
+        expect(jsonResp.errorMessage).toBeUndefined();
+        expect(jsonResp).toHaveProperty("total");
+        expect(jsonResp).toHaveProperty("start");
+        expect(jsonResp).toHaveProperty("size");
+        expect(jsonResp).toHaveProperty("transactions");
+        expect(jsonResp.transactions.length).toBeGreaterThan(1);
         done();
       });
+    });
   });
 
   test("Transaction List should return a failed message (missing token)", done => {
@@ -58,18 +55,17 @@ describe("Transaction Controllers", () => {
         ":" +
         CONFIG.CONTROLLER.PORT +
         CONFIG.CONTROLLER.ROUTES.TRANSACTIONS
-    )
-      .then(fetchRes => fetchRes.json())
-      .then(response => {
-        expect(response).toHaveProperty("status");
-        expect(response).toHaveProperty("errorMessage");
-        expect(response.status).toBe(StatusCode.ERROR);
-        expect(response.errorMessage).toBe(
+    ).then(response => {
+      response.json().then(jsonResp => {
+        expect(response.status).toBe(400);
+        expect(jsonResp).toHaveProperty("errorMessage");
+        expect(jsonResp.errorMessage).toBe(
           "Token is required for this request"
         );
-        expect(response.content).toBeUndefined();
+        expect(jsonResp.transactions).toBeUndefined();
         done();
       });
+    });
   });
 
   test("Transaction List should return a specific element", done => {
@@ -80,19 +76,17 @@ describe("Transaction Controllers", () => {
         CONFIG.CONTROLLER.PORT +
         CONFIG.CONTROLLER.ROUTES.TRANSACTION
       ).replace(":id", "2") + "?token=A123"
-    )
-      .then(fetchRes => fetchRes.json())
-      .then(response => {
-        expect(response).toHaveProperty("status");
-        expect(response.status).toBe(StatusCode.OK);
-        expect(response.errorMessage).toBeUndefined();
-        expect(response).toHaveProperty("content");
-        expect(response.content).toHaveProperty("total");
-        expect(response.content).toHaveProperty("start");
-        expect(response.content).toHaveProperty("size");
-        expect(response.content).toHaveProperty("transactions");
-        expect(response.content.transactions.length).toBe(1);
+    ).then(response => {
+      response.json().then(jsonResp => {
+        expect(response.status).toBe(200);
+        expect(jsonResp.errorMessage).toBeUndefined();
+        expect(jsonResp).toHaveProperty("total");
+        expect(jsonResp).toHaveProperty("start");
+        expect(jsonResp).toHaveProperty("size");
+        expect(jsonResp).toHaveProperty("transactions");
+        expect(jsonResp.transactions.length).toBe(1);
         done();
       });
+    });
   });
 });

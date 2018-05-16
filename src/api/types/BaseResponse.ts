@@ -28,3 +28,6 @@ export const Properties = t.interface({
   decimalDigits: t.number
 });
 export type Properties = t.TypeOf<typeof Properties>;
+
+export const AckResult = t.keyof({ OK: "OK", KO: "KO" });
+export type AckResult = t.TypeOf<typeof AckResult>;

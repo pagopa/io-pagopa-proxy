@@ -6,6 +6,7 @@
 import * as express from "express";
 import { TransactionAPI } from "../api/services/TransactionAPI";
 import { TransactionListResponse } from "../api/types/TransactionResponse";
+import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
 import { RestfulUtils } from "../utils/RestfulUtils";
 
@@ -23,18 +24,24 @@ export class TransactionController {
 
     TransactionAPI.getTransactionListResponse(
       res,
-      RestfulUtils.handleErrorCallback,
+      RestfulUtils.sendUnavailableAPIError,
       (
         response: express.Response,
         transactionListResponse: TransactionListResponse
       ) => {
-        // Success callback
-        RestfulUtils.setSuccessResponse(
-          response,
-          AppResponseConverter.getTransactionListFromAPIResponse(
-            transactionListResponse
-          )
+        // Check result
+        const requestResult = AppResponseConverter.getTransactionListFromAPIResponse(
+          transactionListResponse
         );
+        if (requestResult.isLeft()) {
+          RestfulUtils.sendErrorResponse(
+            response,
+            requestResult.value,
+            HttpErrorStatusCode.FORBIDDEN
+          );
+          return;
+        }
+        RestfulUtils.sendSuccessResponse(response, requestResult.value);
       },
       req.query.apiRequestToken,
       req.params.id,

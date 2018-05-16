@@ -13,14 +13,14 @@ import { NotificationSubscriptionResponse } from "../types/NotificationSubscript
 export class NotificationAPI {
   // Retrieve wallet containing payment methods
   public static updateSubscription(
+    fiscalCode: string,
+    requestType: NotificationSubscriptionRequestType,
     res: express.Response,
     errorCallback: (res: express.Response, errorMsg: string) => void,
     successCallback: (
       res: express.Response,
       notificationSubscriptionResponse: NotificationSubscriptionResponse
-    ) => void,
-    fiscalCode: string,
-    requestType: NotificationSubscriptionRequestType
+    ) => void
   ): void {
     const url =
       CONFIG.PAGOPA.HOST +

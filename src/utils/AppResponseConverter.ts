@@ -3,14 +3,13 @@
  * Define utils to convert data from PagoPaAPI interfaces to controller interfaces and viceversa
  */
 
+import { Either, Left, Right } from "fp-ts/lib/Either";
+import { AckResult } from "../api/types/BaseResponse";
 import {
   LoginAnonymousResponse,
   LoginResponse
 } from "../api/types/LoginResponse";
-import {
-  AckResult,
-  NotificationSubscriptionResponse
-} from "../api/types/NotificationSubscriptionResponse";
+import { NotificationSubscriptionResponse } from "../api/types/NotificationSubscriptionResponse";
 import {
   Transaction,
   TransactionListResponse
@@ -35,41 +34,39 @@ import {
 export class AppResponseConverter {
   public static getLoginFromAPIResponse(
     loginResponse: LoginResponse
-  ): LoginResponseApp | Error {
+  ): Either<ControllerError, LoginResponseApp> {
     if (loginResponse.apiRequestToken === undefined) {
-      return new Error(ControllerError.ERROR_LOGIN_FAILED);
+      return new Left(ControllerError.ERROR_LOGIN_FAILED);
     }
-    return {
-      token: loginResponse.apiRequestToken
-    };
+    return new Right({ token: loginResponse.apiRequestToken });
   }
 
   public static getLoginAnonymusFromAPIResponse(
     loginAnonymousResponse: LoginAnonymousResponse
-  ): LoginAnonymousResponseApp | Error {
+  ): Either<ControllerError, LoginAnonymousResponseApp> {
     if (
       loginAnonymousResponse.apiRequestToken === undefined ||
       loginAnonymousResponse.apiRequestToken === ""
     ) {
-      return new Error(ControllerError.ERROR_LOGIN_FAILED);
+      return new Left(ControllerError.ERROR_LOGIN_FAILED);
     }
-    return {
+    return new Right({
       token: loginAnonymousResponse.apiRequestToken,
       type: loginAnonymousResponse.approveTerms.type,
       title: loginAnonymousResponse.approveTerms.title,
       privacy: loginAnonymousResponse.approveTerms.properties.privacy,
       terms: loginAnonymousResponse.approveTerms.properties.terms
-    };
+    });
   }
 
   public static getWalletFromAPIResponse(
     walletResponse: WalletResponse
-  ): WalletResponseApp | Error {
+  ): Either<ControllerError, WalletResponseApp> {
     if (walletResponse.data === undefined) {
-      return new Error(ControllerError.ERROR_DATA_NOT_FOUND);
+      return new Left(ControllerError.ERROR_DATA_NOT_FOUND);
     }
 
-    return {
+    return new Right({
       wallet: walletResponse.data.map(
         (paymentMethod: PaymentMethod): PaymentMethodApp => {
           return {
@@ -86,17 +83,17 @@ export class AppResponseConverter {
           };
         }
       )
-    } as WalletResponseApp;
+    });
   }
 
   public static getTransactionListFromAPIResponse(
     transactionListResponse: TransactionListResponse
-  ): TransactionListResponseApp | Error {
+  ): Either<ControllerError, TransactionListResponseApp> {
     if (transactionListResponse.data === undefined) {
-      return new Error(ControllerError.ERROR_DATA_NOT_FOUND);
+      return new Left(ControllerError.ERROR_DATA_NOT_FOUND);
     }
 
-    return {
+    return new Right({
       total: transactionListResponse.total,
       size: transactionListResponse.size,
       start: transactionListResponse.start,
@@ -114,17 +111,17 @@ export class AppResponseConverter {
           };
         }
       )
-    } as TransactionListResponseApp;
+    });
   }
 
   public static getNotificationSubscriptionResponseFromAPIResponse(
     notificationSubscriptionResponse: NotificationSubscriptionResponse
-  ): NotificationSubscriptionResponseApp | Error {
+  ): Either<ControllerError, NotificationSubscriptionResponseApp> {
     if (notificationSubscriptionResponse.result !== AckResult.keys.OK) {
-      return new Error(ControllerError.REQUEST_REJECTED);
+      return new Left(ControllerError.REQUEST_REJECTED);
     }
-    return {
+    return new Right({
       result: true
-    };
+    });
   }
 }

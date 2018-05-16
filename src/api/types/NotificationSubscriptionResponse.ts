@@ -4,9 +4,7 @@
  */
 
 import * as t from "io-ts";
-
-export const AckResult = t.keyof({ OK: "OK", KO: "KO" });
-export type AckResult = t.TypeOf<typeof AckResult>;
+import { AckResult } from "./BaseResponse";
 
 export const NotificationSubscriptionResponse = t.interface({
   result: AckResult

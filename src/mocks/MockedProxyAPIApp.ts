@@ -17,21 +17,18 @@ import { logger } from "../utils/Logger";
 debug("ts-express:server");
 
 export class MockedProxyAPIApp {
-  private readonly app?: core.Express;
-  private server?: http.Server;
+  private readonly app: core.Express;
+  private readonly server: http.Server;
 
   public constructor() {
     this.app = express();
     this.setGlobalSettings();
     this.setServerRoutes();
+    this.server = http.createServer(this.app);
   }
 
   public startServer(): boolean {
-    logger.info("Starting PagoPa API Mocked Server...");
-    if (this.app === undefined) {
-      return false;
-    }
-    this.server = http.createServer(this.app);
+    logger.info("Starting Proxy PagoPa Server...");
     this.server.listen(CONFIG.PAGOPA.PORT);
     this.server.on("error", this.onError);
     this.server.on("listening", this.onListening);

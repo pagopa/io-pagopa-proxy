@@ -6,6 +6,7 @@
 import * as express from "express";
 import { WalletAPI } from "../api/services/WalletAPI";
 import { WalletResponse } from "../api/types/WalletResponse";
+import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
 import { RestfulUtils } from "../utils/RestfulUtils";
 
@@ -21,13 +22,21 @@ export class WalletController {
     // Require wallet to API
     WalletAPI.getWalletResponse(
       res,
-      RestfulUtils.handleErrorCallback,
+      RestfulUtils.sendUnavailableAPIError,
       (response: express.Response, walletResponse: WalletResponse) => {
-        // Success callback
-        RestfulUtils.setSuccessResponse(
-          response,
-          AppResponseConverter.getWalletFromAPIResponse(walletResponse)
+        // Check result
+        const requestResult = AppResponseConverter.getWalletFromAPIResponse(
+          walletResponse
         );
+        if (requestResult.isLeft()) {
+          RestfulUtils.sendErrorResponse(
+            response,
+            requestResult.value,
+            HttpErrorStatusCode.UNAUTHORIZED
+          );
+          return;
+        }
+        RestfulUtils.sendSuccessResponse(response, requestResult.value);
       },
       req.query.apiRequestToken
     );

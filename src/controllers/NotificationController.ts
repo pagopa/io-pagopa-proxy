@@ -7,6 +7,7 @@ import * as express from "express";
 import { NotificationAPI } from "../api/services/NotificationAPI";
 import { NotificationSubscriptionResponse } from "../api/types/NotificationSubscriptionResponse";
 import { ControllerError } from "../enums/ControllerError";
+import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { NotificationSubscriptionRequestType } from "../enums/NotificationSubscriptionType";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
 import { RestfulUtils } from "../utils/RestfulUtils";
@@ -21,28 +22,38 @@ export class NotificationController {
   ): void {
     // Check input
     if (req.params.fiscalCode === undefined || requestType === undefined) {
-      RestfulUtils.setErrorResponse(res, ControllerError.ERROR_INVALID_INPUT);
+      RestfulUtils.sendErrorResponse(
+        res,
+        ControllerError.ERROR_INVALID_INPUT,
+        HttpErrorStatusCode.BAD_REQUEST
+      );
       return;
     }
 
     // Require subscription to API
     NotificationAPI.updateSubscription(
+      req.params.fiscalCode,
+      requestType,
       res,
-      RestfulUtils.handleErrorCallback,
+      RestfulUtils.sendUnavailableAPIError,
       (
         response: express.Response,
         notificationSubscriptionResponse: NotificationSubscriptionResponse
       ) => {
-        // Success callback
-        RestfulUtils.setSuccessResponse(
-          response,
-          AppResponseConverter.getNotificationSubscriptionResponseFromAPIResponse(
-            notificationSubscriptionResponse
-          )
+        // Check result
+        const requestResult = AppResponseConverter.getNotificationSubscriptionResponseFromAPIResponse(
+          notificationSubscriptionResponse
         );
-      },
-      req.params.fiscalCode,
-      requestType
+        if (requestResult.isLeft()) {
+          RestfulUtils.sendErrorResponse(
+            response,
+            requestResult.value,
+            HttpErrorStatusCode.FORBIDDEN
+          );
+          return;
+        }
+        RestfulUtils.sendSuccessResponse(response, requestResult.value);
+      }
     );
   }
 }
