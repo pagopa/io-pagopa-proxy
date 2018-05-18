@@ -11,7 +11,7 @@ import { NotificationSubscriptionResponse } from "../types/NotificationSubscript
 
 // Notification Service for PagoPA communications
 export class NotificationAPI {
-  // Retrieve wallet containing payment methods
+  // Update subscription (Activation or Deactivation) to Notification Service for a fiscalCode
   public static updateSubscription(
     fiscalCode: string,
     requestType: NotificationSubscriptionRequestType,
@@ -29,7 +29,7 @@ export class NotificationAPI {
       CONFIG.PAGOPA.SERVICES.NOTIFICATION_UPDATE_SUBSCRIPTION;
     const body = {
       timestamp: Date.now(),
-      requestId: Math.floor(Math.random() * 99999999999999999999),
+      requestId: Math.floor(Math.random() * Number.MAX_SAFE_INTEGER),
       operation:
         requestType === NotificationSubscriptionRequestType.ACTIVATION
           ? "A"

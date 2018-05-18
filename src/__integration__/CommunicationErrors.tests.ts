@@ -27,10 +27,12 @@ describe("Generic Controllers", () => {
   test("PagoPaAPI should be not available", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.LOGIN +
-        "?username=mario&password=rossi"
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION("A123"),
+      {
+        method: "POST"
+      }
     ).then(response => {
       response.json().then(jsonResp => {
         expect(response.status).toBe(503);

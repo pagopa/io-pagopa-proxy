@@ -11,7 +11,9 @@
     "clean": "rm -r ./lib",
     "prettify": "prettier --write './**/*.ts'",
     "start": "node lib/index.js",
-    "test": "jest"
+    "test": "jest -i",
+    "test:integration": "jest -i --config=jest.integration.js",
+    "lint": "tslint --project ."
   },
   "devDependencies": {
     "@types/debug": "0.0.30",
@@ -49,24 +51,15 @@
     "winston": "^2.4.2"
   },
   "jest": {
-    "globals": {
-      "ts-jest": {
-        "skipBabel": true
-      }
-    },
     "collectCoverage": true,
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
+    "testMatch": [
+      "**/__tests__/*.js"
+    ],
     "coveragePathIgnorePatterns": [
       "/mocks/"
-    ],
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "json",
-      "node"
     ]
   }
 }

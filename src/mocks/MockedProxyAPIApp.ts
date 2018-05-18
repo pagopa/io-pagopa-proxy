@@ -48,74 +48,18 @@ export class MockedProxyAPIApp {
     if (this.app === undefined) {
       return false;
     }
-    const mockedProxyAPIData = new MockedProxyAPIData();
 
-    this.app.get(CONFIG.PAGOPA.SERVICES.LOGIN, (req, res) => {
-      if (req.query.username === "mario" && req.query.password === "rossi") {
-        res.status(200).json(mockedProxyAPIData.getLoginResponseMocked());
-      } else {
-        res.status(200).json(mockedProxyAPIData.getLoginResponseErrorMocked());
-      }
-    });
-    this.app.get(CONFIG.PAGOPA.SERVICES.LOGIN_ANONYMOUS, (req, res) => {
-      if (
-        req.query.email === "mario@mail.it" &&
-        req.query.idPayment === "test"
-      ) {
-        res
-          .status(200)
-          .json(mockedProxyAPIData.getLoginAnonymousResponseMocked());
-      } else {
-        res
-          .status(200)
-          .json(mockedProxyAPIData.getLoginAnonymousResponseErrorMocked());
-      }
-    });
-    this.app.get(CONFIG.PAGOPA.SERVICES.TRANSACTION, (req, res) => {
-      if (
-        req.query.apiRequestToken !== undefined &&
-        req.params.id !== undefined
-      ) {
-        res
-          .status(200)
-          .json(
-            mockedProxyAPIData.getTransactionListResponseMocked(req.params.id)
-          );
-      } else {
-        res
-          .status(200)
-          .json(mockedProxyAPIData.getTransactionListResponseErrorMocked());
-      }
-    });
-    this.app.get(CONFIG.PAGOPA.SERVICES.TRANSACTIONS, (req, res) => {
-      if (req.query.apiRequestToken !== undefined) {
-        res
-          .status(200)
-          .json(mockedProxyAPIData.getTransactionListResponseMocked(undefined));
-      } else {
-        res
-          .status(200)
-          .json(mockedProxyAPIData.getTransactionListResponseErrorMocked());
-      }
-    });
-    this.app.get(CONFIG.PAGOPA.SERVICES.WALLET, (req, res) => {
-      if (req.query.apiRequestToken !== undefined) {
-        res.status(200).json(mockedProxyAPIData.getWalletResponseMocked());
-      } else {
-        res.status(200).json(mockedProxyAPIData.getWalletResponseErrorMocked());
-      }
-    });
     this.app.post(
       CONFIG.PAGOPA.SERVICES.NOTIFICATION_UPDATE_SUBSCRIPTION,
       (req, res) => {
         if (req.body.user.id === "wrongFiscalCode") {
           res
             .status(200)
-            .json(mockedProxyAPIData.getNotificationResponseMocked(false));
+            .json(MockedProxyAPIData.getNotificationResponseMocked(false));
         } else {
           res
             .status(200)
-            .json(mockedProxyAPIData.getNotificationResponseMocked(true));
+            .json(MockedProxyAPIData.getNotificationResponseMocked(true));
         }
       }
     );

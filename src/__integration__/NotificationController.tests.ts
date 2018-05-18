@@ -29,14 +29,13 @@ afterAll(() => {
 });
 
 describe("Notification Controllers", () => {
-  test("Activation should return a positive result", done => {
-    fetch(
-      (
-        CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
-      ).replace(":fiscalCode", "AAABBB11H11A100A"),
+
+  test("Activation should return a positive result", () => {
+    return fetch(
+      CONFIG.CONTROLLER.HOST +
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION("AAABBB11H11A100A"),
       {
         method: "POST"
       }
@@ -46,64 +45,16 @@ describe("Notification Controllers", () => {
         expect(jsonResp.errorMessage).toBeUndefined();
         expect(jsonResp).toHaveProperty("result");
         expect(jsonResp.result).toBe(true);
-        done();
       });
     });
   });
 
-  test("Activation should return a negative result", done => {
-    fetch(
-      (
-        CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
-      ).replace(":fiscalCode", "wrongFiscalCode"),
-      {
-        method: "POST"
-      }
-    ).then(response => {
-      response.json().then(jsonResp => {
-        expect(response.status).toBe(403);
-        expect(jsonResp.errorMessage).toBe(ControllerError.REQUEST_REJECTED);
-        expect(jsonResp.result).toBeUndefined();
-        done();
-      });
-    });
-  });
-});
-
-test("Deactivation should return a positive result", done => {
-  fetch(
-    (
+  test("Activation should return a negative result", () => {
+    return fetch(
       CONFIG.CONTROLLER.HOST +
       ":" +
       CONFIG.CONTROLLER.PORT +
-      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION
-    ).replace(":fiscalCode", "AAABBB11H11A100A"),
-    {
-      method: "POST"
-    }
-  ).then(response => {
-    response.json().then(jsonResp => {
-      expect(response.status).toBe(200);
-      expect(jsonResp.errorMessage).toBeUndefined();
-      expect(jsonResp).toHaveProperty("result");
-      expect(jsonResp.result).toBe(true);
-      done();
-    });
-  });
-});
-
-describe("Notification Controllers", () => {
-  test("Deactivation should return a negative result", done => {
-    fetch(
-      (
-        CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION
-      ).replace(":fiscalCode", "wrongFiscalCode"),
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION("wrongFiscalCode"),
       {
         method: "POST"
       }
@@ -112,8 +63,46 @@ describe("Notification Controllers", () => {
         expect(response.status).toBe(403);
         expect(jsonResp.errorMessage).toBe(ControllerError.REQUEST_REJECTED);
         expect(jsonResp.result).toBeUndefined();
-        done();
       });
     });
   });
+
+  test("Deactivation should return a positive result", () => {
+    return fetch(
+      CONFIG.CONTROLLER.HOST +
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION("AAABBB11H11A100A"),
+      {
+        method: "POST"
+      }
+    ).then(response => {
+      return response.json().then(jsonResp => {
+        expect(response.status).toBe(200);
+        expect(jsonResp.errorMessage).toBeUndefined();
+        expect(jsonResp).toHaveProperty("result");
+        expect(jsonResp.result).toBe(true);
+      });
+    });
+  });
+
+  test("Deactivation should return a negative result", () => {
+    return fetch(
+      CONFIG.CONTROLLER.HOST +
+      ":" +
+      CONFIG.CONTROLLER.PORT +
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION("wrongFiscalCode"),
+      {
+        method: "POST"
+      }
+    ).then(response => {
+      response.json().then(jsonResp => {
+        expect(response.status).toBe(403);
+        expect(jsonResp.errorMessage).toBe(ControllerError.REQUEST_REJECTED);
+        expect(jsonResp.result).toBeUndefined();
+      });
+    });
+  });
+
 });
+

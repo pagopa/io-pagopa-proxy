@@ -9,9 +9,6 @@ import * as core from "express-serve-static-core";
 import * as http from "http";
 import { CONFIG } from "./Configuration";
 import { NotificationController } from "./controllers/NotificationController";
-import { TransactionController } from "./controllers/TransactionController";
-import { UserController } from "./controllers/UserController";
-import { WalletController } from "./controllers/WalletController";
 import { NotificationSubscriptionRequestType } from "./enums/NotificationSubscriptionType";
 import { logger } from "./utils/Logger";
 
@@ -19,12 +16,8 @@ import { logger } from "./utils/Logger";
 export class App {
   private readonly app: core.Express;
   private readonly server: http.Server;
-  private readonly serverPort: number | string;
 
   public constructor() {
-    this.serverPort = this.normalizePort(
-      process.env.PORT || CONFIG.CONTROLLER.PORT
-    );
     this.app = express();
     this.setGlobalSettings();
     this.setServerRoutes();
@@ -33,9 +26,8 @@ export class App {
 
   public startServer(): boolean {
     logger.info("Starting Proxy PagoPa Server...");
-    this.server.listen(this.serverPort);
+    this.server.listen(this.getServerPort());
     this.server.on("error", this.onError);
-    this.server.on("listening", this.onListening);
     return true;
   }
 
@@ -52,28 +44,8 @@ export class App {
     if (this.app === undefined) {
       return false;
     }
-    this.app.get(CONFIG.CONTROLLER.ROUTES.LOGIN, (req, res) => {
-      logger.info("Serving Login Request (GET)...");
-      UserController.login(req, res);
-    });
-    this.app.get(CONFIG.CONTROLLER.ROUTES.LOGIN_ANONYMOUS, (req, res) => {
-      logger.info("Serving LoginAnonymous Request (GET)...");
-      UserController.loginAnonymous(req, res);
-    });
-    this.app.get(CONFIG.CONTROLLER.ROUTES.WALLET, (req, res) => {
-      logger.info("Serving Wallet Request (GET)...");
-      WalletController.getWallet(req, res);
-    });
-    this.app.get(CONFIG.CONTROLLER.ROUTES.TRANSACTIONS, (req, res) => {
-      logger.info("Serving Transactions Request (GET)...");
-      TransactionController.getTransactions(req, res);
-    });
-    this.app.get(CONFIG.CONTROLLER.ROUTES.TRANSACTION, (req, res) => {
-      logger.info("Serving Transaction Request (GET)...");
-      TransactionController.getTransactions(req, res);
-    });
     this.app.post(
-      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION,
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION(),
       (req, res) => {
         logger.info("Serving Notification Activation Request (POST)...");
         NotificationController.updateSubscription(
@@ -84,7 +56,7 @@ export class App {
       }
     );
     this.app.post(
-      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION,
+      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION(),
       (req, res) => {
         logger.info("Serving Notification Deactivation REQUEST (POST)...");
         NotificationController.updateSubscription(
@@ -101,32 +73,35 @@ export class App {
     if (this.app === undefined) {
       return false;
     }
-    this.app.set("port", this.serverPort);
+    this.app.set("port", this.getServerPort());
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     return true;
   }
 
-  private normalizePort(val: number | string): number | string {
-    const xport: number = typeof val === "string" ? parseInt(val, 10) : val;
-    if (isNaN(xport)) {
-      return val;
-    } else if (xport >= 0) {
-      return xport;
-    } else {
-      throw Error("Cannot define a valid port to user for Server!");
+  private getServerPort(): number {
+    if (CONFIG.CONTROLLER.PORT === undefined) {
+      throw Error("Cannot use undefined port for Server!");
     }
+    if (typeof CONFIG.CONTROLLER.PORT === "string") {
+      const portNumber = parseInt(CONFIG.CONTROLLER.PORT, 10);
+      if (portNumber > 0) {
+        return portNumber;
+      }
+    } else if (
+      typeof CONFIG.CONTROLLER.PORT === "number" &&
+      CONFIG.CONTROLLER.PORT > 0
+    ) {
+      return CONFIG.CONTROLLER.PORT;
+    }
+    throw Error("Invalid port defined for Server");
   }
 
   private onError(error: NodeJS.ErrnoException): void {
     if (error.syscall !== "listen") {
       throw error;
     }
-    const stringPort = String(this.serverPort);
-    const bind =
-      typeof this.serverPort === "string"
-        ? "Pipe " + stringPort
-        : "Port " + stringPort;
+    const bind = "Port " + String(this.getServerPort());
     switch (error.code) {
       case "EACCES":
         logger.error(`${bind} requires elevated privileges`);
@@ -139,16 +114,5 @@ export class App {
       default:
         throw error;
     }
-  }
-
-  private onListening(): boolean {
-    if (this.server === undefined) {
-      return false;
-    }
-    const addr = this.server.address();
-    const bind =
-      typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
-    logger.debug(`Listening on ${bind}`);
-    return true;
   }
 }
