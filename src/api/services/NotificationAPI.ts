@@ -5,15 +5,17 @@
 
 import * as express from "express";
 import fetch from "node-fetch";
+import * as uuid from "uuid";
 import { CONFIG } from "../../Configuration";
 import { NotificationSubscriptionRequestType } from "../../enums/NotificationSubscriptionType";
+import { FiscalCode } from "../../types/FiscalCode";
 import { NotificationSubscriptionResponse } from "../types/NotificationSubscriptionResponse";
 
 // Notification Service for PagoPA communications
 export class NotificationAPI {
   // Update subscription (Activation or Deactivation) to Notification Service for a fiscalCode
   public static updateSubscription(
-    fiscalCode: string,
+    fiscalCode: FiscalCode,
     requestType: NotificationSubscriptionRequestType,
     res: express.Response,
     errorCallback: (res: express.Response, errorMsg: string) => void,
@@ -29,11 +31,11 @@ export class NotificationAPI {
       CONFIG.PAGOPA.SERVICES.NOTIFICATION_UPDATE_SUBSCRIPTION;
     const body = {
       timestamp: Date.now(),
-      requestId: Math.floor(Math.random() * Number.MAX_SAFE_INTEGER),
+      requestId: uuid.v1(),
       operation:
         requestType === NotificationSubscriptionRequestType.ACTIVATION
-          ? "A"
-          : "D",
+          ? "A" // Activation
+          : "D", // Deactivation
       user: {
         type: "F",
         id: fiscalCode

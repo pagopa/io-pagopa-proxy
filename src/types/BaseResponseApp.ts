@@ -3,13 +3,12 @@
  */
 
 export interface IRestfulObject {
-  [key: string]:
+  readonly [key: string]:
     | IRestfulObject
     | string
     | number
     | boolean
     | ReadonlyArray<IRestfulObject>
     | ReadonlyArray<string>
-    | ReadonlyArray<number>
-    | undefined; // tslint:disable-line
+    | ReadonlyArray<number>;
 }

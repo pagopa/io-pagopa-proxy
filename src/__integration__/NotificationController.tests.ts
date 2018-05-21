@@ -5,37 +5,40 @@
 
 // tslint:disable
 
+import * as http from "http";
 import fetch from "node-fetch";
 import { App } from "../App";
 import { CONFIG } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
 import { MockedProxyAPIApp } from "../mocks/MockedProxyAPIApp";
 import { disableConsoleLog } from "../utils/Logger";
+import { FiscalCode } from "../types/FiscalCode";
+import { RestfulUtils } from "../utils/RestfulUtils";
 
-let mockedProxyAPIApp: MockedProxyAPIApp;
-let app: App;
+let mockedProxyAPIServer: http.Server;
+let server: http.Server;
 
 beforeAll(() => {
   disableConsoleLog();
-  mockedProxyAPIApp = new MockedProxyAPIApp();
-  app = new App();
-  mockedProxyAPIApp.startServer();
-  app.startServer();
+  mockedProxyAPIServer = MockedProxyAPIApp.startApp();
+  server = App.startApp();
 });
 
 afterAll(() => {
-  if (app !== undefined) app.stopServer();
-  if (mockedProxyAPIApp !== undefined) mockedProxyAPIApp.stopServer();
+  App.stopServer(server);
+  MockedProxyAPIApp.stopServer(mockedProxyAPIServer);
 });
 
 describe("Notification Controllers", () => {
-
   test("Activation should return a positive result", () => {
+    FiscalCode.decode("AAABBB88H22A089A");
     return fetch(
       CONFIG.CONTROLLER.HOST +
-      ":" +
-      CONFIG.CONTROLLER.PORT +
-      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION("AAABBB11H11A100A"),
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+          FiscalCode.decode("AAABBB88H22A089A").value as FiscalCode
+        ),
       {
         method: "POST"
       }
@@ -52,9 +55,11 @@ describe("Notification Controllers", () => {
   test("Activation should return a negative result", () => {
     return fetch(
       CONFIG.CONTROLLER.HOST +
-      ":" +
-      CONFIG.CONTROLLER.PORT +
-      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION("wrongFiscalCode"),
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+          FiscalCode.decode("BADBAD88H22A089A").value as FiscalCode
+        ),
       {
         method: "POST"
       }
@@ -67,12 +72,34 @@ describe("Notification Controllers", () => {
     });
   });
 
+  test("Activation should return a negative result (invalid FiscalCode)", () => {
+    return fetch(
+      CONFIG.CONTROLLER.HOST +
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+          FiscalCode.decode("wrongFiscalCode").value as FiscalCode
+        ),
+      {
+        method: "POST"
+      }
+    ).then(response => {
+      response.json().then(jsonResp => {
+        expect(response.status).toBe(400);
+        expect(jsonResp.errorMessage).toBe(ControllerError.ERROR_INVALID_INPUT);
+        expect(jsonResp.result).toBeUndefined();
+      });
+    });
+  });
+
   test("Deactivation should return a positive result", () => {
     return fetch(
       CONFIG.CONTROLLER.HOST +
-      ":" +
-      CONFIG.CONTROLLER.PORT +
-      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION("AAABBB11H11A100A"),
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+          FiscalCode.decode("AAABBB88H22A089A").value as FiscalCode
+        ),
       {
         method: "POST"
       }
@@ -89,9 +116,11 @@ describe("Notification Controllers", () => {
   test("Deactivation should return a negative result", () => {
     return fetch(
       CONFIG.CONTROLLER.HOST +
-      ":" +
-      CONFIG.CONTROLLER.PORT +
-      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION("wrongFiscalCode"),
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        RestfulUtils.getDeactivateNotificationSubscriptionUrlForApp(
+          FiscalCode.decode("BADBAD88H22A089A").value as FiscalCode
+        ),
       {
         method: "POST"
       }
@@ -103,6 +132,4 @@ describe("Notification Controllers", () => {
       });
     });
   });
-
 });
-

@@ -9,19 +9,43 @@ import { NotificationSubscriptionResponse } from "../api/types/NotificationSubsc
 import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { NotificationSubscriptionRequestType } from "../enums/NotificationSubscriptionType";
+import { FiscalCode } from "../types/FiscalCode";
 import { AppResponseConverter } from "../utils/AppResponseConverter";
 import { RestfulUtils } from "../utils/RestfulUtils";
 
 // Notification Controller
 export class NotificationController {
+  public static notificationActivation(
+    req: express.Request,
+    res: express.Response
+  ): void {
+    this.updateSubscription(
+      req,
+      res,
+      NotificationSubscriptionRequestType.ACTIVATION
+    );
+  }
+
+  public static notificationDeactivation(
+    req: express.Request,
+    res: express.Response
+  ): void {
+    this.updateSubscription(
+      req,
+      res,
+      NotificationSubscriptionRequestType.DEACTIVATION
+    );
+  }
+
   // Update user subscription to Notification Service
-  public static updateSubscription(
+  private static updateSubscription(
     req: express.Request,
     res: express.Response,
     requestType: NotificationSubscriptionRequestType
   ): void {
     // Check input
-    if (req.params.fiscalCode === undefined || requestType === undefined) {
+    const fiscalCode = FiscalCode.decode(req.params.fiscalCode);
+    if (fiscalCode.isLeft()) {
       RestfulUtils.sendErrorResponse(
         res,
         ControllerError.ERROR_INVALID_INPUT,
@@ -32,7 +56,7 @@ export class NotificationController {
 
     // Require subscription to API
     NotificationAPI.updateSubscription(
-      req.params.fiscalCode,
+      fiscalCode.value,
       requestType,
       res,
       RestfulUtils.sendUnavailableAPIError,

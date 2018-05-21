@@ -13,7 +13,7 @@ describe("AppResponseConverter", () => {
     expect(response.isRight()).toBe(true);
   });
 
-  test("NotificationSubscriptionResponse should be invalid", () => {
+  test("NotificationSubscriptionResponse should be rejected", () => {
     const response = AppResponseConverter.getNotificationSubscriptionResponseFromAPIResponse(
       MockedProxyAPIData.getNotificationResponseMocked(false)
     );

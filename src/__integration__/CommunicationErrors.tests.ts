@@ -5,31 +5,35 @@
 
 // tslint:disable
 
+import * as http from "http";
 import fetch from "node-fetch";
 import { App } from "../App";
 import { CONFIG } from "../Configuration";
 import { disableConsoleLog } from "../utils/Logger";
 import { ControllerError } from "../enums/ControllerError";
+import { FiscalCode } from "../types/FiscalCode";
+import { RestfulUtils } from "../utils/RestfulUtils";
 
-let app: App;
+let server: http.Server;
 
 beforeAll(() => {
   disableConsoleLog();
-  app = new App();
-  app.startServer();
+  server = App.startApp();
 });
 
 afterAll(() => {
-  if (app !== undefined) app.stopServer();
+  App.stopServer(server);
 });
 
 describe("Generic Controllers", () => {
   test("PagoPaAPI should be not available", done => {
     fetch(
       CONFIG.CONTROLLER.HOST +
-      ":" +
-      CONFIG.CONTROLLER.PORT +
-      CONFIG.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION("A123"),
+        ":" +
+        CONFIG.CONTROLLER.PORT +
+        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+          FiscalCode.decode("AAABBB11H11A100A").value as FiscalCode
+        ),
       {
         method: "POST"
       }
