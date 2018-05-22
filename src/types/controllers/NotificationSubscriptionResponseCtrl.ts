@@ -5,9 +5,9 @@
 
 import * as t from "io-ts";
 
-export const NotificationSubscriptionResponseApp = t.interface({
+export const NotificationSubscriptionResponseCtrl = t.interface({
   result: t.boolean
 });
-export type NotificationSubscriptionResponseApp = t.TypeOf<
-  typeof NotificationSubscriptionResponseApp
+export type NotificationSubscriptionResponseCtrl = t.TypeOf<
+  typeof NotificationSubscriptionResponseCtrl
 >;

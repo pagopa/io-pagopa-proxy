@@ -8,9 +8,9 @@ import * as t from "io-ts";
 export const AckResult = t.keyof({ OK: "OK", KO: "KO" });
 export type AckResult = t.TypeOf<typeof AckResult>;
 
-export const NotificationSubscriptionResponse = t.interface({
+export const NotificationSubscriptionResponseAPI = t.interface({
   result: AckResult
 });
-export type NotificationSubscriptionResponse = t.TypeOf<
-  typeof NotificationSubscriptionResponse
+export type NotificationSubscriptionResponseAPI = t.TypeOf<
+  typeof NotificationSubscriptionResponseAPI
 >;

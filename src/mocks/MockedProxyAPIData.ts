@@ -3,15 +3,14 @@
  * Define Mocked Responses used by MockedProxyAPIApp
  */
 
-// tslint:disable
 import {
   AckResult,
-  NotificationSubscriptionResponse
-} from "../api/types/NotificationSubscriptionResponse";
+  NotificationSubscriptionResponseAPI
+} from "../types/api/NotificationSubscriptionResponseAPI";
 
 export function getNotificationResponseMocked(
   positive: boolean
-): NotificationSubscriptionResponse {
+): NotificationSubscriptionResponseAPI {
   return {
     result: positive === true ? AckResult.encode("OK") : AckResult.encode("KO")
   };

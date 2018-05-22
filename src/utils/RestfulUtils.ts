@@ -40,17 +40,18 @@ export function sendUnavailableAPIError(res: express.Response): void {
   );
 }
 
-// Provide a valid url to activate notification subscription
-export function getActivateNotificationSubscriptionUrlForApp(
+// Provide a valid url to activate\deactivate notification subscription
+export function getNotificationSubscriptionUrlForCtrl(
   fiscalCode: FiscalCode,
   serviceUrl: NonEmptyString
-): string {
-  return serviceUrl.replace(":fiscalCode", fiscalCode);
-}
-// Provide a valid url to deactivate notification subscription
-export function getDeactivateNotificationSubscriptionUrlForApp(
-  fiscalCode: FiscalCode,
-  serviceUrl: NonEmptyString
-): string {
-  return serviceUrl.replace(":fiscalCode", fiscalCode);
+): NonEmptyString {
+  const errorOrUrl = NonEmptyString.decode(
+    serviceUrl.replace(":fiscalCode", fiscalCode)
+  );
+  if (errorOrUrl.isLeft()) {
+    throw Error(
+      "Invalid URL or fiscalCode. Cannot define an url for Notification Subscription Endpoint!"
+    );
+  }
+  return errorOrUrl.value;
 }

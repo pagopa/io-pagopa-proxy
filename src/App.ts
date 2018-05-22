@@ -34,11 +34,15 @@ function setServerRoutes(
 ): void {
   app.post(config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION, (req, res) => {
     logger.info("Serving Notification Activation Request (POST)...");
-    NotificationController.notificationActivation(req, res, config.PAGOPA);
+    NotificationController.notificationActivation(req, res, config.PAGOPA_API);
   });
   app.post(config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION, (req, res) => {
     logger.info("Serving Notification Deactivation REQUEST (POST)...");
-    NotificationController.notificationDeactivation(req, res, config.PAGOPA);
+    NotificationController.notificationDeactivation(
+      req,
+      res,
+      config.PAGOPA_API
+    );
   });
 }
 

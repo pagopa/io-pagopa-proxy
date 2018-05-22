@@ -6,10 +6,10 @@
 import * as express from "express";
 import fetch from "node-fetch";
 import * as uuid from "uuid";
-import { PagoPaConfig } from "../../Configuration";
-import { NotificationSubscriptionRequestType } from "../../enums/NotificationSubscriptionType";
-import { FiscalCode } from "../../types/FiscalCode";
-import { NotificationSubscriptionResponse } from "../types/NotificationSubscriptionResponse";
+import { PagoPaConfig } from "../Configuration";
+import { NotificationSubscriptionRequestType } from "../enums/NotificationSubscriptionType";
+import { NotificationSubscriptionResponseAPI } from "../types/api/NotificationSubscriptionResponseAPI";
+import { FiscalCode } from "../types/FiscalCode";
 
 // Update subscription (Activation or Deactivation) to Notification Service for a fiscalCode
 export function updateSubscription(
@@ -20,7 +20,7 @@ export function updateSubscription(
   errorCallback: (res: express.Response, errorMsg: string) => void,
   successCallback: (
     res: express.Response,
-    notificationSubscriptionResponse: NotificationSubscriptionResponse
+    notificationSubscriptionResponse: NotificationSubscriptionResponseAPI
   ) => void
 ): void {
   const url = `${pagoPaConfig.HOST}:${pagoPaConfig.PORT}${
@@ -31,8 +31,8 @@ export function updateSubscription(
     requestId: uuid.v1(),
     operation:
       requestType === NotificationSubscriptionRequestType.ACTIVATION
-        ? "A" // Activation
-        : "D", // Deactivation
+        ? OperationType.Activation
+        : OperationType.Deactivation,
     user: {
       type: "F",
       id: fiscalCode
@@ -47,4 +47,9 @@ export function updateSubscription(
     .then(fetchRes => fetchRes.json())
     .then(json => successCallback(res, json))
     .catch(err => errorCallback(res, err));
+}
+
+enum OperationType {
+  Activation = "A",
+  Deactivation = "B"
 }

@@ -4,17 +4,17 @@
  */
 
 import { Either, Left, Right } from "fp-ts/lib/Either";
+import { ControllerError } from "../enums/ControllerError";
 import {
   AckResult,
-  NotificationSubscriptionResponse
-} from "../api/types/NotificationSubscriptionResponse";
-import { ControllerError } from "../enums/ControllerError";
-import { NotificationSubscriptionResponseApp } from "../types/NotificationSubscriptionResponseApp";
+  NotificationSubscriptionResponseAPI
+} from "../types/api/NotificationSubscriptionResponseAPI";
+import { NotificationSubscriptionResponseCtrl } from "../types/controllers/NotificationSubscriptionResponseCtrl";
 
 // Data converter for controllers to translate API responses to Controller responses
 export function getNotificationSubscriptionResponseFromAPIResponse(
-  notificationSubscriptionResponse: NotificationSubscriptionResponse
-): Either<ControllerError, NotificationSubscriptionResponseApp> {
+  notificationSubscriptionResponse: NotificationSubscriptionResponseAPI
+): Either<ControllerError, NotificationSubscriptionResponseCtrl> {
   if (notificationSubscriptionResponse.result !== AckResult.keys.OK) {
     return new Left(ControllerError.REQUEST_REJECTED);
   }

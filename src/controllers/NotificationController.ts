@@ -4,17 +4,16 @@
  */
 
 import * as express from "express";
-import * as NotificationAPI from "../api/services/NotificationAPI";
-import { NotificationSubscriptionResponse } from "../api/types/NotificationSubscriptionResponse";
 import { PagoPaConfig } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { NotificationSubscriptionRequestType } from "../enums/NotificationSubscriptionType";
-import { FiscalCode } from "../types/FiscalCode";
+import * as NotificationAPI from "../services/NotificationAPI";
+import { NotificationSubscriptionResponseAPI } from "../types/api/NotificationSubscriptionResponseAPI";
+import { NotificationSubscriptionRequestCtrl } from "../types/controllers/NotificationSubscriptionRequestCtrl";
 import * as AppResponseConverter from "../utils/AppResponseConverter";
 import * as RestfulUtils from "../utils/RestfulUtils";
 
-// Notification Controller
 export function notificationActivation(
   req: express.Request,
   res: express.Response,
@@ -49,8 +48,8 @@ function updateSubscription(
   pagoPaConfig: PagoPaConfig
 ): void {
   // Check input
-  const fiscalCode = FiscalCode.decode(req.params.fiscalCode);
-  if (fiscalCode.isLeft()) {
+  const errorOrRequest = NotificationSubscriptionRequestCtrl.decode(req.params);
+  if (errorOrRequest.isLeft()) {
     RestfulUtils.sendErrorResponse(
       res,
       ControllerError.ERROR_INVALID_INPUT,
@@ -61,14 +60,14 @@ function updateSubscription(
 
   // Require subscription to API
   NotificationAPI.updateSubscription(
-    fiscalCode.value,
+    errorOrRequest.value.fiscalCode,
     requestType,
     res,
     pagoPaConfig,
     RestfulUtils.sendUnavailableAPIError,
     (
       response: express.Response,
-      notificationSubscriptionResponse: NotificationSubscriptionResponse
+      notificationSubscriptionResponse: NotificationSubscriptionResponseAPI
     ) => {
       // Check result
       const requestResult = AppResponseConverter.getNotificationSubscriptionResponseFromAPIResponse(
