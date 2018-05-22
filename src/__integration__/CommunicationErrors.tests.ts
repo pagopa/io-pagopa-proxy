@@ -7,15 +7,16 @@
 
 import * as http from "http";
 import fetch from "node-fetch";
-import { App } from "../App";
-import { CONFIG } from "../Configuration";
+import * as App from "../App";
+import * as Configuration from "../Configuration";
 import { disableConsoleLog } from "../utils/Logger";
 import { ControllerError } from "../enums/ControllerError";
 import { FiscalCode } from "../types/FiscalCode";
-import { RestfulUtils } from "../utils/RestfulUtils";
+import * as RestfulUtils from "../utils/RestfulUtils";
 
 let server: http.Server;
 
+const config = Configuration.GET_CONFIG();
 beforeAll(() => {
   disableConsoleLog();
   server = App.startApp();
@@ -27,13 +28,12 @@ afterAll(() => {
 
 describe("Generic Controllers", () => {
   test("PagoPaAPI should be not available", done => {
+    const serviceEndpoint = RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+      FiscalCode.decode("AAABBB11H11A100A").value as FiscalCode,
+      config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
+    );
     fetch(
-      CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
-          FiscalCode.decode("AAABBB11H11A100A").value as FiscalCode
-        ),
+      `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
       {
         method: "POST"
       }

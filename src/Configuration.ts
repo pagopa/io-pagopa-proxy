@@ -7,7 +7,7 @@ import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import { logger } from "./utils/Logger";
 
-export const CONFIG = {
+const CONFIG = {
   // PagoPa-Proxy Configuration
   CONTROLLER: {
     PORT: process.env.PAGOPAPROXY_PORT || 3000,
@@ -31,6 +31,15 @@ export const CONFIG = {
 };
 
 // Configuration validator
+const PagoPaConfig = t.interface({
+  PORT: WithinRangeNumber(0, 65535),
+  HOST: NonEmptyString,
+  SERVICES: t.interface({
+    NOTIFICATION_UPDATE_SUBSCRIPTION: NonEmptyString
+  })
+});
+export type PagoPaConfig = t.TypeOf<typeof PagoPaConfig>;
+
 const Configuration = t.interface({
   CONTROLLER: t.interface({
     PORT: WithinRangeNumber(0, 65535),
@@ -40,17 +49,16 @@ const Configuration = t.interface({
       NOTIFICATION_DEACTIVATION: NonEmptyString
     })
   }),
-  PAGOPA: t.interface({
-    PORT: WithinRangeNumber(0, 65535),
-    HOST: NonEmptyString,
-    SERVICES: t.interface({
-      NOTIFICATION_UPDATE_SUBSCRIPTION: NonEmptyString
-    })
-  })
+  PAGOPA: PagoPaConfig
 });
-type Configuration = t.TypeOf<typeof Configuration>;
-if (Configuration.decode(CONFIG).isLeft()) {
-  const error = "Invalid Configuration! Please check it!";
-  logger.error(error);
-  throw Error(error);
+
+export type Configuration = t.TypeOf<typeof Configuration>;
+export function GET_CONFIG(): Configuration {
+  const configDecode = Configuration.decode(CONFIG);
+  if (configDecode.isLeft()) {
+    const error = "Invalid Configuration! Please check it!";
+    logger.error(error);
+    throw Error(error);
+  }
+  return configDecode.value;
 }

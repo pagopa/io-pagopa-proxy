@@ -7,19 +7,19 @@
 
 import * as http from "http";
 import fetch from "node-fetch";
-import { App } from "../App";
-import { CONFIG } from "../Configuration";
+import * as App from "../App";
 import { ControllerError } from "../enums/ControllerError";
-import { MockedProxyAPIApp } from "../mocks/MockedProxyAPIApp";
-import { disableConsoleLog } from "../utils/Logger";
+import * as MockedProxyAPIApp from "../mocks/MockedProxyAPIApp";
+import * as Logger from "../utils/Logger";
+import * as RestfulUtils from "../utils/RestfulUtils";
 import { FiscalCode } from "../types/FiscalCode";
-import { RestfulUtils } from "../utils/RestfulUtils";
-
+import * as Configuration from "../Configuration";
 let mockedProxyAPIServer: http.Server;
 let server: http.Server;
 
+const config = Configuration.GET_CONFIG();
 beforeAll(() => {
-  disableConsoleLog();
+  Logger.disableConsoleLog();
   mockedProxyAPIServer = MockedProxyAPIApp.startApp();
   server = App.startApp();
 });
@@ -31,14 +31,13 @@ afterAll(() => {
 
 describe("Notification Controllers", () => {
   test("Activation should return a positive result", () => {
+    const serviceEndpoint = RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+      FiscalCode.decode("AAABBB88H22A089A").value as FiscalCode,
+      config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
+    );
     FiscalCode.decode("AAABBB88H22A089A");
     return fetch(
-      CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
-          FiscalCode.decode("AAABBB88H22A089A").value as FiscalCode
-        ),
+      `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
       {
         method: "POST"
       }
@@ -53,13 +52,12 @@ describe("Notification Controllers", () => {
   });
 
   test("Activation should return a negative result", () => {
+    const serviceEndpoint = RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+      FiscalCode.decode("BADBAD88H22A089A").value as FiscalCode,
+      config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
+    );
     return fetch(
-      CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
-          FiscalCode.decode("BADBAD88H22A089A").value as FiscalCode
-        ),
+      `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
       {
         method: "POST"
       }
@@ -73,13 +71,12 @@ describe("Notification Controllers", () => {
   });
 
   test("Activation should return a negative result (invalid FiscalCode)", () => {
+    const serviceEndpoint = RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
+      FiscalCode.decode("wrongFiscalCode").value as FiscalCode,
+      config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
+    );
     return fetch(
-      CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
-          FiscalCode.decode("wrongFiscalCode").value as FiscalCode
-        ),
+      `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
       {
         method: "POST"
       }
@@ -93,13 +90,12 @@ describe("Notification Controllers", () => {
   });
 
   test("Deactivation should return a positive result", () => {
+    const serviceEndpoint = RestfulUtils.getDeactivateNotificationSubscriptionUrlForApp(
+      FiscalCode.decode("AAABBB88H22A089A").value as FiscalCode,
+      config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION
+    );
     return fetch(
-      CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        RestfulUtils.getActivateNotificationSubscriptionUrlForApp(
-          FiscalCode.decode("AAABBB88H22A089A").value as FiscalCode
-        ),
+      `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
       {
         method: "POST"
       }
@@ -114,13 +110,12 @@ describe("Notification Controllers", () => {
   });
 
   test("Deactivation should return a negative result", () => {
+    const serviceEndpoint = RestfulUtils.getDeactivateNotificationSubscriptionUrlForApp(
+      FiscalCode.decode("BADBAD88H22A089A").value as FiscalCode,
+      config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION
+    );
     return fetch(
-      CONFIG.CONTROLLER.HOST +
-        ":" +
-        CONFIG.CONTROLLER.PORT +
-        RestfulUtils.getDeactivateNotificationSubscriptionUrlForApp(
-          FiscalCode.decode("BADBAD88H22A089A").value as FiscalCode
-        ),
+      `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
       {
         method: "POST"
       }

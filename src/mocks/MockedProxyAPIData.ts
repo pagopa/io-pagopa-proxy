@@ -4,16 +4,15 @@
  */
 
 // tslint:disable
-import { AckResult } from "../api/types/BaseResponse";
-import { NotificationSubscriptionResponse } from "../api/types/NotificationSubscriptionResponse";
+import {
+  AckResult,
+  NotificationSubscriptionResponse
+} from "../api/types/NotificationSubscriptionResponse";
 
-export class MockedProxyAPIData {
-  public static getNotificationResponseMocked(
-    positive: boolean
-  ): NotificationSubscriptionResponse {
-    return {
-      result:
-        positive === true ? AckResult.encode("OK") : AckResult.encode("KO")
-    };
-  }
+export function getNotificationResponseMocked(
+  positive: boolean
+): NotificationSubscriptionResponse {
+  return {
+    result: positive === true ? AckResult.encode("OK") : AckResult.encode("KO")
+  };
 }

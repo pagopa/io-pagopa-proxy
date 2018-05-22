@@ -2,8 +2,8 @@
  * Test AppResponseConverter utils
  */
 
-import { MockedProxyAPIData } from "../mocks/MockedProxyAPIData";
-import { AppResponseConverter } from "../utils/AppResponseConverter";
+import * as MockedProxyAPIData from "../mocks/MockedProxyAPIData";
+import * as AppResponseConverter from "../utils/AppResponseConverter";
 
 describe("AppResponseConverter", () => {
   test("NotificationSubscriptionResponse should be valid", () => {
