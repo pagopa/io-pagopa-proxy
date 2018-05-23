@@ -5,12 +5,11 @@
 import * as t from "io-ts";
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
-import { logger } from "./utils/Logger";
 
 const localhost = "http://localhost";
 
 // Controller Configuration for REST Webservice
-const CONFIG = {
+export const CONFIG = {
   CONTROLLER: {
     PORT: process.env.PAGOPAPROXY_PORT || 3000,
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
@@ -77,20 +76,9 @@ const CDBackendConfig = t.intersection([
 ]);
 export type CDBackendConfig = t.TypeOf<typeof CDBackendConfig>;
 
-const Configuration = t.interface({
+export const Configuration = t.interface({
   CONTROLLER: ControllerConfig,
   PAGOPA_API: PagoPaConfig,
   CD_BACKEND: CDBackendConfig
 });
-
-// Provide a valid and typed Configuration
 export type Configuration = t.TypeOf<typeof Configuration>;
-export function GET_CONFIG(): Configuration {
-  const errorOrConfig = Configuration.decode(CONFIG);
-  if (errorOrConfig.isLeft()) {
-    const error = "Invalid Configuration! Please check it!";
-    logger.error(error);
-    throw Error(error);
-  }
-  return errorOrConfig.value;
-}

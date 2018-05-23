@@ -9,44 +9,43 @@ import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { NotificationSubscriptionRequestType } from "../enums/NotificationSubscriptionType";
 import * as NotificationAPI from "../services/NotificationAPI";
-import { NotificationSubscriptionResponseAPI } from "../types/api/NotificationSubscriptionResponseAPI";
 import { NotificationSubscriptionRequestCtrl } from "../types/controllers/NotificationSubscriptionRequestCtrl";
 import * as AppResponseConverter from "../utils/AppResponseConverter";
 import * as RestfulUtils from "../utils/RestfulUtils";
 
-export function notificationActivation(
+export function activeNotificationsSubscription(
   req: express.Request,
   res: express.Response,
   pagoPaConfig: PagoPaConfig
 ): void {
-  updateSubscription(
+  updateNotificationsSubscription(
     req,
     res,
     NotificationSubscriptionRequestType.ACTIVATION,
     pagoPaConfig
-  );
+  ).catch();
 }
 
-export function notificationDeactivation(
+export function deactiveNotificationsSubscription(
   req: express.Request,
   res: express.Response,
   pagoPaConfig: PagoPaConfig
 ): void {
-  updateSubscription(
+  updateNotificationsSubscription(
     req,
     res,
     NotificationSubscriptionRequestType.DEACTIVATION,
     pagoPaConfig
-  );
+  ).catch();
 }
 
 // Update user subscription to Notification Service
-function updateSubscription(
+async function updateNotificationsSubscription(
   req: express.Request,
   res: express.Response,
   requestType: NotificationSubscriptionRequestType,
   pagoPaConfig: PagoPaConfig
-): void {
+): Promise<boolean> {
   // Check input
   const errorOrRequest = NotificationSubscriptionRequestCtrl.decode(req.params);
   if (errorOrRequest.isLeft()) {
@@ -55,33 +54,33 @@ function updateSubscription(
       ControllerError.ERROR_INVALID_INPUT,
       HttpErrorStatusCode.BAD_REQUEST
     );
-    return;
+    return false;
   }
 
   // Require subscription to API
-  NotificationAPI.updateSubscription(
+  const errorOrApiResponse = await NotificationAPI.updateNotificationsSubscription(
     errorOrRequest.value.fiscalCode,
     requestType,
-    res,
-    pagoPaConfig,
-    RestfulUtils.sendUnavailableAPIError,
-    (
-      response: express.Response,
-      notificationSubscriptionResponse: NotificationSubscriptionResponseAPI
-    ) => {
-      // Check result
-      const requestResult = AppResponseConverter.getNotificationSubscriptionResponseFromAPIResponse(
-        notificationSubscriptionResponse
-      );
-      if (requestResult.isLeft()) {
-        RestfulUtils.sendErrorResponse(
-          response,
-          requestResult.value,
-          HttpErrorStatusCode.FORBIDDEN
-        );
-        return;
-      }
-      RestfulUtils.sendSuccessResponse(response, requestResult.value);
-    }
+    pagoPaConfig
   );
+
+  if (errorOrApiResponse.isLeft()) {
+    RestfulUtils.sendUnavailableAPIError(res);
+    return false;
+  }
+
+  // Check result
+  const requestResult = AppResponseConverter.getNotificationSubscriptionResponseFromAPIResponse(
+    errorOrApiResponse.value
+  );
+  if (requestResult.isLeft()) {
+    RestfulUtils.sendErrorResponse(
+      res,
+      requestResult.value,
+      HttpErrorStatusCode.FORBIDDEN
+    );
+    return false;
+  }
+  RestfulUtils.sendSuccessResponse(res, requestResult.value);
+  return true;
 }

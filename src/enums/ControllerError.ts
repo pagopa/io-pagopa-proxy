@@ -6,7 +6,8 @@
 export enum ControllerError {
   ERROR_INVALID_INPUT = "Invalid input provided",
   ERROR_INVALID_TOKEN = "Token is required for this request",
-  ERROR_PAGOPA_API_UNAVAILABLE = "Service PagoPa is currently unavailable",
+  ERROR_PAGOPA_API_UNAVAILABLE = "Service PagoPaAPI is currently unavailable",
   ERROR_DATA_NOT_FOUND = "Requested data was not found or Invalid request",
-  REQUEST_REJECTED = "Request was rejected"
+  REQUEST_REJECTED = "Request was rejected",
+  ERROR_INVALID_API_RESPONSE = "Invalid response retrieved from PagoPaAPI"
 }

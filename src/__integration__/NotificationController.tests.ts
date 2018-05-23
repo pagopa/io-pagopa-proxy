@@ -8,7 +8,7 @@
 import * as http from "http";
 import fetch from "node-fetch";
 import * as App from "../App";
-import * as Configuration from "../Configuration";
+import { CONFIG, Configuration } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
 import * as MockedProxyAPIApp from "../mocks/MockedProxyAPIApp";
 import { FiscalCode } from "../types/FiscalCode";
@@ -17,10 +17,12 @@ import * as RestfulUtils from "../utils/RestfulUtils";
 
 let mockedProxyAPIServer: http.Server; // tslint:disable-line
 let server: http.Server; // tslint:disable-line
-const config = Configuration.GET_CONFIG();
+const config = Configuration.decode(CONFIG).value as Configuration; // tslint:disable-line
 const validFiscalCode: FiscalCode = FiscalCode.decode("AAABBB88H22A089A")
   .value as FiscalCode; // tslint:disable-line
-const validButRefusedFiscalCode: FiscalCode = FiscalCode.decode("BADBAD88H22A089A").value as FiscalCode; // tslint:disable-line
+const validButRefusedFiscalCode: FiscalCode = FiscalCode.decode(
+  "BADBAD88H22A089A"
+).value as FiscalCode; // tslint:disable-line
 
 beforeAll(() => {
   Logger.disableConsoleLog();
@@ -39,9 +41,14 @@ describe("Notification Controllers", async () => {
       validFiscalCode,
       config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
     );
+    if (serviceEndpoint.isLeft()) {
+      fail();
+    }
 
     const response = await fetch(
-      `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
+      `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${
+        serviceEndpoint.value
+      }`,
       {
         method: "POST"
       }
@@ -60,8 +67,13 @@ test("Activation should return a negative result", async () => {
     validButRefusedFiscalCode,
     config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
   );
+  if (serviceEndpoint.isLeft()) {
+    fail();
+  }
   const response = await fetch(
-    `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
+    `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${
+      serviceEndpoint.value
+    }`,
     {
       method: "POST"
     }
@@ -96,9 +108,14 @@ test("Deactivation should return a positive result", async () => {
     validFiscalCode,
     config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION
   );
+  if (serviceEndpoint.isLeft()) {
+    fail();
+  }
 
   const response = await fetch(
-    `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
+    `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${
+      serviceEndpoint.value
+    }`,
     {
       method: "POST"
     }
@@ -116,8 +133,14 @@ test("Deactivation should return a negative result", async () => {
     validButRefusedFiscalCode,
     config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION
   );
+  if (serviceEndpoint.isLeft()) {
+    fail();
+  }
+
   const response = await fetch(
-    `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${serviceEndpoint}`,
+    `${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}${
+      serviceEndpoint.value
+    }`,
     {
       method: "POST"
     }

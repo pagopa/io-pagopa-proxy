@@ -4,6 +4,7 @@
  */
 
 import * as express from "express";
+import { Either, Left, Right } from "fp-ts/lib/Either";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
@@ -44,14 +45,15 @@ export function sendUnavailableAPIError(res: express.Response): void {
 export function getNotificationSubscriptionUrlForCtrl(
   fiscalCode: FiscalCode,
   serviceUrl: NonEmptyString
-): NonEmptyString {
+): Either<Error, NonEmptyString> {
   const errorOrUrl = NonEmptyString.decode(
     serviceUrl.replace(":fiscalCode", fiscalCode)
   );
+
   if (errorOrUrl.isLeft()) {
-    throw Error(
-      "Invalid URL or fiscalCode. Cannot define an url for Notification Subscription Endpoint!"
+    return new Left(
+      new Error("Invalid Url for Notification Subscription Controller")
     );
   }
-  return errorOrUrl.value;
+  return new Right(errorOrUrl.value);
 }
