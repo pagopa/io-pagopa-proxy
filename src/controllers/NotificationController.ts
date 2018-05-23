@@ -13,30 +13,30 @@ import { NotificationSubscriptionRequestCtrl } from "../types/controllers/Notifi
 import * as AppResponseConverter from "../utils/AppResponseConverter";
 import * as RestfulUtils from "../utils/RestfulUtils";
 
-export function activeNotificationsSubscription(
+export async function activateNotificationsSubscription(
   req: express.Request,
   res: express.Response,
   pagoPaConfig: PagoPaConfig
-): void {
-  updateNotificationsSubscription(
+): Promise<boolean> {
+  return updateNotificationsSubscription(
     req,
     res,
     NotificationSubscriptionRequestType.ACTIVATION,
     pagoPaConfig
-  ).catch();
+  );
 }
 
-export function deactiveNotificationsSubscription(
+export async function deactivateNotificationsSubscription(
   req: express.Request,
   res: express.Response,
   pagoPaConfig: PagoPaConfig
-): void {
-  updateNotificationsSubscription(
+): Promise<boolean> {
+  return updateNotificationsSubscription(
     req,
     res,
     NotificationSubscriptionRequestType.DEACTIVATION,
     pagoPaConfig
-  ).catch();
+  );
 }
 
 // Update user subscription to Notification Service

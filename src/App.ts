@@ -37,7 +37,7 @@ export function stopServer(server: http.Server): void {
 function setServerRoutes(app: core.Express, config: Configuration): void {
   app.post(config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION, (req, res) => {
     logger.info("Serving Notification Activation Request (POST)...");
-    NotificationController.activeNotificationsSubscription(
+    return NotificationController.activateNotificationsSubscription(
       req,
       res,
       config.PAGOPA_API
@@ -45,7 +45,7 @@ function setServerRoutes(app: core.Express, config: Configuration): void {
   });
   app.post(config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION, (req, res) => {
     logger.info("Serving Notification Deactivation REQUEST (POST)...");
-    NotificationController.deactiveNotificationsSubscription(
+    return NotificationController.deactivateNotificationsSubscription(
       req,
       res,
       config.PAGOPA_API

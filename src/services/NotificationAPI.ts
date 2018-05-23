@@ -11,7 +11,6 @@ import { ControllerError } from "../enums/ControllerError";
 import { NotificationSubscriptionRequestType } from "../enums/NotificationSubscriptionType";
 import { NotificationSubscriptionResponseAPI } from "../types/api/NotificationSubscriptionResponseAPI";
 import { FiscalCode } from "../types/FiscalCode";
-import { logger } from "../utils/Logger";
 
 // Update subscription (Activation or Deactivation) to Notification Service for a fiscalCode
 export async function updateNotificationsSubscription(
@@ -35,29 +34,24 @@ export async function updateNotificationsSubscription(
     }
   };
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: { "Content-Type": "application/json" }
-    });
+  const response = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: { "Content-Type": "application/json" }
+  });
 
-    if (!response.ok || response.status !== 200) {
-      return new Left(new Error(ControllerError.ERROR_PAGOPA_API_UNAVAILABLE));
-    }
-
-    const jsonResp = await response.json();
-    const errorOrNotificationResponse = NotificationSubscriptionResponseAPI.decode(
-      jsonResp
-    );
-    if (errorOrNotificationResponse.isLeft()) {
-      return new Left(new Error(ControllerError.ERROR_INVALID_API_RESPONSE));
-    }
-    return new Right(errorOrNotificationResponse.value);
-  } catch (error) {
-    logger.error(error);
+  if (!response.ok || response.status !== 200) {
     return new Left(new Error(ControllerError.ERROR_PAGOPA_API_UNAVAILABLE));
   }
+
+  const jsonResp = await response.json();
+  const errorOrNotificationResponse = NotificationSubscriptionResponseAPI.decode(
+    jsonResp
+  );
+  if (errorOrNotificationResponse.isLeft()) {
+    return new Left(new Error(ControllerError.ERROR_INVALID_API_RESPONSE));
+  }
+  return new Right(errorOrNotificationResponse.value);
 }
 
 enum OperationType {

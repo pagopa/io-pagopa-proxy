@@ -40,7 +40,7 @@ describe("Generic Controllers", () => {
       {
         method: "POST"
       }
-    ).catch();
+    );
     expect(response.status).toBe(503);
   });
 });
