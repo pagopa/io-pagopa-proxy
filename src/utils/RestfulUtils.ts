@@ -4,15 +4,11 @@
  */
 
 import * as express from "express";
-import { Either, Left, Right } from "fp-ts/lib/Either";
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
-import { IRestfulObject } from "../types/BaseResponseApp";
-import { FiscalCode } from "../types/FiscalCode";
+import { IRestfulObject } from "../types/IRestfulObject";
 import { logger } from "../utils/Logger";
 
-// Utils used by Controllers
 // Send an error message for express response
 export function sendErrorResponse(
   res: express.Response,
@@ -26,7 +22,7 @@ export function sendErrorResponse(
 // Send a success message for express response
 export function sendSuccessResponse(
   res: express.Response,
-  content: IRestfulObject
+  content?: IRestfulObject
 ): void {
   res.status(200).json(content);
 }
@@ -36,24 +32,7 @@ export function sendUnavailableAPIError(res: express.Response): void {
   // Error callback
   sendErrorResponse(
     res,
-    ControllerError.ERROR_PAGOPA_API_UNAVAILABLE,
+    ControllerError.ERROR_API_UNAVAILABLE,
     HttpErrorStatusCode.SERVICE_UNAVAILABLE
   );
-}
-
-// Provide a valid url to activate\deactivate notification subscription
-export function getNotificationSubscriptionUrlForCtrl(
-  fiscalCode: FiscalCode,
-  serviceUrl: NonEmptyString
-): Either<Error, NonEmptyString> {
-  const errorOrUrl = NonEmptyString.decode(
-    serviceUrl.replace(":fiscalCode", fiscalCode)
-  );
-
-  if (errorOrUrl.isLeft()) {
-    return new Left(
-      new Error("Invalid Url for Notification Subscription Controller")
-    );
-  }
-  return new Right(errorOrUrl.value);
 }

@@ -10,6 +10,8 @@ import * as http from "http";
 import { reporters } from "italia-ts-commons";
 import { CONFIG, Configuration, ServerConfiguration } from "./Configuration";
 import * as NotificationController from "./controllers/NotificationController";
+import * as PaymentController from "./controllers/PaymentController";
+import * as ReceiptController from "./controllers/ReceiptController";
 import { logger } from "./utils/Logger";
 
 // Define server and routes
@@ -35,7 +37,7 @@ export function stopServer(server: http.Server): void {
 }
 
 function setServerRoutes(app: core.Express, config: Configuration): void {
-  app.post(config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION, (req, res) => {
+  app.post(config.CONTROLLER.ROUTES.NOTIFICATIONS_ACTIVATION, (req, res) => {
     logger.info("Serving Notification Activation Request (POST)...");
     return NotificationController.activateNotificationsSubscription(
       req,
@@ -43,13 +45,47 @@ function setServerRoutes(app: core.Express, config: Configuration): void {
       config.PAGOPA_API
     );
   });
-  app.post(config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION, (req, res) => {
-    logger.info("Serving Notification Deactivation REQUEST (POST)...");
+
+  app.post(config.CONTROLLER.ROUTES.NOTIFICATIONS_DEACTIVATION, (req, res) => {
+    logger.info("Serving Notification Deactivation Request (POST)...");
     return NotificationController.deactivateNotificationsSubscription(
       req,
       res,
       config.PAGOPA_API
     );
+  });
+
+  app.put(CONFIG.CONTROLLER.ROUTES.NOTIFICATIONS_DISPATCHER, (req, res) => {
+    console.log(
+      "Receiving a new Notification to dispatch from PagoPa API (PUT)..."
+    );
+    return NotificationController.dispatchNotification(
+      req,
+      res,
+      config.CDAVVISI_API
+    );
+  });
+
+  app.post(CONFIG.CONTROLLER.ROUTES.PAYMENTS_ACTIVATION, (req, res) => {
+    console.log("Serving Payment Activation Request (POST)...");
+    return PaymentController.activatePayment(req, res, config.PAGOPA_API);
+  });
+
+  app.get(CONFIG.CONTROLLER.ROUTES.PAYMENTS_CHECK, (req, res) => {
+    console.log("Serving Payment Check Request (GET)...");
+    return PaymentController.checkPayment(req, res, config.PAGOPA_API);
+  });
+
+  app.post(CONFIG.CONTROLLER.ROUTES.PAYMENTS_STATUS_UPDATE, (req, res) => {
+    console.log(
+      "Receiving an update for a payment activation status (POST)..."
+    );
+    return PaymentController.notifyPaymentStatus(req, res, config.CDAVVISI_API);
+  });
+
+  app.put(CONFIG.CONTROLLER.ROUTES.RECEIPTS_DISPATCHER, (req, res) => {
+    console.log("Receiving a new Receipt to dispatch from PagoPa API (PUT)");
+    return ReceiptController.dispatchReceipt(req, res, config.CDAVVISI_API);
   });
 }
 

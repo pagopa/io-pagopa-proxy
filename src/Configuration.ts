@@ -14,25 +14,29 @@ export const CONFIG = {
     PORT: process.env.PAGOPAPROXY_PORT || 3000,
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
     ROUTES: {
-      NOTIFICATION_ACTIVATION:
+      NOTIFICATIONS_ACTIVATION:
         "/notifications/subscription/:fiscalCode/activation",
-      NOTIFICATION_DEACTIVATION:
+      NOTIFICATIONS_DEACTIVATION:
         "/notifications/subscription/:fiscalCode/deactivation",
-      PUT_NOTIFICATION: "/notifications"
+      NOTIFICATIONS_DISPATCHER: "/notifications/dispatcher",
+      PAYMENTS_CHECK: "/payment/check",
+      PAYMENTS_ACTIVATION: "/payment/activation",
+      PAYMENTS_STATUS_UPDATE: "/payment/status/update",
+      RECEIPTS_DISPATCHER: "/receipts/dispatcher"
     }
   },
 
-  // PagoPa REST Webservices Configuration
+  // PagoPa API Configuration
   PAGOPA_API: {
     HOST: process.env.PAGOPAAPI_HOST || localhost,
     PORT: process.env.PAGOPAAPI_PORT || 3001,
     SERVICES: {
-      NOTIFICATION_UPDATE_SUBSCRIPTION: "/notifications/subscription/update"
+      NOTIFICATIONS_UPDATE_SUBSCRIPTION: "/notifications/subscription/update"
     }
   },
 
-  // Backend REST Webservices Configuration
-  CD_BACKEND: {
+  // CdAvvisi API Configuration
+  CDAVVISI_API: {
     HOST: process.env.CDBACKEND_HOST || localhost,
     PORT: process.env.CDBACKEND_PORT || 3002,
     SERVICES: {}
@@ -50,9 +54,13 @@ const ControllerConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     ROUTES: t.interface({
-      NOTIFICATION_ACTIVATION: NonEmptyString,
-      NOTIFICATION_DEACTIVATION: NonEmptyString,
-      PUT_NOTIFICATION: NonEmptyString
+      NOTIFICATIONS_ACTIVATION: NonEmptyString,
+      NOTIFICATIONS_DEACTIVATION: NonEmptyString,
+      NOTIFICATIONS_DISPATCHER: NonEmptyString,
+      PAYMENTS_CHECK: NonEmptyString,
+      PAYMENTS_ACTIVATION: NonEmptyString,
+      PAYMENTS_STATUS_UPDATE: NonEmptyString,
+      RECEIPTS_DISPATCHER: NonEmptyString
     })
   })
 ]);
@@ -62,23 +70,23 @@ const PagoPaConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     SERVICES: t.interface({
-      NOTIFICATION_UPDATE_SUBSCRIPTION: NonEmptyString
+      NOTIFICATIONS_UPDATE_SUBSCRIPTION: NonEmptyString
     })
   })
 ]);
 export type PagoPaConfig = t.TypeOf<typeof PagoPaConfig>;
 
-const CDBackendConfig = t.intersection([
+const CDAvvisiConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     SERVICES: t.interface({})
   })
 ]);
-export type CDBackendConfig = t.TypeOf<typeof CDBackendConfig>;
+export type CDAvvisiConfig = t.TypeOf<typeof CDAvvisiConfig>;
 
 export const Configuration = t.interface({
   CONTROLLER: ControllerConfig,
   PAGOPA_API: PagoPaConfig,
-  CD_BACKEND: CDBackendConfig
+  CDAVVISI_API: CDAvvisiConfig
 });
 export type Configuration = t.TypeOf<typeof Configuration>;

@@ -5,17 +5,16 @@
 
 // tslint:disable:no-identical-functions
 
+import { Either, Left, Right } from "fp-ts/lib/Either";
 import * as http from "http";
+import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import fetch from "node-fetch";
 import * as App from "../App";
 import { CONFIG, Configuration } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
-import * as MockedProxyAPIApp from "../mocks/MockedProxyAPIApp";
 import { FiscalCode } from "../types/FiscalCode";
 import * as Logger from "../utils/Logger";
-import * as RestfulUtils from "../utils/RestfulUtils";
 
-let mockedProxyAPIServer: http.Server; // tslint:disable-line
 let server: http.Server; // tslint:disable-line
 const config = Configuration.decode(CONFIG).value as Configuration; // tslint:disable-line
 const validFiscalCode: FiscalCode = FiscalCode.decode("AAABBB88H22A089A")
@@ -26,20 +25,18 @@ const validButRefusedFiscalCode: FiscalCode = FiscalCode.decode(
 
 beforeAll(() => {
   Logger.disableConsoleLog();
-  mockedProxyAPIServer = MockedProxyAPIApp.startApp();
   server = App.startApp();
 });
 
 afterAll(() => {
   App.stopServer(server);
-  MockedProxyAPIApp.stopServer(mockedProxyAPIServer);
 });
 
 describe("Notification Controllers", async () => {
   test("Activation should return a positive result", async () => {
-    const serviceEndpoint = RestfulUtils.getNotificationSubscriptionUrlForCtrl(
+    const serviceEndpoint = getNotificationSubscriptionUrlForCtrl(
       validFiscalCode,
-      config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
+      config.CONTROLLER.ROUTES.NOTIFICATIONS_ACTIVATION
     );
     if (serviceEndpoint.isLeft()) {
       fail();
@@ -63,9 +60,9 @@ describe("Notification Controllers", async () => {
 });
 
 test("Activation should return a negative result", async () => {
-  const serviceEndpoint = RestfulUtils.getNotificationSubscriptionUrlForCtrl(
+  const serviceEndpoint = getNotificationSubscriptionUrlForCtrl(
     validButRefusedFiscalCode,
-    config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION
+    config.CONTROLLER.ROUTES.NOTIFICATIONS_ACTIVATION
   );
   if (serviceEndpoint.isLeft()) {
     fail();
@@ -85,7 +82,7 @@ test("Activation should return a negative result", async () => {
 });
 
 test("Activation should return a negative result (invalid FiscalCode)", async () => {
-  const serviceEndpoint = config.CONTROLLER.ROUTES.NOTIFICATION_ACTIVATION.replace(
+  const serviceEndpoint = config.CONTROLLER.ROUTES.NOTIFICATIONS_ACTIVATION.replace(
     ":fiscalCode",
     "wrongFiscalCode"
   );
@@ -104,9 +101,9 @@ test("Activation should return a negative result (invalid FiscalCode)", async ()
 });
 
 test("Deactivation should return a positive result", async () => {
-  const serviceEndpoint = RestfulUtils.getNotificationSubscriptionUrlForCtrl(
+  const serviceEndpoint = getNotificationSubscriptionUrlForCtrl(
     validFiscalCode,
-    config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION
+    config.CONTROLLER.ROUTES.NOTIFICATIONS_DEACTIVATION
   );
   if (serviceEndpoint.isLeft()) {
     fail();
@@ -129,9 +126,9 @@ test("Deactivation should return a positive result", async () => {
 });
 
 test("Deactivation should return a negative result", async () => {
-  const serviceEndpoint = RestfulUtils.getNotificationSubscriptionUrlForCtrl(
+  const serviceEndpoint = getNotificationSubscriptionUrlForCtrl(
     validButRefusedFiscalCode,
-    config.CONTROLLER.ROUTES.NOTIFICATION_DEACTIVATION
+    config.CONTROLLER.ROUTES.NOTIFICATIONS_DEACTIVATION
   );
   if (serviceEndpoint.isLeft()) {
     fail();
@@ -151,3 +148,20 @@ test("Deactivation should return a negative result", async () => {
   expect(jsonResp.errorMessage).toBe(ControllerError.REQUEST_REJECTED);
   expect(jsonResp.result).toBeUndefined();
 });
+
+// Provide a valid url to activate\deactivate notification subscription
+export function getNotificationSubscriptionUrlForCtrl(
+  fiscalCode: FiscalCode,
+  serviceUrl: NonEmptyString
+): Either<Error, NonEmptyString> {
+  const errorOrUrl = NonEmptyString.decode(
+    serviceUrl.replace(":fiscalCode", fiscalCode)
+  );
+
+  if (errorOrUrl.isLeft()) {
+    return new Left(
+      new Error("Invalid Url for Notification Subscription Controller")
+    );
+  }
+  return new Right(errorOrUrl.value);
+}

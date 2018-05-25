@@ -1,5 +1,5 @@
 /**
- * User's fiscal code
+ * FiscalCode Type
  */
 
 import * as t from "io-ts";
