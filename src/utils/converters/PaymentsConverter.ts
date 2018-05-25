@@ -1,6 +1,6 @@
 /**
  * Payments Converter
- * Data Converter for Payment Request\Responses
+ * Data Converter for Payments Request\Responses
  */
 
 import { Either, Left } from "fp-ts/lib/Either";

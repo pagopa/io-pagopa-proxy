@@ -13,8 +13,8 @@ import {
 } from "../FakePagoPaExternalTypes";
 import { PaymentsStatusUpdateRequest } from "../types/controllers/PaymentsStatusUpdateRequest";
 
-// Send a request to PagoPaAPI to update subscription (Activation or Deactivation)
-export async function sendPaymentCheckToPagoPaAPI(
+// Send a request to PagoPaAPI to check payment info
+export async function sendPaymentCheckRequestToPagoPaAPI(
   paymentCheckRequestPagoPa: PaymentsCheckRequestPagoPa,
   pagoPaConfig: PagoPaConfig
 ): Promise<Either<ControllerError, PaymentsCheckResponsePagoPa>> {
@@ -22,15 +22,16 @@ export async function sendPaymentCheckToPagoPaAPI(
   return new Left(ControllerError.ERROR_API_UNAVAILABLE);
 }
 
-// Send a request to PagoPaAPI to update subscription (Activation or Deactivation)
-export async function sendPaymentsActivationToPagoPaAPI(
-  paymentsActivationRequestPagoPa: PaymentsActivationRequestPagoPa,
+// Send a request to PagoPaAPI to activate a payment
+export async function sendPaymentsActivationRequestToPagoPaAPI(
+  paymentsSubscriptionUpdateRequestPagoPa: PaymentsActivationRequestPagoPa,
   pagoPaConfig: PagoPaConfig
 ): Promise<Either<ControllerError, void>> {
   // TODO
   return new Left(ControllerError.ERROR_API_UNAVAILABLE);
 }
 
+// Send a payment status update to CD Avvisi API
 export async function sendPaymentsStatusUpdateToAPIAvvisi(
   paymentsStatusUpdateRequest: PaymentsStatusUpdateRequest,
   cdAvvisiConfig: CDAvvisiConfig

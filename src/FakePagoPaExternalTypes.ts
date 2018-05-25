@@ -36,3 +36,8 @@ export const PaymentsStatusUpdateRequestPagoPa = t.interface({});
 export type PaymentsStatusUpdateRequestPagoPa = t.TypeOf<
   typeof PaymentsStatusUpdateRequestPagoPa
 >;
+
+export const ReceiptsDispatchRequestPagoPa = t.interface({});
+export type ReceiptsDispatchRequestPagoPa = t.TypeOf<
+  typeof ReceiptsDispatchRequestPagoPa
+>;
