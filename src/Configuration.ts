@@ -21,8 +21,7 @@ export const CONFIG = {
       NOTIFICATIONS_DISPATCHER: "/notifications/dispatcher",
       PAYMENTS_CHECK: "/payment/check",
       PAYMENTS_ACTIVATION: "/payment/activation",
-      PAYMENTS_STATUS_UPDATE: "/payment/status/update",
-      RECEIPTS_DISPATCHER: "/receipts/dispatcher"
+      PAYMENTS_STATUS_UPDATE: "/payment/status/update"
     }
   },
 
@@ -31,7 +30,14 @@ export const CONFIG = {
     HOST: process.env.PAGOPAAPI_HOST || localhost,
     PORT: process.env.PAGOPAAPI_PORT || 3001,
     SERVICES: {
-      NOTIFICATIONS_UPDATE_SUBSCRIPTION: "/notifications/subscription/update"
+      NOTIFICATIONS_UPDATEPAGOPA_API_SUBSCRIPTION:
+        "/notifications/subscription/update"
+    },
+    IDENTIFIER: {
+      identificativoPSP: "AGID_01",
+      identificativoIntermediarioPSP: "97735020584",
+      identificativoCanale: "97735020584_02",
+      token: "ND"
     }
   },
 
@@ -59,8 +65,7 @@ const ControllerConfig = t.intersection([
       NOTIFICATIONS_DISPATCHER: NonEmptyString,
       PAYMENTS_CHECK: NonEmptyString,
       PAYMENTS_ACTIVATION: NonEmptyString,
-      PAYMENTS_STATUS_UPDATE: NonEmptyString,
-      RECEIPTS_DISPATCHER: NonEmptyString
+      PAYMENTS_STATUS_UPDATE: NonEmptyString
     })
   })
 ]);
@@ -79,7 +84,13 @@ export type PagoPaConfig = t.TypeOf<typeof PagoPaConfig>;
 const CDAvvisiConfig = t.intersection([
   ServerConfiguration,
   t.interface({
-    SERVICES: t.interface({})
+    SERVICES: t.interface({}),
+    IDENTIFIER: t.interface({
+      identificativoPSP: NonEmptyString,
+      identificativoIntermediarioPSP: NonEmptyString,
+      identificativoCanale: NonEmptyString,
+      password: NonEmptyString
+    })
   })
 ]);
 export type CDAvvisiConfig = t.TypeOf<typeof CDAvvisiConfig>;

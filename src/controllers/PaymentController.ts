@@ -44,7 +44,7 @@ export async function checkPayment(
   }
 
   // Require payment check to PagoPa API
-  const errorOrPaymentCheckPagoPaResponse = await PaymentsService.sendPaymentCheckToPagoPaAPI(
+  const errorOrPaymentCheckPagoPaResponse = await PaymentsService.sendPaymentCheckRequestToPagoPaAPI(
     errorOrPaymentCheckRequestPagoPa.value,
     pagoPaConfig
   );
@@ -114,7 +114,7 @@ export async function activatePayment(
   }
 
   // Require payment activation to PagoPa API
-  const errorOrPaymentActivationPagoPaResponse = await PaymentsService.sendPaymentsActivationToPagoPaAPI(
+  const errorOrPaymentActivationPagoPaResponse = await PaymentsService.sendPaymentsActivationRequestToPagoPaAPI(
     errorOrPaymentsActivationRequestPagoPa.value,
     pagoPaConfig
   );

@@ -11,7 +11,6 @@ import { reporters } from "italia-ts-commons";
 import { CONFIG, Configuration, ServerConfiguration } from "./Configuration";
 import * as NotificationController from "./controllers/NotificationController";
 import * as PaymentController from "./controllers/PaymentController";
-import * as ReceiptController from "./controllers/ReceiptController";
 import { logger } from "./utils/Logger";
 
 // Define server and routes
@@ -81,11 +80,6 @@ function setServerRoutes(app: core.Express, config: Configuration): void {
       "Receiving an update for a payment activation status (POST)..."
     );
     return PaymentController.notifyPaymentStatus(req, res, config.CDAVVISI_API);
-  });
-
-  app.put(CONFIG.CONTROLLER.ROUTES.RECEIPTS_DISPATCHER, (req, res) => {
-    console.log("Receiving a new Receipt to dispatch from PagoPa API (PUT)");
-    return ReceiptController.dispatchReceipt(req, res, config.CDAVVISI_API);
   });
 }
 

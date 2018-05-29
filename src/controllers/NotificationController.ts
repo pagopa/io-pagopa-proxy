@@ -10,7 +10,7 @@ import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
 import { NotificationSubscriptionRequestType } from "../enums/NotificationSubscriptionType";
 import { NotificationsDispatchRequestPagoPa } from "../FakePagoPaExternalTypes";
 import * as NotificationsService from "../services/NotificationsService";
-import { FiscalCode } from "../types/FiscalCode";
+import { FiscalCode } from "../types/CommonTypes";
 import * as NotificationsConverter from "../utils/converters/NotificationsConverter";
 import * as RestfulUtils from "../utils/RestfulUtils";
 
@@ -113,6 +113,7 @@ export async function dispatchNotification(
       ControllerError.ERROR_INVALID_INPUT,
       HttpErrorStatusCode.BAD_REQUEST
     );
+    return false;
   }
 
   // Forward request to API Avvisi (CD)

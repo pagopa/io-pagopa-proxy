@@ -12,7 +12,7 @@ import fetch from "node-fetch";
 import * as App from "../App";
 import { CONFIG, Configuration } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
-import { FiscalCode } from "../types/FiscalCode";
+import { FiscalCode } from "../types/CommonTypes";
 import * as Logger from "../utils/Logger";
 
 let server: http.Server; // tslint:disable-line

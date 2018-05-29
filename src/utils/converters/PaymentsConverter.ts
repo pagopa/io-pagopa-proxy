@@ -19,6 +19,7 @@ import { PaymentsStatusUpdateRequest } from "../../types/controllers/PaymentsSta
 export function getPaymentsCheckRequestPagoPa(
   paymentsCheckRequest: PaymentsCheckRequest
 ): Either<Error, PaymentsCheckRequestPagoPa> {
+  // codificaInfrastrutturaPSP="QR-CODE"
   return new Left(new Error("TODO"));
 }
 
@@ -33,6 +34,7 @@ export function getPaymentsCheckResponse(
 export function getPaymentsActivationRequestPagoPa(
   paymentsActivationRequest: PaymentsActivationRequest
 ): Either<Error, PaymentsActivationRequestPagoPa> {
+  // codificaInfrastrutturaPSP="QR-CODE"
   return new Left(new Error("TODO"));
 }
 
