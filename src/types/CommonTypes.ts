@@ -9,11 +9,6 @@ import { PatternString } from "italia-ts-commons/lib/strings";
 export const Iban = PatternString("[a-zA-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}");
 export type Iban = t.TypeOf<typeof Iban>;
 
-export const BIC = PatternString(
-  "[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}"
-);
-export type BIC = t.TypeOf<typeof BIC>;
-
 export const FiscalCode = PatternString(
   "^[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]$"
 );

@@ -4,8 +4,11 @@
  */
 
 import * as t from "io-ts";
-import { WithinRangeString } from "italia-ts-commons/lib/strings";
-import { BIC, Iban, Importo } from "../CommonTypes";
+import {
+  PatternString,
+  WithinRangeString
+} from "italia-ts-commons/lib/strings";
+import { Iban, Importo } from "../CommonTypes";
 
 export const PaymentsCheckResponse = t.intersection([
   t.interface({
@@ -13,9 +16,19 @@ export const PaymentsCheckResponse = t.intersection([
   }),
   t.partial({
     ibanAccredito: Iban,
-    bicAccredito: BIC,
-    denominazioneBeneficiario: WithinRangeString(1, 70),
     causaleVersamento: WithinRangeString(1, 140),
+    enteBeneficiario: t.interface({
+      codiceIdentificativoUnivoco: WithinRangeString(1, 35),
+      denominazioneBeneficiario: WithinRangeString(1, 70),
+      codiceUnitOperBeneficiario: WithinRangeString(1, 35),
+      denomUnitOperBeneficiario: WithinRangeString(1, 70),
+      indirizzoBeneficiario: WithinRangeString(1, 70),
+      civicoBeneficiario: WithinRangeString(1, 16),
+      capBeneficiario: WithinRangeString(1, 16),
+      localitaBeneficiario: WithinRangeString(1, 35),
+      provinciaBeneficiario: WithinRangeString(1, 35),
+      nazioneBeneficiario: PatternString("[A-Z]{2,2}")
+    }),
     spezzoniCausaleVersamento: t.array(
       t.interface({
         spezzoneCausaleVersamento: WithinRangeString(1, 35),
