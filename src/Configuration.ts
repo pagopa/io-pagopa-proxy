@@ -34,10 +34,21 @@ export const CONFIG = {
         "/notifications/subscription/update"
     },
     IDENTIFIER: {
-      identificativoPSP: "AGID_01",
-      identificativoIntermediarioPSP: "97735020584",
-      identificativoCanale: "97735020584_02",
-      token: "ND"
+      IDENTIFICATIVO_PSP: "AGID_01",
+      IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
+      IDENTIFICATIVO_CANALE: "97735020584_02",
+      TOKEN: "ND"
+    },
+    DATI_NOTIFICA: {
+      DATA_ORA_RICHIESTA: String(new Date().toISOString().slice(0, 19)),
+      IDENTIFICATIVO_MESSAGGIO_RICHIESTA: String(
+        Math.random()
+          .toString(36)
+          .substring(2, 15) +
+          Math.random()
+            .toString(36)
+            .substring(2, 15)
+      ) //tslint:disable-line
     }
   },
 
@@ -86,10 +97,15 @@ const CDAvvisiConfig = t.intersection([
   t.interface({
     SERVICES: t.interface({}),
     IDENTIFIER: t.interface({
-      identificativoPSP: NonEmptyString,
-      identificativoIntermediarioPSP: NonEmptyString,
-      identificativoCanale: NonEmptyString,
-      password: NonEmptyString
+      IDENTIFICATIVO_PSP: NonEmptyString,
+      IDENTIFICATIVO_INTERMEDIARIO_PSP: NonEmptyString,
+      IDENTIFICATIVO_CANALE: NonEmptyString,
+      TOKEN: NonEmptyString,
+      TIPO_IDENTIFICATIVO_UNIVOCO: NonEmptyString
+    }),
+    DATI_NOTIFICA: t.interface({
+      DATA_ORA_RICHIESTA: NonEmptyString,
+      IDENTIFICATIVO_MESSAGGIO_RICHIESTA: NonEmptyString
     })
   })
 ]);

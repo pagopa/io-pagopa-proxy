@@ -60,10 +60,23 @@ async function updateNotificationsSubscription(
     return false;
   }
 
+  // Convert controller request to PagoPaAPI request
+  const errorOrInodoAggiornaIscrizioniAvvisaturaInput = NotificationsConverter.getUpdateNotificationsSubscriptionRequestPagoPaAPI(
+    req.query.fiscalCode,
+    requestType
+  );
+  if (errorOrInodoAggiornaIscrizioniAvvisaturaInput.isLeft()) {
+    RestfulUtils.sendErrorResponse(
+      res,
+      ControllerError.ERROR_INVALID_INPUT,
+      HttpErrorStatusCode.BAD_REQUEST
+    );
+    return false;
+  }
+
   // Require subscription activation\deactivation to PagoPa API
   const errorOrApiResponse = await NotificationsService.updateNotificationsSubscriptionToPagoPaAPI(
-    errorOrFiscalCode.value,
-    requestType,
+    errorOrInodoAggiornaIscrizioniAvvisaturaInput.value,
     pagoPaConfig
   );
 

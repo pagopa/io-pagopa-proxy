@@ -4,6 +4,6 @@
  */
 
 export enum NotificationSubscriptionRequestType {
-  ACTIVATION = "ACTIVATION",
-  DEACTIVATION = "DEACTIVATION"
+  ACTIVATION = "A",
+  DEACTIVATION = "D"
 }
