@@ -4,11 +4,11 @@
  */
 
 import { Either, Left, left, Right } from "fp-ts/lib/Either";
-import { clients } from "italia-pagopa-api-custom";
+import { clients } from "italia-pagopa-api";
 import {
   InodoAggiornaIscrizioniAvvisaturaInput,
   InodoAggiornaIscrizioniAvvisaturaOutput
-} from "italia-pagopa-api-custom/dist/wsdl-lib/IscrizioniAvvisaturaService/PPTPort";
+} from "italia-pagopa-api/dist/wsdl-lib/IscrizioniAvvisaturaService/PPTPort";
 import { CDAvvisiConfig, PagoPaConfig } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
 
