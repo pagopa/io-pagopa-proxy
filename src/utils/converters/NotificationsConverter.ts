@@ -13,7 +13,7 @@ import { TipoIdentificativoUnivocoType } from "../../enums/TipoIdentificativoUni
 import {
   InodoAggiornaIscrizioniAvvisaturaInput,
   PPTPortTypes
-} from "italia-pagopa-api-custom/dist/wsdl-lib/IscrizioniAvvisaturaService/PPTPort";
+} from "italia-pagopa-api/dist/wsdl-lib/IscrizioniAvvisaturaService/PPTPort";
 import { CONFIG } from "../../Configuration";
 import { ControllerError } from "../../enums/ControllerError";
 
@@ -30,8 +30,8 @@ export function getUpdateNotificationsSubscriptionRequestPagoPaAPI(
 ): Either<Error, InodoAggiornaIscrizioniAvvisaturaInput> {
   try {
     const identificativoUnivocoSoggetto: PPTPortTypes.IidentificativoUnivocoSoggetto = {
-      "sac:tipoIdentificativoUnivoco": TipoIdentificativoUnivocoType.FISICA,
-      "sac:codiceIdentificativoUnivoco": fiscalCode
+      tipoIdentificativoUnivoco: TipoIdentificativoUnivocoType.FISICA,
+      codiceIdentificativoUnivoco: fiscalCode
     };
 
     const datiNotifica: PPTPortTypes.IdatiNotifica = {

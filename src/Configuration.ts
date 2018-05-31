@@ -49,6 +49,9 @@ export const CONFIG = {
             .toString(36)
             .substring(2, 15)
       ) //tslint:disable-line
+    },
+    PAYMENTS: {
+      CODICE_CONTESTO_PAGAMENTO: "n/a"
     }
   },
 
