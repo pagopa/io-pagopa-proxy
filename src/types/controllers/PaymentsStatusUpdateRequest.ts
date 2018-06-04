@@ -4,9 +4,13 @@
  */
 
 import * as t from "io-ts";
+import { WithinRangeString } from "italia-ts-commons/lib/strings";
+import { CodiceIdRPT } from "../CommonTypes";
 
-// TODO: [#157910884] Waiting SIA specs
-export const PaymentsStatusUpdateRequest = t.interface({});
+export const PaymentsStatusUpdateRequest = t.interface({
+  codiceContestoPagamento: WithinRangeString(1, 35),
+  codiceIdRPT: CodiceIdRPT
+});
 export type PaymentsStatusUpdateRequest = t.TypeOf<
   typeof PaymentsStatusUpdateRequest
 >;

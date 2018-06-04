@@ -17,7 +17,7 @@ export type FiscalCode = t.TypeOf<typeof FiscalCode>;
 export const IUV = PatternString("[0-9]{15}|[0-9]{17}");
 export type IUV = t.TypeOf<typeof IUV>;
 
-export const Importo = WithinRangeNumber(0, 999999.99);
+export const Importo = WithinRangeNumber(0.11, 999999.99);
 export type Importo = t.TypeOf<typeof Importo>;
 
 export const CodiceIdRPT = t.intersection([

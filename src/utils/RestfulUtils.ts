@@ -6,7 +6,7 @@
 import * as express from "express";
 import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
-import { IRestfulObject } from "../types/IRestfulObject";
+import { IRestfulObject } from "../types/CommonTypes";
 import { logger } from "../utils/Logger";
 
 // Send an error message for express response

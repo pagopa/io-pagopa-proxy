@@ -14,44 +14,25 @@ export const CONFIG = {
     PORT: process.env.PAGOPAPROXY_PORT || 3000,
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
     ROUTES: {
-      NOTIFICATIONS_ACTIVATION:
-        "/notifications/subscription/:fiscalCode/activation",
-      NOTIFICATIONS_DEACTIVATION:
-        "/notifications/subscription/:fiscalCode/deactivation",
-      NOTIFICATIONS_DISPATCHER: "/notifications/dispatcher",
       PAYMENTS_CHECK: "/payment/check",
-      PAYMENTS_ACTIVATION: "/payment/activation",
-      PAYMENTS_STATUS_UPDATE: "/payment/status/update"
+      PAYMENTS_ACTIVATION: "/payment/activation"
     }
   },
 
-  // PagoPa API Configuration
-  PAGOPA_API: {
+  // PagoPa SOAP Configuration
+  PAGOPA: {
     HOST: process.env.PAGOPAAPI_HOST || localhost,
     PORT: process.env.PAGOPAAPI_PORT || 3001,
-    SERVICES: {
-      NOTIFICATIONS_UPDATEPAGOPA_API_SUBSCRIPTION:
-        "/notifications/subscription/update"
-    },
+    SERVICES: {},
     IDENTIFIER: {
       IDENTIFICATIVO_PSP: "AGID_01",
       IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
       IDENTIFICATIVO_CANALE: "97735020584_02",
       TOKEN: "ND"
     },
-    DATI_NOTIFICA: {
-      DATA_ORA_RICHIESTA: String(new Date().toISOString().slice(0, 19)),
-      IDENTIFICATIVO_MESSAGGIO_RICHIESTA: String(
-        Math.random()
-          .toString(36)
-          .substring(2, 15) +
-          Math.random()
-            .toString(36)
-            .substring(2, 15)
-      ) //tslint:disable-line
-    },
     PAYMENTS: {
-      CODICE_CONTESTO_PAGAMENTO: "n/a"
+      CODIFICA_INFRASTRUTTURA_PSP: "QR-CODE",
+      TIPO_IDENTIFICATIVO_UNIVOCO_PERSONA_G: "G"
     }
   },
 
@@ -59,7 +40,9 @@ export const CONFIG = {
   CDAVVISI_API: {
     HOST: process.env.CDBACKEND_HOST || localhost,
     PORT: process.env.CDBACKEND_PORT || 3002,
-    SERVICES: {}
+    SERVICES: {
+      PAYMENTS_STATUS_UPDATE: "/payment/status/update"
+    }
   }
 };
 
@@ -74,28 +57,24 @@ const ControllerConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     ROUTES: t.interface({
-      NOTIFICATIONS_ACTIVATION: NonEmptyString,
-      NOTIFICATIONS_DEACTIVATION: NonEmptyString,
-      NOTIFICATIONS_DISPATCHER: NonEmptyString,
       PAYMENTS_CHECK: NonEmptyString,
-      PAYMENTS_ACTIVATION: NonEmptyString,
-      PAYMENTS_STATUS_UPDATE: NonEmptyString
+      PAYMENTS_ACTIVATION: NonEmptyString
     })
   })
 ]);
 export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 
-const PagoPaConfig = t.intersection([
+const CDAvvisiConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     SERVICES: t.interface({
-      NOTIFICATIONS_UPDATE_SUBSCRIPTION: NonEmptyString
+      PAYMENTS_STATUS_UPDATE: NonEmptyString
     })
   })
 ]);
-export type PagoPaConfig = t.TypeOf<typeof PagoPaConfig>;
+export type CDAvvisiConfig = t.TypeOf<typeof CDAvvisiConfig>;
 
-const CDAvvisiConfig = t.intersection([
+const PagoPaConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     SERVICES: t.interface({}),
@@ -103,20 +82,20 @@ const CDAvvisiConfig = t.intersection([
       IDENTIFICATIVO_PSP: NonEmptyString,
       IDENTIFICATIVO_INTERMEDIARIO_PSP: NonEmptyString,
       IDENTIFICATIVO_CANALE: NonEmptyString,
-      TOKEN: NonEmptyString,
-      TIPO_IDENTIFICATIVO_UNIVOCO: NonEmptyString
+      TOKEN: NonEmptyString
     }),
-    DATI_NOTIFICA: t.interface({
-      DATA_ORA_RICHIESTA: NonEmptyString,
-      IDENTIFICATIVO_MESSAGGIO_RICHIESTA: NonEmptyString
+    PAYMENTS: t.interface({
+      CODIFICA_INFRASTRUTTURA_PSP: NonEmptyString,
+      TIPO_IDENTIFICATIVO_UNIVOCO_PERSONA_G: NonEmptyString
     })
   })
 ]);
-export type CDAvvisiConfig = t.TypeOf<typeof CDAvvisiConfig>;
+
+export type PagoPaConfig = t.TypeOf<typeof PagoPaConfig>;
 
 export const Configuration = t.interface({
   CONTROLLER: ControllerConfig,
-  PAGOPA_API: PagoPaConfig,
-  CDAVVISI_API: CDAvvisiConfig
+  CDAVVISI_API: CDAvvisiConfig,
+  PAGOPA: PagoPaConfig
 });
 export type Configuration = t.TypeOf<typeof Configuration>;

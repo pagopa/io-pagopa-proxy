@@ -4,10 +4,14 @@
  */
 
 import * as express from "express";
-import { CDAvvisiConfig, PagoPaConfig } from "../Configuration";
+import {
+  IcdInfoWispInput,
+  IcdInfoWispOutput
+} from "italia-pagopa-api/wsdl-lib/PagamentiTelematiciPSPNodoService/PPTPort";
+
 import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
-import { PaymentsStatusUpdateRequestPagoPa } from "../FakePagoPaExternalTypes";
+import { EsitoType } from "../enums/PagoPaEnumTypes";
 import * as PaymentsService from "../services/PaymentsService";
 import { PaymentsActivationRequest } from "../types/controllers/PaymentsActivationRequest";
 import { PaymentsCheckRequest } from "../types/controllers/PaymentsCheckRequest";
@@ -17,8 +21,7 @@ import * as RestfulUtils from "../utils/RestfulUtils";
 // Forward a payment check request from CD App to PagoPa API
 export async function checkPayment(
   req: express.Request,
-  res: express.Response,
-  pagoPaConfig: PagoPaConfig
+  res: express.Response
 ): Promise<boolean> {
   // Validate input
   const errorOrPaymentsCheckRequest = PaymentsCheckRequest.decode(req.params);
@@ -41,12 +44,12 @@ export async function checkPayment(
       ControllerError.ERROR_INVALID_INPUT,
       HttpErrorStatusCode.BAD_REQUEST
     );
+    return false;
   }
 
   // Require payment check to PagoPa API
   const errorOrPaymentCheckPagoPaResponse = await PaymentsService.sendPaymentCheckRequestToPagoPaAPI(
-    errorOrPaymentCheckRequestPagoPa.value,
-    pagoPaConfig
+    errorOrPaymentCheckRequestPagoPa.value
   );
 
   // Provide a response to applicant if error occurred
@@ -85,8 +88,8 @@ export async function checkPayment(
 // Forward a payment check request from CD App to PagoPa API
 export async function activatePayment(
   req: express.Request,
-  res: express.Response,
-  pagoPaConfig: PagoPaConfig
+  res: express.Response
+  // pagoPaConfig: PagoPaConfig
 ): Promise<boolean> {
   // Validate input
   const errorOrPaymentsActivationRequest = PaymentsActivationRequest.decode(
@@ -111,14 +114,13 @@ export async function activatePayment(
       ControllerError.ERROR_INVALID_INPUT,
       HttpErrorStatusCode.BAD_REQUEST
     );
+    return false;
   }
 
   // Require payment activation to PagoPa API
-  const errorOrPaymentActivationPagoPaResponse = await PaymentsService.sendPaymentsActivationRequestToPagoPaAPI(
-    errorOrPaymentsActivationRequestPagoPa.value,
-    pagoPaConfig
-  );
-
+  const errorOrPaymentActivationPagoPaResponse = await PaymentsService.sendPaymentsActivationRequestToPagoPaAPI();
+  /* errorOrPaymentsActivationRequestPagoPa.value,
+    pagoPaConfig)*/
   // Provide a response to applicant
   if (errorOrPaymentActivationPagoPaResponse.isLeft()) {
     if (
@@ -141,46 +143,29 @@ export async function activatePayment(
 
 // Forward a payment status update from PagoPA API to CDAvvisi API
 export async function notifyPaymentStatus(
-  req: express.Request,
-  res: express.Response,
-  cdAvvisiConfig: CDAvvisiConfig
-): Promise<boolean> {
-  // Check input
-  const errorOrPaymentsStatusUpdateRequestPagoPa = PaymentsStatusUpdateRequestPagoPa.decode(
-    req.params
-  );
-  if (errorOrPaymentsStatusUpdateRequestPagoPa.isLeft()) {
-    RestfulUtils.sendErrorResponse(
-      res,
-      ControllerError.ERROR_INVALID_INPUT,
-      HttpErrorStatusCode.BAD_REQUEST
-    );
-    return false;
-  }
-
+  cdInfoWispInput: IcdInfoWispInput
+  // cdAvvisiConfig: CDAvvisiConfig
+): Promise<IcdInfoWispOutput> {
   // Convert PagoPaAPI request to CD Avvisi API request
   const errorOrPaymentsStatusUpdateRequest = PaymentsConverter.getPaymentsStatusUpdateRequest(
-    errorOrPaymentsStatusUpdateRequestPagoPa.value
+    cdInfoWispInput
   );
   if (errorOrPaymentsStatusUpdateRequest.isLeft()) {
-    RestfulUtils.sendErrorResponse(
-      res,
-      ControllerError.ERROR_INVALID_INPUT,
-      HttpErrorStatusCode.BAD_REQUEST
-    );
+    return {
+      esito: EsitoType.KO
+    };
   }
 
   // Forward request to API Avvisi (CD)
-  const errorOrApiResponse = await PaymentsService.sendPaymentsStatusUpdateToAPIAvvisi(
-    errorOrPaymentsStatusUpdateRequest.value,
-    cdAvvisiConfig
-  );
+  const errorOrApiResponse = await PaymentsService.sendPaymentsStatusUpdateToAPIAvvisi();
 
   // Provide a response to PagoPa API (Avvisatura)
   if (errorOrApiResponse.isLeft()) {
-    RestfulUtils.sendUnavailableAPIError(res);
-    return false;
+    return {
+      esito: EsitoType.KO
+    };
   }
-  RestfulUtils.sendSuccessResponse(res);
-  return true;
+  return {
+    esito: EsitoType.OK
+  };
 }

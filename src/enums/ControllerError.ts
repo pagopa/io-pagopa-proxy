@@ -9,5 +9,6 @@ export enum ControllerError {
   ERROR_API_UNAVAILABLE = "Service API is currently unavailable",
   ERROR_DATA_NOT_FOUND = "Requested data was not found or Invalid request",
   REQUEST_REJECTED = "Request was rejected",
-  ERROR_INVALID_API_RESPONSE = "Invalid response retrieved from API"
+  ERROR_INVALID_API_RESPONSE = "Invalid response retrieved from API",
+  ERROR_INTERNAL = "Internal error"
 }
