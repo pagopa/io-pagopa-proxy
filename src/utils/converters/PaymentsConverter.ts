@@ -6,12 +6,11 @@ import { CONFIG } from "../../Configuration";
 
 import { Either, Left, Right } from "fp-ts/lib/Either";
 import {
+  IcdInfoWispInput,
   InodoAttivaRPTInput,
   InodoVerificaRPTInput,
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-
-import { IcdInfoWispInput } from "italia-pagopa-api/wsdl-lib/PagamentiTelematiciPSPNodoService/PPTPort";
 import { ControllerError } from "../../enums/ControllerError";
 import { PaymentsActivationRequest } from "../../types/controllers/PaymentsActivationRequest";
 import { PaymentsCheckRequest } from "../../types/controllers/PaymentsCheckRequest";

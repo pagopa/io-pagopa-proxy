@@ -7,7 +7,7 @@ import * as express from "express";
 import {
   IcdInfoWispInput,
   IcdInfoWispOutput
-} from "italia-pagopa-api/wsdl-lib/PagamentiTelematiciPSPNodoService/PPTPort";
+} from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 
 import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
