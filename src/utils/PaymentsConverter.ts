@@ -1,22 +1,25 @@
 /**
  * Payments Converter
- * Data Converter for Payments Request\Responses
+ * Data Converter for Payments Request\Responses between PagoPa and BackendAPP types
  */
-import { CONFIG } from "../../Configuration";
-
 import { Either, Left, Right } from "fp-ts/lib/Either";
 import {
+  codificaInfrastrutturaPSPEnum,
   IcdInfoWispInput,
   InodoAttivaRPTInput,
+  InodoAttivaRPTOutput,
   InodoVerificaRPTInput,
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { ControllerError } from "../../enums/ControllerError";
-import { PaymentsActivationRequest } from "../../types/controllers/PaymentsActivationRequest";
-import { PaymentsCheckRequest } from "../../types/controllers/PaymentsCheckRequest";
-import { PaymentsCheckResponse } from "../../types/controllers/PaymentsCheckResponse";
-import { PaymentsStatusUpdateRequest } from "../../types/controllers/PaymentsStatusUpdateRequest";
-import { generateCodiceContestoPagamento } from "./ConverterUtils";
+import * as uuid from "uuid";
+import { CONFIG } from "../Configuration";
+import { ControllerError } from "../enums/ControllerError";
+import { PaymentsActivationRequest } from "../types/controllers/PaymentsActivationRequest";
+import { PaymentsActivationResponse } from "../types/controllers/PaymentsActivationResponse";
+import { PaymentsCheckRequest } from "../types/controllers/PaymentsCheckRequest";
+import { PaymentsCheckResponse } from "../types/controllers/PaymentsCheckResponse";
+import { PaymentsStatusUpdateRequest } from "../types/controllers/PaymentsStatusUpdateRequest";
+import { CodiceContestoPagamento } from "../types/PagoPaTypes";
 
 // Convert PaymentsCheckRequest (controller) to PaymentsCheckRequestPagoPa (PagoPa API)
 export function getPaymentsCheckRequestPagoPa(
@@ -33,8 +36,7 @@ export function getPaymentsCheckRequestPagoPa(
     identificativoCanale: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
     password: CONFIG.PAGOPA.IDENTIFIER.TOKEN,
     codiceContestoPagamento: errorOrCodiceContestoPagamento.value,
-    codificaInfrastrutturaPSP:
-      CONFIG.PAGOPA.PAYMENTS.CODIFICA_INFRASTRUTTURA_PSP,
+    codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
     codiceIdRPT: {
       CF: paymentsCheckRequest.codiceIdRPT.CF,
       AuxDigit: paymentsCheckRequest.codiceIdRPT.AuxDigit,
@@ -120,8 +122,7 @@ export function getPaymentsActivationRequestPagoPa(
       CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
     identificativoCanalePagamento:
       CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
-    codificaInfrastrutturaPSP:
-      CONFIG.PAGOPA.PAYMENTS.CODIFICA_INFRASTRUTTURA_PSP,
+    codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
     codiceIdRPT: {
       CF: paymentsActivationRequest.codiceIdRPT.CF,
       AuxDigit: paymentsActivationRequest.codiceIdRPT.AuxDigit,
@@ -133,6 +134,62 @@ export function getPaymentsActivationRequestPagoPa(
         paymentsActivationRequest.importoSingoloVersamento
     }
   });
+}
+
+// Convert PaymentsActivationResponsePagoPa (PagoPa API) to PaymentsActivationkResponse (controller)
+export function getPaymentsActivationResponse(
+  iNodoAttivaRPTOutput: InodoAttivaRPTOutput
+): Either<Error, PaymentsActivationResponse> {
+  const errorOrPaymentsActivationResponse = PaymentsActivationResponse.decode({
+    importoSingoloVersamento:
+      iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+        .importoSingoloVersamento,
+    ibanAccredito:
+      iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA.ibanAccredito,
+    causaleVersamento:
+      iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+        .causaleVersamento,
+    enteBeneficiario: {
+      identificativoUnivocoBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.identificativoUnivocoBeneficiario,
+      denominazioneBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.denominazioneBeneficiario,
+      codiceUnitOperBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.codiceUnitOperBeneficiario,
+      denomUnitOperBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.denomUnitOperBeneficiario,
+      indirizzoBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.indirizzoBeneficiario,
+      civicoBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.civicoBeneficiario,
+      capBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.capBeneficiario,
+      localitaBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.localitaBeneficiario,
+      provinciaBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.provinciaBeneficiario,
+      nazioneBeneficiario:
+        iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+          .enteBeneficiario.nazioneBeneficiario
+    },
+    spezzoniCausaleVersamento:
+      iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
+        .spezzoniCausaleVersamento
+  });
+
+  if (errorOrPaymentsActivationResponse.isLeft()) {
+    return new Left(new Error(ControllerError.ERROR_INVALID_INPUT));
+  }
+  return new Right(errorOrPaymentsActivationResponse.value);
 }
 
 // Convert PaymentsStatusUpdateRequestPagoPa (PagoPa API) to PaymentsStatusUpdateRequest (controller)
@@ -157,4 +214,19 @@ export function getPaymentsStatusUpdateRequest(
   }
 
   return new Right(errorOrPaymentsStatusUpdateRequest.value);
+}
+
+// Generate a Session Token to follow a stream of requests
+function generateCodiceContestoPagamento(): Either<
+  Error,
+  CodiceContestoPagamento
+> {
+  const errorOrCodiceContestoPagamento = CodiceContestoPagamento.decode(
+    uuid.v1()
+  );
+
+  if (errorOrCodiceContestoPagamento.isLeft()) {
+    return new Left(new Error(ControllerError.ERROR_INTERNAL));
+  }
+  return new Right(errorOrCodiceContestoPagamento.value);
 }
