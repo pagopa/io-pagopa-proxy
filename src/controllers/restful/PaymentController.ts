@@ -28,9 +28,21 @@ export async function checkPaymentToPagoPa(
     return false;
   }
 
+  // Generate a session token (this is the first message of a payment flow)
+  const errorOrCodiceContestoPagamento = PaymentsConverter.generateCodiceContestoPagamento();
+  if (errorOrCodiceContestoPagamento.isLeft()) {
+    RestfulUtils.sendErrorResponse(
+      res,
+      ControllerError.ERROR_INVALID_INPUT,
+      HttpErrorStatusCode.INTERNAL_ERROR
+    );
+    return false;
+  }
+
   // Convert controller request to PagoPa request
   const errorOrPaymentCheckRequestPagoPa = PaymentsConverter.getPaymentsCheckRequestPagoPa(
-    errorOrPaymentsCheckRequest.value
+    errorOrPaymentsCheckRequest.value,
+    errorOrCodiceContestoPagamento.value
   );
   if (errorOrPaymentCheckRequestPagoPa.isLeft()) {
     RestfulUtils.sendErrorResponse(
@@ -65,7 +77,8 @@ export async function checkPaymentToPagoPa(
 
   // Convert PagoPa response to controller response
   const errorOrPaymentCheckResponse = PaymentsConverter.getPaymentsCheckResponse(
-    errorOrPaymentCheckPagoPaResponse.value
+    errorOrPaymentCheckPagoPaResponse.value,
+    errorOrCodiceContestoPagamento.value
   );
   if (errorOrPaymentCheckResponse.isLeft()) {
     RestfulUtils.sendErrorResponse(

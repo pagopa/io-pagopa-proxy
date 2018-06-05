@@ -6,6 +6,7 @@ import { Either, Left, Right } from "fp-ts/lib/Either";
 import {
   codificaInfrastrutturaPSPEnum,
   IcdInfoWispInput,
+  IcdInfoWispOutput,
   InodoAttivaRPTInput,
   InodoAttivaRPTOutput,
   InodoVerificaRPTInput,
@@ -23,19 +24,16 @@ import { CodiceContestoPagamento } from "../types/PagoPaTypes";
 
 // Convert PaymentsCheckRequest (controller) to PaymentsCheckRequestPagoPa (PagoPa API)
 export function getPaymentsCheckRequestPagoPa(
-  paymentsCheckRequest: PaymentsCheckRequest
+  paymentsCheckRequest: PaymentsCheckRequest,
+  codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, InodoVerificaRPTInput> {
-  const errorOrCodiceContestoPagamento = generateCodiceContestoPagamento();
-  if (errorOrCodiceContestoPagamento.isLeft()) {
-    return new Left(errorOrCodiceContestoPagamento.value);
-  }
   return new Right({
     identificativoPSP: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP,
     identificativoIntermediarioPSP:
       CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
     identificativoCanale: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
     password: CONFIG.PAGOPA.IDENTIFIER.TOKEN,
-    codiceContestoPagamento: errorOrCodiceContestoPagamento.value,
+    codiceContestoPagamento,
     codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
     codiceIdRPT: {
       CF: paymentsCheckRequest.codiceIdRPT.CF,
@@ -48,12 +46,17 @@ export function getPaymentsCheckRequestPagoPa(
 
 // Convert PaymentsCheckResponsePagoPa (PagoPa API) to PaymentsCheckResponse (controller)
 export function getPaymentsCheckResponse(
-  iNodoVerificaRPTOutput: InodoVerificaRPTOutput
+  iNodoVerificaRPTOutput: InodoVerificaRPTOutput,
+  codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, PaymentsCheckResponse> {
+  if (iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.esito === "KO") {
+    return new Left(new Error(ControllerError.REQUEST_REJECTED));
+  }
   const errorOrPaymentCheckResponse = PaymentsCheckResponse.decode({
     importoSingoloVersamento:
       iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.datiPagamentoPA
         .importoSingoloVersamento,
+    codiceContestoPagamento,
     ibanAccredito:
       iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.datiPagamentoPA
         .ibanAccredito,
@@ -107,17 +110,13 @@ export function getPaymentsCheckResponse(
 export function getPaymentsActivationRequestPagoPa(
   paymentsActivationRequest: PaymentsActivationRequest
 ): Either<Error, InodoAttivaRPTInput> {
-  const errorOrCodiceContestoPagamento = generateCodiceContestoPagamento();
-  if (errorOrCodiceContestoPagamento.isLeft()) {
-    return new Left(errorOrCodiceContestoPagamento.value);
-  }
   return new Right({
     identificativoPSP: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP,
     identificativoIntermediarioPSP:
       CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
     identificativoCanale: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
     password: CONFIG.PAGOPA.IDENTIFIER.TOKEN,
-    codiceContestoPagamento: errorOrCodiceContestoPagamento.value,
+    codiceContestoPagamento: paymentsActivationRequest.codiceContestoPagamento,
     identificativoIntermediarioPSPPagamento:
       CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
     identificativoCanalePagamento:
@@ -140,6 +139,9 @@ export function getPaymentsActivationRequestPagoPa(
 export function getPaymentsActivationResponse(
   iNodoAttivaRPTOutput: InodoAttivaRPTOutput
 ): Either<Error, PaymentsActivationResponse> {
+  if (iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.esito === "KO") {
+    return new Left(new Error(ControllerError.REQUEST_REJECTED));
+  }
   const errorOrPaymentsActivationResponse = PaymentsActivationResponse.decode({
     importoSingoloVersamento:
       iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA
@@ -216,8 +218,17 @@ export function getPaymentsStatusUpdateRequest(
   return new Right(errorOrPaymentsStatusUpdateRequest.value);
 }
 
+// Define a response to send to PagoPa, after an PaymentsStatusUpdateRequestPagoPa
+export function getPaymentsStatusUpdateResponsePagoPa(
+  requestResult: boolean
+): IcdInfoWispOutput {
+  return {
+    esito: requestResult ? "OK" : "KO"
+  };
+}
+
 // Generate a Session Token to follow a stream of requests
-function generateCodiceContestoPagamento(): Either<
+export function generateCodiceContestoPagamento(): Either<
   Error,
   CodiceContestoPagamento
 > {

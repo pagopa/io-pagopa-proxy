@@ -18,26 +18,30 @@ import { ControllerError } from "../enums/ControllerError";
 export async function sendPaymentCheckRequestToPagoPa(
   iNodoVerificaRPTInput: InodoVerificaRPTInput
 ): Promise<Either<ControllerError, InodoVerificaRPTOutput>> {
-  const pagamentiTelematiciPSPNodoClientBase = await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient(
-    {
-      endpoint: `${CONFIG.PAGOPA.HOST}:${CONFIG.PAGOPA.PORT}${
-        CONFIG.PAGOPA.SERVICES.PAYMENTS_CHECK
-      }`,
-      envelopeKey: "soapenv"
+  try {
+    const pagamentiTelematiciPSPNodoClientBase = await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient(
+      {
+        endpoint: `${CONFIG.PAGOPA.HOST}:${CONFIG.PAGOPA.PORT}${
+          CONFIG.PAGOPA.SERVICES.PAYMENTS_CHECK
+        }`,
+        envelopeKey: "soapenv"
+      }
+    );
+
+    const pagamentiTelematiciPSPNodoClient = new pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient(
+      pagamentiTelematiciPSPNodoClientBase
+    );
+
+    const nodoVerificaRPTOutput = await pagamentiTelematiciPSPNodoClient.nodoVerificaRPT(
+      iNodoVerificaRPTInput
+    );
+    if (nodoVerificaRPTOutput.nodoVerificaRPTRisposta.esito === "KO") {
+      return new Left(ControllerError.REQUEST_REJECTED);
     }
-  );
-
-  const pagamentiTelematiciPSPNodoClient = new pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient(
-    pagamentiTelematiciPSPNodoClientBase
-  );
-
-  const nodoVerificaRPT = await pagamentiTelematiciPSPNodoClient.nodoVerificaRPT(
-    iNodoVerificaRPTInput
-  );
-  if (nodoVerificaRPT.nodoVerificaRPTRisposta.esito === "KO") {
+    return new Right(nodoVerificaRPTOutput);
+  } catch (exception) {
     return new Left(ControllerError.ERROR_API_UNAVAILABLE);
   }
-  return new Right(nodoVerificaRPT);
 }
 
 // Send a request to PagoPa to activate a payment

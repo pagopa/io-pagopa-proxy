@@ -12,7 +12,8 @@ import { Iban, Importo } from "../CommonTypes";
 
 export const PaymentsCheckResponse = t.intersection([
   t.interface({
-    importoSingoloVersamento: Importo
+    importoSingoloVersamento: Importo,
+    codiceContestoPagamento: WithinRangeString(1, 35)
   }),
   t.partial({
     ibanAccredito: Iban,

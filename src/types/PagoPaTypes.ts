@@ -9,7 +9,7 @@ import { Iban, Importo } from "./CommonTypes";
 export const Text16 = WithinRangeString(1, 16);
 export type Text16 = t.TypeOf<typeof Text16>;
 
-export const Text35 = WithinRangeString(1, 36);
+export const Text35 = WithinRangeString(1, 35);
 export type Text35 = t.TypeOf<typeof Text35>;
 
 export const Text70 = WithinRangeString(1, 70);
