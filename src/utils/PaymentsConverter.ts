@@ -13,7 +13,7 @@ import {
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import * as uuid from "uuid";
-import { CONFIG } from "../Configuration";
+import { PagoPaConfig } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
 import { PaymentsActivationRequest } from "../types/controllers/PaymentsActivationRequest";
 import { PaymentsActivationResponse } from "../types/controllers/PaymentsActivationResponse";
@@ -24,15 +24,16 @@ import { CodiceContestoPagamento } from "../types/PagoPaTypes";
 
 // Convert PaymentsCheckRequest (controller) to PaymentsCheckRequestPagoPa (PagoPa API)
 export function getPaymentsCheckRequestPagoPa(
+  pagoPaConfig: PagoPaConfig,
   paymentsCheckRequest: PaymentsCheckRequest,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, InodoVerificaRPTInput> {
   return new Right({
-    identificativoPSP: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP,
+    identificativoPSP: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
     identificativoIntermediarioPSP:
-      CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-    identificativoCanale: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
-    password: CONFIG.PAGOPA.IDENTIFIER.TOKEN,
+      pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+    identificativoCanale: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+    password: pagoPaConfig.IDENTIFIER.TOKEN,
     codiceContestoPagamento,
     codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
     codiceIdRPT: {
@@ -108,19 +109,20 @@ export function getPaymentsCheckResponse(
 
 // Convert PaymentsActivationRequest (controller) to PaymentsActivationRequestPagoPa (PagoPa API)
 export function getPaymentsActivationRequestPagoPa(
+  pagoPaConfig: PagoPaConfig,
   paymentsActivationRequest: PaymentsActivationRequest
 ): Either<Error, InodoAttivaRPTInput> {
   return new Right({
-    identificativoPSP: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP,
+    identificativoPSP: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
     identificativoIntermediarioPSP:
-      CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-    identificativoCanale: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
-    password: CONFIG.PAGOPA.IDENTIFIER.TOKEN,
+      pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+    identificativoCanale: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+    password: pagoPaConfig.IDENTIFIER.TOKEN,
     codiceContestoPagamento: paymentsActivationRequest.codiceContestoPagamento,
     identificativoIntermediarioPSPPagamento:
-      CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
     identificativoCanalePagamento:
-      CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
+      pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
     codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
     codiceIdRPT: {
       CF: paymentsActivationRequest.codiceIdRPT.CF,

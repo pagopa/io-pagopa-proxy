@@ -4,6 +4,7 @@
  */
 
 import * as express from "express";
+import { PagoPaConfig } from "../../Configuration";
 import { ControllerError } from "../../enums/ControllerError";
 import { HttpErrorStatusCode } from "../../enums/HttpErrorStatusCode";
 import * as PaymentsService from "../../services/PaymentsService";
@@ -15,7 +16,8 @@ import * as RestfulUtils from "../../utils/RestfulUtils";
 // Forward a payment check request from BackendApp to PagoPa
 export async function checkPaymentToPagoPa(
   req: express.Request,
-  res: express.Response
+  res: express.Response,
+  pagoPaConfig: PagoPaConfig
 ): Promise<boolean> {
   // Validate input
   const errorOrPaymentsCheckRequest = PaymentsCheckRequest.decode(req.params);
@@ -41,6 +43,7 @@ export async function checkPaymentToPagoPa(
 
   // Convert controller request to PagoPa request
   const errorOrPaymentCheckRequestPagoPa = PaymentsConverter.getPaymentsCheckRequestPagoPa(
+    pagoPaConfig,
     errorOrPaymentsCheckRequest.value,
     errorOrCodiceContestoPagamento.value
   );
@@ -55,7 +58,8 @@ export async function checkPaymentToPagoPa(
 
   // Require payment check to PagoPa
   const errorOrPaymentCheckPagoPaResponse = await PaymentsService.sendPaymentCheckRequestToPagoPa(
-    errorOrPaymentCheckRequestPagoPa.value
+    errorOrPaymentCheckRequestPagoPa.value,
+    pagoPaConfig
   );
 
   // Provide a response to applicant if error occurred
@@ -95,7 +99,8 @@ export async function checkPaymentToPagoPa(
 // Forward a payment check request from BackendApp to PagoPa
 export async function activatePaymentToPagoPa(
   req: express.Request,
-  res: express.Response
+  res: express.Response,
+  pagoPaConfig: PagoPaConfig
 ): Promise<boolean> {
   // Validate input
   const errorOrPaymentsActivationRequest = PaymentsActivationRequest.decode(
@@ -112,6 +117,7 @@ export async function activatePaymentToPagoPa(
 
   // Convert controller request to PagoPa request
   const errorOrPaymentsActivationRequestPagoPa = PaymentsConverter.getPaymentsActivationRequestPagoPa(
+    pagoPaConfig,
     errorOrPaymentsActivationRequest.value
   );
   if (errorOrPaymentsActivationRequestPagoPa.isLeft()) {

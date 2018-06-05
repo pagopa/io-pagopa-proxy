@@ -11,18 +11,20 @@ import {
   InodoVerificaRPTInput,
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { CONFIG } from "../Configuration";
+import { BackendAppConfig, PagoPaConfig } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
+import { PaymentsStatusUpdateRequest } from "../types/controllers/PaymentsStatusUpdateRequest";
 
 // Send a request to PagoPa to check payment info
 export async function sendPaymentCheckRequestToPagoPa(
-  iNodoVerificaRPTInput: InodoVerificaRPTInput
+  iNodoVerificaRPTInput: InodoVerificaRPTInput,
+  pagoPaConfig: PagoPaConfig
 ): Promise<Either<ControllerError, InodoVerificaRPTOutput>> {
   try {
     const pagamentiTelematiciPSPNodoClientBase = await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient(
       {
-        endpoint: `${CONFIG.PAGOPA.HOST}:${CONFIG.PAGOPA.PORT}${
-          CONFIG.PAGOPA.SERVICES.PAYMENTS_CHECK
+        endpoint: `${pagoPaConfig.HOST}:${pagoPaConfig.PORT}${
+          pagoPaConfig.SERVICES.PAYMENTS_CHECK
         }`,
         envelopeKey: "soapenv"
       }
@@ -53,9 +55,25 @@ export async function sendPaymentsActivationRequestToPagoPa(): Promise<
 }
 
 // Send a payment status update to API Notifica
-export async function sendPaymentsStatusUpdateToAPINotifica(): Promise<
-  Either<ControllerError, void>
-> {
-  // TODO: [#157911381] Chiamate Restful verso il Backend CD
-  return new Left(ControllerError.ERROR_API_UNAVAILABLE);
+export async function sendPaymentsStatusUpdateToAPINotifica(
+  backendAppConfig: BackendAppConfig,
+  paymentsStatusUpdateRequest: PaymentsStatusUpdateRequest
+): Promise<Either<ControllerError, boolean>> {
+  try {
+    const response = await fetch(
+      `${backendAppConfig.HOST}:${backendAppConfig.PORT}${
+        backendAppConfig.SERVICES.PAYMENTS_STATUS_UPDATE
+      }`,
+      {
+        method: "POST",
+        body: JSON.stringify(paymentsStatusUpdateRequest)
+      }
+    );
+    if (response.status === 200) {
+      return new Right(true);
+    }
+  } catch (exception) {
+    return new Left(ControllerError.ERROR_API_UNAVAILABLE);
+  }
+  return new Left(ControllerError.REQUEST_REJECTED);
 }

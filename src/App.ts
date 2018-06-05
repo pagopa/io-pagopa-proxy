@@ -24,7 +24,7 @@ export function startApp(): http.Server {
   app.set("port", config.CONTROLLER.PORT);
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
-  setRestfulRoutes(app);
+  setRestfulRoutes(app, config);
   const server = http.createServer(app);
   logger.info("Starting Proxy PagoPa Server...");
   server.listen(config.CONTROLLER.PORT);
@@ -37,13 +37,13 @@ export function stopServer(server: http.Server): void {
 }
 
 // Set Restful WS routes
-function setRestfulRoutes(app: core.Express): void {
-  app.get(CONFIG.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_CHECK, (req, res) => {
+function setRestfulRoutes(app: core.Express, config: Configuration): void {
+  app.get(config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_CHECK, (req, res) => {
     console.log("Serving Payment Check Request (GET)...");
-    return PaymentController.checkPaymentToPagoPa(req, res);
+    return PaymentController.checkPaymentToPagoPa(req, res, config.PAGOPA);
   });
-  app.post(CONFIG.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_ACTIVATION, (req, res) => {
+  app.post(config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_ACTIVATION, (req, res) => {
     console.log("Serving Payment Activation Request (POST)...");
-    return PaymentController.activatePaymentToPagoPa(req, res);
+    return PaymentController.activatePaymentToPagoPa(req, res, config.PAGOPA);
   });
 }
