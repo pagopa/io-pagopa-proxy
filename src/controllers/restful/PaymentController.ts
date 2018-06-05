@@ -129,8 +129,11 @@ export async function activatePaymentToPagoPa(
     return false;
   }
 
-  // Require payment activation to PagoPa
-  const errorOrPaymentActivationPagoPaResponse = await PaymentsService.sendPaymentsActivationRequestToPagoPa();
+  // Require payment activation to PagoPa API
+  const errorOrPaymentActivationPagoPaResponse = await PaymentsService.sendPaymentsActivationRequestToPagoPaAPI(
+    errorOrPaymentsActivationRequestPagoPa.value,
+    pagoPaConfig
+  );
 
   // Provide a response to applicant
   if (errorOrPaymentActivationPagoPaResponse.isLeft()) {

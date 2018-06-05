@@ -73,7 +73,7 @@ const ControllerConfig = t.intersection([
 ]);
 export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 
-const PagoPaConfig = t.intersection([
+export const PagoPaConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     SERVICES: t.interface({

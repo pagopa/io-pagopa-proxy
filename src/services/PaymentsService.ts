@@ -7,6 +7,7 @@ import { Either, Left, Right } from "fp-ts/lib/Either";
 
 import { clients as pagoPaSoapClient } from "italia-pagopa-api";
 import {
+  InodoAttivaRPTInput,
   InodoAttivaRPTOutput,
   InodoVerificaRPTInput,
   InodoVerificaRPTOutput
@@ -34,24 +35,47 @@ export async function sendPaymentCheckRequestToPagoPa(
       pagamentiTelematiciPSPNodoClientBase
     );
 
-    const nodoVerificaRPTOutput = await pagamentiTelematiciPSPNodoClient.nodoVerificaRPT(
+    const nodoVerificaRPT = await pagamentiTelematiciPSPNodoClient.nodoVerificaRPT(
       iNodoVerificaRPTInput
     );
-    if (nodoVerificaRPTOutput.nodoVerificaRPTRisposta.esito === "KO") {
-      return new Left(ControllerError.REQUEST_REJECTED);
+    if (nodoVerificaRPT.nodoVerificaRPTRisposta.esito === "KO") {
+      return new Left(ControllerError.ERROR_API_UNAVAILABLE);
     }
-    return new Right(nodoVerificaRPTOutput);
-  } catch (exception) {
-    return new Left(ControllerError.ERROR_API_UNAVAILABLE);
+    return new Right(nodoVerificaRPT);
+  } catch {
+    return new Left(ControllerError.REQUEST_REJECTED);
   }
 }
 
-// Send a request to PagoPa to activate a payment
-export async function sendPaymentsActivationRequestToPagoPa(): Promise<
-  Either<ControllerError, InodoAttivaRPTOutput>
-> {
-  // TODO:[#157911366] Chiamate SOAP verso PagoPA
-  return new Left(ControllerError.ERROR_API_UNAVAILABLE);
+// Send a request to PagoPaAPI to activate a payment
+export async function sendPaymentsActivationRequestToPagoPaAPI(
+  iNodoVerificaRPTInput: InodoAttivaRPTInput,
+  pagoPaConfig: PagoPaConfig
+): Promise<Either<ControllerError, InodoAttivaRPTOutput>> {
+  try {
+    const pagamentiTelematiciPSPNodoClientBase = await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient(
+      {
+        endpoint: `${pagoPaConfig.HOST}:${pagoPaConfig.PORT}${
+          pagoPaConfig.SERVICES.PAYMENTS_CHECK
+        }`,
+        envelopeKey: "soapenv"
+      }
+    );
+
+    const pagamentiTelematiciPSPNodoClient = new pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient(
+      pagamentiTelematiciPSPNodoClientBase
+    );
+
+    const nodoAttivaRPT = await pagamentiTelematiciPSPNodoClient.nodoAttivaRPT(
+      iNodoVerificaRPTInput
+    );
+    if (nodoAttivaRPT.nodoAttivaRPTRisposta.esito === "KO") {
+      return new Left(ControllerError.ERROR_API_UNAVAILABLE);
+    }
+    return new Right(nodoAttivaRPT);
+  } catch {
+    return new Left(ControllerError.REQUEST_REJECTED);
+  }
 }
 
 // Send a payment status update to API Notifica
