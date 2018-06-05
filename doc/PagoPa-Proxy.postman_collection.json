@@ -1,0 +1,104 @@
+{
+	"info": {
+		"_postman_id": "6e1c0550-3ee8-4d49-b452-53787fb315e2",
+		"name": "PagoPa-Proxy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "errors",
+			"description": "",
+			"item": [
+				{
+					"name": "Invalid input provided",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:3000/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request Rejected",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:3000/notifications/subscription/wrongFiscalCode/activation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"notifications",
+								"subscription",
+								"wrongFiscalCode",
+								"activation"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "notification activation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:3000/notifications/subscription/AAABBB11H11A100A/activation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"notifications",
+						"subscription",
+						"AAABBB11H11A100A",
+						"activation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notification deactivation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:3000/notifications/subscription/AAABBB11H11A100A/deactivation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"notifications",
+						"subscription",
+						"AAABBB11H11A100A",
+						"deactivation"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
