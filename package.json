@@ -12,7 +12,7 @@
     "lint": "tslint --project ."
   },
   "devDependencies": {
-    "prettier": "^1.12.1",
+    "prettier": "^1.13.4",
     "danger": "^3.7.15",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3",
