@@ -6,13 +6,10 @@ export const NON_CORRECT_CF = "BDAGPP36H07C351LAX";
 export const CORRECT_COD_IUV = "105983676029386";
 export const NON_CORRECT_COD_IUV = "1059836760293860000000";
 
-export const CORRECT_AUX_DIGIT = "2";
-export const NON_CORRECT_AUX_DIGIT = "99";
-
 export const INCORRECT_PAYMENT_CHECK_REQUEST_CF = {
   codiceIdRPT: {
     CF: NON_CORRECT_CF, // Incorrect CF
-    AuxDigit: CORRECT_AUX_DIGIT,
+    AuxDigit: "2",
     CodIUV: CORRECT_COD_IUV
   }
 };
