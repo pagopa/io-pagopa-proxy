@@ -1,9 +1,9 @@
 import { CONFIG } from "../Configuration";
-import { FiscalCode, IUV } from "../types/CommonTypes";
+import { FiscalCode } from "../types/CommonTypes";
 export const CORRECT_CF = FiscalCode.decode("BDAGPP36H07C351L");
 export const NON_CORRECT_CF = "BDAGPP36H07C351LAX";
 
-export const CORRECT_COD_IUV = IUV.decode("105983676029386");
+export const CORRECT_COD_IUV = "105983676029386";
 export const NON_CORRECT_COD_IUV = "1059836760293860000000";
 
 export const CORRECT_AUX_DIGIT = "2";
