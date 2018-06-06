@@ -1,21 +1,13 @@
 import { CONFIG } from "../Configuration";
-
-export const CORRECT_CF = "BDAGPP36H07C351L";
+import { FiscalCode, IUV } from "../types/CommonTypes";
+export const CORRECT_CF = FiscalCode.decode("BDAGPP36H07C351L");
 export const NON_CORRECT_CF = "BDAGPP36H07C351LAX";
 
-export const CORRECT_COD_IUV = "105983676029386";
+export const CORRECT_COD_IUV = IUV.decode("105983676029386");
 export const NON_CORRECT_COD_IUV = "1059836760293860000000";
 
 export const CORRECT_AUX_DIGIT = "2";
 export const NON_CORRECT_AUX_DIGIT = "99";
-
-export const CORRECT_PAYMENT_CHECK_REQUEST = {
-  codiceIdRPT: {
-    CF: CORRECT_CF,
-    AuxDigit: CORRECT_AUX_DIGIT,
-    CodIUV: CORRECT_COD_IUV
-  }
-};
 
 export const INCORRECT_PAYMENT_CHECK_REQUEST_CF = {
   codiceIdRPT: {
@@ -50,5 +42,38 @@ export const PAGOPA_CONFIG = {
       CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
     IDENTIFICATIVO_CANALE: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
     TOKEN: CONFIG.PAGOPA.IDENTIFIER.TOKEN
+  }
+};
+export const CODICE_CONTESTO_PAGAMENTO = "1A";
+
+export const CORRECT_NODO_ATTIVA_RPT_OUTPUT = {
+  esito: "OK",
+  datiPagamento: {
+    importoSingoloVersamento: 110,
+    ibanAccredito: "IT60X0542811101000000123456",
+    bicAccredito: "LOYDCHGGZCH",
+    credenzialiPagatore: "username",
+    spezzoniCausaleVersamento: {
+      spezzoneCausaleVersamento: 1,
+      spezzoneStrutturatoCausaleVersamento: {
+        causaleSpezzone: "pagamento multa",
+        importoSpezzone: 110
+      }
+    },
+    enteBeneficiario: {
+      identificativoUnivocoBeneficiario: {
+        tipoIdentificativoUnivoco: "F",
+        codiceIdentificativoUnivoco: CORRECT_CF
+      },
+      denominazioneBeneficiario: "banca",
+      codiceUnitOperBeneficiario: "AX1234",
+      denomUnitOperBeneficiario: "unit operativa",
+      indirizzoBeneficiario: "Via Roma",
+      civicoBeneficiario: "11",
+      capBeneficiario: "00146",
+      localitaBeneficiario: "Roma",
+      provinciaBeneficiario: "Roma",
+      nazioneBeneficiario: "Italia"
+    }
   }
 };
