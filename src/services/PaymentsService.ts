@@ -38,12 +38,10 @@ export async function sendPaymentCheckRequestToPagoPa(
     const nodoVerificaRPT = await pagamentiTelematiciPSPNodoClient.nodoVerificaRPT(
       iNodoVerificaRPTInput
     );
-    if (nodoVerificaRPT.nodoVerificaRPTRisposta.esito === "KO") {
-      return new Left(ControllerError.ERROR_API_UNAVAILABLE);
-    }
+
     return new Right(nodoVerificaRPT);
-  } catch {
-    return new Left(ControllerError.REQUEST_REJECTED);
+  } catch (exception) {
+    return new Left(ControllerError.ERROR_API_UNAVAILABLE);
   }
 }
 
@@ -69,12 +67,9 @@ export async function sendPaymentsActivationRequestToPagoPaAPI(
     const nodoAttivaRPT = await pagamentiTelematiciPSPNodoClient.nodoAttivaRPT(
       iNodoVerificaRPTInput
     );
-    if (nodoAttivaRPT.nodoAttivaRPTRisposta.esito === "KO") {
-      return new Left(ControllerError.ERROR_API_UNAVAILABLE);
-    }
     return new Right(nodoAttivaRPT);
-  } catch {
-    return new Left(ControllerError.REQUEST_REJECTED);
+  } catch (exception) {
+    return new Left(ControllerError.ERROR_API_UNAVAILABLE);
   }
 }
 

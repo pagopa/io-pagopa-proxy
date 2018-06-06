@@ -1,51 +1,43 @@
-import { CONFIG, PagoPaConfig } from "../Configuration";
-import { PaymentsCheckRequest } from "../types/controllers/PaymentsCheckRequest";
-import { CodiceContestoPagamento } from "../types/PagoPaTypes";
+import { CONFIG } from "../Configuration";
 
-export const CORRECT_PAYMENT_CHECK_REQUEST = PaymentsCheckRequest.decode({
+export const CORRECT_CF = "BDAGPP36H07C351L";
+export const NON_CORRECT_CF = "BDAGPP36H07C351LAX";
+
+export const CORRECT_COD_IUV = "105983676029386";
+export const NON_CORRECT_COD_IUV = "1059836760293860000000";
+
+export const CORRECT_AUX_DIGIT = "2";
+export const NON_CORRECT_AUX_DIGIT = "99";
+
+export const CORRECT_PAYMENT_CHECK_REQUEST = {
   codiceIdRPT: {
-    CF: "BDAGPP36H07C351L",
-    AuxDigit: 2,
-    CodIUV: "105983676029386"
+    CF: CORRECT_CF,
+    AuxDigit: CORRECT_AUX_DIGIT,
+    CodIUV: CORRECT_COD_IUV
   }
-});
+};
 
-export const INCORRECT_PAYMENT_CHECK_REQUEST_CF = PaymentsCheckRequest.decode({
+export const INCORRECT_PAYMENT_CHECK_REQUEST_CF = {
   codiceIdRPT: {
-    CF: "BDAGPP36H07C351LAX", // Incorrect CF
+    CF: NON_CORRECT_CF, // Incorrect CF
+    AuxDigit: CORRECT_AUX_DIGIT,
+    CodIUV: CORRECT_COD_IUV
+  }
+};
+
+export const INCORRECT_PAYMENT_CHECK_REQUEST_COD_IUV = {
+  codiceIdRPT: {
+    CF: CORRECT_CF,
     AuxDigit: "2",
-    CodIUV: "105983676029386"
+    CodIUV: NON_CORRECT_COD_IUV // Incorrect CodIUV
   }
-});
+};
 
-export const INCORRECT_PAYMENT_CHECK_REQUEST_AUX_DIGIT = PaymentsCheckRequest.decode(
-  {
-    codiceIdRPT: {
-      CF: "BDAGPP36H07C351L",
-      AuxDigit: "99", // Incorrect AuxDigit
-      CodIUV: "105983676029386"
-    }
-  }
-);
+export const VALID_CODICE_CONTESTO_PAGAMENTO = "AXPOIEHKSPGO93INBSOJ";
+export const INVALID_CODICE_CONTESTO_PAGAMENTO =
+  "JFP39JFOO38HGNYE872YHBII9SHJ084HJG0BCU0A";
 
-export const INCORRECT_PAYMENT_CHECK_REQUEST_COD_IUV = PaymentsCheckRequest.decode(
-  {
-    codiceIdRPT: {
-      CF: "BDAGPP36H07C351L",
-      AuxDigit: "2",
-      CodIUV: "1059836760293860000000" // Incorrect CodIUV
-    }
-  }
-);
-
-export const VALID_CODICE_CONTESTO_PAGAMENTO = CodiceContestoPagamento.decode(
-  "AXPOIEHKSPGO93INBSOJ"
-);
-export const INVALID_CODICE_CONTESTO_PAGAMENTO = CodiceContestoPagamento.decode(
-  "JFP39JFOO38HGNYE872YHBII9SHJ084HJG0BCU0A"
-);
-
-export const PAGOPA_CONFIG = PagoPaConfig.decode({
+export const PAGOPA_CONFIG = {
   HOST: CONFIG.PAGOPA.HOST,
   PORT: CONFIG.PAGOPA.PORT,
   SERVICES: {
@@ -59,4 +51,4 @@ export const PAGOPA_CONFIG = PagoPaConfig.decode({
     IDENTIFICATIVO_CANALE: CONFIG.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE,
     TOKEN: CONFIG.PAGOPA.IDENTIFIER.TOKEN
   }
-});
+};

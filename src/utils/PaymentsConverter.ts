@@ -10,7 +10,8 @@ import {
   InodoAttivaRPTInput,
   InodoAttivaRPTOutput,
   InodoVerificaRPTInput,
-  InodoVerificaRPTOutput
+  InodoVerificaRPTOutput,
+  PPTPortTypes
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import * as uuid from "uuid";
 import { PagoPaConfig } from "../Configuration";
@@ -50,7 +51,10 @@ export function getPaymentsCheckResponse(
   iNodoVerificaRPTOutput: InodoVerificaRPTOutput,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, PaymentsCheckResponse> {
-  if (iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.esito === "KO") {
+  if (
+    iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.esito ===
+    PPTPortTypes.Esito.KO
+  ) {
     return new Left(new Error(ControllerError.REQUEST_REJECTED));
   }
   const errorOrPaymentCheckResponse = PaymentsCheckResponse.decode({
@@ -141,7 +145,9 @@ export function getPaymentsActivationRequestPagoPa(
 export function getPaymentsActivationResponse(
   iNodoAttivaRPTOutput: InodoAttivaRPTOutput
 ): Either<Error, PaymentsActivationResponse> {
-  if (iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.esito === "KO") {
+  if (
+    iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.esito === PPTPortTypes.Esito.KO
+  ) {
     return new Left(new Error(ControllerError.REQUEST_REJECTED));
   }
   const errorOrPaymentsActivationResponse = PaymentsActivationResponse.decode({
@@ -225,7 +231,7 @@ export function getPaymentsStatusUpdateResponsePagoPa(
   requestResult: boolean
 ): IcdInfoWispOutput {
   return {
-    esito: requestResult ? "OK" : "KO"
+    esito: requestResult ? PPTPortTypes.Esito.OK : PPTPortTypes.Esito.KO
   };
 }
 
