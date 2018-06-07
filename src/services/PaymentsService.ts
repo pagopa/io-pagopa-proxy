@@ -3,7 +3,7 @@
  * Provide services related to Payments (Nodo) to communicate with PagoPa and Backend API
  */
 
-import { Either, Left, Right } from "fp-ts/lib/Either";
+import { Either, left, right } from "fp-ts/lib/Either";
 
 import { clients as pagoPaSoapClient } from "italia-pagopa-api";
 import {
@@ -38,9 +38,9 @@ export async function sendPaymentCheckRequestToPagoPa(
       iNodoVerificaRPTInput
     );
 
-    return new Right(nodoVerificaRPT);
+    return right(nodoVerificaRPT);
   } catch (exception) {
-    return new Left(ControllerError.ERROR_API_UNAVAILABLE);
+    return left(ControllerError.ERROR_API_UNAVAILABLE);
   }
 }
 
@@ -66,8 +66,8 @@ export async function sendPaymentsActivationRequestToPagoPaAPI(
     const nodoAttivaRPT = await pagamentiTelematiciPSPNodoClient.nodoAttivaRPT(
       iNodoVerificaRPTInput
     );
-    return new Right(nodoAttivaRPT);
+    return right(nodoAttivaRPT);
   } catch (exception) {
-    return new Left(ControllerError.ERROR_API_UNAVAILABLE);
+    return left(ControllerError.ERROR_API_UNAVAILABLE);
   }
 }

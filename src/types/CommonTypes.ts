@@ -32,13 +32,15 @@ export const CodiceIdRPT = t.intersection([
 ]);
 
 // Define an interface used to build responses for REST controllers
+type IRestfulContentType =
+  | string
+  | number
+  | boolean
+  | ReadonlyArray<string>
+  | ReadonlyArray<number>;
+
 export interface IRestfulObject {
   readonly [key: string]:
-    | IRestfulObject
-    | string
-    | number
-    | boolean
-    | ReadonlyArray<IRestfulObject>
-    | ReadonlyArray<string>
-    | ReadonlyArray<number>;
+    | IRestfulContentType
+    | ReadonlyArray<IRestfulContentType>;
 }

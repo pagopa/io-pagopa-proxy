@@ -2,7 +2,7 @@
  * Payments Converter
  * Data Converter for Payments Request\Responses between PagoPa and BackendAPP types
  */
-import { Either, Left, Right } from "fp-ts/lib/Either";
+import { Either, left, right } from "fp-ts/lib/Either";
 import {
   codificaInfrastrutturaPSPEnum,
   IcdInfoWispInput,
@@ -28,7 +28,7 @@ export function getPaymentsCheckRequestPagoPa(
   paymentsCheckRequest: PaymentsCheckRequest,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, InodoVerificaRPTInput> {
-  return new Right({
+  return right({
     identificativoPSP: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
     identificativoIntermediarioPSP:
       pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
@@ -54,7 +54,7 @@ export function getPaymentsCheckResponse(
     iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.esito ===
     PPTPortTypes.Esito.KO
   ) {
-    return new Left(new Error(ControllerError.REQUEST_REJECTED));
+    return left(new Error(ControllerError.REQUEST_REJECTED));
   }
   const errorOrPaymentCheckResponse = PaymentsCheckResponse.decode({
     importoSingoloVersamento:
@@ -105,9 +105,9 @@ export function getPaymentsCheckResponse(
   });
 
   if (errorOrPaymentCheckResponse.isLeft()) {
-    return new Left(new Error(ControllerError.ERROR_INVALID_INPUT));
+    return left(new Error(ControllerError.ERROR_INVALID_INPUT));
   }
-  return new Right(errorOrPaymentCheckResponse.value);
+  return right(errorOrPaymentCheckResponse.value);
 }
 
 // Convert PaymentsActivationRequest (controller) to PaymentsActivationRequestPagoPa (PagoPa API)
@@ -115,7 +115,7 @@ export function getPaymentsActivationRequestPagoPa(
   pagoPaConfig: PagoPaConfig,
   paymentsActivationRequest: PaymentsActivationRequest
 ): Either<Error, InodoAttivaRPTInput> {
-  return new Right({
+  return right({
     identificativoPSP: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
     identificativoIntermediarioPSP:
       pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
@@ -147,7 +147,7 @@ export function getPaymentsActivationResponse(
   if (
     iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.esito === PPTPortTypes.Esito.KO
   ) {
-    return new Left(new Error(ControllerError.REQUEST_REJECTED));
+    return left(new Error(ControllerError.REQUEST_REJECTED));
   }
   const errorOrPaymentsActivationResponse = PaymentsActivationResponse.decode({
     importoSingoloVersamento:
@@ -196,9 +196,9 @@ export function getPaymentsActivationResponse(
   });
 
   if (errorOrPaymentsActivationResponse.isLeft()) {
-    return new Left(new Error(ControllerError.ERROR_INVALID_INPUT));
+    return left(new Error(ControllerError.ERROR_INVALID_INPUT));
   }
-  return new Right(errorOrPaymentsActivationResponse.value);
+  return right(errorOrPaymentsActivationResponse.value);
 }
 
 // Convert PaymentsStatusUpdateRequestPagoPa (PagoPa API) to PaymentsStatusUpdateRequest (controller)
@@ -214,10 +214,10 @@ export function getPaymentsStatusUpdateRequest(
   );
 
   if (errorOrPaymentsStatusUpdateRequest.isLeft()) {
-    return new Left(new Error(ControllerError.ERROR_INVALID_INPUT));
+    return left(new Error(ControllerError.ERROR_INVALID_INPUT));
   }
 
-  return new Right(errorOrPaymentsStatusUpdateRequest.value);
+  return right(errorOrPaymentsStatusUpdateRequest.value);
 }
 
 // Generate a Session Token to follow a stream of requests
@@ -230,7 +230,7 @@ export function generateCodiceContestoPagamento(): Either<
   );
 
   if (errorOrCodiceContestoPagamento.isLeft()) {
-    return new Left(new Error(ControllerError.ERROR_INTERNAL));
+    return left(new Error(ControllerError.ERROR_INTERNAL));
   }
-  return new Right(errorOrCodiceContestoPagamento.value);
+  return right(errorOrCodiceContestoPagamento.value);
 }
