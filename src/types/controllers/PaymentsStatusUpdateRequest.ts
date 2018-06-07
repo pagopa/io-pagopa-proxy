@@ -5,11 +5,10 @@
 
 import * as t from "io-ts";
 import { WithinRangeString } from "italia-ts-commons/lib/strings";
-import { CodiceIdRPT } from "../CommonTypes";
 
 export const PaymentsStatusUpdateRequest = t.interface({
   codiceContestoPagamento: WithinRangeString(1, 35),
-  codiceIdRPT: CodiceIdRPT
+  idPagamento: WithinRangeString(1, 35)
 });
 export type PaymentsStatusUpdateRequest = t.TypeOf<
   typeof PaymentsStatusUpdateRequest

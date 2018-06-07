@@ -12,9 +12,8 @@ import {
   InodoVerificaRPTInput,
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { BackendAppConfig, PagoPaConfig } from "../Configuration";
+import { PagoPaConfig } from "../Configuration";
 import { ControllerError } from "../enums/ControllerError";
-import { PaymentsStatusUpdateRequest } from "../types/controllers/PaymentsStatusUpdateRequest";
 
 // Send a request to PagoPa to check payment info
 export async function sendPaymentCheckRequestToPagoPa(
@@ -71,28 +70,4 @@ export async function sendPaymentsActivationRequestToPagoPaAPI(
   } catch (exception) {
     return new Left(ControllerError.ERROR_API_UNAVAILABLE);
   }
-}
-
-// Send a payment status update to API Notifica
-export async function sendPaymentsStatusUpdateToAPINotifica(
-  backendAppConfig: BackendAppConfig,
-  paymentsStatusUpdateRequest: PaymentsStatusUpdateRequest
-): Promise<Either<ControllerError, boolean>> {
-  try {
-    const response = await fetch(
-      `${backendAppConfig.HOST}:${backendAppConfig.PORT}${
-        backendAppConfig.SERVICES.PAYMENTS_STATUS_UPDATE
-      }`,
-      {
-        method: "POST",
-        body: JSON.stringify(paymentsStatusUpdateRequest)
-      }
-    );
-    if (response.status === 200) {
-      return new Right(true);
-    }
-  } catch (exception) {
-    return new Left(ControllerError.ERROR_API_UNAVAILABLE);
-  }
-  return new Left(ControllerError.REQUEST_REJECTED);
 }

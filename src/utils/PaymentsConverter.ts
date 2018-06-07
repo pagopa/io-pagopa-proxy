@@ -6,7 +6,6 @@ import { Either, Left, Right } from "fp-ts/lib/Either";
 import {
   codificaInfrastrutturaPSPEnum,
   IcdInfoWispInput,
-  IcdInfoWispOutput,
   InodoAttivaRPTInput,
   InodoAttivaRPTOutput,
   InodoVerificaRPTInput,
@@ -210,12 +209,7 @@ export function getPaymentsStatusUpdateRequest(
     {
       codiceContestoPagamento:
         paymentsStatusUpdateRequestPagoPa.codiceContestoPagamento,
-      codiceIdRPT: {
-        CF: paymentsStatusUpdateRequestPagoPa.codiceIdRPT.CF,
-        AuxDigit: paymentsStatusUpdateRequestPagoPa.codiceIdRPT.AuxDigit,
-        CodStazPA: paymentsStatusUpdateRequestPagoPa.codiceIdRPT.CodStazPA,
-        CodIUV: paymentsStatusUpdateRequestPagoPa.codiceIdRPT.CodIUV
-      }
+      idPagamento: paymentsStatusUpdateRequestPagoPa.idPagamento
     }
   );
 
@@ -224,15 +218,6 @@ export function getPaymentsStatusUpdateRequest(
   }
 
   return new Right(errorOrPaymentsStatusUpdateRequest.value);
-}
-
-// Define a response to send to PagoPa, after an PaymentsStatusUpdateRequestPagoPa
-export function getPaymentsStatusUpdateResponsePagoPa(
-  requestResult: boolean
-): IcdInfoWispOutput {
-  return {
-    esito: requestResult ? PPTPortTypes.Esito.OK : PPTPortTypes.Esito.KO
-  };
 }
 
 // Generate a Session Token to follow a stream of requests

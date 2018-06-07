@@ -168,8 +168,9 @@ export async function activatePaymentToPagoPa(
   return true;
 }
 
-// Forward a payment status update from PagoPa to API Notifica
+// Receive an async activation result frop PagoPA
 export async function notifyPaymentStatusToAPINotifica(): Promise<boolean> {
   // TODO: [#157910857] Creazione dei controller SOAP per l'esposizione dei servizi verso PagoPa
+  // TODO: [#158176380] Gestione della conferma di attivazione di un pagamento
   return false;
 }

@@ -14,6 +14,7 @@ import { logger } from "./utils/Logger";
 
 // Define and start a WS SOAP\Restful Server
 export function startApp(): http.Server {
+  logger.info("Starting Proxy PagoPa Server...");
   const config = Configuration.decode(CONFIG).getOrElseL(errors => {
     throw new Error(
       `Invalid configuration: ${reporters.readableReport(errors)}`
@@ -26,8 +27,11 @@ export function startApp(): http.Server {
   app.use(bodyParser.urlencoded({ extended: false }));
   setRestfulRoutes(app, config);
   const server = http.createServer(app);
-  logger.info("Starting Proxy PagoPa Server...");
+
   server.listen(config.CONTROLLER.PORT);
+  logger.info(
+    `Server started at ${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}`
+  );
   return server;
 }
 
