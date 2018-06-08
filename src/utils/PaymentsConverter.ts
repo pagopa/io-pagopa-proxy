@@ -3,6 +3,7 @@
  * Data Converter for Payments Request\Responses between PagoPa and BackendAPP types
  */
 import { Either, left, right } from "fp-ts/lib/Either";
+import { ValidationError } from "io-ts";
 import {
   codificaInfrastrutturaPSPEnum,
   IcdInfoWispInput,
@@ -123,7 +124,8 @@ export function getPaymentsActivationRequestPagoPa(
 // Convert PaymentsActivationResponsePagoPa (PagoPa API) to PaymentsActivationkResponse (controller)
 export function getPaymentsActivationResponse(
   iNodoAttivaRPTOutput: InodoAttivaRPTOutput
-): Either<Error, PaymentsActivationResponse> {
+  // tslint:disable-next-line:readonly-array
+): Either<ValidationError[], PaymentsActivationResponse> {
   const datiPagamentoPA =
     iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA;
   return PaymentsActivationResponse.decode({
@@ -150,20 +152,17 @@ export function getPaymentsActivationResponse(
       nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
     },
     spezzoniCausaleVersamento: datiPagamentoPA.spezzoniCausaleVersamento
-  }).mapLeft(() => {
-    return new Error();
   });
 }
 
 // Convert PaymentsStatusUpdateRequestPagoPa (PagoPa API) to PaymentsStatusUpdateRequest (controller)
 export function getPaymentsStatusUpdateRequest(
   paymentsStatusUpdateRequestPagoPa: IcdInfoWispInput
-): Either<Error, PaymentsStatusUpdateRequest> {
+  // tslint:disable-next-line:readonly-array
+): Either<ValidationError[], PaymentsStatusUpdateRequest> {
   return PaymentsStatusUpdateRequest.decode({
     codiceContestoPagamento:
       paymentsStatusUpdateRequestPagoPa.codiceContestoPagamento,
     idPagamento: paymentsStatusUpdateRequestPagoPa.idPagamento
-  }).mapLeft(() => {
-    return new Error();
   });
 }
