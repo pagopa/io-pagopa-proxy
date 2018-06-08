@@ -21,4 +21,4 @@ Here's the decisions we taken so far:
 | ADR | Title                         | PR (discussion) |
 | --- | ----------------------------- | --------------- |
 | 1   | [Record architecture decisions](doc/architecture/decisions/0001-record-architecture-decisions.md) | [PR#25](https://github.com/teamdigitale/italia-pagopa-proxy/pull/25)                |
-| 1   | [Use uuid/v1 for sequential requests](doc/adr/0002-use-uuid-v1-for-sequential-requests.md) | [PR#37](https://github.com/teamdigitale/italia-pagopa-proxy/pull/37)                |
+| 2   | [Use uuid/v1 for sequential requests](doc/adr/0002-use-uuid-v1-for-sequential-requests.md) | [PR#8](https://github.com/teamdigitale/italia-pagopa-proxy/pull/8)                |
