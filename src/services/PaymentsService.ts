@@ -13,20 +13,22 @@ import {
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { PagoPaConfig } from "../Configuration";
-import { ControllerError } from "../enums/ControllerError";
+
+// TODO : [#158215861] Move it on PagoPaAPI
+const envelopeKey = "soapenv";
 
 // Send a request to PagoPa to check payment info
 export async function sendPaymentCheckRequestToPagoPa(
   iNodoVerificaRPTInput: InodoVerificaRPTInput,
   pagoPaConfig: PagoPaConfig
-): Promise<Either<ControllerError, InodoVerificaRPTOutput>> {
+): Promise<Either<Error, InodoVerificaRPTOutput>> {
   try {
     const pagamentiTelematiciPSPNodoClientBase = await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient(
       {
         endpoint: `${pagoPaConfig.HOST}:${pagoPaConfig.PORT}${
           pagoPaConfig.SERVICES.PAYMENTS_CHECK
         }`,
-        envelopeKey: "soapenv"
+        envelopeKey
       }
     );
 
@@ -40,7 +42,7 @@ export async function sendPaymentCheckRequestToPagoPa(
 
     return right(nodoVerificaRPT);
   } catch (exception) {
-    return left(ControllerError.ERROR_API_UNAVAILABLE);
+    return left(new Error());
   }
 }
 
@@ -48,14 +50,14 @@ export async function sendPaymentCheckRequestToPagoPa(
 export async function sendPaymentsActivationRequestToPagoPaAPI(
   iNodoVerificaRPTInput: InodoAttivaRPTInput,
   pagoPaConfig: PagoPaConfig
-): Promise<Either<ControllerError, InodoAttivaRPTOutput>> {
+): Promise<Either<Error, InodoAttivaRPTOutput>> {
   try {
     const pagamentiTelematiciPSPNodoClientBase = await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient(
       {
         endpoint: `${pagoPaConfig.HOST}:${pagoPaConfig.PORT}${
           pagoPaConfig.SERVICES.PAYMENTS_CHECK
         }`,
-        envelopeKey: "soapenv"
+        envelopeKey
       }
     );
 
@@ -68,6 +70,6 @@ export async function sendPaymentsActivationRequestToPagoPaAPI(
     );
     return right(nodoAttivaRPT);
   } catch (exception) {
-    return left(ControllerError.ERROR_API_UNAVAILABLE);
+    return left(new Error());
   }
 }

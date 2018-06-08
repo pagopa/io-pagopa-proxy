@@ -14,12 +14,13 @@ export const FiscalCode = PatternString(
 );
 export type FiscalCode = t.TypeOf<typeof FiscalCode>;
 
+// These values are documented here:
+// https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
 export const IUV = PatternString("[0-9]{15}|[0-9]{17}");
 export type IUV = t.TypeOf<typeof IUV>;
-
+// TODO: [#158215630] We have to handle monetary values with some custom type
 export const Importo = WithinRangeNumber(0.11, 999999.99);
 export type Importo = t.TypeOf<typeof Importo>;
-
 export const CodiceIdRPT = t.intersection([
   t.interface({
     CF: FiscalCode,
@@ -38,7 +39,6 @@ type IRestfulContentType =
   | boolean
   | ReadonlyArray<string>
   | ReadonlyArray<number>;
-
 export interface IRestfulObject {
   readonly [key: string]:
     | IRestfulContentType
