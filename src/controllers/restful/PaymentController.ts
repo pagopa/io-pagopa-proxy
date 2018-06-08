@@ -1,7 +1,7 @@
 /**
- * PaymentControllers
- * RESTful Controllers for Payments Endpoints
- */
+  * PaymentControllers
+  * RESTful Controllers for Payments Endpoints
+  */
 
 import * as express from "express";
 import { Either, left, right } from "fp-ts/lib/Either";
@@ -27,23 +27,21 @@ export async function checkPaymentToPagoPa(
   // Validate input
   const errorOrPaymentsCheckRequest = PaymentsCheckRequest.decode(req.params);
   if (errorOrPaymentsCheckRequest.isLeft()) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.ERROR_INVALID_INPUT,
       HttpErrorStatusCode.BAD_REQUEST
-    );
-    return left(ControllerError.ERROR_INVALID_INPUT);
+    ));
   }
 
   // Generate a session token (this is the first message of a payment flow)
   const errorOrCodiceContestoPagamento = generateCodiceContestoPagamento();
   if (errorOrCodiceContestoPagamento.isLeft()) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.ERROR_INTERNAL,
       HttpErrorStatusCode.INTERNAL_ERROR
-    );
-    return left(ControllerError.ERROR_INTERNAL);
+    ));
   }
 
   // Convert controller request to PagoPa request
@@ -53,12 +51,11 @@ export async function checkPaymentToPagoPa(
     errorOrCodiceContestoPagamento.value
   );
   if (errorOrPaymentCheckRequestPagoPa.isLeft()) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.ERROR_INVALID_INPUT,
       HttpErrorStatusCode.BAD_REQUEST
-    );
-    return left(ControllerError.ERROR_INVALID_INPUT);
+    ));
   }
 
   // Require payment check to PagoPa
@@ -78,12 +75,11 @@ export async function checkPaymentToPagoPa(
     errorOrPaymentCheckPagoPaResponse.value.nodoVerificaRPTRisposta.esito ===
     PPTPortTypes.Esito.KO
   ) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.REQUEST_REJECTED,
       HttpErrorStatusCode.BAD_REQUEST
-    );
-    return left(ControllerError.REQUEST_REJECTED);
+    ));
   }
 
   // Convert PagoPa response to controller response
@@ -92,12 +88,11 @@ export async function checkPaymentToPagoPa(
     errorOrCodiceContestoPagamento.value
   );
   if (errorOrPaymentCheckResponse.isLeft()) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.ERROR_INVALID_API_RESPONSE,
       HttpErrorStatusCode.INTERNAL_ERROR
-    );
-    return left(ControllerError.ERROR_INVALID_API_RESPONSE);
+    ));
   }
   RestfulUtils.sendSuccessResponse(res, errorOrPaymentCheckResponse.value);
   return right(errorOrPaymentCheckResponse.value);
@@ -114,12 +109,11 @@ export async function activatePaymentToPagoPa(
     req.params
   );
   if (errorOrPaymentsActivationRequest.isLeft()) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.ERROR_INVALID_INPUT,
       HttpErrorStatusCode.BAD_REQUEST
-    );
-    return left(ControllerError.ERROR_INVALID_INPUT);
+    ));
   }
 
   // Convert controller request to PagoPa request
@@ -128,12 +122,11 @@ export async function activatePaymentToPagoPa(
     errorOrPaymentsActivationRequest.value
   );
   if (errorOrPaymentsActivationRequestPagoPa.isLeft()) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.ERROR_INVALID_INPUT,
       HttpErrorStatusCode.BAD_REQUEST
-    );
-    return left(ControllerError.ERROR_INVALID_INPUT);
+    ));
   }
 
   // Require payment activation to PagoPa API
@@ -153,12 +146,11 @@ export async function activatePaymentToPagoPa(
     errorOrPaymentActivationPagoPaResponse.value.nodoAttivaRPTRisposta.esito ===
     PPTPortTypes.Esito.KO
   ) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.REQUEST_REJECTED,
       HttpErrorStatusCode.BAD_REQUEST
-    );
-    return left(ControllerError.REQUEST_REJECTED);
+    ));
   }
 
   // Convert PagoPa response to controller response
@@ -166,20 +158,20 @@ export async function activatePaymentToPagoPa(
     errorOrPaymentActivationPagoPaResponse.value
   );
   if (errorOrPaymentActivationResponse.isLeft()) {
-    RestfulUtils.sendErrorResponse(
+    return left(RestfulUtils.sendErrorResponse(
       res,
       ControllerError.ERROR_INVALID_API_RESPONSE,
       HttpErrorStatusCode.INTERNAL_ERROR
-    );
-    return left(ControllerError.ERROR_INVALID_API_RESPONSE);
+    ));
   }
   RestfulUtils.sendSuccessResponse(res, errorOrPaymentActivationResponse.value);
   return right(errorOrPaymentActivationResponse.value);
 }
 
-// Receive an async activation result frop PagoPA
-// TODO: [#157910857] Creazione dei controller SOAP per l'esposizione dei servizi verso PagoPa
-// TODO: [#158176380] Gestione della conferma di attivazione di un pagamento
+/** Receive an async activation result frop PagoPA
+  * TODO: [#157910857] Creazione dei controller SOAP per l'esposizione dei servizi verso PagoPa
+  * TODO: [#158176380] Gestione della conferma di attivazione di un pagamento
+  */
 // tslint:disable-next-line:no-empty
 export async function notifyPaymentStatusToAPINotifica(): Promise<void> {}
 

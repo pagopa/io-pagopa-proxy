@@ -1,7 +1,7 @@
 /**
- * PaymentsService
- * Provide services related to Payments (Nodo) to communicate with PagoPa and Backend API
- */
+  * PaymentsService
+  * Provide services related to Payments (Nodo) to communicate with PagoPa and Backend API
+  */
 
 import { Either, left, right } from "fp-ts/lib/Either";
 

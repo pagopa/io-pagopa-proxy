@@ -14,9 +14,10 @@ export function sendErrorResponse(
   res: express.Response,
   errorMsg: ControllerError,
   httpStatusCode: HttpErrorStatusCode
-): void {
+): ControllerError {
   logger.error(`Controller response is an error: ${errorMsg}`);
   res.status(httpStatusCode).json({ errorMessage: errorMsg });
+  return errorMsg;
 }
 
 // Send a success message for express response

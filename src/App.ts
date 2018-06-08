@@ -1,7 +1,7 @@
 /**
- * App
- * Define a Restful and a SOAP Webservice and routes incoming requests to controllers
- */
+  * App
+  * Define a Restful and a SOAP Webservice and routes incoming requests to controllers
+  */
 
 import * as bodyParser from "body-parser";
 import * as express from "express";
@@ -36,11 +36,11 @@ export function stopServer(server: http.Server): void {
 // Set Restful WS routes
 function setRestfulRoutes(app: core.Express, config: Configuration): void {
   app.get(config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_CHECK, (req, res) => {
-    console.log("Serving Payment Check Request (GET)...");
+    logger.info("Serving Payment Check Request (GET)...");
     return PaymentController.checkPaymentToPagoPa(req, res, config.PAGOPA);
   });
   app.post(config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_ACTIVATION, (req, res) => {
-    console.log("Serving Payment Activation Request (POST)...");
+    logger.info("Serving Payment Activation Request (POST)...");
     return PaymentController.activatePaymentToPagoPa(req, res, config.PAGOPA);
   });
 }

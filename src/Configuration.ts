@@ -1,6 +1,6 @@
 /**
- * Common configurations for Proxy PagoPa and external resources
- */
+  * Common configurations for Proxy PagoPa and external resources
+  */
 
 import * as t from "io-ts";
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
@@ -9,10 +9,10 @@ import { NonEmptyString } from "italia-ts-commons/lib/strings";
 const localhost = "http://localhost";
 
 export const CONFIG = {
-  /* RESTful Webservice configuration
-     These information are documented here:
-     https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
-     Used to expose services
+  /** RESTful Webservice configuration
+    * These information are documented here:
+    * https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
+    *  Used to expose services
     */
   CONTROLLER: {
     PORT: process.env.PAGOPAPROXY_PORT || 3000,
@@ -28,10 +28,11 @@ export const CONFIG = {
     }
   },
 
-  /* PagoPa Configuration
-     Ask the pagopa service administrator.
-     These values are the same for test and production environment
-     Used to communicate with PagoPa */
+  /** PagoPa Configuration
+    * Ask the pagopa service administrator.
+    * These values are the same for test and production environment
+    * Used to communicate with PagoPa
+    */
   PAGOPA: {
     HOST: process.env.PAGOPA_HOST || localhost,
     PORT: process.env.PAGOPA_PORT || 3001,
@@ -48,10 +49,10 @@ export const CONFIG = {
     }
   },
 
-  /* BackendApp Configuration
-     These information are documented here:
-     https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
-     Used to communicate with Backend App
+  /** BackendApp Configuration
+    * These information are documented here:
+    * https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
+    * Used to communicate with Backend App
     */
   BACKEND_APP: {
     HOST: process.env.BACKEND_APP_HOST || localhost,
