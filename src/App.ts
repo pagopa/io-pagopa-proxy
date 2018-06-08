@@ -7,20 +7,13 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
-import { reporters } from "italia-ts-commons";
-import { CONFIG, Configuration } from "./Configuration";
+import { Configuration } from "./Configuration";
 import * as PaymentController from "./controllers/restful/PaymentController";
 import { logger } from "./utils/Logger";
 
 // Define and start a WS SOAP\Restful Server
-export function startApp(): http.Server {
+export function startApp(config: Configuration): http.Server {
   logger.info("Starting Proxy PagoPa Server...");
-  const config = Configuration.decode(CONFIG).getOrElseL(errors => {
-    throw new Error(
-      `Invalid configuration: ${reporters.readableReport(errors)}`
-    );
-  });
-
   const app = express();
   app.set("port", config.CONTROLLER.PORT);
   app.use(bodyParser.json());

@@ -1,4 +1,4 @@
-# 1. Use uuid/v1 for sequential requests
+# 2. Use uuid/v1 for sequential requests
 
 Date: 2018-05-21
 

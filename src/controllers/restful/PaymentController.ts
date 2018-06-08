@@ -4,12 +4,16 @@
  */
 
 import * as express from "express";
+import { Either } from "fp-ts/lib/Either";
+import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import * as uuid from "uuid";
 import { PagoPaConfig } from "../../Configuration";
 import { ControllerError } from "../../enums/ControllerError";
 import { HttpErrorStatusCode } from "../../enums/HttpErrorStatusCode";
 import * as PaymentsService from "../../services/PaymentsService";
 import { PaymentsActivationRequest } from "../../types/controllers/PaymentsActivationRequest";
 import { PaymentsCheckRequest } from "../../types/controllers/PaymentsCheckRequest";
+import { CodiceContestoPagamento } from "../../types/PagoPaTypes";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import * as RestfulUtils from "../../utils/RestfulUtils";
 
@@ -31,7 +35,7 @@ export async function checkPaymentToPagoPa(
   }
 
   // Generate a session token (this is the first message of a payment flow)
-  const errorOrCodiceContestoPagamento = PaymentsConverter.generateCodiceContestoPagamento();
+  const errorOrCodiceContestoPagamento = generateCodiceContestoPagamento();
   if (errorOrCodiceContestoPagamento.isLeft()) {
     RestfulUtils.sendErrorResponse(
       res,
@@ -79,6 +83,19 @@ export async function checkPaymentToPagoPa(
     return false;
   }
 
+  // Check if response is an error
+  if (
+    errorOrPaymentCheckPagoPaResponse.value.nodoVerificaRPTRisposta.esito ===
+    PPTPortTypes.Esito.KO
+  ) {
+    RestfulUtils.sendErrorResponse(
+      res,
+      ControllerError.REQUEST_REJECTED,
+      HttpErrorStatusCode.BAD_REQUEST
+    );
+    return false;
+  }
+
   // Convert PagoPa response to controller response
   const errorOrPaymentCheckResponse = PaymentsConverter.getPaymentsCheckResponse(
     errorOrPaymentCheckPagoPaResponse.value,
@@ -87,7 +104,7 @@ export async function checkPaymentToPagoPa(
   if (errorOrPaymentCheckResponse.isLeft()) {
     RestfulUtils.sendErrorResponse(
       res,
-      ControllerError.ERROR_INVALID_INPUT,
+      ControllerError.ERROR_INVALID_API_RESPONSE,
       HttpErrorStatusCode.INTERNAL_ERROR
     );
     return false;
@@ -152,6 +169,19 @@ export async function activatePaymentToPagoPa(
     return false;
   }
 
+  // Check if response is an error
+  if (
+    errorOrPaymentActivationPagoPaResponse.value.nodoAttivaRPTRisposta.esito ===
+    PPTPortTypes.Esito.KO
+  ) {
+    RestfulUtils.sendErrorResponse(
+      res,
+      ControllerError.REQUEST_REJECTED,
+      HttpErrorStatusCode.BAD_REQUEST
+    );
+    return false;
+  }
+
   // Convert PagoPa response to controller response
   const errorOrPaymentActivationResponse = PaymentsConverter.getPaymentsActivationResponse(
     errorOrPaymentActivationPagoPaResponse.value
@@ -159,7 +189,7 @@ export async function activatePaymentToPagoPa(
   if (errorOrPaymentActivationResponse.isLeft()) {
     RestfulUtils.sendErrorResponse(
       res,
-      ControllerError.ERROR_INVALID_INPUT,
+      ControllerError.ERROR_INVALID_API_RESPONSE,
       HttpErrorStatusCode.INTERNAL_ERROR
     );
     return false;
@@ -173,4 +203,14 @@ export async function notifyPaymentStatusToAPINotifica(): Promise<boolean> {
   // TODO: [#157910857] Creazione dei controller SOAP per l'esposizione dei servizi verso PagoPa
   // TODO: [#158176380] Gestione della conferma di attivazione di un pagamento
   return false;
+}
+
+// Generate a Session Token to follow a stream of requests
+function generateCodiceContestoPagamento(): Either<
+  Error,
+  CodiceContestoPagamento
+> {
+  return CodiceContestoPagamento.decode(uuid.v1()).mapLeft(() => {
+    return Error();
+  });
 }
