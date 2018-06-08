@@ -1,6 +1,6 @@
 /**
-  * Common Types
-  */
+ * Common Types
+ */
 
 import * as t from "io-ts";
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";

@@ -1,7 +1,7 @@
 /**
-  * App
-  * Define a Restful and a SOAP Webservice and routes incoming requests to controllers
-  */
+ * App
+ * Define a Restful and a SOAP Webservice and routes incoming requests to controllers
+ */
 
 import * as bodyParser from "body-parser";
 import * as express from "express";
