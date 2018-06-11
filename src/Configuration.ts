@@ -12,7 +12,7 @@ export const CONFIG = {
   /** RESTful Webservice configuration
    * These information are documented here:
    * https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
-   *  Used to expose services
+   * Used to expose services
    */
   CONTROLLER: {
     PORT: process.env.PAGOPAPROXY_PORT || 3000,
@@ -20,12 +20,20 @@ export const CONFIG = {
     ROUTES: {
       RESTFUL: {
         PAYMENTS_CHECK: "/payment/check",
-        PAYMENTS_ACTIVATION: "/payment/activation"
+        PAYMENTS_ACTIVATION: "/payment/activation",
+        PAYMENTS_ACTIVATION_CHECK:
+          "/payment/activation/check/:codiceContestoPagamento"
       },
       SOAP: {
-        PAYMENTS_STATUS_UPDATE: "cdInfoWisp"
+        PAYMENTS_ACTIVATION_STATUS_UPDATE: "cdInfoWisp"
       }
     }
+  },
+
+  // Redis DB configuration
+  REDIS_DB: {
+    PORT: process.env.REDIS_DB_PORT || 6379,
+    HOST: process.env.REDIS_DB_HOST || "localhost"
   },
 
   /** PagoPa Configuration
@@ -48,6 +56,9 @@ export const CONFIG = {
       TOKEN: process.env.PAGOPA_TOKEN || "ND"
     }
   },
+
+  // Timeout (seconds) for payment activation status expiration used for DB (1 HOUR - 5 DAYS)
+  PAYMENT_ACTIVATION_STATUS_TIMEOUT: 60 * 60 * 24,
 
   /** BackendApp Configuration
    * These information are documented here:
@@ -76,10 +87,11 @@ const ControllerConfig = t.intersection([
     ROUTES: t.interface({
       RESTFUL: t.interface({
         PAYMENTS_CHECK: NonEmptyString,
-        PAYMENTS_ACTIVATION: NonEmptyString
+        PAYMENTS_ACTIVATION: NonEmptyString,
+        PAYMENTS_ACTIVATION_CHECK: NonEmptyString
       }),
       SOAP: t.interface({
-        PAYMENTS_STATUS_UPDATE: NonEmptyString
+        PAYMENTS_ACTIVATION_STATUS_UPDATE: NonEmptyString
       })
     })
   })
@@ -115,9 +127,14 @@ const BackendAppConfig = t.intersection([
 ]);
 export type BackendAppConfig = t.TypeOf<typeof BackendAppConfig>;
 
+export const RedisTimeout = WithinRangeNumber(3600, 432000); // 1 HOUR - 5 DAYS
+export type RedisTimeout = t.TypeOf<typeof RedisTimeout>;
+
 export const Configuration = t.interface({
   CONTROLLER: ControllerConfig,
   PAGOPA: PagoPaConfig,
-  BACKEND_APP: BackendAppConfig
+  BACKEND_APP: BackendAppConfig,
+  PAYMENT_ACTIVATION_STATUS_TIMEOUT: RedisTimeout,
+  REDIS_DB: ServerConfiguration
 });
 export type Configuration = t.TypeOf<typeof Configuration>;

@@ -6,7 +6,6 @@ import { Either, left, right } from "fp-ts/lib/Either";
 import { ValidationError } from "io-ts";
 import {
   codificaInfrastrutturaPSPEnum,
-  IcdInfoWispInput,
   InodoAttivaRPTInput,
   InodoAttivaRPTOutput,
   InodoVerificaRPTInput,
@@ -17,7 +16,6 @@ import { PaymentsActivationRequest } from "../types/controllers/PaymentsActivati
 import { PaymentsActivationResponse } from "../types/controllers/PaymentsActivationResponse";
 import { PaymentsCheckRequest } from "../types/controllers/PaymentsCheckRequest";
 import { PaymentsCheckResponse } from "../types/controllers/PaymentsCheckResponse";
-import { PaymentsStatusUpdateRequest } from "../types/controllers/PaymentsStatusUpdateRequest";
 import { CodiceContestoPagamento } from "../types/PagoPaTypes";
 
 // Convert PaymentsCheckRequest (controller) to PaymentsCheckRequestPagoPa (PagoPa API)
@@ -152,17 +150,5 @@ export function getPaymentsActivationResponse(
       nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
     },
     spezzoniCausaleVersamento: datiPagamentoPA.spezzoniCausaleVersamento
-  });
-}
-
-// Convert PaymentsStatusUpdateRequestPagoPa (PagoPa API) to PaymentsStatusUpdateRequest (controller)
-export function getPaymentsStatusUpdateRequest(
-  paymentsStatusUpdateRequestPagoPa: IcdInfoWispInput
-  // tslint:disable-next-line:readonly-array
-): Either<ValidationError[], PaymentsStatusUpdateRequest> {
-  return PaymentsStatusUpdateRequest.decode({
-    codiceContestoPagamento:
-      paymentsStatusUpdateRequestPagoPa.codiceContestoPagamento,
-    idPagamento: paymentsStatusUpdateRequestPagoPa.idPagamento
   });
 }

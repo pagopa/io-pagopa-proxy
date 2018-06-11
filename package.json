@@ -22,6 +22,7 @@
     "@types/jest": "^23.0.0",
     "@types/morgan": "^1.7.35",
     "@types/node": "^8.9.4",
+    "@types/redis": "^2.8.6",
     "@types/supertest": "^2.0.4",
     "@types/winston": "^2.3.9",
     "@types/node-fetch": "^1.6.9",
@@ -50,6 +51,7 @@
     "morgan": "^1.9.0",
     "node-fetch": "^2.1.2",
     "querystring": "^0.2.0",
+    "redis": "^2.8.0",
     "uuid": "^3.2.1",
     "winston": "^2.4.2"
   },

@@ -7,6 +7,7 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
+import * as redis from "redis";
 import { Configuration } from "./Configuration";
 import * as PaymentController from "./controllers/restful/PaymentController";
 import { logger } from "./utils/Logger";
@@ -14,11 +15,15 @@ import { logger } from "./utils/Logger";
 // Define and start a WS SOAP\Restful Server
 export function startApp(config: Configuration): http.Server {
   logger.info("Starting Proxy PagoPa Server...");
+  const redisClient = redis.createClient(
+    config.REDIS_DB.PORT,
+    config.REDIS_DB.HOST
+  );
   const app = express();
   app.set("port", config.CONTROLLER.PORT);
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
-  setRestfulRoutes(app, config);
+  setRestfulRoutes(app, config, redisClient);
   const server = http.createServer(app);
 
   server.listen(config.CONTROLLER.PORT);
@@ -34,7 +39,11 @@ export function stopServer(server: http.Server): void {
 }
 
 // Set Restful WS routes
-function setRestfulRoutes(app: core.Express, config: Configuration): void {
+function setRestfulRoutes(
+  app: core.Express,
+  config: Configuration,
+  redisClient: redis.RedisClient
+): void {
   app.get(config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_CHECK, (req, res) => {
     logger.info("Serving Payment Check Request (GET)...");
     return PaymentController.checkPaymentToPagoPa(req, res, config.PAGOPA);
@@ -43,4 +52,15 @@ function setRestfulRoutes(app: core.Express, config: Configuration): void {
     logger.info("Serving Payment Activation Request (POST)...");
     return PaymentController.activatePaymentToPagoPa(req, res, config.PAGOPA);
   });
+  app.get(
+    config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_ACTIVATION_CHECK,
+    (req, res) => {
+      logger.info("Serving Payment Check Activation Request (GET)...");
+      return PaymentController.checkPaymentActivationStatusFromDB(
+        req,
+        res,
+        redisClient
+      );
+    }
+  );
 }
