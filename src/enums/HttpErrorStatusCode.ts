@@ -3,12 +3,14 @@
  * Define http codes returned by controllers
  */
 
-export enum HttpErrorStatusCode {
-  BAD_REQUEST = 400,
-  UNAUTHORIZED = 401,
-  FORBIDDEN = 403,
-  NOT_FOUND = 404,
-  CONFLICT = 409,
-  INTERNAL_ERROR = 500,
-  SERVICE_UNAVAILABLE = 503
-}
+import * as t from "io-ts";
+import { HttpStatusCodeEnum } from "italia-ts-commons/lib/responses";
+
+export const HttpErrorStatusCode = t.keyof({
+  BAD_REQUEST: HttpStatusCodeEnum.HTTP_STATUS_400,
+  FORBIDDEN: HttpStatusCodeEnum.HTTP_STATUS_403,
+  NOT_FOUND: HttpStatusCodeEnum.HTTP_STATUS_404,
+  CONFLICT: HttpStatusCodeEnum.HTTP_STATUS_409,
+  INTERNAL_ERROR: HttpStatusCodeEnum.HTTP_STATUS_500
+});
+export type HttpErrorStatusCode = t.TypeOf<typeof HttpErrorStatusCode>;

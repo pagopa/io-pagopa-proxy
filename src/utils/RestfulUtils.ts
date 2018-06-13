@@ -4,28 +4,24 @@
  */
 
 import * as express from "express";
+import {
+  HttpStatusCodeEnum,
+  ResponseErrorGeneric
+} from "italia-ts-commons/lib/responses";
 import { ControllerError } from "../enums/ControllerError";
 import { HttpErrorStatusCode } from "../enums/HttpErrorStatusCode";
-import { IRestfulObject } from "../types/CommonTypes";
 import { logger } from "../utils/Logger";
 
 // Send an error message for express response
 export function sendErrorResponse(
   res: express.Response,
   errorMsg: ControllerError,
-  httpStatusCode: HttpErrorStatusCode
+  httpStatusCodeEnum: HttpStatusCodeEnum
 ): ControllerError {
   logger.error(`Controller response is an error: ${errorMsg}`);
-  res.status(httpStatusCode).json({ errorMessage: errorMsg });
-  return errorMsg;
-}
 
-// Send a success message for express response
-export function sendSuccessResponse(
-  res: express.Response,
-  content?: IRestfulObject
-): void {
-  res.status(200).json(content);
+  ResponseErrorGeneric(httpStatusCodeEnum, errorMsg, errorMsg).apply(res);
+  return errorMsg;
 }
 
 // A default error callback handler for unavailable API services
@@ -34,6 +30,6 @@ export function sendUnavailableAPIError(res: express.Response): void {
   sendErrorResponse(
     res,
     ControllerError.ERROR_API_UNAVAILABLE,
-    HttpErrorStatusCode.SERVICE_UNAVAILABLE
+    HttpErrorStatusCode.keys.INTERNAL_ERROR
   );
 }

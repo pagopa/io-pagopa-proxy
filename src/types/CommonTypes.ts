@@ -31,16 +31,3 @@ export const CodiceIdRPT = t.intersection([
     CodStazPA: PatternString("[0-9]{2}")
   })
 ]);
-
-// Define an interface used to build responses for REST controllers
-type IRestfulContentType =
-  | string
-  | number
-  | boolean
-  | ReadonlyArray<string>
-  | ReadonlyArray<number>;
-export interface IRestfulObject {
-  readonly [key: string]:
-    | IRestfulContentType
-    | ReadonlyArray<IRestfulContentType>;
-}

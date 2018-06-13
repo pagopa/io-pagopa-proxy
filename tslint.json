@@ -24,15 +24,6 @@
     "no-mixed-interface": false,
     "prettier": true,
     "no-console": false,
-    "no-object-mutation": [
-      true,
-      {
-        "ignore-prefix": [
-          "this.",
-          "req."
-        ]
-      }
-    ],
     "object-literal-sort-keys": false
   },
   "rulesDirectory": []

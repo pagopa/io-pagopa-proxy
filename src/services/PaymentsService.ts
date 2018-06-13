@@ -4,7 +4,6 @@
  */
 
 import { Either, left, right } from "fp-ts/lib/Either";
-
 import { clients as pagoPaSoapClient } from "italia-pagopa-api";
 import {
   InodoAttivaRPTInput,
@@ -17,7 +16,12 @@ import { PagoPaConfig } from "../Configuration";
 // TODO : [#158215861] Move it on PagoPaAPI
 const envelopeKey = "soapenv";
 
-// Send a request to PagoPa to check payment info
+/**
+ * Send a request to PagoPa to retrieve payment info (VerificaRPT)
+ * @param {InodoVerificaRPTInput} iNodoVerificaRPTInput - The request to send to PagoPa
+ * @param {PagoPaConfig} pagoPaConfig - Configuration about PagoPa WS to contact
+ * @return {Promise<Either<Error, InodoVerificaRPTOutput>>} The response provided by PagoPa as response
+ */
 export async function sendPaymentCheckRequestToPagoPa(
   iNodoVerificaRPTInput: InodoVerificaRPTInput,
   pagoPaConfig: PagoPaConfig
@@ -46,9 +50,14 @@ export async function sendPaymentCheckRequestToPagoPa(
   }
 }
 
-// Send a request to PagoPaAPI to activate a payment
+/**
+ * Send a request to PagoPa to activate (lock) a payment (AttivaRPT)
+ * @param {InodoAttivaRPTInput} iNodoAttivaRPTInput - The request to send to PagoPa
+ * @param {PagoPaConfig} pagoPaConfig - Configuration about PagoPa WS to contact
+ * @return {Promise<Either<Error, InodoAttivaRPTOutput>>} The response provided by PagoPa as response
+ */
 export async function sendPaymentsActivationRequestToPagoPaAPI(
-  iNodoVerificaRPTInput: InodoAttivaRPTInput,
+  iNodoAttivaRPTInput: InodoAttivaRPTInput,
   pagoPaConfig: PagoPaConfig
 ): Promise<Either<Error, InodoAttivaRPTOutput>> {
   try {
@@ -60,13 +69,12 @@ export async function sendPaymentsActivationRequestToPagoPaAPI(
         envelopeKey
       }
     );
-
     const pagamentiTelematiciPSPNodoClient = new pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient(
       pagamentiTelematiciPSPNodoClientBase
     );
 
     const nodoAttivaRPT = await pagamentiTelematiciPSPNodoClient.nodoAttivaRPT(
-      iNodoVerificaRPTInput
+      iNodoAttivaRPTInput
     );
     return right(nodoAttivaRPT);
   } catch (exception) {
