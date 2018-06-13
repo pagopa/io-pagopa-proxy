@@ -5,6 +5,7 @@
 
 import * as express from "express";
 import { Either, left, right } from "fp-ts/lib/Either";
+import { clients as pagoPaSoapClient } from "italia-pagopa-api";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { ResponseSuccessJson } from "italia-ts-commons/lib/responses";
 import * as uuid from "uuid";
@@ -32,7 +33,8 @@ import * as RestfulUtils from "../../utils/RestfulUtils";
 export async function checkPaymentToPagoPa(
   req: express.Request,
   res: express.Response,
-  pagoPaConfig: PagoPaConfig
+  pagoPaConfig: PagoPaConfig,
+  paymentVerificaRPTPagoPaClient: pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<ControllerError, PaymentsCheckResponse>> {
   // Validate input provided by BackendApp
   const errorOrPaymentsCheckRequest = PaymentsCheckRequest.decode(req.params);
@@ -53,16 +55,7 @@ export async function checkPaymentToPagoPa(
    * started by BackendApp (checkPaymentToPagoPa)
    * For the next messages, BackendApp will provide the same codiceContestoPagamento
    */
-  const errorOrCodiceContestoPagamento = generateCodiceContestoPagamento();
-  if (errorOrCodiceContestoPagamento.isLeft()) {
-    return left(
-      RestfulUtils.sendErrorResponse(
-        res,
-        ControllerError.ERROR_INTERNAL,
-        HttpErrorStatusCode.keys.INTERNAL_ERROR
-      )
-    );
-  }
+  const codiceContestoPagamento = generateCodiceContestoPagamento();
 
   /**
    * Convert the input provided by BackendApp (RESTful request)
@@ -73,7 +66,7 @@ export async function checkPaymentToPagoPa(
   const errorOrPaymentCheckRequestPagoPa = PaymentsConverter.getPaymentsCheckRequestPagoPa(
     pagoPaConfig,
     errorOrPaymentsCheckRequest.value,
-    errorOrCodiceContestoPagamento.value
+    codiceContestoPagamento
   );
   if (errorOrPaymentCheckRequestPagoPa.isLeft()) {
     return left(
@@ -88,7 +81,7 @@ export async function checkPaymentToPagoPa(
   // Send the SOAP request to PagoPa (VerificaRPT message)
   const errorOrPaymentCheckPagoPaResponse = await PaymentsService.sendPaymentCheckRequestToPagoPa(
     errorOrPaymentCheckRequestPagoPa.value,
-    pagoPaConfig
+    paymentVerificaRPTPagoPaClient
   );
   if (errorOrPaymentCheckPagoPaResponse.isLeft()) {
     RestfulUtils.sendUnavailableAPIError(res);
@@ -119,7 +112,7 @@ export async function checkPaymentToPagoPa(
    */
   const errorOrPaymentCheckResponse = PaymentsConverter.getPaymentsCheckResponse(
     errorOrPaymentCheckPagoPaResponse.value,
-    errorOrCodiceContestoPagamento.value
+    codiceContestoPagamento
   );
   if (errorOrPaymentCheckResponse.isLeft()) {
     return left(
@@ -148,7 +141,8 @@ export async function checkPaymentToPagoPa(
 export async function activatePaymentToPagoPa(
   req: express.Request,
   res: express.Response,
-  pagoPaConfig: PagoPaConfig
+  pagoPaConfig: PagoPaConfig,
+  attivaRPTPagoPaClient: pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<ControllerError, PaymentsActivationResponse>> {
   // Validate input
   const errorOrPaymentsActivationRequest = PaymentsActivationRequest.decode(
@@ -182,7 +176,7 @@ export async function activatePaymentToPagoPa(
   // Require payment activation to PagoPa API
   const errorOrPaymentActivationPagoPaResponse = await PaymentsService.sendPaymentsActivationRequestToPagoPaAPI(
     errorOrPaymentsActivationRequestPagoPa.value,
-    pagoPaConfig
+    attivaRPTPagoPaClient
   );
 
   // Provide a response to applicant
@@ -237,11 +231,6 @@ export async function notifyPaymentStatusToAPINotifica(): Promise<void> {}
  * For the next messages, BackendApp will provide the same codiceContestoPagamento
  * @return {Either<Error,CodiceContestoPagamento>} The generated token or an internal error
  */
-function generateCodiceContestoPagamento(): Either<
-  Error,
-  CodiceContestoPagamento
-> {
-  return CodiceContestoPagamento.decode(uuid.v1()).mapLeft(() => {
-    return Error();
-  });
+function generateCodiceContestoPagamento(): CodiceContestoPagamento {
+  return uuid.v1() as CodiceContestoPagamento;
 }

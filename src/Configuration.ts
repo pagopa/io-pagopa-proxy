@@ -9,6 +9,8 @@ import { NonEmptyString } from "italia-ts-commons/lib/strings";
 const localhost = "http://localhost";
 
 export const CONFIG = {
+  WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL || "debug",
+
   /** RESTful Webservice configuration
    * These information are documented here:
    * https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
@@ -115,7 +117,18 @@ const BackendAppConfig = t.intersection([
 ]);
 export type BackendAppConfig = t.TypeOf<typeof BackendAppConfig>;
 
+export const WinstonLogLevel = t.keyof({
+  error: 0,
+  warn: 1,
+  info: 2,
+  verbose: 3,
+  debug: 4,
+  silly: 5
+});
+export type WinstonLogLevel = t.TypeOf<typeof WinstonLogLevel>;
+
 export const Configuration = t.interface({
+  WINSTON_LOG_LEVEL: WinstonLogLevel,
   CONTROLLER: ControllerConfig,
   PAGOPA: PagoPaConfig,
   BACKEND_APP: BackendAppConfig

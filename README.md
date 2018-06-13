@@ -25,6 +25,6 @@ Here's the decisions we taken so far:
 
 ## NOTES
 
-This project includes manually @types/bluebird because it's necessary for node-soap lib.
+This project includes @types/bluebird because it's necessary for node-soap.
 It will be removed when this dependency will be fixed into soap:
 https://github.com/vpulim/node-soap/pull/1009

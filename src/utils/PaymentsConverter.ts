@@ -48,7 +48,7 @@ export function getPaymentsCheckRequestPagoPa(
       }
     });
   } catch (exception) {
-    return left(new Error());
+    return left(Error(exception));
   }
 }
 
@@ -90,7 +90,7 @@ export function getPaymentsCheckResponse(
     },
     spezzoniCausaleVersamento: datiPagamentoPA.spezzoniCausaleVersamento
   }).mapLeft(() => {
-    return new Error();
+    return Error();
   });
 }
 
@@ -131,7 +131,7 @@ export function getPaymentsActivationRequestPagoPa(
       }
     });
   } catch (exception) {
-    return left(new Error());
+    return left(Error(exception));
   }
 }
 
