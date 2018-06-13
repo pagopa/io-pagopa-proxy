@@ -8,6 +8,8 @@ import { NonEmptyString } from "italia-ts-commons/lib/strings";
 
 const localhost = "http://localhost";
 
+export const cdPerNodoWsdl = "/wsdl/CdPerNodo.wsdl";
+
 export const CONFIG = {
   /** RESTful Webservice configuration
    * These information are documented here:
@@ -25,7 +27,7 @@ export const CONFIG = {
           "/payment/activation/check/:codiceContestoPagamento"
       },
       SOAP: {
-        PAYMENTS_ACTIVATION_STATUS_UPDATE: "cdInfoWisp"
+        PAYMENTS_ACTIVATION_STATUS_UPDATE: "/cdInfoPagamento"
       }
     }
   },

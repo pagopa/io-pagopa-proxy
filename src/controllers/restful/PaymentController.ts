@@ -6,10 +6,11 @@
 import * as express from "express";
 import { Either, left, right } from "fp-ts/lib/Either";
 import {
-  IcdInfoWispInput,
-  IcdInfoWispOutput,
-  PPTPortTypes
-} from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+  Esito,
+  IcdInfoPagamentoInput,
+  IcdInfoPagamentoOutput
+} from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
+import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import * as redis from "redis";
 import { promisify } from "util";
 import * as uuid from "uuid";
@@ -195,32 +196,31 @@ export async function activatePaymentToPagoPa(
 }
 
 // Receive a payment activation status update from PagoPa and store it into DB
-export async function updatePaymentActivationStatusIntoDB(
-  cdInfoWispInput: IcdInfoWispInput,
+export function updatePaymentActivationStatusIntoDB(
+  cdInfoPagamentoInput: IcdInfoPagamentoInput,
   statusTimeout: RedisTimeout,
-  redisClient: redis.RedisClient
-): Promise<IcdInfoWispOutput> {
+  redisClient: redis.RedisClient,
+  callback: (cdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void
+): void {
   // Check DB connection status
   if (redisClient.connected !== true) {
-    return {
-      esito: PPTPortTypes.Esito.KO
-    };
+    callback({
+      esito: Esito.KO
+    });
   }
-  try {
-    redisClient.set(
-      cdInfoWispInput.codiceContestoPagamento,
-      cdInfoWispInput.idPagamento,
-      "EX",
-      statusTimeout
-    );
-  } catch (exception) {
-    return {
-      esito: PPTPortTypes.Esito.KO
-    };
-  }
-  return {
-    esito: PPTPortTypes.Esito.OK
-  };
+  const setAsyncRedis = promisify(redisClient.set).bind(redisClient);
+  setAsyncRedis(
+    cdInfoPagamentoInput.codiceContestoPagamento,
+    cdInfoPagamentoInput.idPagamento,
+    "EX",
+    statusTimeout
+  ).catch((error: Error) => {
+    return error;
+  });
+
+  callback({
+    esito: Esito.OK
+  });
 }
 
 // Check if a paymentId related to a codiceContestoPagamento is available and return it
@@ -256,7 +256,11 @@ export async function checkPaymentActivationStatusFromDB(
 
   // Retrieve idPayment related to a codiceContestoPagamento from DB
   const getAsyncRedis = promisify(redisClient.get).bind(redisClient);
-  const idPagamento = await getAsyncRedis(errorOrCodiceContestoPagamento.value);
+  const idPagamento = await getAsyncRedis(
+    errorOrCodiceContestoPagamento.value
+  ).catch((error: Error) => {
+    return error;
+  });
 
   const errorOrPaymentsActivationStatusCheckResponse = PaymentsActivationStatusCheckResponse.decode(
     {

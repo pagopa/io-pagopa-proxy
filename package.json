@@ -7,7 +7,7 @@
   "author": "Sergio Manetta <sergio.manetta@it.ibm.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tslint --project . && tsc",
+    "build": "tslint --project . && tsc && cp -r ./src/wsdl dist",
     "clean": "rm -r ./dist",
     "prettify": "prettier --write './**/*.ts'",
     "start": "node dist/index.js",
