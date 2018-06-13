@@ -26,10 +26,10 @@
     "@types/winston": "^2.3.9",
     "@types/node-fetch": "^1.6.9",
     "@types/uuid": "^3.4.3",
-    "danger": "^3.7.15",
+    "danger": "^3.7.16",
     "danger-plugin-digitalcitizenship": "^0.3.1",
     "jest": "^23.1.0",
-    "prettier": "^1.13.4",
+    "prettier": "^1.13.5",
     "supertest": "^3.0.0",
     "ts-jest": "^22.4.6",
     "tslint": "^5.10.0",
@@ -37,8 +37,8 @@
     "tslint-immutable": "^4.5.4",
     "tslint-plugin-prettier": "^1.3.0",
     "tslint-sonarts": "^1.7.0",
-    "typescript": "^2.8.3",
-    "typestrict": "^0.0.8"
+    "typescript": "^2.9.1",
+    "typestrict": "^0.0.9"
   },
   "dependencies": {
     "debug": "^3.1.0",
