@@ -12,11 +12,11 @@ import {
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { PagoPaConfig } from "../Configuration";
+import { CodiceContestoPagamento } from "../types/CommonTypes";
 import { PaymentsActivationRequest } from "../types/controllers/PaymentsActivationRequest";
 import { PaymentsActivationResponse } from "../types/controllers/PaymentsActivationResponse";
 import { PaymentsCheckRequest } from "../types/controllers/PaymentsCheckRequest";
 import { PaymentsCheckResponse } from "../types/controllers/PaymentsCheckResponse";
-import { CodiceContestoPagamento } from "../types/PagoPaTypes";
 
 /**
  * Convert PaymentsCheckRequest (BackendApp request) to InodoVerificaRPTInput (PagoPa request)

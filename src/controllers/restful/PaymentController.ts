@@ -8,23 +8,23 @@ import { isLeft } from "fp-ts/lib/Either";
 import { clients as pagoPaSoapClient } from "italia-pagopa-api";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import {
-  HttpStatusCodeEnum,
   IResponseErrorGeneric,
+  IResponseErrorInternal,
   IResponseErrorValidation,
   IResponseSuccessJson,
   ResponseErrorFromValidationErrors,
-  ResponseErrorGeneric,
+  ResponseErrorInternal,
   ResponseErrorValidation,
   ResponseSuccessJson
 } from "italia-ts-commons/lib/responses";
 import * as uuid from "uuid";
 import { PagoPaConfig } from "../../Configuration";
 import * as PaymentsService from "../../services/PaymentsService";
+import { CodiceContestoPagamento } from "../../types/CommonTypes";
 import { PaymentsActivationRequest } from "../../types/controllers/PaymentsActivationRequest";
 import { PaymentsActivationResponse } from "../../types/controllers/PaymentsActivationResponse";
 import { PaymentsCheckRequest } from "../../types/controllers/PaymentsCheckRequest";
 import { PaymentsCheckResponse } from "../../types/controllers/PaymentsCheckResponse";
-import { CodiceContestoPagamento } from "../../types/PagoPaTypes";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 
 /**
@@ -35,6 +35,7 @@ import * as PaymentsConverter from "../../utils/PaymentsConverter";
  * @param {PagoPaConfig} pagoPaConfig - Configuration about PagoPa WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentsActivationResponse>>} The response content to send to applicant
  */
+
 export function checkPaymentToPagoPa(
   pagoPaConfig: PagoPaConfig,
   paymentVerificaRPTPagoPaClient: pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient
@@ -42,8 +43,9 @@ export function checkPaymentToPagoPa(
   req: express.Request
 ) => Promise<
   | IResponseErrorValidation
-  | IResponseSuccessJson<PaymentsCheckResponse>
   | IResponseErrorGeneric
+  | IResponseErrorInternal
+  | IResponseSuccessJson<PaymentsCheckResponse>
 > {
   return async req => {
     // Validate qrcode data provided by BackendApp
@@ -70,7 +72,10 @@ export function checkPaymentToPagoPa(
     );
     if (isLeft(errorOrPaymentCheckRequestPagoPa)) {
       const error = errorOrPaymentCheckRequestPagoPa.value;
-      return ResponseErrorValidation("Invalid PagoPa Request", error.message);
+      return ResponseErrorValidation(
+        "Invalid PagoPa check Request",
+        error.message
+      );
     }
     const paymentCheckRequestPagoPa = errorOrPaymentCheckRequestPagoPa.value;
 
@@ -81,10 +86,8 @@ export function checkPaymentToPagoPa(
     );
     if (isLeft(errorOrPaymentCheckPagoPaResponse)) {
       const error = errorOrPaymentCheckPagoPaResponse.value;
-      return ResponseErrorGeneric(
-        HttpStatusCodeEnum.HTTP_STATUS_500,
-        "PagoPa Server communication error",
-        error.message
+      return ResponseErrorInternal(
+        `PagoPa Server communication error: ${error.message}`
       );
     }
     const paymentCheckPagoPaResponse = errorOrPaymentCheckPagoPaResponse.value;
@@ -95,11 +98,7 @@ export function checkPaymentToPagoPa(
       paymentCheckPagoPaResponse.nodoVerificaRPTRisposta.esito ===
       PPTPortTypes.Esito.KO
     ) {
-      return ResponseErrorGeneric(
-        HttpStatusCodeEnum.HTTP_STATUS_500,
-        "Request rejected",
-        "Error during payment check: esito === KO"
-      );
+      return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
     // Convert the output provided by PagoPa (SOAP response)
@@ -111,7 +110,7 @@ export function checkPaymentToPagoPa(
     ).fold<
       IResponseErrorValidation | IResponseSuccessJson<PaymentsCheckResponse>
     >(
-      error => ResponseErrorFromValidationErrors(PaymentsCheckResponse)(error),
+      ResponseErrorFromValidationErrors(PaymentsCheckResponse),
       ResponseSuccessJson
     );
   };
@@ -135,6 +134,7 @@ export function activatePaymentToPagoPa(
 ) => Promise<
   | IResponseErrorValidation
   | IResponseErrorGeneric
+  | IResponseErrorInternal
   | IResponseSuccessJson<PaymentsActivationResponse>
 > {
   return async req => {
@@ -160,7 +160,10 @@ export function activatePaymentToPagoPa(
     );
     if (isLeft(errorOrPaymentsActivationRequestPagoPa)) {
       const error = errorOrPaymentsActivationRequestPagoPa.value;
-      return ResponseErrorValidation("Invalid PagoPa Request", error.message);
+      return ResponseErrorValidation(
+        "Invalid PagoPa activation Request",
+        error.message
+      );
     }
     const paymentsActivationRequestPagoPa =
       errorOrPaymentsActivationRequestPagoPa.value;
@@ -172,10 +175,8 @@ export function activatePaymentToPagoPa(
     );
     if (isLeft(errorOrPaymentActivationPagoPaResponse)) {
       const error = errorOrPaymentActivationPagoPaResponse.value;
-      return ResponseErrorGeneric(
-        HttpStatusCodeEnum.HTTP_STATUS_500,
-        "PagoPa Server communication error",
-        error.message
+      return ResponseErrorInternal(
+        `PagoPa Server communication error: ${error.message}`
       );
     }
     const paymentActivationPagoPaResponse =
@@ -187,11 +188,7 @@ export function activatePaymentToPagoPa(
       paymentActivationPagoPaResponse.nodoAttivaRPTRisposta.esito ===
       PPTPortTypes.Esito.KO
     ) {
-      return ResponseErrorGeneric(
-        HttpStatusCodeEnum.HTTP_STATUS_500,
-        "Request rejected",
-        "Error during payment check: esito === KO"
-      );
+      return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
     // Convert the output provided by PagoPa (SOAP response)
@@ -203,8 +200,7 @@ export function activatePaymentToPagoPa(
       | IResponseErrorValidation
       | IResponseSuccessJson<PaymentsActivationResponse>
     >(
-      error =>
-        ResponseErrorFromValidationErrors(PaymentsActivationResponse)(error),
+      ResponseErrorFromValidationErrors(PaymentsActivationResponse),
       ResponseSuccessJson
     );
   };

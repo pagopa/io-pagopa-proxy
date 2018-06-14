@@ -4,7 +4,10 @@
 
 import * as t from "io-ts";
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
-import { PatternString } from "italia-ts-commons/lib/strings";
+import {
+  PatternString,
+  WithinRangeString
+} from "italia-ts-commons/lib/strings";
 
 export const Iban = PatternString("[a-zA-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}");
 export type Iban = t.TypeOf<typeof Iban>;
@@ -31,3 +34,7 @@ export const CodiceIdRPT = t.intersection([
     CodStazPA: PatternString("[0-9]{2}")
   })
 ]);
+
+// Session token required into PagoPa communications
+export const CodiceContestoPagamento = WithinRangeString(1, 35);
+export type CodiceContestoPagamento = t.TypeOf<typeof CodiceContestoPagamento>;

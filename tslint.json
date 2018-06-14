@@ -24,7 +24,8 @@
     "no-mixed-interface": false,
     "prettier": true,
     "no-console": false,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "max-union-size": false
   },
   "rulesDirectory": []
 }
