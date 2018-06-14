@@ -53,15 +53,15 @@ export function getPaymentsCheckRequestPagoPa(
 }
 
 /**
- * Convert InodoVerificaRPTOutput (PagoPa response) to PaymentsCheckResponse (BackendApp response)
+ * Convert InodoVerificaRPTOutput (PagoPa response) to \ (BackendApp response)
  * @param {InodoVerificaRPTOutput} iNodoVerificaRPTOutput - Message to convert
  * @param {CodiceContestoPagamento} codiceContestoPagamento - Session Identifier to put into response
- * @return {Either<Error, PaymentsCheckResponse>>} Converted object
+ * @return {Validation<PaymentsCheckResponse>} Converted object
  */
 export function getPaymentsCheckResponse(
   iNodoVerificaRPTOutput: InodoVerificaRPTOutput,
   codiceContestoPagamento: CodiceContestoPagamento
-): Either<Error, PaymentsCheckResponse> {
+): Validation<PaymentsCheckResponse> {
   const datiPagamentoPA =
     iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.datiPagamentoPA;
   return PaymentsCheckResponse.decode({
@@ -89,8 +89,6 @@ export function getPaymentsCheckResponse(
       nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
     },
     spezzoniCausaleVersamento: datiPagamentoPA.spezzoniCausaleVersamento
-  }).mapLeft(() => {
-    return Error();
   });
 }
 

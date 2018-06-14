@@ -11,11 +11,10 @@ const localhost = "http://localhost";
 export const CONFIG = {
   WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL || "debug",
 
-  /** RESTful Webservice configuration
-   * These information are documented here:
-   * https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
-   *  Used to expose services
-   */
+  // RESTful Webservice configuration
+  // These information are documented here:
+  // https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
+  // Used to expose services
   CONTROLLER: {
     PORT: process.env.PAGOPAPROXY_PORT || 3000,
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
@@ -30,11 +29,10 @@ export const CONFIG = {
     }
   },
 
-  /** PagoPa Configuration
-   * Ask the pagopa service administrator.
-   * These values are the same for test and production environment
-   * Used to communicate with PagoPa
-   */
+  // PagoPa Configuration
+  // Ask the pagopa service administrator.
+  // These values are the same for test and production environment
+  // Used to communicate with PagoPa
   PAGOPA: {
     HOST: process.env.PAGOPA_HOST || localhost,
     PORT: process.env.PAGOPA_PORT || 3001,
@@ -51,11 +49,10 @@ export const CONFIG = {
     }
   },
 
-  /** BackendApp Configuration
-   * These information are documented here:
-   * https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
-   * Used to communicate with Backend App
-   */
+  // BackendApp Configuration
+  // These information are documented here:
+  // https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
+  // Used to communicate with Backend App
   BACKEND_APP: {
     HOST: process.env.BACKEND_APP_HOST || localhost,
     PORT: process.env.BACKEND_APP_PORT || 3002,

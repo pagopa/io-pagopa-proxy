@@ -11,10 +11,8 @@ const config = Configuration.decode(CONFIG).getOrElseL(errors => {
   throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
 });
 
-App.startApp(config)
-  .then()
-  .catch(error => {
-    logger.error(
-      `Error occurred starting server: ${reporters.readableReport(error)}`
-    );
-  });
+App.startApp(config).catch(error => {
+  logger.error(
+    `Error occurred starting server: ${reporters.readableReport(error)}`
+  );
+});

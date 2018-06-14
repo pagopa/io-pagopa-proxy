@@ -9,6 +9,7 @@ import * as core from "express-serve-static-core";
 import * as http from "http";
 import { clients as pagoPaSoapClient } from "italia-pagopa-api";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import { toExpressHandler } from "italia-ts-commons/lib/express";
 import { Configuration } from "./Configuration";
 import * as PaymentController from "./controllers/restful/PaymentController";
 import { logger } from "./utils/Logger";
@@ -65,24 +66,24 @@ function setRestfulRoutes(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_CHECK,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Check Request (GET)...");
-      return PaymentController.checkPaymentToPagoPa(
-        req,
-        res,
-        config.PAGOPA,
-        verificaRPTPagoPaClient
-      );
+      toExpressHandler(
+        PaymentController.checkPaymentToPagoPa(
+          config.PAGOPA,
+          verificaRPTPagoPaClient
+        )
+      )(req, res);
     }
   );
   app.post(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_ACTIVATION,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Activation Request (POST)...");
-      return PaymentController.activatePaymentToPagoPa(
-        req,
-        res,
-        config.PAGOPA,
-        attivaRPTPagoPaClient
-      );
+      toExpressHandler(
+        PaymentController.activatePaymentToPagoPa(
+          config.PAGOPA,
+          attivaRPTPagoPaClient
+        )
+      )(req, res);
     }
   );
 }
