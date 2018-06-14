@@ -55,13 +55,11 @@ export function checkPaymentToPagoPa(
     }
     const paymentCheckRequest = errorOrPaymentsCheckRequest.value;
 
-    /**
-     * Generate a Session Token called CodiceContestoPagamento
-     * to follow a stream of requests with PagoPa.
-     * It will be generated here after the first interaction
-     * started by BackendApp (checkPaymentToPagoPa)
-     * For the next messages, BackendApp will provide the same codiceContestoPagamento
-     */
+    // Generate a Session Token called CodiceContestoPagamento
+    // to follow a stream of requests with PagoPa.
+    // It will be generated here after the first interaction
+    // started by BackendApp (checkPaymentToPagoPa)
+    // For the next messages, BackendApp will provide the same codiceContestoPagamento
     const codiceContestoPagamento = generateCodiceContestoPagamento();
 
     // Convert the input provided by BackendApp (RESTful request) to a PagoPa request (SOAP request).
@@ -100,11 +98,9 @@ export function checkPaymentToPagoPa(
       return ResponseErrorInternal(`Error during payment check: esito === KO`);
     }
 
-    /**
-     * Convert the output provided by PagoPa (SOAP response)
-     * to a BackendApp response (RESTful response), mapping the result information.
-     * Send a response to BackendApp
-     */
+    // Convert the output provided by PagoPa (SOAP response)
+    // to a BackendApp response (RESTful response), mapping the result information.
+    // Send a response to BackendApp
     return PaymentsConverter.getPaymentsCheckResponse(
       errorOrPaymentCheckPagoPaResponse.value,
       codiceContestoPagamento
