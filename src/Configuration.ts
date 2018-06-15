@@ -116,11 +116,8 @@ export type BackendAppConfig = t.TypeOf<typeof BackendAppConfig>;
 
 export const WinstonLogLevel = t.keyof({
   error: 0,
-  warn: 1,
   info: 2,
-  verbose: 3,
-  debug: 4,
-  silly: 5
+  debug: 4
 });
 export type WinstonLogLevel = t.TypeOf<typeof WinstonLogLevel>;
 
