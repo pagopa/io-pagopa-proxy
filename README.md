@@ -35,7 +35,7 @@ Those are all Environment variables needed by the application:
 
 | Variable name                          | Description                                                                       | type   |
 |----------------------------------------|-----------------------------------------------------------------------------------|--------|
-| WINSTON_LOG_LEVEL                      | The log level used for Winston logger                                             | string |
+| WINSTON_LOG_LEVEL                      | The log level used for Winston logger                                             | logLev |
 | PAGOPAPROXY_HOST                       | The hostname or IP address the Express server is listening to                     | string |
 | PAGOPAPROXY_PORT                       | The HTTP port the Express server is listening to                                  | int    |
 | PAGOPA_HOST                            | The PagoPA SOAP Server hostname or IP address                                     | string |
@@ -45,3 +45,5 @@ Those are all Environment variables needed by the application:
 | BACKEND_APP_PORT                       | The AppBackend RESTful Server port                                                | int    |
 | REDIS_DB_HOST                          | The Redis DB Server hostname or IP address                                        | string |
 | REDIS_DB_PORT                          | The Redis DB Server port                                                          | int    |
+
+logLev values: "error", "info", "debug"
