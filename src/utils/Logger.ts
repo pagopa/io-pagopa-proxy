@@ -3,9 +3,10 @@
  */
 
 import * as winston from "winston";
+import { CONFIG } from "../Configuration";
 
 export const logger = new winston.Logger({
-  level: "debug",
+  level: CONFIG.WINSTON_LOG_LEVEL,
   transports: [new winston.transports.Console()]
 });
 

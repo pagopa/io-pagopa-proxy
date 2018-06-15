@@ -16,7 +16,7 @@
     "typedef": [
       true,
       "call-signature"
-    ],
+    ],    
     "readonly-keyword": true,
     "readonly-array": true,
     "no-let": true,
@@ -24,16 +24,8 @@
     "no-mixed-interface": false,
     "prettier": true,
     "no-console": false,
-    "no-object-mutation": [
-      true,
-      {
-        "ignore-prefix": [
-          "this.",
-          "req."
-        ]
-      }
-    ],
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "max-union-size": false
   },
   "rulesDirectory": []
 }

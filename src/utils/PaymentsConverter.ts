@@ -3,7 +3,7 @@
  * Data Converter for Payments Request\Responses between PagoPa and BackendAPP types
  */
 import { Either, left, right } from "fp-ts/lib/Either";
-import { ValidationError } from "io-ts";
+import { Validation } from "io-ts";
 import {
   codificaInfrastrutturaPSPEnum,
   InodoAttivaRPTInput,
@@ -12,13 +12,19 @@ import {
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { PagoPaConfig } from "../Configuration";
+import { CodiceContestoPagamento } from "../types/CommonTypes";
 import { PaymentsActivationRequest } from "../types/controllers/PaymentsActivationRequest";
 import { PaymentsActivationResponse } from "../types/controllers/PaymentsActivationResponse";
 import { PaymentsCheckRequest } from "../types/controllers/PaymentsCheckRequest";
 import { PaymentsCheckResponse } from "../types/controllers/PaymentsCheckResponse";
-import { CodiceContestoPagamento } from "../types/PagoPaTypes";
 
-// Convert PaymentsCheckRequest (controller) to PaymentsCheckRequestPagoPa (PagoPa API)
+/**
+ * Convert PaymentsCheckRequest (BackendApp request) to InodoVerificaRPTInput (PagoPa request)
+ * @param {PagoPaConfig} pagoPaConfig - PagoPa config, containing static information to put into response
+ * @param {PaymentsCheckRequest} paymentsCheckRequest - Message to convert
+ * @param {CodiceContestoPagamento} codiceContestoPagamento - Session Identifier to put into response
+ * @return {Either<Error, InodoVerificaRPTInput>} Converted object
+ */
 export function getPaymentsCheckRequestPagoPa(
   pagoPaConfig: PagoPaConfig,
   paymentsCheckRequest: PaymentsCheckRequest,
@@ -42,15 +48,20 @@ export function getPaymentsCheckRequestPagoPa(
       }
     });
   } catch (exception) {
-    return left(new Error());
+    return left(Error(exception));
   }
 }
 
-// Convert PaymentsCheckResponsePagoPa (PagoPa API) to PaymentsCheckResponse (controller)
+/**
+ * Convert InodoVerificaRPTOutput (PagoPa response) to \ (BackendApp response)
+ * @param {InodoVerificaRPTOutput} iNodoVerificaRPTOutput - Message to convert
+ * @param {CodiceContestoPagamento} codiceContestoPagamento - Session Identifier to put into response
+ * @return {Validation<PaymentsCheckResponse>} Converted object
+ */
 export function getPaymentsCheckResponse(
   iNodoVerificaRPTOutput: InodoVerificaRPTOutput,
   codiceContestoPagamento: CodiceContestoPagamento
-): Either<Error, PaymentsCheckResponse> {
+): Validation<PaymentsCheckResponse> {
   const datiPagamentoPA =
     iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.datiPagamentoPA;
   return PaymentsCheckResponse.decode({
@@ -78,12 +89,15 @@ export function getPaymentsCheckResponse(
       nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
     },
     spezzoniCausaleVersamento: datiPagamentoPA.spezzoniCausaleVersamento
-  }).mapLeft(() => {
-    return new Error();
   });
 }
 
-// Convert PaymentsActivationRequest (controller) to PaymentsActivationRequestPagoPa (PagoPa API)
+/**
+ * Convert PaymentsActivationRequest (BackendApp request) to InodoAttivaRPTInput (PagoPa request)
+ * @param {PagoPaConfig} pagoPaConfig - PagoPa config, containing static information to put into response
+ * @param {PaymentsActivationRequest} paymentsActivationRequest - Message to convert
+ * @return {Either<Error, InodoAttivaRPTInput>} Converted object
+ */
 export function getPaymentsActivationRequestPagoPa(
   pagoPaConfig: PagoPaConfig,
   paymentsActivationRequest: PaymentsActivationRequest
@@ -115,15 +129,18 @@ export function getPaymentsActivationRequestPagoPa(
       }
     });
   } catch (exception) {
-    return left(new Error());
+    return left(Error(exception));
   }
 }
 
-// Convert PaymentsActivationResponsePagoPa (PagoPa API) to PaymentsActivationkResponse (controller)
+/**
+ * Convert InodoAttivaRPTOutput (PagoPa response) to PaymentsActivationResponse (BackendApp response)
+ * @param {InodoAttivaRPTOutput} iNodoAttivaRPTOutput - Message to convert
+ * @return {Validation<PaymentsActivationResponse>} Converted object
+ */
 export function getPaymentsActivationResponse(
   iNodoAttivaRPTOutput: InodoAttivaRPTOutput
-  // tslint:disable-next-line:readonly-array
-): Either<ValidationError[], PaymentsActivationResponse> {
+): Validation<PaymentsActivationResponse> {
   const datiPagamentoPA =
     iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA;
   return PaymentsActivationResponse.decode({
