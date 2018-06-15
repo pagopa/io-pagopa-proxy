@@ -71,7 +71,8 @@ export function getPaymentsCheckResponse(
     causaleVersamento: datiPagamentoPA.causaleVersamento,
     enteBeneficiario: {
       codiceIdentificativoUnivoco:
-        datiPagamentoPA.enteBeneficiario.identificativoUnivocoBeneficiario,
+        datiPagamentoPA.enteBeneficiario.identificativoUnivocoBeneficiario
+          .codiceIdentificativoUnivoco,
       denominazioneBeneficiario:
         datiPagamentoPA.enteBeneficiario.denominazioneBeneficiario,
       codiceUnitOperBeneficiario:
@@ -149,7 +150,8 @@ export function getPaymentsActivationResponse(
     causaleVersamento: datiPagamentoPA.causaleVersamento,
     enteBeneficiario: {
       identificativoUnivocoBeneficiario:
-        datiPagamentoPA.enteBeneficiario.identificativoUnivocoBeneficiario,
+        datiPagamentoPA.enteBeneficiario.identificativoUnivocoBeneficiario
+          .codiceIdentificativoUnivoco,
       denominazioneBeneficiario:
         datiPagamentoPA.enteBeneficiario.denominazioneBeneficiario,
       codiceUnitOperBeneficiario:
