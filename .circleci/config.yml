@@ -29,6 +29,7 @@ jobs:
       # Run tests
       - run: yarn build
       - run: yarn test
+      - run: yarn test:integration
       - run: 'bash <(curl -s https://codecov.io/bash)'
 
       # Run DangerJS
