@@ -2,6 +2,8 @@
 
 [![codecov](https://codecov.io/gh/teamdigitale/italia-pagopa-proxy/branch/master/graph/badge.svg)](https://codecov.io/gh/teamdigitale/italia-pagopa-proxy)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/5a8e35c5db40f63c3ebf/maintainability)](https://codeclimate.com/github/teamdigitale/italia-pagopa-proxy/maintainability)
+
 # PagoPA Proxy
 
 ## What is this?
@@ -47,3 +49,6 @@ Those are all Environment variables needed by the application:
 | REDIS_DB_PORT                          | The Redis DB Server port                                                          | int    |
 
 logLev values: "error", "info", "debug"
+
+## OpenAPI specs
+/specs/api/v1/swagger.json

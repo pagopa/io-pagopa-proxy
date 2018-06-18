@@ -1,16 +1,19 @@
 import { isLeft, isRight } from "fp-ts/lib/Either";
 import {
+  codificaInfrastrutturaPSPEnum,
   InodoAttivaRPTOutput,
   InodoVerificaRPTOutput,
   PPTPortTypes
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { reporters } from "italia-ts-commons";
 import { NonNegativeNumber } from "italia-ts-commons/lib/numbers";
 import { WithinRangeString } from "italia-ts-commons/lib/strings";
-import { CONFIG, Configuration } from "../../Configuration";
-import { CodiceContestoPagamento } from "../../types/CodiceContestoPagamento";
-import { FiscalCode } from "../../types/FiscalCode";
-import { Importo } from "../../types/Importo";
+import { CONFIG as Config, PagoPaConfig } from "../../Configuration";
+import {
+  CodiceContestoPagamento,
+  FiscalCode,
+  Importo,
+  IUV
+} from "../../types/CommonTypes";
 import { PaymentsActivationRequest } from "../../types/PaymentsActivationRequest";
 import { PaymentsCheckRequest } from "../../types/PaymentsCheckRequest";
 import {
@@ -284,24 +287,13 @@ const anAttivaRPTOutputKoIban: InodoAttivaRPTOutput = {
   }
 };
 
-const aPaymentCheckRequest: PaymentsCheckRequest = {
+const aPaymentCheckRequestOk: PaymentsCheckRequest = {
   codiceIdRPT: {
     CF: "DVCMCD99D30E611V" as FiscalCode,
-    AuxDigit: 3 as NonNegativeNumber,
-    CodIUV: "010101010101010",
+    AuxDigit: 0 as NonNegativeNumber,
+    CodIUV: "010101010101010" as IUV,
     CodStazPA: "22"
   }
-};
-
-const aPaymentActivationRequest: PaymentsActivationRequest = {
-  codiceIdRPT: {
-    CF: "DVCMCD99D30E611V" as FiscalCode,
-    AuxDigit: 3 as NonNegativeNumber,
-    CodIUV: "010101010101010",
-    CodStazPA: "22"
-  },
-  importoSingoloVersamento: 99.05 as Importo,
-  codiceContestoPagamento: "12345" as CodiceContestoPagamento
 };
 
 const aCodiceContestoPagamento: CodiceContestoPagamento = "12345" as WithinRangeString<
@@ -309,81 +301,192 @@ const aCodiceContestoPagamento: CodiceContestoPagamento = "12345" as WithinRange
   35
 >;
 
-const aConfig = Configuration.decode(CONFIG).getOrElseL(errors => {
-  throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
-});
+const aPaymentActivationRequest: PaymentsActivationRequest = {
+  codiceIdRPT: {
+    CF: "DVCMCD99D30E611V" as FiscalCode,
+    AuxDigit: 0 as NonNegativeNumber,
+    CodIUV: "010101010101010" as IUV,
+    CodStazPA: "22"
+  },
+  importoSingoloVersamento: 99.05 as Importo,
+  codiceContestoPagamento: aCodiceContestoPagamento
+};
 
-describe(" Test getPaymentsCheckRequestPagoPa to convert PaymentCheckRequest to InodoVerificaRPTInput", () => {
-  it("Should return an istance of InodoVerificaRPTInput ", () => {
-    expect(
-      isRight(
-        getPaymentsCheckRequestPagoPa(
-          aConfig.PAGOPA,
-          aPaymentCheckRequest,
-          aCodiceContestoPagamento
-        )
-      )
-    ).toBeTruthy();
+const aConfig = {
+  HOST: process.env.PAGOPA_HOST || "http://localhost",
+  PORT: process.env.PAGOPA_PORT || "3001",
+  SERVICES: {
+    PAYMENTS_CHECK: "nodoVerificaRPT",
+    PAYMENTS_ACTIVATION: "nodoAttivaRPT"
+  },
+  // These information will identify our system when it will access to PagoPa
+  IDENTIFIER: {
+    IDENTIFICATIVO_PSP: "AGID_01",
+    IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
+    IDENTIFICATIVO_CANALE: "97735020584_02",
+    TOKEN: process.env.PAGOPA_TOKEN || "ND"
+  }
+};
+
+describe("getPaymentsCheckRequestPagoPa", () => {
+  it("should convert PaymentCheckRequest to InodoVerificaRPTInput", async () => {
+    const errorOrNodoVerificaRPTInput = getPaymentsCheckRequestPagoPa(
+      aConfig as PagoPaConfig,
+      aPaymentCheckRequestOk,
+      aCodiceContestoPagamento
+    );
+    expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
+    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
+      codiceContestoPagamento: "12345"
+    });
+    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
+      codificaInfrastrutturaPSP: "QR-CODE"
+    });
+    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
+      identificativoCanale: "97735020584_02"
+    });
+    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
+      identificativoIntermediarioPSP: "97735020584"
+    });
+    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
+      identificativoPSP: "AGID_01"
+    });
+    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
+      password: "ND" //tslint:disable-line
+    });
   });
 });
 
-describe(" Test getPaymentsCheckResponse to convert InodoVerificaRPTOutput in PaymentCheckResponse", () => {
-  it("Should return an istance of PaymentCheckResponse", () => {
-    expect(
-      isRight(
-        getPaymentsCheckResponse(aVerificaRPTOutputOk, aCodiceContestoPagamento)
-      )
-    ).toBeTruthy();
+describe("getPaymentsCheckResponse", () => {
+  it("should convert InodoVerificaRPTOutput to PaymentsCheckResponse", () => {
+    const errorOrPaymentCheckResponse = getPaymentsCheckResponse(
+      aVerificaRPTOutputOk,
+      aCodiceContestoPagamento
+    );
+    expect(isRight(errorOrPaymentCheckResponse)).toBeTruthy();
+    expect(errorOrPaymentCheckResponse.value).toMatchObject({
+      enteBeneficiario: {
+        identificativoUnivocoBeneficiario: "001",
+        denominazioneBeneficiario: "BANCA01",
+        codiceUnitOperBeneficiario: "01",
+        denomUnitOperBeneficiario: "DENOM01",
+        indirizzoBeneficiario: "VIAROMA",
+        civicoBeneficiario: "01",
+        capBeneficiario: "00000",
+        localitaBeneficiario: "ROMA",
+        provinciaBeneficiario: "ROMA",
+        nazioneBeneficiario: "IT"
+      }
+    });
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "causaleVersamento",
+      "CAUSALE01"
+    );
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "importoSingoloVersamento",
+      99.05
+    );
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "codiceContestoPagamento",
+      "12345"
+    );
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "ibanAccredito",
+      "IT17X0605502100000001234567"
+    );
+
+    expect(errorOrPaymentCheckResponse.value).toMatchObject({
+      spezzoniCausaleVersamento: [
+        {
+          spezzoneCausaleVersamento: "SPEZZONE1",
+          spezzoneStrutturatoCausaleVersamento: {
+            causaleSpezzone: "CAUSALE01",
+            importoSpezzone: 99.05
+          }
+        }
+      ]
+    });
   });
 
-  it("Should return input error (wrong importo)", () => {
-    expect(
-      isLeft(
-        getPaymentsCheckResponse(
-          aVerificaRPTOutputKoImporto,
-          aCodiceContestoPagamento
-        )
-      )
-    ).toBeTruthy();
+  it("should not convert to PaymentsCheckResponse (wrong importo) ", () => {
+    const errorOrPaymentCheckResponse = getPaymentsCheckResponse(
+      aVerificaRPTOutputKoImporto,
+      aCodiceContestoPagamento
+    );
+    expect(isLeft(errorOrPaymentCheckResponse)).toBeTruthy();
   });
 
-  it("Should return input error (wrong iban)", () => {
-    expect(
-      isLeft(
-        getPaymentsCheckResponse(
-          aVerificaRPTOutputKoIban,
-          aCodiceContestoPagamento
-        )
-      )
-    ).toBeTruthy();
+  it("should not convert to PaymentsCheckResponse (wrong iban)", () => {
+    const errorOrPaymentCheckResponse = getPaymentsCheckResponse(
+      aVerificaRPTOutputKoIban,
+      aCodiceContestoPagamento
+    );
+    expect(isLeft(errorOrPaymentCheckResponse)).toBeTruthy();
   });
 });
 
-describe(" Test getPaymentsActivationRequestPagoPa to convert PaymentsActivationRequest in InodoAttivaRPTInput", () => {
-  it("Should return an istance of InodoAttivaRPTInput", () => {
-    expect(
-      isRight(
-        getPaymentsActivationRequestPagoPa(
-          aConfig.PAGOPA,
-          aPaymentActivationRequest
-        )
-      )
-    ).toBeTruthy();
+describe("getPaymentsActivationRequestPagoPa", () => {
+  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput", () => {
+    const errorOrNodoAttivaRPTInput = getPaymentsActivationRequestPagoPa(
+      aConfig as PagoPaConfig,
+      aPaymentActivationRequest
+    );
+    expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
+    expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
+      codiceIdRPT: {
+        CF: "DVCMCD99D30E611V" as FiscalCode,
+        AuxDigit: "0",
+        CodIUV: "010101010101010" as IUV,
+        CodStazPA: "22"
+      }
+    });
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoPSP",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoIntermediarioPSP",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoCanale",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "password",
+      Config.PAGOPA.IDENTIFIER.TOKEN
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "codiceContestoPagamento",
+      aCodiceContestoPagamento
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoIntermediarioPSPPagamento",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoCanalePagamento",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "codificaInfrastrutturaPSP",
+      codificaInfrastrutturaPSPEnum.QR_CODE
+    );
   });
 });
 
-describe(" Test getPaymentsActivationResponse to convert InodoAttivaRPTOutput in PaymentsActivationResponse", () => {
-  it("Should return an istance of PaymentActivationResponse", () => {
+describe("getPaymentsActivationResponse", () => {
+  it("Should convert InodoAttivaRPTOutput in PaymentsActivationResponse", () => {
     expect(
       getPaymentsActivationResponse(anAttivaRPTOutputOk).isRight()
     ).toBeTruthy();
   });
-  it("Should return input error (wrong importo)", () => {
+  it("should not convert to PaymentsActivationResponse (wrong importo)", () => {
     expect(
       getPaymentsActivationResponse(anAttivaRPTOutputKoImporto).isLeft()
     ).toBeTruthy();
   });
-  it("Should return input error (wrong iban)", () => {
+  it("should not convert to PaymentsActivationResponse (wrong iban)", () => {
     expect(
       getPaymentsActivationResponse(anAttivaRPTOutputKoIban).isLeft()
     ).toBeTruthy();

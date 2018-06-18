@@ -140,7 +140,6 @@ export function activatePaymentToPagoPa(
 ): (
   req: express.Request
 ) => Promise<
-  // tslint:disable-next-line
   | IResponseErrorValidation
   | IResponseErrorGeneric
   | IResponseErrorInternal
