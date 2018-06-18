@@ -5,16 +5,14 @@ import {
   PPTPortTypes
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { reporters } from "italia-ts-commons";
+import { NonNegativeNumber } from "italia-ts-commons/lib/numbers";
 import { WithinRangeString } from "italia-ts-commons/lib/strings";
 import { CONFIG, Configuration } from "../../Configuration";
-import {
-  CodiceContestoPagamento,
-  FiscalCode,
-  Importo,
-  IUV
-} from "../../types/CommonTypes";
-import { PaymentsActivationRequest } from "../../types/controllers/PaymentsActivationRequest";
-import { PaymentsCheckRequest } from "../../types/controllers/PaymentsCheckRequest";
+import { CodiceContestoPagamento } from "../../types/CodiceContestoPagamento";
+import { FiscalCode } from "../../types/FiscalCode";
+import { Importo } from "../../types/Importo";
+import { PaymentsActivationRequest } from "../../types/PaymentsActivationRequest";
+import { PaymentsCheckRequest } from "../../types/PaymentsCheckRequest";
 import {
   getPaymentsActivationRequestPagoPa,
   getPaymentsActivationResponse,
@@ -289,8 +287,8 @@ const anAttivaRPTOutputKoIban: InodoAttivaRPTOutput = {
 const aPaymentCheckRequest: PaymentsCheckRequest = {
   codiceIdRPT: {
     CF: "DVCMCD99D30E611V" as FiscalCode,
-    AuxDigit: "0",
-    CodIUV: "010101010101010" as IUV,
+    AuxDigit: 3 as NonNegativeNumber,
+    CodIUV: "010101010101010",
     CodStazPA: "22"
   }
 };
@@ -298,12 +296,12 @@ const aPaymentCheckRequest: PaymentsCheckRequest = {
 const aPaymentActivationRequest: PaymentsActivationRequest = {
   codiceIdRPT: {
     CF: "DVCMCD99D30E611V" as FiscalCode,
-    AuxDigit: "0",
-    CodIUV: "010101010101010" as IUV,
+    AuxDigit: 3 as NonNegativeNumber,
+    CodIUV: "010101010101010",
     CodStazPA: "22"
   },
   importoSingoloVersamento: 99.05 as Importo,
-  codiceContestoPagamento: "12345"
+  codiceContestoPagamento: "12345" as CodiceContestoPagamento
 };
 
 const aCodiceContestoPagamento: CodiceContestoPagamento = "12345" as WithinRangeString<

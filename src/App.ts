@@ -9,25 +9,29 @@ import * as core from "express-serve-static-core";
 import * as fs from "fs";
 import * as http from "http";
 import { clients as pagoPaSoapClient } from "italia-pagopa-api";
+import { FespCdService_WSDL_PATH } from "italia-pagopa-api/dist/lib/wsdl-paths";
 import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as redis from "redis";
 import * as soap from "soap";
-import {
-  cdPerNodoWsdl,
-  CONFIG,
-  Configuration,
-  RedisTimeout
-} from "./Configuration";
+import { specs as publicApiV1Specs } from "./api/public_api_payments";
+import { CONFIG, Configuration } from "./Configuration";
+import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
 import { logger } from "./utils/Logger";
 
-// Define and start a WS SOAP\Restful Server
+/**
+ * Define and start an express Server
+ * to expose RESTful and SOAP endpoints for BackendApp and Proxy requests.
+ * @param {Configuration} config - The server configuration to use
+ * @return {Promise<http.Server>} The express server defined and started
+ */
 export async function startApp(config: Configuration): Promise<http.Server> {
   logger.info("Starting Proxy PagoPa Server...");
 
-  // Define SOAP Clients necessary to send messages to PagoPa SOAP WS
+  // Define SOAP Clients for PagoPA SOAP WS
+  // It is necessary to forward BackendApp requests to PagoPa
   const verificaRPTPagoPaClient = new pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient(
     await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
@@ -45,13 +49,14 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     })
   );
 
-  // Define a redis client necessary to handle persistent data for activationPayment services
+  // Define a redis client necessary to handle persistent data
+  // for async payment activation process
   const redisClient = redis.createClient(
     config.REDIS_DB.PORT,
     config.REDIS_DB.HOST
   );
 
-  // Define endpoints and start SOAP + RESTFUL WS
+  // Define RESTful and SOAP endpoints
   const app = express();
   app.set("port", config.CONTROLLER.PORT);
   setRestfulRoutes(
@@ -61,9 +66,13 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     verificaRPTPagoPaClient,
     attivaRPTPagoPaClient
   );
-  setSoapServices(app, redisClient, config.PAYMENT_ACTIVATION_STATUS_TIMEOUT);
+  getSoapServer(
+    redisClient,
+    config.PAYMENT_ACTIVATION_STATUS_TIMEOUT as number
+  )(app);
   const server = http.createServer(app);
   server.listen(config.CONTROLLER.PORT);
+
   logger.info(
     `Server started at ${config.CONTROLLER.HOST}:${config.CONTROLLER.PORT}`
   );
@@ -75,7 +84,12 @@ export function stopServer(server: http.Server): void {
   server.close();
 }
 
-// Set Restful WS routes
+/**
+ * Set RESTful WS endpoints
+ * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPa
+ * @param {redisTimeout} number - The timeout to use for information stored into redis
+ * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
+ */
 function setRestfulRoutes(
   app: core.Express,
   config: Configuration,
@@ -122,14 +136,22 @@ function setRestfulRoutes(
       )(req, res);
     }
   );
+
+  // Endpoint for OpenAPI handler
+  app.get("/specs/api/v1/swagger.json", GetOpenapi(publicApiV1Specs));
 }
-// Create Soap services for PagoPA (cdInfoDatiPagamento)
-function setSoapServices(
-  app: core.Express,
+
+/**
+ * Define and return a method to start a SOAP Server for PagoPa
+ * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPa
+ * @param {redisTimeout} redisTimeout - The timeout to use for information stored into redis
+ * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
+ */
+function getSoapServer(
   redisClient: redis.RedisClient,
-  statusTimeout: RedisTimeout
-): void {
-  const wsdl = fs.readFileSync(`${__dirname}${cdPerNodoWsdl}`, "UTF-8");
+  redisTimeout: number
+): (app: core.Express) => soap.Server {
+  // Configuration for SOAP endpoints and callback handler
   const service = {
     FespCdService: {
       FespCdPortType: {
@@ -139,7 +161,7 @@ function setSoapServices(
         ): void => {
           PaymentController.updatePaymentActivationStatusIntoDB(
             input,
-            statusTimeout,
+            redisTimeout,
             redisClient,
             callback
           );
@@ -147,11 +169,14 @@ function setSoapServices(
       }
     }
   };
-
-  soap.listen(
-    app,
-    CONFIG.CONTROLLER.ROUTES.SOAP.PAYMENTS_ACTIVATION_STATUS_UPDATE,
-    service,
-    wsdl
-  );
+  // Retrieve the wsdl related to the endpoint and define a starter function to return
+  const wsdl = fs.readFileSync(`${FespCdService_WSDL_PATH}`, "UTF-8");
+  return (app: core.Express): soap.Server => {
+    return soap.listen(
+      app,
+      CONFIG.CONTROLLER.ROUTES.SOAP.PAYMENTS_ACTIVATION_STATUS_UPDATE,
+      service,
+      wsdl
+    );
+  };
 }

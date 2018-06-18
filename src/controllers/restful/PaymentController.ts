@@ -25,14 +25,14 @@ import {
 import * as redis from "redis";
 import { promisify } from "util";
 import * as uuid from "uuid";
-import { PagoPaConfig, RedisTimeout } from "../../Configuration";
+import { PagoPaConfig } from "../../Configuration";
 import * as PaymentsService from "../../services/PaymentsService";
-import { CodiceContestoPagamento } from "../../types/CommonTypes";
-import { PaymentsActivationRequest } from "../../types/controllers/PaymentsActivationRequest";
-import { PaymentsActivationResponse } from "../../types/controllers/PaymentsActivationResponse";
-import { PaymentsActivationStatusCheckResponse } from "../../types/controllers/PaymentsActivationStatusCheckResponse";
-import { PaymentsCheckRequest } from "../../types/controllers/PaymentsCheckRequest";
-import { PaymentsCheckResponse } from "../../types/controllers/PaymentsCheckResponse";
+import { CodiceContestoPagamento } from "../../types/CodiceContestoPagamento";
+import { PaymentsActivationRequest } from "../../types/PaymentsActivationRequest";
+import { PaymentsActivationResponse } from "../../types/PaymentsActivationResponse";
+import { PaymentsActivationStatusCheckResponse } from "../../types/PaymentsActivationStatusCheckResponse";
+import { PaymentsCheckRequest } from "../../types/PaymentsCheckRequest";
+import { PaymentsCheckResponse } from "../../types/PaymentsCheckResponse";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 
 /**
@@ -214,10 +214,20 @@ export function activatePaymentToPagoPa(
     );
   };
 }
-// Receive a payment activation status update from PagoPa and store it into DB
+
+/**
+ * This controller is invoked by PagoPa that provides a paymentId
+ * related to a previous async request (attivaRPT)
+ * It just store this information into redis db. This information will be retrieved by App using polling
+ * @param {IcdInfoPagamentoInput} cdInfoPagamentoInput - The request from PagoPa
+ * @param {RedisTimeout} redisTimeout - The expiration timeout for the information to store
+ * @param {RedisClient} redisClient - The redis client used to store the paymentId
+ * @param {(cdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void} callback - Callback function to send a feedback to PagoPa
+ * @return {Promise<IResponse*>} The response content to send to applicant
+ */
 export function updatePaymentActivationStatusIntoDB(
   cdInfoPagamentoInput: IcdInfoPagamentoInput,
-  statusTimeout: RedisTimeout,
+  redisTimeout: number,
   redisClient: redis.RedisClient,
   callback: (cdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void
 ): void {
@@ -231,8 +241,8 @@ export function updatePaymentActivationStatusIntoDB(
   setAsyncRedis(
     cdInfoPagamentoInput.codiceContestoPagamento,
     cdInfoPagamentoInput.idPagamento,
-    "EX",
-    statusTimeout
+    "EX", // Set the specified expire time, in seconds.
+    redisTimeout
   ).catch((error: Error) => {
     return error;
   });
@@ -245,10 +255,9 @@ export function updatePaymentActivationStatusIntoDB(
 /**
  * This controller is invoked by BackendApp to check the status of a previous activation request (async process)
  * If PagoPa sent an activation result (via cdInfoPagamento), a paymentId will be retrieved into redis
- * The paymentId will be used by App to proceed with the payment process
- * @param {express.Request} req - The RESTful request
+ * The paymentId is necessary for App to proceed with the payment process
  * @param {redis.RedisClient} redisClient - The redis client used to retrieve the paymentId
- * @return {Promise<PaymentCtrlResponse<PaymentsActivationStatusCheckResponse>>} The response content to send to applicant
+ * @return {Promise<IResponse*>} The response content to send to applicant
  */
 export function checkPaymentActivationStatusFromDB(
   redisClient: redis.RedisClient
@@ -278,6 +287,7 @@ export function checkPaymentActivationStatusFromDB(
     }
 
     // Retrieve idPayment related to a codiceContestoPagamento from DB
+    // It's just a key-value mapping
     const getAsyncRedis = promisify(redisClient.get).bind(redisClient);
     const idPagamento = await getAsyncRedis(codiceContestoPagamento).catch(
       (error: Error) => {
@@ -285,9 +295,8 @@ export function checkPaymentActivationStatusFromDB(
       }
     );
 
-    // Define a response to send to the applicant
+    // Define a response to send to the applicant containing an error or the retrieved data
     return PaymentsActivationStatusCheckResponse.decode({
-      codiceContestoPagamento,
       idPagamento
     }).fold<
       | IResponseErrorValidation

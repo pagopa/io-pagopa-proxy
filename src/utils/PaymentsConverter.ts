@@ -12,11 +12,11 @@ import {
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { PagoPaConfig } from "../Configuration";
-import { CodiceContestoPagamento } from "../types/CommonTypes";
-import { PaymentsActivationRequest } from "../types/controllers/PaymentsActivationRequest";
-import { PaymentsActivationResponse } from "../types/controllers/PaymentsActivationResponse";
-import { PaymentsCheckRequest } from "../types/controllers/PaymentsCheckRequest";
-import { PaymentsCheckResponse } from "../types/controllers/PaymentsCheckResponse";
+import { CodiceContestoPagamento } from "../types/CodiceContestoPagamento";
+import { PaymentsActivationRequest } from "../types/PaymentsActivationRequest";
+import { PaymentsActivationResponse } from "../types/PaymentsActivationResponse";
+import { PaymentsCheckRequest } from "../types/PaymentsCheckRequest";
+import { PaymentsCheckResponse } from "../types/PaymentsCheckResponse";
 
 /**
  * Convert PaymentsCheckRequest (BackendApp request) to InodoVerificaRPTInput (PagoPa request)
@@ -42,7 +42,7 @@ export function getPaymentsCheckRequestPagoPa(
       codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
       codiceIdRPT: {
         CF: paymentsCheckRequest.codiceIdRPT.CF,
-        AuxDigit: paymentsCheckRequest.codiceIdRPT.AuxDigit,
+        AuxDigit: String(paymentsCheckRequest.codiceIdRPT.AuxDigit),
         CodStazPA: paymentsCheckRequest.codiceIdRPT.CodStazPA,
         CodIUV: paymentsCheckRequest.codiceIdRPT.CodIUV
       }
@@ -70,7 +70,7 @@ export function getPaymentsCheckResponse(
     ibanAccredito: datiPagamentoPA.ibanAccredito,
     causaleVersamento: datiPagamentoPA.causaleVersamento,
     enteBeneficiario: {
-      codiceIdentificativoUnivoco:
+      identificativoUnivocoBeneficiario:
         datiPagamentoPA.enteBeneficiario.identificativoUnivocoBeneficiario
           .codiceIdentificativoUnivoco,
       denominazioneBeneficiario:
@@ -120,7 +120,7 @@ export function getPaymentsActivationRequestPagoPa(
       codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
       codiceIdRPT: {
         CF: paymentsActivationRequest.codiceIdRPT.CF,
-        AuxDigit: paymentsActivationRequest.codiceIdRPT.AuxDigit,
+        AuxDigit: String(paymentsActivationRequest.codiceIdRPT.AuxDigit),
         CodStazPA: paymentsActivationRequest.codiceIdRPT.CodStazPA,
         CodIUV: paymentsActivationRequest.codiceIdRPT.CodIUV
       },

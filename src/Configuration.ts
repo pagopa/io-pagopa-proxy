@@ -6,11 +6,11 @@ import * as t from "io-ts";
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 
+// Localhost hostname used for debugging
 const localhost = "http://localhost";
 
-export const cdPerNodoWsdl = "/wsdl/CdPerNodo.wsdl";
-
 export const CONFIG = {
+  // The log level used for Winston logger (error, info, debug)
   WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL || "debug",
 
   // RESTful Webservice configuration
@@ -53,26 +53,15 @@ export const CONFIG = {
     }
   },
 
-  // BackendApp Configuration
-  // These information are documented here:
-  // https://docs.google.com/document/d/1Qqe6mSfon-blHzc-ldeEHmzIkVaElKY5LtDnKiLbk80/edit
-  // Used to communicate with Backend App
-  BACKEND_APP: {
-    HOST: process.env.BACKEND_APP_HOST || localhost,
-    PORT: process.env.BACKEND_APP_PORT || 3002,
-    SERVICES: {
-      PAYMENTS_STATUS_UPDATE: "/payment/status/update"
-    }
-  },
-
-  // Redis DB Configuration
+  // Redis DB Server Configuration
   REDIS_DB: {
     PORT: process.env.REDIS_DB_PORT || 6379,
     HOST: process.env.REDIS_DB_HOST || "localhost"
   },
 
-  // Timeout (seconds) for payment activation status expiration used for DB (1 HOUR - 5 DAYS)
-  PAYMENT_ACTIVATION_STATUS_TIMEOUT: 60 * 60 * 24
+  // Timeout used to store PaymentId into redis db (AttivaRPT process)
+  // #158387557 The value is an estimation that could be reviewed with real scenarios
+  PAYMENT_ACTIVATION_STATUS_TIMEOUT: 60 * 60 * 48
 };
 
 // Configuration validator - Define configuration types and interfaces
@@ -92,7 +81,7 @@ const ControllerConfig = t.intersection([
         PAYMENTS_ACTIVATION_CHECK: NonEmptyString
       }),
       SOAP: t.interface({
-        PAYMENTS_STATUS_UPDATE: NonEmptyString
+        PAYMENTS_ACTIVATION_STATUS_UPDATE: NonEmptyString
       })
     })
   })
@@ -105,9 +94,7 @@ const PagoPaConfig = t.intersection([
     SERVICES: t.interface({
       PAYMENTS_CHECK: NonEmptyString,
       PAYMENTS_ACTIVATION: NonEmptyString
-    })
-  }),
-  t.interface({
+    }),
     IDENTIFIER: t.interface({
       IDENTIFICATIVO_PSP: NonEmptyString,
       IDENTIFICATIVO_INTERMEDIARIO_PSP: NonEmptyString,
@@ -118,16 +105,6 @@ const PagoPaConfig = t.intersection([
 ]);
 export type PagoPaConfig = t.TypeOf<typeof PagoPaConfig>;
 
-const BackendAppConfig = t.intersection([
-  ServerConfiguration,
-  t.interface({
-    SERVICES: t.interface({
-      PAYMENTS_STATUS_UPDATE: NonEmptyString
-    })
-  })
-]);
-export type BackendAppConfig = t.TypeOf<typeof BackendAppConfig>;
-
 export const WinstonLogLevel = t.keyof({
   error: 0,
   info: 2,
@@ -135,15 +112,11 @@ export const WinstonLogLevel = t.keyof({
 });
 export type WinstonLogLevel = t.TypeOf<typeof WinstonLogLevel>;
 
-export const RedisTimeout = WithinRangeNumber(3600, 432000); // 1 HOUR - 5 DAYS
-export type RedisTimeout = t.TypeOf<typeof RedisTimeout>;
-
 export const Configuration = t.interface({
   WINSTON_LOG_LEVEL: WinstonLogLevel,
   CONTROLLER: ControllerConfig,
   PAGOPA: PagoPaConfig,
-  BACKEND_APP: BackendAppConfig,
-  PAYMENT_ACTIVATION_STATUS_TIMEOUT: RedisTimeout,
+  PAYMENT_ACTIVATION_STATUS_TIMEOUT: t.number,
   REDIS_DB: ServerConfiguration
 });
 export type Configuration = t.TypeOf<typeof Configuration>;
