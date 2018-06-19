@@ -25,7 +25,7 @@ export const CONFIG = {
         PAYMENTS_CHECK: "/payment/check",
         PAYMENTS_ACTIVATION: "/payment/activation",
         PAYMENTS_ACTIVATION_CHECK:
-          "/payment/activation/check/:codiceContestoPagamento"
+          "/payment/activation/:codiceContestoPagamento"
       },
       SOAP: {
         PAYMENTS_ACTIVATION_STATUS_UPDATE: "/cdInfoPagamento"

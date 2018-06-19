@@ -70,7 +70,7 @@ paths:
           description: Input provided or PagoPA response are invalid
         "500":
           description: PagoPA services are not available or request is rejected
-  "/payment/activation/check/{codiceContestoPagamento}":
+  "/payment/activation/{codiceContestoPagamento}":
     x-swagger-router-controller: PaymentController
     get:
       operationId: checkPaymentActivationStatusFromDB
