@@ -17,6 +17,8 @@ export type RequestHandler<R> = (
  *
  * Failed promises will be mapped to 500 errors handled by ResponseErrorGeneric.
  */
+
+// TODO: [#158454734] Move this code on italia-ts-commons and replace it
 export function wrapRequestHandler<R>(
   handler: RequestHandler<R>
 ): express.RequestHandler {
