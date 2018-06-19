@@ -6,5 +6,3 @@ coverage
 yarn-error.log
 package-lock.json
 .vscode/settings.json
-src/api/
-src/types/api/
