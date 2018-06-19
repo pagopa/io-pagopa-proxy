@@ -13,21 +13,21 @@ import {
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { PagoPAConfig } from "../Configuration";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
-import { PaymentsActivationRequest } from "../types/api/PaymentsActivationRequest";
-import { PaymentsActivationResponse } from "../types/api/PaymentsActivationResponse";
-import { PaymentsCheckRequest } from "../types/api/PaymentsCheckRequest";
-import { PaymentsCheckResponse } from "../types/api/PaymentsCheckResponse";
+import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
+import { PaymentActivationsPostResponse } from "../types/api/PaymentActivationsPostResponse";
+import { PaymentRequestsGetResponse } from "../types/api/PaymentRequestsGetResponse";
+import { RptId } from "../types/api/RptId";
 
 /**
- * Convert PaymentsCheckRequest (BackendApp request) to InodoVerificaRPTInput (PagoPA request)
+ * Define InodoVerificaRPTInput (PagoPA request) using information provided by BackendApp
  * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
- * @param {PaymentsCheckRequest} paymentsCheckRequest - Message to convert
+ * @param {RptId} rptId - Unique identifier for payment (fiscalCode + numeroAvviso)
  * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
  * @return {Either<Error, InodoVerificaRPTInput>} Converted object
  */
-export function getPaymentsCheckRequestPagoPA(
+export function getInodoVerificaRPTInput(
   pagoPAConfig: PagoPAConfig,
-  paymentsCheckRequest: PaymentsCheckRequest,
+  rptId: RptId,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, InodoVerificaRPTInput> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
@@ -41,10 +41,10 @@ export function getPaymentsCheckRequestPagoPA(
       codiceContestoPagamento,
       codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
       codiceIdRPT: {
-        CF: paymentsCheckRequest.codiceIdRPT.CF,
-        AuxDigit: String(paymentsCheckRequest.codiceIdRPT.AuxDigit),
-        CodStazPA: paymentsCheckRequest.codiceIdRPT.CodStazPA,
-        CodIUV: paymentsCheckRequest.codiceIdRPT.CodIUV
+        CF: getFiscalCode(rptId),
+        AuxDigit: getAuxDigit(rptId),
+        CodStazPA: getCodStazPA(rptId),
+        CodIUV: getCodIUV(rptId)
       }
     });
   } catch (exception) {
@@ -53,18 +53,18 @@ export function getPaymentsCheckRequestPagoPA(
 }
 
 /**
- * Convert InodoVerificaRPTOutput (PagoPA response) to \ (BackendApp response)
+ * Convert InodoVerificaRPTOutput (PagoPA response) to PaymentRequestsGetResponse (BackendApp response)
  * @param {InodoVerificaRPTOutput} iNodoVerificaRPTOutput - Message to convert
  * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
- * @return {Validation<PaymentsCheckResponse>} Converted object
+ * @return {Validation<PaymentRequestsGetResponse>} Converted object
  */
-export function getPaymentsCheckResponse(
+export function getPaymentRequestsGetResponse(
   iNodoVerificaRPTOutput: InodoVerificaRPTOutput,
   codiceContestoPagamento: CodiceContestoPagamento
-): Validation<PaymentsCheckResponse> {
+): Validation<PaymentRequestsGetResponse> {
   const datiPagamentoPA =
     iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.datiPagamentoPA;
-  return PaymentsCheckResponse.decode({
+  return PaymentRequestsGetResponse.decode({
     importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento,
     codiceContestoPagamento,
     ibanAccredito: datiPagamentoPA.ibanAccredito,
@@ -94,14 +94,14 @@ export function getPaymentsCheckResponse(
 }
 
 /**
- * Convert PaymentsActivationRequest (BackendApp request) to InodoAttivaRPTInput (PagoPA request)
+ * Convert PaymentActivationsPostRequest (BackendApp request) to InodoAttivaRPTInput (PagoPA request)
  * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
- * @param {PaymentsActivationRequest} paymentsActivationRequest - Message to convert
+ * @param {PaymentActivationsPostRequest} paymentActivationsPostRequest - Message to convert
  * @return {Either<Error, InodoAttivaRPTInput>} Converted object
  */
-export function getPaymentsActivationRequestPagoPA(
+export function getInodoAttivaRPTInput(
   pagoPAConfig: PagoPAConfig,
-  paymentsActivationRequest: PaymentsActivationRequest
+  paymentActivationsPostRequest: PaymentActivationsPostRequest
 ): Either<Error, InodoAttivaRPTInput> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
@@ -112,21 +112,21 @@ export function getPaymentsActivationRequestPagoPA(
       identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
       password: pagoPAConfig.IDENTIFIER.TOKEN,
       codiceContestoPagamento:
-        paymentsActivationRequest.codiceContestoPagamento,
+        paymentActivationsPostRequest.codiceContestoPagamento,
       identificativoIntermediarioPSPPagamento:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanalePagamento:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
       codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
       codiceIdRPT: {
-        CF: paymentsActivationRequest.codiceIdRPT.CF,
-        AuxDigit: String(paymentsActivationRequest.codiceIdRPT.AuxDigit),
-        CodStazPA: paymentsActivationRequest.codiceIdRPT.CodStazPA,
-        CodIUV: paymentsActivationRequest.codiceIdRPT.CodIUV
+        CF: getFiscalCode(paymentActivationsPostRequest.rptId),
+        AuxDigit: getAuxDigit(paymentActivationsPostRequest.rptId),
+        CodStazPA: getCodStazPA(paymentActivationsPostRequest.rptId),
+        CodIUV: getCodIUV(paymentActivationsPostRequest.rptId)
       },
       datiPagamentoPSP: {
         importoSingoloVersamento:
-          paymentsActivationRequest.importoSingoloVersamento
+          paymentActivationsPostRequest.importoSingoloVersamento
       }
     });
   } catch (exception) {
@@ -135,16 +135,16 @@ export function getPaymentsActivationRequestPagoPA(
 }
 
 /**
- * Convert InodoAttivaRPTOutput (PagoPA response) to PaymentsActivationResponse (BackendApp response)
+ * Convert InodoAttivaRPTOutput (PagoPA response) to PaymentActivationsPostResponse (BackendApp response)
  * @param {InodoAttivaRPTOutput} iNodoAttivaRPTOutput - Message to convert
- * @return {Validation<PaymentsActivationResponse>} Converted object
+ * @return {Validation<PaymentActivationsPostResponse>} Converted object
  */
-export function getPaymentsActivationResponse(
+export function getPaymentActivationsPostResponse(
   iNodoAttivaRPTOutput: InodoAttivaRPTOutput
-): Validation<PaymentsActivationResponse> {
+): Validation<PaymentActivationsPostResponse> {
   const datiPagamentoPA =
     iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA;
-  return PaymentsActivationResponse.decode({
+  return PaymentActivationsPostResponse.decode({
     importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento,
     ibanAccredito: datiPagamentoPA.ibanAccredito,
     causaleVersamento: datiPagamentoPA.causaleVersamento,
@@ -170,4 +170,33 @@ export function getPaymentsActivationResponse(
     },
     spezzoniCausaleVersamento: datiPagamentoPA.spezzoniCausaleVersamento
   });
+}
+
+// TODO: [#158463790] Replace this methods and RptId object with a common definition to share with App
+export function getAuxDigit(rptId: string): string {
+  if (rptId !== undefined) {
+    return "0";
+  }
+  return "ERROR";
+}
+// tslint:disable-next-line
+export function getCodIUV(rptId: string): string {
+  if (rptId !== undefined) {
+    return "010101010101010";
+  }
+  return "ERROR";
+}
+// tslint:disable-next-line
+export function getCodStazPA(rptId: string): string {
+  if (rptId !== undefined) {
+    return "22";
+  }
+  return "ERROR";
+}
+// tslint:disable-next-line
+export function getFiscalCode(rptId: string): string {
+  if (rptId !== undefined) {
+    return "DVCMCD99D30E611V";
+  }
+  return "ERROR";
 }

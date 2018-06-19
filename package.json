@@ -7,7 +7,8 @@
   "author": "Sergio Manetta <sergio.manetta@it.ibm.com>",
   "license": "MIT",
   "scripts": {
-    "build": "yarn generate:proxy-api-models && tslint --project . && tsc",
+    "build": "npm-run-all -s generate:proxy-api-models lint build:tsc",
+    "build:tsc": "tsc",
     "clean": "rm -r ./dist",
     "generate:proxy-api-models": "rm -f ./src/types/api/* && gen-api-models --api-spec ./api_pagopa.yaml --out-dir ./src/types/api/ --ts-spec-file ./src/api/public_api_pagopa.ts",
     "prettify": "prettier --write './**/*.ts'",

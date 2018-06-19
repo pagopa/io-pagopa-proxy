@@ -18,7 +18,7 @@ import {
  * @param {PagamentiTelematiciPspNodoAsyncClient} pagamentiTelematiciPSPNodoClient - SOAP client used to call PagoPa services
  * @return {Promise<Either<Error, InodoVerificaRPTOutput>>} The response provided by PagoPA as response
  */
-export async function sendPaymentCheckRequest(
+export async function sendInodoVerificaRPTInput(
   iNodoVerificaRPTInput: InodoVerificaRPTInput,
   pagamentiTelematiciPSPNodoClient: PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<Error, InodoVerificaRPTOutput>> {
@@ -38,7 +38,7 @@ export async function sendPaymentCheckRequest(
  * @param {pagamentiTelematiciPSPNodoClient} PagamentiTelematiciPspNodoAsyncClient - SOAP client used to call PagoPa services
  * @return {Promise<Either<Error, InodoAttivaRPTOutput>>} The response provided by PagoPA as response
  */
-export async function sendPaymentsActivationRequest(
+export async function sendInodoAttivaRPTInputToPagoPa(
   iNodoAttivaRPTInput: InodoAttivaRPTInput,
   pagamentiTelematiciPSPNodoClient: PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<Error, InodoAttivaRPTOutput>> {

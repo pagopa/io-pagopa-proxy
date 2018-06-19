@@ -35,7 +35,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const verificaRPTPagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
     await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-        config.PAGOPA.SERVICES.PAYMENTS_CHECK
+        config.PAGOPA.SERVICES.VERIFICA_RPT
       }`,
       envelopeKey: PPTPortTypes.envelopeKey
     })
@@ -43,7 +43,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const attivaRPTPagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
     await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-        config.PAGOPA.SERVICES.PAYMENTS_ACTIVATION
+        config.PAGOPA.SERVICES.ATTIVA_RPT
       }`,
       envelopeKey: PPTPortTypes.envelopeKey
     })
@@ -100,36 +100,43 @@ function setRestfulRoutes(
   attivaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): void {
   app.get(
-    config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_CHECK,
+    config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_REQUESTS_GET,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Check Request (GET)...");
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
-        PaymentController.checkPayment(config.PAGOPA, verificaRPTPagoPAClient)
+        PaymentController.paymentRequestsGet(
+          config.PAGOPA,
+          verificaRPTPagoPAClient
+        )
       )(req, res);
     }
   );
   app.post(
-    config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_ACTIVATION,
+    config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_POST,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Activation Request (POST)...");
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
-        PaymentController.activatePayment(config.PAGOPA, attivaRPTPagoPAClient)
+        PaymentController.paymentActivationsPost(
+          config.PAGOPA,
+          attivaRPTPagoPAClient
+        )
       )(req, res);
     }
   );
   app.get(
-    config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_ACTIVATION_CHECK,
+    config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_GET,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Check Activation Request (GET)...");
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: false }));
-      toExpressHandler(
-        PaymentController.checkPaymentActivationStatusFromDB(redisClient)
-      )(req, res);
+      toExpressHandler(PaymentController.paymentActivationsGet(redisClient))(
+        req,
+        res
+      );
     }
   );
 
@@ -170,7 +177,7 @@ function getSoapServer(
   return (app: core.Express): soap.Server => {
     return soap.listen(
       app,
-      CONFIG.CONTROLLER.ROUTES.SOAP.PAYMENTS_ACTIVATION_STATUS_UPDATE,
+      CONFIG.CONTROLLER.ROUTES.SOAP.PAYMENT_ACTIVATIONS_STATUS_UPDATE,
       service,
       wsdl
     );

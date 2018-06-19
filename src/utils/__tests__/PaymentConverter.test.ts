@@ -5,19 +5,15 @@ import {
   InodoVerificaRPTOutput,
   PPTPortTypes
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { NonNegativeNumber } from "italia-ts-commons/lib/numbers";
 import { WithinRangeString } from "italia-ts-commons/lib/strings";
 import { CONFIG as Config, PagoPAConfig } from "../../Configuration";
 import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
-import { FiscalCode } from "../../types/api/FiscalCode";
 import { Importo } from "../../types/api/Importo";
-import { PaymentsActivationRequest } from "../../types/api/PaymentsActivationRequest";
-import { PaymentsCheckRequest } from "../../types/api/PaymentsCheckRequest";
+import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import {
-  getPaymentsActivationRequestPagoPA,
-  getPaymentsActivationResponse,
-  getPaymentsCheckRequestPagoPA,
-  getPaymentsCheckResponse
+  getInodoAttivaRPTInput,
+  getPaymentActivationsPostResponse,
+  getPaymentRequestsGetResponse
 } from "../PaymentsConverter";
 
 const aVerificaRPTOutputOk: InodoVerificaRPTOutput = {
@@ -284,27 +280,13 @@ const anAttivaRPTOutputKoIban: InodoAttivaRPTOutput = {
   }
 };
 
-const aPaymentCheckRequestOk: PaymentsCheckRequest = {
-  codiceIdRPT: {
-    CF: "DVCMCD99D30E611V" as FiscalCode,
-    AuxDigit: 0 as NonNegativeNumber,
-    CodIUV: "010101010101010",
-    CodStazPA: "22"
-  }
-};
-
 const aCodiceContestoPagamento: CodiceContestoPagamento = "12345" as WithinRangeString<
   1,
   35
 >;
 
-const aPaymentActivationRequest: PaymentsActivationRequest = {
-  codiceIdRPT: {
-    CF: "DVCMCD99D30E611V" as FiscalCode,
-    AuxDigit: 0 as NonNegativeNumber,
-    CodIUV: "010101010101010",
-    CodStazPA: "22"
-  },
+const aPaymentActivationsPostRequest: PaymentActivationsPostRequest = {
+  rptId: "TEST123",
   importoSingoloVersamento: 99.05 as Importo,
   codiceContestoPagamento: aCodiceContestoPagamento
 };
@@ -313,8 +295,8 @@ const aConfig = {
   HOST: process.env.PAGOPA_HOST || "http://localhost",
   PORT: process.env.PAGOPA_PORT || "3001",
   SERVICES: {
-    PAYMENTS_CHECK: "nodoVerificaRPT",
-    PAYMENTS_ACTIVATION: "nodoAttivaRPT"
+    VERIFICA_RPT: "nodoVerificaRPT",
+    ATTIVA_RPT: "nodoAttivaRPT"
   },
   // These information will identify our system when it will access to PagoPA
   IDENTIFIER: {
@@ -325,38 +307,9 @@ const aConfig = {
   }
 };
 
-describe("getPaymentsCheckRequestPagoPA", () => {
-  it("should convert PaymentCheckRequest to InodoVerificaRPTInput", async () => {
-    const errorOrNodoVerificaRPTInput = getPaymentsCheckRequestPagoPA(
-      aConfig as PagoPAConfig,
-      aPaymentCheckRequestOk,
-      aCodiceContestoPagamento
-    );
-    expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
-    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
-      codiceContestoPagamento: "12345"
-    });
-    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
-      codificaInfrastrutturaPSP: "QR-CODE"
-    });
-    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
-      identificativoCanale: "97735020584_02"
-    });
-    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
-      identificativoIntermediarioPSP: "97735020584"
-    });
-    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
-      identificativoPSP: "AGID_01"
-    });
-    expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
-      password: "ND" //tslint:disable-line
-    });
-  });
-});
-
 describe("getPaymentsCheckResponse", () => {
   it("should convert InodoVerificaRPTOutput to PaymentsCheckResponse", () => {
-    const errorOrPaymentCheckResponse = getPaymentsCheckResponse(
+    const errorOrPaymentCheckResponse = getPaymentRequestsGetResponse(
       aVerificaRPTOutputOk,
       aCodiceContestoPagamento
     );
@@ -406,7 +359,7 @@ describe("getPaymentsCheckResponse", () => {
   });
 
   it("should not convert to PaymentsCheckResponse (wrong importo) ", () => {
-    const errorOrPaymentCheckResponse = getPaymentsCheckResponse(
+    const errorOrPaymentCheckResponse = getPaymentRequestsGetResponse(
       aVerificaRPTOutputKoImporto,
       aCodiceContestoPagamento
     );
@@ -414,7 +367,7 @@ describe("getPaymentsCheckResponse", () => {
   });
 
   it("should not convert to PaymentsCheckResponse (wrong iban)", () => {
-    const errorOrPaymentCheckResponse = getPaymentsCheckResponse(
+    const errorOrPaymentCheckResponse = getPaymentRequestsGetResponse(
       aVerificaRPTOutputKoIban,
       aCodiceContestoPagamento
     );
@@ -424,14 +377,14 @@ describe("getPaymentsCheckResponse", () => {
 
 describe("getPaymentsActivationRequestPagoPA", () => {
   it("should convert PaymentsActivationRequest to InodoAttivaRPTInput", () => {
-    const errorOrNodoAttivaRPTInput = getPaymentsActivationRequestPagoPA(
+    const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
       aConfig as PagoPAConfig,
-      aPaymentActivationRequest
+      aPaymentActivationsPostRequest
     );
     expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
     expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
       codiceIdRPT: {
-        CF: "DVCMCD99D30E611V" as FiscalCode,
+        CF: "DVCMCD99D30E611V",
         AuxDigit: "0",
         CodIUV: "010101010101010",
         CodStazPA: "22"
@@ -475,17 +428,17 @@ describe("getPaymentsActivationRequestPagoPA", () => {
 describe("getPaymentsActivationResponse", () => {
   it("Should convert InodoAttivaRPTOutput in PaymentsActivationResponse", () => {
     expect(
-      getPaymentsActivationResponse(anAttivaRPTOutputOk).isRight()
+      getPaymentActivationsPostResponse(anAttivaRPTOutputOk).isRight()
     ).toBeTruthy();
   });
   it("should not convert to PaymentsActivationResponse (wrong importo)", () => {
     expect(
-      getPaymentsActivationResponse(anAttivaRPTOutputKoImporto).isLeft()
+      getPaymentActivationsPostResponse(anAttivaRPTOutputKoImporto).isLeft()
     ).toBeTruthy();
   });
   it("should not convert to PaymentsActivationResponse (wrong iban)", () => {
     expect(
-      getPaymentsActivationResponse(anAttivaRPTOutputKoIban).isLeft()
+      getPaymentActivationsPostResponse(anAttivaRPTOutputKoIban).isLeft()
     ).toBeTruthy();
   });
 });

@@ -22,13 +22,12 @@ export const CONFIG = {
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
     ROUTES: {
       RESTFUL: {
-        PAYMENTS_CHECK: "/payment/check",
-        PAYMENTS_ACTIVATION: "/payment/activation",
-        PAYMENTS_ACTIVATION_CHECK:
-          "/payment/activation/:codiceContestoPagamento"
+        PAYMENT_REQUESTS_GET: "/payment-requests/:rptId",
+        PAYMENT_ACTIVATIONS_POST: "/payment-activations",
+        PAYMENT_ACTIVATIONS_GET: "/payment-activations/:codiceContestoPagamento"
       },
       SOAP: {
-        PAYMENTS_ACTIVATION_STATUS_UPDATE: "/cdInfoPagamento"
+        PAYMENT_ACTIVATIONS_STATUS_UPDATE: "/cdInfoPagamento"
       }
     }
   },
@@ -41,8 +40,8 @@ export const CONFIG = {
     HOST: process.env.PAGOPA_HOST || localhost,
     PORT: process.env.PAGOPA_PORT || 3001,
     SERVICES: {
-      PAYMENTS_CHECK: "nodoVerificaRPT",
-      PAYMENTS_ACTIVATION: "nodoAttivaRPT"
+      VERIFICA_RPT: "nodoVerificaRPT",
+      ATTIVA_RPT: "nodoAttivaRPT"
     },
     // These information will identify our system when it will access to PagoPA
     IDENTIFIER: {
@@ -76,12 +75,12 @@ const ControllerConfig = t.intersection([
   t.interface({
     ROUTES: t.interface({
       RESTFUL: t.interface({
-        PAYMENTS_CHECK: NonEmptyString,
-        PAYMENTS_ACTIVATION: NonEmptyString,
-        PAYMENTS_ACTIVATION_CHECK: NonEmptyString
+        PAYMENT_REQUESTS_GET: NonEmptyString,
+        PAYMENT_ACTIVATIONS_POST: NonEmptyString,
+        PAYMENT_ACTIVATIONS_GET: NonEmptyString
       }),
       SOAP: t.interface({
-        PAYMENTS_ACTIVATION_STATUS_UPDATE: NonEmptyString
+        PAYMENT_ACTIVATIONS_STATUS_UPDATE: NonEmptyString
       })
     })
   })
@@ -92,8 +91,8 @@ const PagoPAConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     SERVICES: t.interface({
-      PAYMENTS_CHECK: NonEmptyString,
-      PAYMENTS_ACTIVATION: NonEmptyString
+      VERIFICA_RPT: NonEmptyString,
+      ATTIVA_RPT: NonEmptyString
     }),
     IDENTIFIER: t.interface({
       IDENTIFICATIVO_PSP: NonEmptyString,
