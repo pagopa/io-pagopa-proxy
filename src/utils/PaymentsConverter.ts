@@ -1,6 +1,6 @@
 /**
  * Payments Converter
- * Data Converter for Payments Request\Responses between PagoPa and BackendAPP types
+ * Data Converter for Payments Request\Responses between PagoPA and BackendAPP types
  */
 import { Either, left, right } from "fp-ts/lib/Either";
 import { Validation } from "io-ts";
@@ -11,33 +11,33 @@ import {
   InodoVerificaRPTInput,
   InodoVerificaRPTOutput
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { PagoPaConfig } from "../Configuration";
-import { CodiceContestoPagamento } from "../types/CodiceContestoPagamento";
-import { PaymentsActivationRequest } from "../types/PaymentsActivationRequest";
-import { PaymentsActivationResponse } from "../types/PaymentsActivationResponse";
-import { PaymentsCheckRequest } from "../types/PaymentsCheckRequest";
-import { PaymentsCheckResponse } from "../types/PaymentsCheckResponse";
+import { PagoPAConfig } from "../Configuration";
+import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
+import { PaymentsActivationRequest } from "../types/api/PaymentsActivationRequest";
+import { PaymentsActivationResponse } from "../types/api/PaymentsActivationResponse";
+import { PaymentsCheckRequest } from "../types/api/PaymentsCheckRequest";
+import { PaymentsCheckResponse } from "../types/api/PaymentsCheckResponse";
 
 /**
- * Convert PaymentsCheckRequest (BackendApp request) to InodoVerificaRPTInput (PagoPa request)
- * @param {PagoPaConfig} pagoPaConfig - PagoPa config, containing static information to put into response
+ * Convert PaymentsCheckRequest (BackendApp request) to InodoVerificaRPTInput (PagoPA request)
+ * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
  * @param {PaymentsCheckRequest} paymentsCheckRequest - Message to convert
- * @param {CodiceContestoPagamento} codiceContestoPagamento - Session Identifier to put into response
+ * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
  * @return {Either<Error, InodoVerificaRPTInput>} Converted object
  */
-export function getPaymentsCheckRequestPagoPa(
-  pagoPaConfig: PagoPaConfig,
+export function getPaymentsCheckRequestPagoPA(
+  pagoPAConfig: PagoPAConfig,
   paymentsCheckRequest: PaymentsCheckRequest,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, InodoVerificaRPTInput> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
     return right({
-      identificativoPSP: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+      identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
-        pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      identificativoCanale: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPaConfig.IDENTIFIER.TOKEN,
+        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIER.TOKEN,
       codiceContestoPagamento,
       codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
       codiceIdRPT: {
@@ -53,9 +53,9 @@ export function getPaymentsCheckRequestPagoPa(
 }
 
 /**
- * Convert InodoVerificaRPTOutput (PagoPa response) to \ (BackendApp response)
+ * Convert InodoVerificaRPTOutput (PagoPA response) to \ (BackendApp response)
  * @param {InodoVerificaRPTOutput} iNodoVerificaRPTOutput - Message to convert
- * @param {CodiceContestoPagamento} codiceContestoPagamento - Session Identifier to put into response
+ * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
  * @return {Validation<PaymentsCheckResponse>} Converted object
  */
 export function getPaymentsCheckResponse(
@@ -94,29 +94,29 @@ export function getPaymentsCheckResponse(
 }
 
 /**
- * Convert PaymentsActivationRequest (BackendApp request) to InodoAttivaRPTInput (PagoPa request)
- * @param {PagoPaConfig} pagoPaConfig - PagoPa config, containing static information to put into response
+ * Convert PaymentsActivationRequest (BackendApp request) to InodoAttivaRPTInput (PagoPA request)
+ * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
  * @param {PaymentsActivationRequest} paymentsActivationRequest - Message to convert
  * @return {Either<Error, InodoAttivaRPTInput>} Converted object
  */
-export function getPaymentsActivationRequestPagoPa(
-  pagoPaConfig: PagoPaConfig,
+export function getPaymentsActivationRequestPagoPA(
+  pagoPAConfig: PagoPAConfig,
   paymentsActivationRequest: PaymentsActivationRequest
 ): Either<Error, InodoAttivaRPTInput> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
     return right({
-      identificativoPSP: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+      identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
-        pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      identificativoCanale: pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPaConfig.IDENTIFIER.TOKEN,
+        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIER.TOKEN,
       codiceContestoPagamento:
         paymentsActivationRequest.codiceContestoPagamento,
       identificativoIntermediarioPSPPagamento:
-        pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanalePagamento:
-        pagoPaConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
       codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
       codiceIdRPT: {
         CF: paymentsActivationRequest.codiceIdRPT.CF,
@@ -135,7 +135,7 @@ export function getPaymentsActivationRequestPagoPa(
 }
 
 /**
- * Convert InodoAttivaRPTOutput (PagoPa response) to PaymentsActivationResponse (BackendApp response)
+ * Convert InodoAttivaRPTOutput (PagoPA response) to PaymentsActivationResponse (BackendApp response)
  * @param {InodoAttivaRPTOutput} iNodoAttivaRPTOutput - Message to convert
  * @return {Validation<PaymentsActivationResponse>} Converted object
  */

@@ -10,5 +10,9 @@
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
 import * as t from "io-ts";
 
+/**
+ * Amount for payments
+ */
+
 export type Importo = t.TypeOf<typeof Importo>;
 export const Importo = WithinRangeNumber(0.11, 999999.99);

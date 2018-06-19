@@ -11,6 +11,10 @@ import { Importo } from "./Importo";
 import * as t from "io-ts";
 import { WithinRangeString } from "italia-ts-commons/lib/strings";
 
+/**
+ * Amount related to a single element of a payment installments
+ */
+
 // required attributes
 const SpezzoneStrutturatoCausaleVersamentoR = t.interface({});
 

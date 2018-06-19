@@ -13,7 +13,7 @@ import { NonNegativeNumber } from "italia-ts-commons/lib/numbers";
 import { PatternString } from "italia-ts-commons/lib/strings";
 
 /**
- * Identify a payment (qrcode information)
+ * Identify a payment
  */
 
 // required attributes

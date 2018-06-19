@@ -11,6 +11,10 @@ import { SpezzoneStrutturatoCausaleVersamento } from "./SpezzoneStrutturatoCausa
 import * as t from "io-ts";
 import { WithinRangeString } from "italia-ts-commons/lib/strings";
 
+/**
+ * Single element of a payment installments
+ */
+
 // required attributes
 const SpezzoniCausaleVersamentoItemR = t.interface({});
 

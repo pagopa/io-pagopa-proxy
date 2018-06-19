@@ -11,6 +11,10 @@ import * as t from "io-ts";
 import { WithinRangeString } from "italia-ts-commons/lib/strings";
 import { PatternString } from "italia-ts-commons/lib/strings";
 
+/**
+ * Beneficiary institution related to a payment
+ */
+
 // required attributes
 const EnteBeneficiarioR = t.interface({
   identificativoUnivocoBeneficiario: WithinRangeString(1, 35),

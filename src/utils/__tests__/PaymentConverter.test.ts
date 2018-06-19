@@ -7,19 +7,16 @@ import {
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { NonNegativeNumber } from "italia-ts-commons/lib/numbers";
 import { WithinRangeString } from "italia-ts-commons/lib/strings";
-import { CONFIG as Config, PagoPaConfig } from "../../Configuration";
+import { CONFIG as Config, PagoPAConfig } from "../../Configuration";
+import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
+import { FiscalCode } from "../../types/api/FiscalCode";
+import { Importo } from "../../types/api/Importo";
+import { PaymentsActivationRequest } from "../../types/api/PaymentsActivationRequest";
+import { PaymentsCheckRequest } from "../../types/api/PaymentsCheckRequest";
 import {
-  CodiceContestoPagamento,
-  FiscalCode,
-  Importo,
-  IUV
-} from "../../types/CommonTypes";
-import { PaymentsActivationRequest } from "../../types/PaymentsActivationRequest";
-import { PaymentsCheckRequest } from "../../types/PaymentsCheckRequest";
-import {
-  getPaymentsActivationRequestPagoPa,
+  getPaymentsActivationRequestPagoPA,
   getPaymentsActivationResponse,
-  getPaymentsCheckRequestPagoPa,
+  getPaymentsCheckRequestPagoPA,
   getPaymentsCheckResponse
 } from "../PaymentsConverter";
 
@@ -291,7 +288,7 @@ const aPaymentCheckRequestOk: PaymentsCheckRequest = {
   codiceIdRPT: {
     CF: "DVCMCD99D30E611V" as FiscalCode,
     AuxDigit: 0 as NonNegativeNumber,
-    CodIUV: "010101010101010" as IUV,
+    CodIUV: "010101010101010",
     CodStazPA: "22"
   }
 };
@@ -305,7 +302,7 @@ const aPaymentActivationRequest: PaymentsActivationRequest = {
   codiceIdRPT: {
     CF: "DVCMCD99D30E611V" as FiscalCode,
     AuxDigit: 0 as NonNegativeNumber,
-    CodIUV: "010101010101010" as IUV,
+    CodIUV: "010101010101010",
     CodStazPA: "22"
   },
   importoSingoloVersamento: 99.05 as Importo,
@@ -319,7 +316,7 @@ const aConfig = {
     PAYMENTS_CHECK: "nodoVerificaRPT",
     PAYMENTS_ACTIVATION: "nodoAttivaRPT"
   },
-  // These information will identify our system when it will access to PagoPa
+  // These information will identify our system when it will access to PagoPA
   IDENTIFIER: {
     IDENTIFICATIVO_PSP: "AGID_01",
     IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
@@ -328,10 +325,10 @@ const aConfig = {
   }
 };
 
-describe("getPaymentsCheckRequestPagoPa", () => {
+describe("getPaymentsCheckRequestPagoPA", () => {
   it("should convert PaymentCheckRequest to InodoVerificaRPTInput", async () => {
-    const errorOrNodoVerificaRPTInput = getPaymentsCheckRequestPagoPa(
-      aConfig as PagoPaConfig,
+    const errorOrNodoVerificaRPTInput = getPaymentsCheckRequestPagoPA(
+      aConfig as PagoPAConfig,
       aPaymentCheckRequestOk,
       aCodiceContestoPagamento
     );
@@ -425,10 +422,10 @@ describe("getPaymentsCheckResponse", () => {
   });
 });
 
-describe("getPaymentsActivationRequestPagoPa", () => {
+describe("getPaymentsActivationRequestPagoPA", () => {
   it("should convert PaymentsActivationRequest to InodoAttivaRPTInput", () => {
-    const errorOrNodoAttivaRPTInput = getPaymentsActivationRequestPagoPa(
-      aConfig as PagoPaConfig,
+    const errorOrNodoAttivaRPTInput = getPaymentsActivationRequestPagoPA(
+      aConfig as PagoPAConfig,
       aPaymentActivationRequest
     );
     expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
@@ -436,7 +433,7 @@ describe("getPaymentsActivationRequestPagoPa", () => {
       codiceIdRPT: {
         CF: "DVCMCD99D30E611V" as FiscalCode,
         AuxDigit: "0",
-        CodIUV: "010101010101010" as IUV,
+        CodIUV: "010101010101010",
         CodStazPA: "22"
       }
     });

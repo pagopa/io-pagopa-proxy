@@ -8,14 +8,14 @@ import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as fs from "fs";
 import * as http from "http";
-import { clients as pagoPaSoapClient } from "italia-pagopa-api";
+import { clients as pagoPASoapClient } from "italia-pagopa-api";
 import { FespCdService_WSDL_PATH } from "italia-pagopa-api/dist/lib/wsdl-paths";
 import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as redis from "redis";
 import * as soap from "soap";
-import { specs as publicApiV1Specs } from "./api/public_api_payments";
+import { specs as publicApiV1Specs } from "./api/public_api_pagopa";
 import { CONFIG, Configuration } from "./Configuration";
 import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
@@ -28,20 +28,20 @@ import { logger } from "./utils/Logger";
  * @return {Promise<http.Server>} The express server defined and started
  */
 export async function startApp(config: Configuration): Promise<http.Server> {
-  logger.info("Starting Proxy PagoPa Server...");
+  logger.info("Starting Proxy PagoPA Server...");
 
   // Define SOAP Clients for PagoPA SOAP WS
-  // It is necessary to forward BackendApp requests to PagoPa
-  const verificaRPTPagoPaClient = new pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient(
-    await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient({
+  // It is necessary to forward BackendApp requests to PagoPA
+  const verificaRPTPagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
+    await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
         config.PAGOPA.SERVICES.PAYMENTS_CHECK
       }`,
       envelopeKey: PPTPortTypes.envelopeKey
     })
   );
-  const attivaRPTPagoPaClient = new pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient(
-    await pagoPaSoapClient.createPagamentiTelematiciPspNodoClient({
+  const attivaRPTPagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
+    await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
         config.PAGOPA.SERVICES.PAYMENTS_ACTIVATION
       }`,
@@ -63,8 +63,8 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     app,
     config,
     redisClient,
-    verificaRPTPagoPaClient,
-    attivaRPTPagoPaClient
+    verificaRPTPagoPAClient,
+    attivaRPTPagoPAClient
   );
   getSoapServer(
     redisClient,
@@ -80,22 +80,24 @@ export async function startApp(config: Configuration): Promise<http.Server> {
 }
 
 export function stopServer(server: http.Server): void {
-  logger.info("Stopping Proxy PagoPa Server...");
+  logger.info("Stopping Proxy PagoPA Server...");
   server.close();
 }
 
 /**
  * Set RESTful WS endpoints
- * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPa
- * @param {redisTimeout} number - The timeout to use for information stored into redis
- * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
+ * @param {core.Express} app - Express server to set
+ * @param {Configuration} config - PagoPa proxy configuration
+ * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPA
+ * @param {PagamentiTelematiciPspNodoAsyncClient} verificaRPTPagoPAClient - PagoPa SOAP client to call verificaRPT service
+ * @param {PagamentiTelematiciPspNodoAsyncClient} attivaRPTPagoPAClient - PagoPa SOAP client to call attivaRPT service
  */
 function setRestfulRoutes(
   app: core.Express,
   config: Configuration,
   redisClient: redis.RedisClient,
-  verificaRPTPagoPaClient: pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient,
-  attivaRPTPagoPaClient: pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient
+  verificaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient,
+  attivaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): void {
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENTS_CHECK,
@@ -104,10 +106,7 @@ function setRestfulRoutes(
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
-        PaymentController.checkPaymentToPagoPa(
-          config.PAGOPA,
-          verificaRPTPagoPaClient
-        )
+        PaymentController.checkPayment(config.PAGOPA, verificaRPTPagoPAClient)
       )(req, res);
     }
   );
@@ -118,10 +117,7 @@ function setRestfulRoutes(
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
-        PaymentController.activatePaymentToPagoPa(
-          config.PAGOPA,
-          attivaRPTPagoPaClient
-        )
+        PaymentController.activatePayment(config.PAGOPA, attivaRPTPagoPAClient)
       )(req, res);
     }
   );
@@ -142,8 +138,8 @@ function setRestfulRoutes(
 }
 
 /**
- * Define and return a method to start a SOAP Server for PagoPa
- * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPa
+ * Define and return a method to start a SOAP Server for PagoPA
+ * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPA
  * @param {redisTimeout} redisTimeout - The timeout to use for information stored into redis
  * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
  */

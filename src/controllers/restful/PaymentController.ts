@@ -5,7 +5,7 @@
 
 import * as express from "express";
 import { isLeft } from "fp-ts/lib/Either";
-import { clients as pagoPaSoapClient } from "italia-pagopa-api";
+import { clients as pagoPASoapClient } from "italia-pagopa-api";
 import {
   Esito,
   IcdInfoPagamentoInput,
@@ -25,27 +25,27 @@ import {
 import * as redis from "redis";
 import { promisify } from "util";
 import * as uuid from "uuid";
-import { PagoPaConfig } from "../../Configuration";
+import { PagoPAConfig } from "../../Configuration";
 import * as PaymentsService from "../../services/PaymentsService";
-import { CodiceContestoPagamento } from "../../types/CodiceContestoPagamento";
-import { PaymentsActivationRequest } from "../../types/PaymentsActivationRequest";
-import { PaymentsActivationResponse } from "../../types/PaymentsActivationResponse";
-import { PaymentsActivationStatusCheckResponse } from "../../types/PaymentsActivationStatusCheckResponse";
-import { PaymentsCheckRequest } from "../../types/PaymentsCheckRequest";
-import { PaymentsCheckResponse } from "../../types/PaymentsCheckResponse";
+import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
+import { PaymentsActivationRequest } from "../../types/api/PaymentsActivationRequest";
+import { PaymentsActivationResponse } from "../../types/api/PaymentsActivationResponse";
+import { PaymentsActivationStatusCheckResponse } from "../../types/api/PaymentsActivationStatusCheckResponse";
+import { PaymentsCheckRequest } from "../../types/api/PaymentsCheckRequest";
+import { PaymentsCheckResponse } from "../../types/api/PaymentsCheckResponse";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 
 /**
  * This controller is invoked by BackendApp
- * to retrieve information about a qrcode (payment).
- * It asks PagoPa for payment information using VerificaRPT service.
+ * to retrieve information about a payment.
+ * It asks PagoPA for payment information using VerificaRPT service.
  * @param {express.Request} req - The RESTful request
- * @param {PagoPaConfig} pagoPaConfig - Configuration about PagoPa WS to contact
+ * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentsActivationResponse>>} The response content to send to applicant
  */
-export function checkPaymentToPagoPa(
-  pagoPaConfig: PagoPaConfig,
-  paymentVerificaRPTPagoPaClient: pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient
+export function checkPayment(
+  pagoPAConfig: PagoPAConfig,
+  paymentVerificaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<
@@ -56,7 +56,7 @@ export function checkPaymentToPagoPa(
   | IResponseSuccessJson<PaymentsCheckResponse>
 > {
   return async req => {
-    // Validate qrcode data provided by BackendApp
+    // Validate payment data provided by BackendApp
     const errorOrPaymentsCheckRequest = PaymentsCheckRequest.decode(req.params);
     if (isLeft(errorOrPaymentsCheckRequest)) {
       const error = errorOrPaymentsCheckRequest.value;
@@ -64,56 +64,56 @@ export function checkPaymentToPagoPa(
     }
     const paymentsCheckRequest = errorOrPaymentsCheckRequest.value;
 
-    // Generate a Session Token called CodiceContestoPagamento
-    // to follow a stream of requests with PagoPa.
+    // Generate a Transaction ID called CodiceContestoPagamento
+    // to follow a stream of requests with PagoPA.
     // It will be generated here after the first interaction
-    // started by BackendApp (checkPaymentToPagoPa)
+    // started by BackendApp (checkPayment)
     // For the next messages, BackendApp will provide the same codiceContestoPagamento
     const codiceContestoPagamento = generateCodiceContestoPagamento();
 
-    // Convert the input provided by BackendApp (RESTful request) to a PagoPa request (SOAP request).
-    // Some static information will be obtained by pagoPaConfig, to identify this client.
-    const errorOrPaymentCheckRequestPagoPa = PaymentsConverter.getPaymentsCheckRequestPagoPa(
-      pagoPaConfig,
+    // Convert the input provided by BackendApp (RESTful request) to a PagoPA request (SOAP request).
+    // Some static information will be obtained by PagoPAConfig, to identify this client.
+    const errorOrPaymentCheckRequestPagoPA = PaymentsConverter.getPaymentsCheckRequestPagoPA(
+      pagoPAConfig,
       paymentsCheckRequest,
       codiceContestoPagamento
     );
-    if (isLeft(errorOrPaymentCheckRequestPagoPa)) {
-      const error = errorOrPaymentCheckRequestPagoPa.value;
+    if (isLeft(errorOrPaymentCheckRequestPagoPA)) {
+      const error = errorOrPaymentCheckRequestPagoPA.value;
       return ResponseErrorValidation(
-        "Invalid PagoPa check Request",
+        "Invalid PagoPA check Request",
         error.message
       );
     }
-    const paymentCheckRequestPagoPa = errorOrPaymentCheckRequestPagoPa.value;
+    const paymentCheckRequestPagoPA = errorOrPaymentCheckRequestPagoPA.value;
 
-    // Send the SOAP request to PagoPa (VerificaRPT message)
-    const errorOrPaymentCheckPagoPaResponse = await PaymentsService.sendPaymentCheckRequestToPagoPa(
-      paymentCheckRequestPagoPa,
-      paymentVerificaRPTPagoPaClient
+    // Send the SOAP request to PagoPA (VerificaRPT message)
+    const errorOrPaymentCheckPagoPAResponse = await PaymentsService.sendPaymentCheckRequest(
+      paymentCheckRequestPagoPA,
+      paymentVerificaRPTPagoPAClient
     );
-    if (isLeft(errorOrPaymentCheckPagoPaResponse)) {
-      const error = errorOrPaymentCheckPagoPaResponse.value;
+    if (isLeft(errorOrPaymentCheckPagoPAResponse)) {
+      const error = errorOrPaymentCheckPagoPAResponse.value;
       return ResponseErrorInternal(
-        `PagoPa Server communication error: ${error.message}`
+        `PagoPA Server communication error: ${error.message}`
       );
     }
-    const paymentCheckPagoPaResponse = errorOrPaymentCheckPagoPaResponse.value;
+    const paymentCheckPagoPAResponse = errorOrPaymentCheckPagoPAResponse.value;
 
-    // Check PagoPa response content.
+    // Check PagoPA response content.
     // If it contains an error, an HTTP error will be provided to BackendApp
     if (
-      paymentCheckPagoPaResponse.nodoVerificaRPTRisposta.esito ===
+      paymentCheckPagoPAResponse.nodoVerificaRPTRisposta.esito ===
       PPTPortTypes.Esito.KO
     ) {
       return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
-    // Convert the output provided by PagoPa (SOAP response)
+    // Convert the output provided by PagoPA (SOAP response)
     // to a BackendApp response (RESTful response), mapping the result information.
     // Send a response to BackendApp
     return PaymentsConverter.getPaymentsCheckResponse(
-      paymentCheckPagoPaResponse,
+      paymentCheckPagoPAResponse,
       codiceContestoPagamento
     ).fold<
       IResponseErrorValidation | IResponseSuccessJson<PaymentsCheckResponse>
@@ -126,17 +126,17 @@ export function checkPaymentToPagoPa(
 
 /**
  * This controller will be invoked by BackendApp.
- * It's necessary to start the payment process for a specific qrcode (payment).
- * It will require the payment lock to PagoPa (AttivaRPT service) to avoid concurrency problems.
+ * It's necessary to start the payment process for a specific payment.
+ * It will require the payment lock to PagoPA (AttivaRPT service) to avoid concurrency problems.
  * This request result will confirm the taking charge about the payment lock request.
- * If success, it will be necessary to wait an async response from PagoPa.
+ * If success, it will be necessary to wait an async response from PagoPA.
  * @param {express.Request} req - The RESTful request
- * @param {PagoPaConfig} pagoPaConfig - Configuration about PagoPa WS to contact
+ * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentsActivationResponse>>} The response content to send to applicant
  */
-export function activatePaymentToPagoPa(
-  pagoPaConfig: PagoPaConfig,
-  attivaRPTPagoPaClient: pagoPaSoapClient.PagamentiTelematiciPspNodoAsyncClient
+export function activatePayment(
+  pagoPAConfig: PagoPAConfig,
+  attivaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<
@@ -159,51 +159,51 @@ export function activatePaymentToPagoPa(
     const paymentsActivationRequest = errorOrPaymentsActivationRequest.value;
 
     // Convert the input provided by BackendApp (RESTful request)
-    // to a PagoPa request (SOAP request), mapping useful information
-    // Some static information will be obtained by pagoPaConfig, to identify this client
+    // to a PagoPA request (SOAP request), mapping useful information
+    // Some static information will be obtained by PagoPAConfig, to identify this client
     // If something wrong into input will be detected during mapping, and error will be provided as response
-    const errorOrPaymentsActivationRequestPagoPa = PaymentsConverter.getPaymentsActivationRequestPagoPa(
-      pagoPaConfig,
+    const errorOrPaymentsActivationRequestPagoPA = PaymentsConverter.getPaymentsActivationRequestPagoPA(
+      pagoPAConfig,
       paymentsActivationRequest
     );
-    if (isLeft(errorOrPaymentsActivationRequestPagoPa)) {
-      const error = errorOrPaymentsActivationRequestPagoPa.value;
+    if (isLeft(errorOrPaymentsActivationRequestPagoPA)) {
+      const error = errorOrPaymentsActivationRequestPagoPA.value;
       return ResponseErrorValidation(
-        "Invalid PagoPa activation Request",
+        "Invalid PagoPA activation Request",
         error.message
       );
     }
-    const paymentsActivationRequestPagoPa =
-      errorOrPaymentsActivationRequestPagoPa.value;
+    const paymentsActivationRequestPagoPA =
+      errorOrPaymentsActivationRequestPagoPA.value;
 
-    // Send the SOAP request to PagoPa (AttivaRPT message)
-    const errorOrPaymentActivationPagoPaResponse = await PaymentsService.sendPaymentsActivationRequestToPagoPaAPI(
-      paymentsActivationRequestPagoPa,
-      attivaRPTPagoPaClient
+    // Send the SOAP request to PagoPA (AttivaRPT message)
+    const errorOrPaymentActivationPagoPAResponse = await PaymentsService.sendPaymentsActivationRequest(
+      paymentsActivationRequestPagoPA,
+      attivaRPTPagoPAClient
     );
-    if (isLeft(errorOrPaymentActivationPagoPaResponse)) {
-      const error = errorOrPaymentActivationPagoPaResponse.value;
+    if (isLeft(errorOrPaymentActivationPagoPAResponse)) {
+      const error = errorOrPaymentActivationPagoPAResponse.value;
       return ResponseErrorInternal(
-        `PagoPa Server communication error: ${error.message}`
+        `PagoPA Server communication error: ${error.message}`
       );
     }
-    const paymentActivationPagoPaResponse =
-      errorOrPaymentActivationPagoPaResponse.value;
+    const paymentActivationPagoPAResponse =
+      errorOrPaymentActivationPagoPAResponse.value;
 
-    // Check PagoPa response content.
+    // Check PagoPA response content.
     // If it contains an error, an HTTP error will be provided to BackendApp
     if (
-      paymentActivationPagoPaResponse.nodoAttivaRPTRisposta.esito ===
+      paymentActivationPagoPAResponse.nodoAttivaRPTRisposta.esito ===
       PPTPortTypes.Esito.KO
     ) {
       return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
-    // Convert the output provided by PagoPa (SOAP response)
+    // Convert the output provided by PagoPA (SOAP response)
     // to a BackendApp response (RESTful response), mapping the result information.
     // Send a response to BackendApp
     return PaymentsConverter.getPaymentsActivationResponse(
-      paymentActivationPagoPaResponse
+      paymentActivationPagoPAResponse
     ).fold<
       | IResponseErrorValidation
       | IResponseSuccessJson<PaymentsActivationResponse>
@@ -215,13 +215,13 @@ export function activatePaymentToPagoPa(
 }
 
 /**
- * This controller is invoked by PagoPa that provides a paymentId
+ * This controller is invoked by PagoPA that provides a paymentId
  * related to a previous async request (attivaRPT)
  * It just store this information into redis db. This information will be retrieved by App using polling
- * @param {IcdInfoPagamentoInput} cdInfoPagamentoInput - The request from PagoPa
+ * @param {IcdInfoPagamentoInput} cdInfoPagamentoInput - The request from PagoPA
  * @param {RedisTimeout} redisTimeout - The expiration timeout for the information to store
  * @param {RedisClient} redisClient - The redis client used to store the paymentId
- * @param {(cdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void} callback - Callback function to send a feedback to PagoPa
+ * @param {(cdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void} callback - Callback function to send a feedback to PagoPA
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
 export function updatePaymentActivationStatusIntoDB(
@@ -253,7 +253,7 @@ export function updatePaymentActivationStatusIntoDB(
 
 /**
  * This controller is invoked by BackendApp to check the status of a previous activation request (async process)
- * If PagoPa sent an activation result (via cdInfoPagamento), a paymentId will be retrieved into redis
+ * If PagoPA sent an activation result (via cdInfoPagamento), a paymentId will be retrieved into redis
  * The paymentId is necessary for App to proceed with the payment process
  * @param {redis.RedisClient} redisClient - The redis client used to retrieve the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
@@ -270,7 +270,7 @@ export function checkPaymentActivationStatusFromDB(
   | IResponseSuccessJson<PaymentsActivationStatusCheckResponse>
 > {
   return async req => {
-    // Validate codiceContestoPagamento (session token) data provided by BackendApp
+    // Validate codiceContestoPagamento (transaction id) data provided by BackendApp
     const errorOrCodiceContestoPagamento = CodiceContestoPagamento.decode(
       req.params.codiceContestoPagamento
     );
@@ -308,12 +308,12 @@ export function checkPaymentActivationStatusFromDB(
 }
 
 /**
- * Generate a Session Token based on uuid (timestamp + random)
- * to follow a stream of requests with PagoPa.
+ * Generate a Transaction ID based on uuid (timestamp + random)
+ * to follow a stream of requests with PagoPA.
  * It will be generated here after the first interaction
- * started by BackendApp (checkPaymentToPagoPa)
+ * started by BackendApp (checkPayment)
  * For the next messages, BackendApp will provide the same codiceContestoPagamento
- * @return {Either<Error,CodiceContestoPagamento>} The generated token or an internal error
+ * @return {Either<Error,CodiceContestoPagamento>} The generated id or an internal error
  */
 function generateCodiceContestoPagamento(): CodiceContestoPagamento {
   return uuid.v1() as CodiceContestoPagamento;

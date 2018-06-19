@@ -1,5 +1,5 @@
 /**
- * Common configurations for Proxy PagoPa and external resources
+ * Common configurations for Proxy PagoPA and external resources
  */
 
 import * as t from "io-ts";
@@ -33,10 +33,10 @@ export const CONFIG = {
     }
   },
 
-  // PagoPa Configuration
+  // PagoPA Configuration
   // Ask the pagopa service administrator.
   // These values are the same for test and production environment
-  // Used to communicate with PagoPa
+  // Used to communicate with PagoPA
   PAGOPA: {
     HOST: process.env.PAGOPA_HOST || localhost,
     PORT: process.env.PAGOPA_PORT || 3001,
@@ -44,7 +44,7 @@ export const CONFIG = {
       PAYMENTS_CHECK: "nodoVerificaRPT",
       PAYMENTS_ACTIVATION: "nodoAttivaRPT"
     },
-    // These information will identify our system when it will access to PagoPa
+    // These information will identify our system when it will access to PagoPA
     IDENTIFIER: {
       IDENTIFICATIVO_PSP: "AGID_01",
       IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
@@ -88,7 +88,7 @@ const ControllerConfig = t.intersection([
 ]);
 export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 
-const PagoPaConfig = t.intersection([
+const PagoPAConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     SERVICES: t.interface({
@@ -103,7 +103,7 @@ const PagoPaConfig = t.intersection([
     })
   })
 ]);
-export type PagoPaConfig = t.TypeOf<typeof PagoPaConfig>;
+export type PagoPAConfig = t.TypeOf<typeof PagoPAConfig>;
 
 export const WinstonLogLevel = t.keyof({
   error: 0,
@@ -115,7 +115,7 @@ export type WinstonLogLevel = t.TypeOf<typeof WinstonLogLevel>;
 export const Configuration = t.interface({
   WINSTON_LOG_LEVEL: WinstonLogLevel,
   CONTROLLER: ControllerConfig,
-  PAGOPA: PagoPaConfig,
+  PAGOPA: PagoPAConfig,
   PAYMENT_ACTIVATION_STATUS_TIMEOUT: t.number,
   REDIS_DB: ServerConfiguration
 });

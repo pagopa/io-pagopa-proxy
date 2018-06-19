@@ -7,12 +7,17 @@
 /* tslint:disable:no-any */
 /* tslint:disable:object-literal-sort-keys */
 
-import { WithinRangeString } from "italia-ts-commons/lib/strings";
 import * as t from "io-ts";
+import { SpezzoniCausaleVersamentoItem } from "./SpezzoniCausaleVersamentoItem";
 
 /**
- * Session Id used to identify the communication flow
+ * Payment installments (optional)
  */
 
-export type CodiceContestoPagamento = t.TypeOf<typeof CodiceContestoPagamento>;
-export const CodiceContestoPagamento = WithinRangeString(1, 35);
+export type SpezzoniCausaleVersamento = t.TypeOf<
+  typeof SpezzoniCausaleVersamento
+>;
+export const SpezzoniCausaleVersamento = t.readonlyArray(
+  SpezzoniCausaleVersamentoItem,
+  "array of SpezzoniCausaleVersamentoItem"
+);
