@@ -2329,6 +2329,10 @@ italia-ts-commons@^2.1.0:
     json-set-map "^1.0.2"
     validator "^10.1.0"
 
+italia-tslint-rules@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/italia-tslint-rules/-/italia-tslint-rules-0.1.1.tgz#b150373925a268ff892a545229708484ac0533ba"
+
 jest-changed-files@^22.2.0:
   version "22.4.3"
   resolved "https://registry.yarnpkg.com/jest-changed-files/-/jest-changed-files-22.4.3.tgz#8882181e022c38bd46a2e4d18d44d19d90a90fb2"
