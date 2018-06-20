@@ -29,6 +29,7 @@
     "@types/winston": "^2.3.9",
     "danger": "^3.7.16",
     "danger-plugin-digitalcitizenship": "^0.3.1",
+    "italia-tslint-rules": "^0.1.1",
     "jest": "^22.4.4",
     "npm-run-all": "^4.1.3",
     "prettier": "^1.13.5",
