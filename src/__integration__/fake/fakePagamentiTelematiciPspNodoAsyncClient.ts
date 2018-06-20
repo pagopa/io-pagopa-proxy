@@ -24,7 +24,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.Pagamenti
     return new Promise<
       PagamentiTelematiciPspNodoService.InodoVerificaRPTOutput
     >((resolve, reject) => {
-      if (input !== undefined) {
+      if (input.codiceIdRPT.CodStazPA === "22") {
         resolve({
           nodoVerificaRPTRisposta: {
             fault: {
@@ -72,5 +72,61 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.Pagamenti
         reject("Invaild input");
       }
     });
+  };
+
+  public readonly nodoAttivaRPT = (
+    input: PagamentiTelematiciPspNodoService.InodoAttivaRPTInput
+  ) => {
+    return new Promise<PagamentiTelematiciPspNodoService.InodoAttivaRPTOutput>(
+      (resolve, reject) => {
+        if (input.codiceIdRPT.CodStazPA === "22") {
+          resolve({
+            nodoAttivaRPTRisposta: {
+              fault: {
+                faultCode: "01",
+                faultString: "FAULTSTRING",
+                id: "ID01",
+                description: "FAULTDESCRIPTION",
+                serial: 1
+              },
+              esito: PagamentiTelematiciPspNodoService.PPTPortTypes.Esito.OK,
+              datiPagamentoPA: {
+                importoSingoloVersamento: 99.05,
+                ibanAccredito: "IT17X0605502100000001234567",
+                bicAccredito: "BPPIITRR",
+                enteBeneficiario: {
+                  identificativoUnivocoBeneficiario: {
+                    tipoIdentificativoUnivoco: "G",
+                    codiceIdentificativoUnivoco: "001"
+                  },
+                  denominazioneBeneficiario: "BANCA01",
+                  codiceUnitOperBeneficiario: "01",
+                  denomUnitOperBeneficiario: "DENOM01",
+                  indirizzoBeneficiario: "VIAROMA",
+                  civicoBeneficiario: "01",
+                  capBeneficiario: "00000",
+                  localitaBeneficiario: "ROMA",
+                  provinciaBeneficiario: "ROMA",
+                  nazioneBeneficiario: "IT"
+                },
+                credenzialiPagatore: "NOMECOGNOME",
+                causaleVersamento: "CAUSALE01",
+                spezzoniCausaleVersamento: [
+                  {
+                    spezzoneCausaleVersamento: "SPEZZONE1",
+                    spezzoneStrutturatoCausaleVersamento: {
+                      causaleSpezzone: "CAUSALE01",
+                      importoSpezzone: 99.05
+                    }
+                  }
+                ]
+              }
+            }
+          });
+        } else {
+          reject("Invaild input");
+        }
+      }
+    );
   };
 }
