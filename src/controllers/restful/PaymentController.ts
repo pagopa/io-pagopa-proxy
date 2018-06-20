@@ -91,7 +91,6 @@ export function checkPaymentToPagoPa(
       );
     }
     const paymentCheckPagoPaResponse = errorOrPaymentCheckPagoPaResponse.value;
-
     // Check PagoPa response content.
     // If it contains an error, an HTTP error will be provided to BackendApp
     if (
@@ -104,6 +103,7 @@ export function checkPaymentToPagoPa(
     // Convert the output provided by PagoPa (SOAP response)
     // to a BackendApp response (RESTful response), mapping the result information.
     // Send a response to BackendApp
+
     return PaymentsConverter.getPaymentsCheckResponse(
       paymentCheckPagoPaResponse,
       codiceContestoPagamento

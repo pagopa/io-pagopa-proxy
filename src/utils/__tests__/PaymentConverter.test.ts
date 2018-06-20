@@ -5,7 +5,6 @@ import {
   InodoVerificaRPTOutput,
   PPTPortTypes
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { WithinRangeString } from "italia-ts-commons/lib/strings";
 import { CONFIG as Config, PagoPaConfig } from "../../Configuration";
 import {
   CodiceContestoPagamento,
@@ -295,10 +294,7 @@ const aPaymentCheckRequestOk: PaymentsCheckRequest = {
   }
 };
 
-const aCodiceContestoPagamento: CodiceContestoPagamento = "12345" as WithinRangeString<
-  1,
-  35
->;
+const aCodiceContestoPagamento: CodiceContestoPagamento = "8447a9f0-7468-11e8-9a8d-5d4209060ab0" as CodiceContestoPagamento;
 
 const aPaymentActivationRequest: PaymentsActivationRequest = {
   codiceIdRPT: {
@@ -336,7 +332,7 @@ describe("getPaymentsCheckRequestPagoPa", () => {
     );
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
     expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
-      codiceContestoPagamento: "12345"
+      codiceContestoPagamento: aCodiceContestoPagamento
     });
     expect(errorOrNodoVerificaRPTInput.value).toMatchObject({
       codificaInfrastrutturaPSP: "QR-CODE"
@@ -387,7 +383,7 @@ describe("getPaymentsCheckResponse", () => {
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "codiceContestoPagamento",
-      "12345"
+      aCodiceContestoPagamento
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "ibanAccredito",

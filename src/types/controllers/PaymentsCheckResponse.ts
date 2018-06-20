@@ -8,12 +8,12 @@ import {
   PatternString,
   WithinRangeString
 } from "italia-ts-commons/lib/strings";
-import { Iban, Importo } from "../CommonTypes";
+import { CodiceContestoPagamento, Iban, Importo } from "../CommonTypes";
 
 export const PaymentsCheckResponse = t.intersection([
   t.interface({
     importoSingoloVersamento: Importo,
-    codiceContestoPagamento: WithinRangeString(1, 35)
+    codiceContestoPagamento: CodiceContestoPagamento
   }),
   t.partial({
     ibanAccredito: Iban,
