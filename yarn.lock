@@ -2401,7 +2401,7 @@ istanbul-reports@^1.3.0:
   dependencies:
     handlebars "^4.0.3"
 
-italia-pagopa-api@teamdigitale/italia-pagopa-api#158031250-Manual-Fix-wsdl-to-ts-to-correct-type-recognition:
+italia-pagopa-api@teamdigitale/italia-pagopa-api#a16b8b3d2e3a4a6aa6757c55464e708670c46e5a:
   version "1.3.0"
   resolved "https://codeload.github.com/teamdigitale/italia-pagopa-api/tar.gz/a16b8b3d2e3a4a6aa6757c55464e708670c46e5a"
   dependencies:
