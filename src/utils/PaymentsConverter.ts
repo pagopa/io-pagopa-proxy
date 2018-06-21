@@ -9,14 +9,15 @@ import {
   InodoAttivaRPTInput,
   InodoAttivaRPTOutput,
   InodoVerificaRPTInput,
-  InodoVerificaRPTOutput
+  InodoVerificaRPTOutput,
+  PPTPortTypes
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import { RptId } from "italia-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../Configuration";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../types/api/PaymentRequestsGetResponse";
-import { RptId } from "../types/api/RptId";
 
 /**
  * Define InodoVerificaRPTInput (PagoPA request) using information provided by BackendApp
@@ -32,6 +33,7 @@ export function getInodoVerificaRPTInput(
 ): Either<Error, InodoVerificaRPTInput> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
+    const codiceIdRPT = getCodiceIdRpt(rptId);
     return right({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
@@ -40,12 +42,7 @@ export function getInodoVerificaRPTInput(
       password: pagoPAConfig.IDENTIFIER.TOKEN,
       codiceContestoPagamento,
       codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
-      codiceIdRPT: {
-        CF: getFiscalCode(rptId),
-        AuxDigit: getAuxDigit(rptId),
-        CodStazPA: getCodStazPA(rptId),
-        CodIUV: getCodIUV(rptId)
-      }
+      codiceIdRPT
     });
   } catch (exception) {
     return left(Error(exception));
@@ -65,7 +62,7 @@ export function getPaymentRequestsGetResponse(
   const datiPagamentoPA =
     iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.datiPagamentoPA;
   return PaymentRequestsGetResponse.decode({
-    importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento,
+    importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
     codiceContestoPagamento,
     ibanAccredito: datiPagamentoPA.ibanAccredito,
     causaleVersamento: datiPagamentoPA.causaleVersamento,
@@ -89,7 +86,9 @@ export function getPaymentRequestsGetResponse(
         datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
       nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
     },
-    spezzoniCausaleVersamento: datiPagamentoPA.spezzoniCausaleVersamento
+    spezzoniCausaleVersamento: getSpezzoniCausaleVersamentoForController(
+      datiPagamentoPA.spezzoniCausaleVersamento
+    )
   });
 }
 
@@ -105,6 +104,7 @@ export function getInodoAttivaRPTInput(
 ): Either<Error, InodoAttivaRPTInput> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
+    const codiceIdRPT = getCodiceIdRpt(paymentActivationsPostRequest.rptId);
     return right({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
@@ -118,15 +118,10 @@ export function getInodoAttivaRPTInput(
       identificativoCanalePagamento:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
       codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
-      codiceIdRPT: {
-        CF: getFiscalCode(paymentActivationsPostRequest.rptId),
-        AuxDigit: getAuxDigit(paymentActivationsPostRequest.rptId),
-        CodStazPA: getCodStazPA(paymentActivationsPostRequest.rptId),
-        CodIUV: getCodIUV(paymentActivationsPostRequest.rptId)
-      },
+      codiceIdRPT,
       datiPagamentoPSP: {
         importoSingoloVersamento:
-          paymentActivationsPostRequest.importoSingoloVersamento
+          paymentActivationsPostRequest.importoSingoloVersamento / 100
       }
     });
   } catch (exception) {
@@ -144,8 +139,9 @@ export function getPaymentActivationsPostResponse(
 ): Validation<PaymentActivationsPostResponse> {
   const datiPagamentoPA =
     iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA;
+
   return PaymentActivationsPostResponse.decode({
-    importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento,
+    importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
     ibanAccredito: datiPagamentoPA.ibanAccredito,
     causaleVersamento: datiPagamentoPA.causaleVersamento,
     enteBeneficiario: {
@@ -168,35 +164,68 @@ export function getPaymentActivationsPostResponse(
         datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
       nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
     },
-    spezzoniCausaleVersamento: datiPagamentoPA.spezzoniCausaleVersamento
+    spezzoniCausaleVersamento: getSpezzoniCausaleVersamentoForController(
+      datiPagamentoPA.spezzoniCausaleVersamento
+    )
   });
 }
 
-// TODO: [#158463790] Replace this methods and RptId object with a common definition to share with App
-export function getAuxDigit(rptId: string): string {
-  if (rptId !== undefined) {
-    return "0";
+/**
+ * Define a IcodiceIdRPT object to send to PagoPA Services, containing payment information
+ * Ask the pagopa service administrator or read documentation from RptId definition
+ * @param {RptId} rptId - Payment information provided by BackendApp
+ * @return {PPTPortTypes.IcodiceIdRPT} The result generated for PagoPa
+ */
+function getCodiceIdRpt(rptId: RptId): PPTPortTypes.IcodiceIdRPT {
+  switch (rptId.paymentNoticeNumber.auxDigit) {
+    case "0":
+      return {
+        CF: rptId.organizationFiscalCode,
+        AuxDigit: rptId.paymentNoticeNumber.auxDigit,
+        CodStazPA: rptId.paymentNoticeNumber.applicationCode,
+        CodIUV: rptId.paymentNoticeNumber.iuv13
+      };
+    case "1":
+      return {
+        CF: rptId.organizationFiscalCode,
+        AuxDigit: rptId.paymentNoticeNumber.auxDigit,
+        CodIUV: rptId.paymentNoticeNumber.iuv17
+      };
+    case "2":
+      return {
+        CF: rptId.organizationFiscalCode,
+        AuxDigit: rptId.paymentNoticeNumber.auxDigit,
+        CodIUV: rptId.paymentNoticeNumber.iuv15
+      };
+    case "3":
+      return {
+        CF: rptId.organizationFiscalCode,
+        AuxDigit: rptId.paymentNoticeNumber.auxDigit,
+        CodIUV: rptId.paymentNoticeNumber.iuv13
+      };
   }
-  return "ERROR";
 }
-// tslint:disable-next-line
-export function getCodIUV(rptId: string): string {
-  if (rptId !== undefined) {
-    return "010101010101010";
-  }
-  return "ERROR";
-}
-// tslint:disable-next-line
-export function getCodStazPA(rptId: string): string {
-  if (rptId !== undefined) {
-    return "22";
-  }
-  return "ERROR";
-}
-// tslint:disable-next-line
-export function getFiscalCode(rptId: string): string {
-  if (rptId !== undefined) {
-    return "DVCMCD99D30E611V";
-  }
-  return "ERROR";
+
+/**
+ * Provide SpezzoniCausaleVersamento element for BackendApp
+ * parsing the SpezzoniCausaleVersamento element provided by PagoPaProxy
+ */
+function getSpezzoniCausaleVersamentoForController(
+  spezzoniCausaleVersamento: ReadonlyArray<
+    PPTPortTypes.IspezzoniCausaleVersamento
+  >
+): ReadonlyArray<PPTPortTypes.IspezzoniCausaleVersamento> {
+  return spezzoniCausaleVersamento.map(
+    (value: PPTPortTypes.IspezzoniCausaleVersamento) => {
+      return {
+        spezzoneCausaleVersamento: value.spezzoneCausaleVersamento,
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone:
+            value.spezzoneStrutturatoCausaleVersamento.causaleSpezzone,
+          importoSpezzone:
+            value.spezzoneStrutturatoCausaleVersamento.importoSpezzone * 100
+        }
+      };
+    }
+  );
 }

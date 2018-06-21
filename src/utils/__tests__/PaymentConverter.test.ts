@@ -5,10 +5,16 @@ import {
   InodoVerificaRPTOutput,
   PPTPortTypes
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { WithinRangeString } from "italia-ts-commons/lib/strings";
+import {
+  PaymentNoticeNumber,
+  RptIdFromString
+} from "italia-ts-commons/lib/pagopa";
+import {
+  OrganizationFiscalCode,
+  WithinRangeString
+} from "italia-ts-commons/lib/strings";
 import { CONFIG as Config, PagoPAConfig } from "../../Configuration";
 import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
-import { Importo } from "../../types/api/Importo";
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import {
   getInodoAttivaRPTInput,
@@ -96,7 +102,7 @@ const aVerificaRPTOutputKoImporto: InodoVerificaRPTOutput = {
           spezzoneCausaleVersamento: "SPEZZONE1",
           spezzoneStrutturatoCausaleVersamento: {
             causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 0
+            importoSpezzone: 9999999999
           }
         }
       ]
@@ -203,7 +209,7 @@ const anAttivaRPTOutputKoImporto: InodoAttivaRPTOutput = {
     },
     esito: PPTPortTypes.Esito.KO,
     datiPagamentoPA: {
-      importoSingoloVersamento: 0,
+      importoSingoloVersamento: 9999999999,
       ibanAccredito: "IT17X0605502100000001234567",
       bicAccredito: "BPPIITRR",
       enteBeneficiario: {
@@ -228,7 +234,7 @@ const anAttivaRPTOutputKoImporto: InodoAttivaRPTOutput = {
           spezzoneCausaleVersamento: "SPEZZONE1",
           spezzoneStrutturatoCausaleVersamento: {
             causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 0
+            importoSpezzone: 9999999999
           }
         }
       ]
@@ -285,11 +291,21 @@ const aCodiceContestoPagamento: CodiceContestoPagamento = "12345" as WithinRange
   35
 >;
 
-const aPaymentActivationsPostRequest: PaymentActivationsPostRequest = {
-  rptId: "TEST123",
-  importoSingoloVersamento: 99.05 as Importo,
+const aPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode({
+  rptId: RptIdFromString.encode({
+    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+    paymentNoticeNumber: {
+      applicationCode: "12",
+      auxDigit: "0",
+      checkDigit: "12",
+      iuv13: "1234567890123"
+    } as PaymentNoticeNumber
+  }),
+  importoSingoloVersamento: 9905,
   codiceContestoPagamento: aCodiceContestoPagamento
-};
+}).getOrElseL(() => {
+  throw new Error();
+});
 
 const aConfig = {
   HOST: process.env.PAGOPA_HOST || "http://localhost",
@@ -334,7 +350,7 @@ describe("getPaymentsCheckResponse", () => {
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "importoSingoloVersamento",
-      99.05
+      9905
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "codiceContestoPagamento",
@@ -351,7 +367,7 @@ describe("getPaymentsCheckResponse", () => {
           spezzoneCausaleVersamento: "SPEZZONE1",
           spezzoneStrutturatoCausaleVersamento: {
             causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 99.05
+            importoSpezzone: 9905
           }
         }
       ]
@@ -384,10 +400,10 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
     expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
       codiceIdRPT: {
-        CF: "DVCMCD99D30E611V",
+        CF: "12345678901",
         AuxDigit: "0",
-        CodIUV: "010101010101010",
-        CodStazPA: "22"
+        CodIUV: "1234567890123",
+        CodStazPA: "12"
       }
     });
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
@@ -433,12 +449,12 @@ describe("getPaymentsActivationResponse", () => {
   });
   it("should not convert to PaymentsActivationResponse (wrong importo)", () => {
     expect(
-      getPaymentActivationsPostResponse(anAttivaRPTOutputKoImporto).isLeft()
+      isLeft(getPaymentActivationsPostResponse(anAttivaRPTOutputKoImporto))
     ).toBeTruthy();
   });
   it("should not convert to PaymentsActivationResponse (wrong iban)", () => {
     expect(
-      getPaymentActivationsPostResponse(anAttivaRPTOutputKoIban).isLeft()
+      isLeft(getPaymentActivationsPostResponse(anAttivaRPTOutputKoIban))
     ).toBeTruthy();
   });
 });

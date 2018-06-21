@@ -12,6 +12,7 @@ import {
   IcdInfoPagamentoOutput
 } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
 import {
   IResponseErrorGeneric,
   IResponseErrorInternal,
@@ -32,7 +33,6 @@ import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivation
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
-import { RptId } from "../../types/api/RptId";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 /**
  * This controller is invoked by BackendApp
@@ -56,7 +56,7 @@ export function paymentRequestsGet(
 > {
   return async req => {
     // Validate rptId (payment identifier) provided by BackendApp
-    const errorOrRptId = RptId.decode(req.params.rptId);
+    const errorOrRptId = RptIdFromString.decode(req.params.rptId);
     if (isLeft(errorOrRptId)) {
       const error = errorOrRptId.value;
       return ResponseErrorFromValidationErrors(RptId)(error);
@@ -261,7 +261,6 @@ export function paymentActivationsGet(
 ): (
   req: express.Request
 ) => Promise<
-  // tslint:disable-next-line
   | IResponseErrorValidation
   | IResponseErrorGeneric
   | IResponseErrorInternal
