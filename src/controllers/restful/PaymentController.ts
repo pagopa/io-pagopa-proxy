@@ -16,10 +16,12 @@ import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
 import {
   IResponseErrorGeneric,
   IResponseErrorInternal,
+  IResponseErrorNotFound,
   IResponseErrorValidation,
   IResponseSuccessJson,
   ResponseErrorFromValidationErrors,
   ResponseErrorInternal,
+  ResponseErrorNotFound,
   ResponseErrorValidation,
   ResponseSuccessJson
 } from "italia-ts-commons/lib/responses";
@@ -264,6 +266,7 @@ export function paymentActivationsGet(
   | IResponseErrorValidation
   | IResponseErrorGeneric
   | IResponseErrorInternal
+  | IResponseErrorNotFound
   | IResponseSuccessJson<PaymentActivationsGetResponse>
 > {
   return async req => {
@@ -290,6 +293,9 @@ export function paymentActivationsGet(
         return error;
       }
     );
+    if (idPagamento === null) {
+      return ResponseErrorNotFound("Not found", "PaymentId is not available");
+    }
 
     // Define a response to send to the applicant containing an error or the retrieved data
     return PaymentActivationsGetResponse.decode({
