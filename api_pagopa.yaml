@@ -18,9 +18,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-            format: RptIdFromString
-            x-import: italia-ts-commons/lib/pagopa
+            "$ref": "#/definitions/RptIdFromString"            
       responses:
         '200':
           description: Payment information retrieved
@@ -172,9 +170,7 @@ definitions:
     description: Define the request received from CD App to require a payment activation
     properties:
       rptId:
-        type: string
-        format: RptIdFromString
-        x-import: italia-ts-commons/lib/pagopa
+        "$ref": "#/definitions/RptIdFromString"
       importoSingoloVersamento:
         $ref: "#/definitions/ImportoEuroCents"
       codiceContestoPagamento:
@@ -223,6 +219,10 @@ definitions:
     required:
       - importoSingoloVersamento
       - codiceContestoPagamento
+  RptIdFromString:
+    type: string
+    format: RptIdFromString
+    x-import: italia-ts-commons/lib/pagopa
   SpezzoniCausaleVersamento: 
     description: Payment installments (optional)
     type: array
