@@ -45,5 +45,11 @@ Those are all Environment variables needed by the application:
 | PAGOPA_TOKEN                           | The token used to authenticate to PagoPA SOAP Server                              | string |
 | BACKEND_APP_HOST                       | The AppBackend RESTful Server hostname or IP address                              | string |
 | BACKEND_APP_PORT                       | The AppBackend RESTful Server port                                                | int    |
+| REDIS_DB_HOST                          | The Redis DB Server hostname or IP address                                        | string |
+| REDIS_DB_PORT                          | The Redis DB Server port                                                          | int    |
 
 logLev values: "error", "info", "debug"
+
+## OpenAPI specs
+Swagger API specs are available at /specs/api/v1/swagger.json
+For example, running it on local enviroment it's reachable at http://localhost:3000/specs/api/v1/swagger.json

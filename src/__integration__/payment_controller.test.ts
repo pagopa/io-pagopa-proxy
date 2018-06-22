@@ -1,33 +1,35 @@
+//tslint:disable
 import { isRight } from "fp-ts/lib/Either";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import { IResponseSuccessJson } from "italia-ts-commons/lib/responses";
+import {
+  ApplicationCode,
+  AuxDigit,
+  CheckDigit,
+  IUV13,
+  PaymentNoticeNumber,
+  RptId
+} from "italia-ts-commons/lib/pagopa";
+
+import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
-import { PagoPaConfig } from "../Configuration";
-import {
-  activatePaymentToPagoPa,
-  checkPaymentToPagoPa
-} from "../controllers/restful/PaymentController";
-import {
-  CodiceContestoPagamento,
-  FiscalCode,
-  Importo,
-  IUV
-} from "../types/CommonTypes";
-import { PaymentsActivationRequest } from "../types/controllers/PaymentsActivationRequest";
-import { PaymentsActivationResponse } from "../types/controllers/PaymentsActivationResponse";
-import { PaymentsCheckRequest } from "../types/controllers/PaymentsCheckRequest";
+import { PagoPAConfig } from "../Configuration";
+import { paymentRequestsGet, paymentActivationsPost } from "../controllers/restful/PaymentController";
+import { CodiceContestoPagamento } from "../types/CommonTypes";
 import {
   createPagamentiTelematiciPspNodoClient,
   FakePagamentiTelematiciPspNodoAsyncClient
 } from "./fake/fakePagamentiTelematiciPspNodoAsyncClient";
 import mockReq from "./fake/request";
+import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
+import { ImportoEuroCents } from "../types/api/ImportoEuroCents";
+import { RptIdFromString } from "../types/api/RptIdFromString";
 
 const aConfig = {
   HOST: process.env.PAGOPA_HOST || "http://localhost",
   PORT: process.env.PAGOPA_PORT || "3008",
   SERVICES: {
-    PAYMENTS_CHECK: "nodoVerificaRPT",
-    PAYMENTS_ACTIVATION: "nodoAttivaRPT"
+    VERIFICA_RPT: "nodoVerificaRPT",
+    ATTIVA_RPT: "nodoAttivaRPT"
   },
   IDENTIFIER: {
     IDENTIFICATIVO_PSP: "AGID_00",
@@ -41,13 +43,14 @@ const aCodiceContestoPagamento = "05245c90-7468-11e8-b9bf-91897339427e" as Codic
 
 describe("checkPaymentToPagoPa", async () => {
   it("should return the right response", async () => {
-    const aPaymentCheckRequest: PaymentsCheckRequest = {
-      codiceIdRPT: {
-        CF: "DVCMCD99D30E611V" as FiscalCode,
-        AuxDigit: "0",
-        CodIUV: "010101010101010" as IUV,
-        CodStazPA: "22"
-      }
+    const aPaymentCheckRequest: RptId = {
+      organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+      paymentNoticeNumber: {
+        applicationCode: "99" as ApplicationCode,
+        auxDigit: "0" as AuxDigit,
+        checkDigit: "99" as CheckDigit,
+        iuv13: "1234567890123" as IUV13
+      } as PaymentNoticeNumber
     };
 
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
@@ -60,16 +63,15 @@ describe("checkPaymentToPagoPa", async () => {
 
     req.params = aPaymentCheckRequest;
 
-    const errorOrPaymentCheckResponse = await checkPaymentToPagoPa(
-      aConfig as PagoPaConfig,
+    const errorOrPaymentCheckResponse = await paymentRequestsGet(
+      aConfig as PagoPAConfig,
       verificaRPTPagoPaClient
     )(req);
-
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseSuccessJson");
     if (errorOrPaymentCheckResponse.kind === "IResponseSuccessJson") {
       expect(errorOrPaymentCheckResponse.value).toHaveProperty(
         "importoSingoloVersamento",
-        99.05
+        9905
       );
       expect(errorOrPaymentCheckResponse.value).toHaveProperty(
         "ibanAccredito",
@@ -79,9 +81,8 @@ describe("checkPaymentToPagoPa", async () => {
         "causaleVersamento",
         "CAUSALE01"
       );
-      expect(errorOrPaymentCheckResponse.value).toMatchObject({
-        enteBeneficiario: {
-          codiceIdentificativoUnivoco: "001",
+      expect(errorOrPaymentCheckResponse.value.enteBeneficiario).toMatchObject({
+          identificativoUnivocoBeneficiario: "001",
           denominazioneBeneficiario: "BANCA01",
           codiceUnitOperBeneficiario: "01",
           denomUnitOperBeneficiario: "DENOM01",
@@ -92,7 +93,7 @@ describe("checkPaymentToPagoPa", async () => {
           provinciaBeneficiario: "ROMA",
           nazioneBeneficiario: "IT"
         }
-      });
+      );
 
       expect(
         isRight(
@@ -104,15 +105,17 @@ describe("checkPaymentToPagoPa", async () => {
     }
   });
 
-  it("should return error (invalid input)", async () => {
-    const aPaymentCheckRequest: PaymentsCheckRequest = {
-      codiceIdRPT: {
-        CF: "XXX" as FiscalCode,
-        AuxDigit: "0",
-        CodIUV: "010101010101010" as IUV,
-        CodStazPA: "22"
-      }
-    };
+
+it("should return error (invalid input)", async () => {
+  const aPaymentCheckRequest: RptId = {
+    organizationFiscalCode: "1" as OrganizationFiscalCode,
+    paymentNoticeNumber: {
+      applicationCode: "99" as ApplicationCode,
+      auxDigit: "0" as AuxDigit,
+      checkDigit: "99" as CheckDigit,
+      iuv13: "1234567890123" as IUV13
+    } as PaymentNoticeNumber
+  };
 
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
@@ -124,8 +127,8 @@ describe("checkPaymentToPagoPa", async () => {
 
     req.params = aPaymentCheckRequest;
 
-    const errorOrPaymentCheckResponse = await checkPaymentToPagoPa(
-      aConfig as PagoPaConfig,
+    const errorOrPaymentCheckResponse = await paymentRequestsGet(
+      aConfig as PagoPAConfig,
       verificaRPTPagoPaClient
     )(req);
 
@@ -133,18 +136,23 @@ describe("checkPaymentToPagoPa", async () => {
   });
 });
 
+
 describe("activatePaymentToPagoPa", async () => {
   it("should return the right response", async () => {
-    const aPaymentActivationRequest: PaymentsActivationRequest = {
-      codiceIdRPT: {
-        CF: "DVCMCD99D30E611V" as FiscalCode,
-        AuxDigit: "0",
-        CodIUV: "010101010101010" as IUV,
-        CodStazPA: "22"
-      },
-      importoSingoloVersamento: 99.05 as Importo,
+    const aPaymentActivationRequest: PaymentActivationsPostRequest = {
+      rptId: {
+        organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+        paymentNoticeNumber: {
+          applicationCode: "99" as ApplicationCode,
+          auxDigit: "0" as AuxDigit,
+          checkDigit: "99" as CheckDigit,
+          iuv13: "1234567890123" as IUV13
+        } as PaymentNoticeNumber,
+      } as RptIdFromString,
+      importoSingoloVersamento: 9905 as ImportoEuroCents,
       codiceContestoPagamento: aCodiceContestoPagamento
-    };
+    }
+  
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
@@ -156,8 +164,8 @@ describe("activatePaymentToPagoPa", async () => {
 
     req.params = aPaymentActivationRequest;
 
-    const errorOrPaymentActivationResponse = await activatePaymentToPagoPa(
-      aConfig as PagoPaConfig,
+    const errorOrPaymentActivationResponse = await paymentActivationsPost(
+      aConfig as PagoPAConfig,
       attivaRPTPagoPaClient
     )(req);
 
@@ -165,7 +173,7 @@ describe("activatePaymentToPagoPa", async () => {
     if (errorOrPaymentActivationResponse.kind === "IResponseSuccessJson") {
       expect(errorOrPaymentActivationResponse.value).toHaveProperty(
         "importoSingoloVersamento",
-        99.05
+        9905
       );
       expect(errorOrPaymentActivationResponse.value).toHaveProperty(
         "ibanAccredito",
@@ -193,16 +201,21 @@ describe("activatePaymentToPagoPa", async () => {
   });
 
   it("should return error (invalid input)", async () => {
-    const aPaymentActivationRequest: PaymentsActivationRequest = {
-      codiceIdRPT: {
-        CF: "XXX" as FiscalCode,
-        AuxDigit: "0",
-        CodIUV: "010101010101010" as IUV,
-        CodStazPA: "22"
-      },
-      importoSingoloVersamento: 99.05 as Importo,
+    const aPaymentActivationRequest: PaymentActivationsPostRequest = {
+      rptId: {
+        organizationFiscalCode: "XXX" as OrganizationFiscalCode,
+        paymentNoticeNumber: {
+          applicationCode: "99" as ApplicationCode,
+          auxDigit: "0" as AuxDigit,
+          checkDigit: "99" as CheckDigit,
+          iuv13: "1234567890123" as IUV13
+        } as PaymentNoticeNumber,
+      } as RptIdFromString,
+      importoSingoloVersamento: 9905 as ImportoEuroCents,
       codiceContestoPagamento: aCodiceContestoPagamento
-    };
+    }
+  
+
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
@@ -214,13 +227,14 @@ describe("activatePaymentToPagoPa", async () => {
 
     req.params = aPaymentActivationRequest;
 
-    const errorOrPaymentActivationResponse = (await activatePaymentToPagoPa(
-      aConfig as PagoPaConfig,
+    const errorOrPaymentActivationResponse = (await paymentActivationsPost(
+      aConfig as PagoPAConfig,
       attivaRPTPagoPaClient
-    )(req)) as IResponseSuccessJson<PaymentsActivationResponse>;
+    )(req))
 
     expect(errorOrPaymentActivationResponse.kind).toBe(
       "IResponseErrorValidation"
     );
   });
 });
+

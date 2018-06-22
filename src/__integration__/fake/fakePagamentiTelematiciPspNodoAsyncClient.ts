@@ -24,7 +24,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.Pagamenti
     return new Promise<
       PagamentiTelematiciPspNodoService.InodoVerificaRPTOutput
     >((resolve, reject) => {
-      if (input.codiceIdRPT.CodStazPA === "22") {
+      if (input !== undefined) {
         resolve({
           nodoVerificaRPTRisposta: {
             fault: {
@@ -79,7 +79,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.Pagamenti
   ) => {
     return new Promise<PagamentiTelematiciPspNodoService.InodoAttivaRPTOutput>(
       (resolve, reject) => {
-        if (input.codiceIdRPT.CodStazPA === "22") {
+        if (input !== undefined) {
           resolve({
             nodoAttivaRPTRisposta: {
               fault: {
