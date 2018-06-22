@@ -14,11 +14,7 @@ paths:
       summary: Get Payment Info
       description: Retrieve information about a payment
       parameters:
-        - name: rptId
-          in: path
-          required: true
-          schema:
-            "$ref": "#/definitions/RptIdFromString"            
+        - $ref: "#/parameters/RptIdFromString"     
       responses:
         '200':
           description: Payment information retrieved
@@ -45,7 +41,7 @@ paths:
             $ref: "#/definitions/PaymentActivationsPostRequest"
           x-examples:
             application/json:
-              rptId: "DVCMCD99D30E611V044012345678901200"
+              rptId: "12345678901012123456789012345"
               importoSingoloVersamento: 200
               codiceContestoPagamento: "ABC123"
       responses:
@@ -67,12 +63,7 @@ paths:
       summary: Get Activation status
       description: Check the activation status to retrieve the paymentId
       parameters:
-        - name: codiceContestoPagamento
-          in: path
-          required: true
-          description: The transaction id for PagoPA
-          schema:
-            $ref: "#/definitions/CodiceContestoPagamento"
+        - $ref: "#/parameters/CodiceContestoPagamento" 
       responses:
         '200':
           description: Payment information
@@ -84,7 +75,7 @@ paths:
         "400":
           description: Invalid input
         "404":
-          description: Activation status is not available
+          description: Activation status not found
         "500":
           description: Unavailable service
 definitions:
@@ -135,7 +126,7 @@ definitions:
         maxLength: 35
       nazioneBeneficiario:
         type: string
-        pattern: "[A-Z]{2,2}"
+        pattern: "[A-Z]{2}"
     required:
       - identificativoUnivocoBeneficiario
       - denominazioneBeneficiario
@@ -149,7 +140,7 @@ definitions:
       - nazioneBeneficiario
   Iban:
     type: string
-    pattern: "[a-zA-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}"
+    pattern: "[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{1,30}"
   ImportoEuroCents:
     description: Amount for payments, in eurocents
     type: integer
@@ -248,6 +239,25 @@ definitions:
         maxLength: 25
       importoSpezzone:
         $ref: "#/definitions/ImportoEuroCents"                      
+parameters:
+  CodiceContestoPagamento:
+    name: codice_contesto_pagamento
+    description: Transaction Id used to identify the communication flow
+    type: string
+    minLength: 1
+    maxLength: 35
+    required: true
+    in: path
+    x-example: A0123BC123124
+  RptIdFromString:
+    name: rpt_id_from_string
+    description: Unique identifier for payments
+    type: string
+    minLength: 1
+    maxLength: 35
+    required: true
+    in: path
+    x-example: A0123BC123124
 consumes:
   - application/json
 produces:

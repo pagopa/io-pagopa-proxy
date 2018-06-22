@@ -4,8 +4,8 @@
  */
 
 import * as express from "express";
+import { wrapRequestHandler } from "italia-ts-commons/lib/request_middleware";
 import { ResponseSuccessJson } from "italia-ts-commons/lib/responses";
-import { wrapRequestHandler } from "../utils/RequestMiddleware";
 
 export function GetOpenapi(apiSpecs: object): express.RequestHandler {
   return wrapRequestHandler(() =>
