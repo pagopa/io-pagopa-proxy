@@ -17,7 +17,8 @@ jobs:
           - v1-dependencies-
 
       # Install yarn dependencies
-      - run: yarn install --cache-folder ~/.cache/yarn
+      # --cache-folder ~/.cache/yarn
+      - run: yarn install
 
       # Save node_modules to the cache
       - save_cache:
