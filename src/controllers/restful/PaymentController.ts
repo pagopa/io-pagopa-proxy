@@ -35,6 +35,7 @@ import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivation
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
+import { logger } from "../../utils/Logger";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 /**
  * This controller is invoked by BackendApp
@@ -227,28 +228,34 @@ export function paymentActivationsPost(
 export function updatePaymentActivationStatusIntoDB(
   cdInfoPagamentoInput: IcdInfoPagamentoInput,
   redisTimeout: number,
-  redisClient: redis.RedisClient,
-  callback: (cdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void
-): void {
+  redisClient: redis.RedisClient
+): IcdInfoPagamentoOutput {
   // Check DB connection status
   if (redisClient.connected !== true) {
-    callback({
+    logger.error("Redis Client is not connected");
+    return {
       esito: Esito.KO
-    });
+    };
   }
-  const setAsyncRedis = promisify(redisClient.set).bind(redisClient);
-  setAsyncRedis(
-    cdInfoPagamentoInput.codiceContestoPagamento,
-    cdInfoPagamentoInput.idPagamento,
-    "EX", // Set the specified expire time, in seconds.
-    redisTimeout
-  ).catch((error: Error) => {
-    return error;
-  });
+  try {
+    promisify(redisClient.set)
+      .bind(redisClient)
+      .setAsyncRedis(
+        cdInfoPagamentoInput.codiceContestoPagamento,
+        cdInfoPagamentoInput.idPagamento,
+        "EX", // Set the specified expire time, in seconds.
+        redisTimeout
+      );
+  } catch (error) {
+    logger.error(`Redis error occurred writing data: ${error}`);
+    return {
+      esito: Esito.KO
+    };
+  }
 
-  callback({
+  return {
     esito: Esito.OK
-  });
+  };
 }
 
 /**

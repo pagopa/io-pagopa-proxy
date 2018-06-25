@@ -11,6 +11,7 @@ import * as http from "http";
 import { clients as pagoPASoapClient } from "italia-pagopa-api";
 import { FespCdService_WSDL_PATH } from "italia-pagopa-api/dist/lib/wsdl-paths";
 import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
+import { IcdInfoPagamentoOutput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as redis from "redis";
@@ -159,14 +160,15 @@ function getSoapServer(
     FespCdService: {
       FespCdPortType: {
         cdInfoPagamento: (
-          input: IcdInfoPagamentoInput,
-          callback: () => void
+          iCdInfoPagamentoInput: IcdInfoPagamentoInput,
+          callback: (iCdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void
         ): void => {
-          PaymentController.updatePaymentActivationStatusIntoDB(
-            input,
-            redisTimeout,
-            redisClient,
-            callback
+          callback(
+            PaymentController.updatePaymentActivationStatusIntoDB(
+              iCdInfoPagamentoInput,
+              redisTimeout,
+              redisClient
+            )
           );
         }
       }
