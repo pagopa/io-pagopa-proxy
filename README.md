@@ -51,5 +51,6 @@ Those are all Environment variables needed by the application:
 logLev values: "error", "info", "debug"
 
 ## OpenAPI specs
+
 Swagger API specs are available at /specs/api/v1/swagger.json
 For example, running it on local enviroment it's reachable at http://localhost:3000/specs/api/v1/swagger.json
