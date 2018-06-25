@@ -294,26 +294,27 @@ export function paymentActivationsGet(
 
     // Retrieve idPayment related to a codiceContestoPagamento from DB
     // It's just a key-value mapping
-    const getAsyncRedis = promisify(redisClient.get).bind(redisClient);
-    const idPagamento = await getAsyncRedis(codiceContestoPagamento).catch(
-      (error: Error) => {
-        return error;
+    try {
+      const getAsyncRedis = promisify(redisClient.get).bind(redisClient);
+      const idPagamento = await getAsyncRedis(codiceContestoPagamento);
+      if (idPagamento === null) {
+        return ResponseErrorNotFound("Not found", "PaymentId is not available");
       }
-    );
-    if (idPagamento === null) {
-      return ResponseErrorNotFound("Not found", "PaymentId is not available");
-    }
 
-    // Define a response to send to the applicant containing an error or the retrieved data
-    return PaymentActivationsGetResponse.decode({
-      idPagamento
-    }).fold<
-      | IResponseErrorValidation
-      | IResponseSuccessJson<PaymentActivationsGetResponse>
-    >(
-      ResponseErrorFromValidationErrors(PaymentActivationsGetResponse),
-      ResponseSuccessJson
-    );
+      // Define a response to send to the applicant containing an error or the retrieved data
+      return PaymentActivationsGetResponse.decode({
+        idPagamento
+      }).fold<
+        | IResponseErrorValidation
+        | IResponseSuccessJson<PaymentActivationsGetResponse>
+      >(
+        ResponseErrorFromValidationErrors(PaymentActivationsGetResponse),
+        ResponseSuccessJson
+      );
+    } catch (error) {
+      logger.error(`Redis error occurred reading data: ${error}`);
+      return ResponseErrorInternal(error);
+    }
   };
 }
 
