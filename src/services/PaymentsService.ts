@@ -15,15 +15,15 @@ import {
 /**
  * Send a request to PagoPA to retrieve payment info (VerificaRPT)
  * @param {InodoVerificaRPTInput} iNodoVerificaRPTInput - The request to send to PagoPA
- * @param {PagamentiTelematiciPspNodoAsyncClient} pagamentiTelematiciPSPNodoClient - SOAP client used to call PagoPa services
+ * @param {PagamentiTelematiciPspNodoAsyncClient} pagoPASoapClient - SOAP client used to call PagoPa services
  * @return {Promise<Either<Error, InodoVerificaRPTOutput>>} The response provided by PagoPA as response
  */
 export async function sendInodoVerificaRPTInput(
   iNodoVerificaRPTInput: InodoVerificaRPTInput,
-  pagamentiTelematiciPSPNodoClient: PagamentiTelematiciPspNodoAsyncClient
+  pagoPASoapClient: PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<Error, InodoVerificaRPTOutput>> {
   try {
-    const nodoVerificaRPT = await pagamentiTelematiciPSPNodoClient.nodoVerificaRPT(
+    const nodoVerificaRPT = await pagoPASoapClient.nodoVerificaRPT(
       iNodoVerificaRPTInput
     );
     return right(nodoVerificaRPT);
@@ -35,15 +35,15 @@ export async function sendInodoVerificaRPTInput(
 /**
  * Send a request to PagoPA to activate (lock) a payment (AttivaRPT)
  * @param {InodoAttivaRPTInput} iNodoAttivaRPTInput - The request to send to PagoPA
- * @param {pagamentiTelematiciPSPNodoClient} PagamentiTelematiciPspNodoAsyncClient - SOAP client used to call PagoPa services
+ * @param {pagamentiTelematiciPSPNodoClient} pagoPASoapClient - SOAP client used to call PagoPa services
  * @return {Promise<Either<Error, InodoAttivaRPTOutput>>} The response provided by PagoPA as response
  */
 export async function sendInodoAttivaRPTInputToPagoPa(
   iNodoAttivaRPTInput: InodoAttivaRPTInput,
-  pagamentiTelematiciPSPNodoClient: PagamentiTelematiciPspNodoAsyncClient
+  pagoPASoapClient: PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<Error, InodoAttivaRPTOutput>> {
   try {
-    const nodoAttivaRPT = await pagamentiTelematiciPSPNodoClient.nodoAttivaRPT(
+    const nodoAttivaRPT = await pagoPASoapClient.nodoAttivaRPT(
       iNodoAttivaRPTInput
     );
     return right(nodoAttivaRPT);

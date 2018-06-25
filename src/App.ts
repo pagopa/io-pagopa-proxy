@@ -12,7 +12,7 @@ import { clients as pagoPASoapClient } from "italia-pagopa-api";
 import { FespCdService_WSDL_PATH } from "italia-pagopa-api/dist/lib/wsdl-paths";
 import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { IcdInfoPagamentoOutput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
-import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import { InodoVerificaRPTInput } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as redis from "redis";
 import * as soap from "soap";
@@ -33,20 +33,11 @@ export async function startApp(config: Configuration): Promise<http.Server> {
 
   // Define SOAP Clients for PagoPA SOAP WS
   // It is necessary to forward BackendApp requests to PagoPA
-  const verificaRPTPagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
+  const pagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
     await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-        config.PAGOPA.SERVICES.VERIFICA_RPT
-      }`,
-      envelopeKey: PPTPortTypes.envelopeKey
-    })
-  );
-  const attivaRPTPagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
-    await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
-      endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-        config.PAGOPA.SERVICES.ATTIVA_RPT
-      }`,
-      envelopeKey: PPTPortTypes.envelopeKey
+        config.PAGOPA.WS_SERVICES.PAGAMENTI
+      }?wsdl`
     })
   );
 
@@ -60,13 +51,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   // Define RESTful and SOAP endpoints
   const app = express();
   app.set("port", config.CONTROLLER.PORT);
-  setRestfulRoutes(
-    app,
-    config,
-    redisClient,
-    verificaRPTPagoPAClient,
-    attivaRPTPagoPAClient
-  );
+  setRestfulRoutes(app, config, redisClient, pagoPAClient);
   getSoapServer(
     redisClient,
     config.PAYMENT_ACTIVATION_STATUS_TIMEOUT as number
@@ -90,15 +75,13 @@ export function stopServer(server: http.Server): void {
  * @param {core.Express} app - Express server to set
  * @param {Configuration} config - PagoPa proxy configuration
  * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPA
- * @param {PagamentiTelematiciPspNodoAsyncClient} verificaRPTPagoPAClient - PagoPa SOAP client to call verificaRPT service
- * @param {PagamentiTelematiciPspNodoAsyncClient} attivaRPTPagoPAClient - PagoPa SOAP client to call attivaRPT service
+ * @param {PagamentiTelematiciPspNodoAsyncClient} pagoPAClient - PagoPa SOAP client to call verificaRPT and attivaRPT services
  */
 function setRestfulRoutes(
   app: core.Express,
   config: Configuration,
   redisClient: redis.RedisClient,
-  verificaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient,
-  attivaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): void {
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_REQUESTS_GET,
@@ -107,10 +90,7 @@ function setRestfulRoutes(
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
-        PaymentController.paymentRequestsGet(
-          config.PAGOPA,
-          verificaRPTPagoPAClient
-        )
+        PaymentController.paymentRequestsGet(config.PAGOPA, pagoPAClient)
       )(req, res);
     }
   );
@@ -121,10 +101,7 @@ function setRestfulRoutes(
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
-        PaymentController.paymentActivationsPost(
-          config.PAGOPA,
-          attivaRPTPagoPAClient
-        )
+        PaymentController.paymentActivationsPost(config.PAGOPA, pagoPAClient)
       )(req, res);
     }
   );
@@ -185,3 +162,36 @@ function getSoapServer(
     );
   };
 }
+
+export async function testFunc(): Promise<void> {
+  // Define SOAP Clients for PagoPA SOAP WS
+  // It is necessary to forward BackendApp requests to PagoPA
+  const test = await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
+    endpoint: "http://localhost:3001/PagamentiTelematiciPspNodoservice/",
+    envelopeKey: "soapenv"
+  });
+  test.addHttpHeader("Host", "localhost:3001");
+  const pagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
+    test
+  );
+
+  console.log(pagoPAClient.nodoVerificaRPT.toString());
+  const input: InodoVerificaRPTInput = {
+    identificativoCanale: "123",
+    identificativoIntermediarioPSP: "123",
+    identificativoPSP: "CDPSP",
+    password: "cddiao",
+    codificaInfrastrutturaPSP: "cprova",
+    codiceContestoPagamento: "Ciao",
+    codiceIdRPT: {
+      CF: "XX",
+      AuxDigit: "0",
+      CodIUV: "xx"
+    }
+  };
+
+  const output = await pagoPAClient.nodoVerificaRPT(input);
+  console.log(output);
+}
+
+testFunc();

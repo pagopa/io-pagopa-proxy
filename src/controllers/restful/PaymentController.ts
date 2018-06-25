@@ -47,7 +47,7 @@ import * as PaymentsConverter from "../../utils/PaymentsConverter";
  */
 export function paymentRequestsGet(
   pagoPAConfig: PagoPAConfig,
-  paymentVerificaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<
@@ -92,7 +92,7 @@ export function paymentRequestsGet(
     // Send the SOAP request to PagoPA (VerificaRPT message)
     const errorOrInodoVerificaRPTOutput = await PaymentsService.sendInodoVerificaRPTInput(
       iNodoVerificaRPTInput,
-      paymentVerificaRPTPagoPAClient
+      pagoPAClient
     );
     if (isLeft(errorOrInodoVerificaRPTOutput)) {
       const error = errorOrInodoVerificaRPTOutput.value;
@@ -139,7 +139,7 @@ export function paymentRequestsGet(
  */
 export function paymentActivationsPost(
   pagoPAConfig: PagoPAConfig,
-  attivaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<
@@ -182,7 +182,7 @@ export function paymentActivationsPost(
     // Send the SOAP request to PagoPA (AttivaRPT message)
     const errorOrInodoAttivaRPTOutput = await PaymentsService.sendInodoAttivaRPTInputToPagoPa(
       iNodoAttivaRPTInput,
-      attivaRPTPagoPAClient
+      pagoPAClient
     );
     if (isLeft(errorOrInodoAttivaRPTOutput)) {
       const error = errorOrInodoAttivaRPTOutput.value;

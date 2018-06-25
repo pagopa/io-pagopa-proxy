@@ -310,7 +310,10 @@ const aPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode({
 const aConfig = {
   HOST: process.env.PAGOPA_HOST || "http://localhost",
   PORT: process.env.PAGOPA_PORT || "3001",
-  SERVICES: {
+  WS_SERVICES: {
+    PAGAMENTI: "/PagamentiTelematiciPspNodoservice"
+  },
+  WS_OPERATIONS: {
     VERIFICA_RPT: "nodoVerificaRPT",
     ATTIVA_RPT: "nodoAttivaRPT"
   },
