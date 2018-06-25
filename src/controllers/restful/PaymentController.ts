@@ -4,7 +4,7 @@
  */
 
 import * as express from "express";
-import { isLeft } from "fp-ts/lib/Either";
+import { Either, fromOption, isLeft, left } from "fp-ts/lib/Either";
 import { clients as pagoPASoapClient } from "italia-pagopa-api";
 import {
   Esito,
@@ -26,7 +26,6 @@ import {
   ResponseSuccessJson
 } from "italia-ts-commons/lib/responses";
 import * as redis from "redis";
-import { promisify } from "util";
 import * as uuid from "uuid";
 import { PagoPAConfig } from "../../Configuration";
 import * as PaymentsService from "../../services/PaymentsService";
@@ -35,8 +34,10 @@ import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivation
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
-import { logger } from "../../utils/Logger";
+
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
+import { redisGet, redisSet } from "../../utils/Redis";
+
 /**
  * This controller is invoked by BackendApp
  * to retrieve information about a payment.
@@ -225,37 +226,25 @@ export function paymentActivationsPost(
  * @param {(cdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void} callback - Callback function to send a feedback to PagoPA
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
-export function updatePaymentActivationStatusIntoDB(
+export async function updatePaymentActivationStatusIntoDB(
   cdInfoPagamentoInput: IcdInfoPagamentoInput,
   redisTimeout: number,
   redisClient: redis.RedisClient
-): IcdInfoPagamentoOutput {
-  // Check DB connection status
-  if (redisClient.connected !== true) {
-    logger.error("Redis Client is not connected");
-    return {
+): Promise<IcdInfoPagamentoOutput> {
+  return (await redisSet(
+    redisClient,
+    cdInfoPagamentoInput.codiceContestoPagamento,
+    cdInfoPagamentoInput.idPagamento,
+    "EX", // Set the specified expire time, in seconds.
+    redisTimeout
+  )).fold<IcdInfoPagamentoOutput>(
+    _ => ({
       esito: Esito.KO
-    };
-  }
-  try {
-    promisify(redisClient.set)
-      .bind(redisClient)
-      .setAsyncRedis(
-        cdInfoPagamentoInput.codiceContestoPagamento,
-        cdInfoPagamentoInput.idPagamento,
-        "EX", // Set the specified expire time, in seconds.
-        redisTimeout
-      );
-  } catch (error) {
-    logger.error(`Redis error occurred writing data: ${error}`);
-    return {
-      esito: Esito.KO
-    };
-  }
-
-  return {
-    esito: Esito.OK
-  };
+    }),
+    _ => ({
+      esito: Esito.OK
+    })
+  );
 }
 
 /**
@@ -287,34 +276,36 @@ export function paymentActivationsGet(
     }
     const codiceContestoPagamento = errorOrCodiceContestoPagamento.value;
 
-    // Check db connection status
-    if (redisClient.connected !== true) {
-      return ResponseErrorInternal("DB currently not available");
-    }
-
     // Retrieve idPayment related to a codiceContestoPagamento from DB
     // It's just a key-value mapping
-    try {
-      const getAsyncRedis = promisify(redisClient.get).bind(redisClient);
-      const idPagamento = await getAsyncRedis(codiceContestoPagamento);
-      if (idPagamento === null) {
-        return ResponseErrorNotFound("Not found", "PaymentId is not available");
-      }
-
-      // Define a response to send to the applicant containing an error or the retrieved data
-      return PaymentActivationsGetResponse.decode({
-        idPagamento
-      }).fold<
+    return (await redisGet(redisClient, codiceContestoPagamento))
+      .fold<Either<IResponseErrorNotFound | IResponseErrorInternal, string>>(
+        error => left(ResponseErrorInternal(`PaymentActivationsGet: ${error}`)),
+        maybeIdPagamento =>
+          fromOption(
+            ResponseErrorNotFound("Not found", "PaymentActivationsGet")
+          )(maybeIdPagamento)
+      )
+      .fold<
         | IResponseErrorValidation
+        | IResponseErrorGeneric
+        | IResponseErrorInternal
+        | IResponseErrorNotFound
         | IResponseSuccessJson<PaymentActivationsGetResponse>
       >(
-        ResponseErrorFromValidationErrors(PaymentActivationsGetResponse),
-        ResponseSuccessJson
+        errorResponse => errorResponse,
+        // Define a response to send to the applicant containing an error or the retrieved data
+        idPagamento =>
+          PaymentActivationsGetResponse.decode({
+            idPagamento
+          }).fold<
+            | IResponseErrorValidation
+            | IResponseSuccessJson<PaymentActivationsGetResponse>
+          >(
+            ResponseErrorFromValidationErrors(PaymentActivationsGetResponse),
+            ResponseSuccessJson
+          )
       );
-    } catch (error) {
-      logger.error(`Redis error occurred reading data: ${error}`);
-      return ResponseErrorInternal(error);
-    }
   };
 }
 
