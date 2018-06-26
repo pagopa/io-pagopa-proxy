@@ -32,6 +32,7 @@ jobs:
       - run: yarn test
       - run: yarn test:integration
       - run: 'bash <(curl -s https://codecov.io/bash)'
+      - run: docker stop redis
 
       # Run DangerJS
       - run: '[ -z "$DANGER_GITHUB_API_TOKEN" ] || yarn danger ci'

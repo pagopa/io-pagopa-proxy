@@ -9,9 +9,7 @@ import {
   PaymentNoticeNumber,
   RptId
 } from "italia-ts-commons/lib/pagopa";
-
 import * as redis from "redis";
-
 import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import { PagoPAConfig } from "../Configuration";
@@ -59,8 +57,6 @@ const aCdInfoPagamentoInput = {
   codiceContestoPagamento: aCodiceContestoPagamento,
   idPagamento: "id1234"
 } as IcdInfoPagamentoInput;
-
-// const aCdInfoPagamentoOutput = {Esito: cdEsito.OK} as IcdInfoPagamentoOutput
 
 describe("checkPaymentToPagoPa", async () => {
   it("should return the right response", async () => {
@@ -253,7 +249,7 @@ describe("activatePaymentToPagoPa", async () => {
   });
 });
 
-describe("paymentActivationsGet", () => {
+describe("paymentActivationsGet and paymentActivationsGet", () => {
   it("should store payment id and payment info in redis db", async () => {
 
     const aPaymentActivationRequest: PaymentActivationsPostRequest = {
@@ -286,7 +282,7 @@ describe("paymentActivationsGet", () => {
       return logger.info("Mocked Redis connected!");
     });
 
-    const errorOrPaymentActivationResponse =  await paymentActivationsGet(aMockedRedisClient)(req);
+    const errorOrPaymentActivationGet =  await paymentActivationsGet(aMockedRedisClient)(req);
 
     expect(aMockedRedisClient.connected).toBeTruthy();
     const keyCodiceContestoPagamento = aMockedRedisClient.get(
@@ -300,9 +296,9 @@ describe("paymentActivationsGet", () => {
     );
 
     expect(keyCodiceContestoPagamento).toBeTruthy();
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseSuccessJson");
-    if (errorOrPaymentActivationResponse.kind === "IResponseSuccessJson") {
-      expect(errorOrPaymentActivationResponse.value.idPagamento).toBe("id1234")
+    expect(errorOrPaymentActivationGet.kind).toBe("IResponseSuccessJson");
+    if (errorOrPaymentActivationGet.kind === "IResponseSuccessJson") {
+      expect(errorOrPaymentActivationGet.value.idPagamento).toBe("id1234")
     }
     aMockedRedisClient.quit();
   });
