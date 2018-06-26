@@ -10,10 +10,12 @@ import {
   RptId
 } from "italia-ts-commons/lib/pagopa";
 
+import * as redis from "redis";
+
 import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import { PagoPAConfig } from "../Configuration";
-import { paymentRequestsGet, paymentActivationsPost } from "../controllers/restful/PaymentController";
+import { paymentRequestsGet, paymentActivationsPost, updatePaymentActivationStatusIntoDB } from "../controllers/restful/PaymentController";
 import { CodiceContestoPagamento } from "../types/CommonTypes";
 import {
   createPagamentiTelematiciPspNodoClient,
@@ -23,6 +25,9 @@ import mockReq from "./fake/request";
 import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
 import { ImportoEuroCents } from "../types/api/ImportoEuroCents";
 import { RptIdFromString } from "../types/api/RptIdFromString";
+import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
+import {Esito as cdEsito} from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType"
+import { logger } from "../utils/Logger";
 
 const aConfig = {
   HOST: process.env.PAGOPA_HOST || "http://localhost",
@@ -39,7 +44,20 @@ const aConfig = {
   }
 };
 
+
+const aMockedRedisClient = redis.createClient(6379, "localhost");
+
 const aCodiceContestoPagamento = "05245c90-7468-11e8-b9bf-91897339427e" as CodiceContestoPagamento;
+
+const aCdInfoPagamentoInput = {
+  identificativoDominio: "idDom",
+  identificativoUnivocoVersamento: "idUniv",
+  codiceContestoPagamento: aCodiceContestoPagamento,
+  idPagamento: "id1234"
+} as IcdInfoPagamentoInput
+
+// const aCdInfoPagamentoOutput = {Esito: cdEsito.OK} as IcdInfoPagamentoOutput
+
 
 describe("checkPaymentToPagoPa", async () => {
   it("should return the right response", async () => {
@@ -238,3 +256,18 @@ describe("activatePaymentToPagoPa", async () => {
   });
 });
 
+describe("updatePaymentActivationStatusIntoDB", () => {
+
+  it("should store payment id and payment info in redis db", ()=>{
+
+    updatePaymentActivationStatusIntoDB(aCdInfoPagamentoInput, 5000, aMockedRedisClient, (aCdInfoPagamentoOutput) => {aCdInfoPagamentoOutput.esito = cdEsito.OK})
+
+    aMockedRedisClient.on("connect", () => {return logger.info("Mocked Redis connected!")})
+     
+    
+    expect(aMockedRedisClient.connected).toBeTruthy();
+
+    aMockedRedisClient.quit();
+
+  })
+})
