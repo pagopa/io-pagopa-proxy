@@ -52,7 +52,6 @@ export function paymentRequestsGet(
 ): (
   req: express.Request
 ) => Promise<
-  // tslint:disable-next-line
   | IResponseErrorValidation
   | IResponseErrorGeneric
   | IResponseErrorInternal
