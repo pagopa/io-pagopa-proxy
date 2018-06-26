@@ -10,9 +10,10 @@ import * as fs from "fs";
 import * as http from "http";
 import { clients as pagoPASoapClient } from "italia-pagopa-api";
 import { FespCdService_WSDL_PATH } from "italia-pagopa-api/dist/lib/wsdl-paths";
-import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
-import { IcdInfoPagamentoOutput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
-import { InodoVerificaRPTInput } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import {
+  IcdInfoPagamentoInput,
+  IcdInfoPagamentoOutput
+} from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as redis from "redis";
 import * as soap from "soap";
@@ -56,6 +57,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     redisClient,
     config.PAYMENT_ACTIVATION_STATUS_TIMEOUT as number
   )(app);
+
   const server = http.createServer(app);
   server.listen(config.CONTROLLER.PORT);
 
@@ -83,12 +85,13 @@ function setRestfulRoutes(
   redisClient: redis.RedisClient,
   pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): void {
+  const jsonParser = bodyParser.json();
+  const urlencodedParser = bodyParser.urlencoded({ extended: false });
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_REQUESTS_GET,
+    urlencodedParser,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Check Request (GET)...");
-      app.use(bodyParser.json());
-      app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
         PaymentController.paymentRequestsGet(config.PAGOPA, pagoPAClient)
       )(req, res);
@@ -96,10 +99,9 @@ function setRestfulRoutes(
   );
   app.post(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_POST,
+    jsonParser,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Activation Request (POST)...");
-      app.use(bodyParser.json());
-      app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
         PaymentController.paymentActivationsPost(config.PAGOPA, pagoPAClient)
       )(req, res);
@@ -107,10 +109,9 @@ function setRestfulRoutes(
   );
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_GET,
+    urlencodedParser,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Check Activation Request (GET)...");
-      app.use(bodyParser.json());
-      app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(PaymentController.paymentActivationsGet(redisClient))(
         req,
         res
@@ -140,6 +141,7 @@ function getSoapServer(
           iCdInfoPagamentoInput: IcdInfoPagamentoInput,
           callback: (iCdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void
         ): void => {
+          logger.info("Serving Payment Activation Update Request (SOAP)...");
           callback(
             PaymentController.updatePaymentActivationStatusIntoDB(
               iCdInfoPagamentoInput,
@@ -162,36 +164,3 @@ function getSoapServer(
     );
   };
 }
-
-export async function testFunc(): Promise<void> {
-  // Define SOAP Clients for PagoPA SOAP WS
-  // It is necessary to forward BackendApp requests to PagoPA
-  const test = await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
-    endpoint: "http://localhost:3001/PagamentiTelematiciPspNodoservice/",
-    envelopeKey: "soapenv"
-  });
-  test.addHttpHeader("Host", "localhost:3001");
-  const pagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
-    test
-  );
-
-  console.log(pagoPAClient.nodoVerificaRPT.toString());
-  const input: InodoVerificaRPTInput = {
-    identificativoCanale: "123",
-    identificativoIntermediarioPSP: "123",
-    identificativoPSP: "CDPSP",
-    password: "cddiao",
-    codificaInfrastrutturaPSP: "cprova",
-    codiceContestoPagamento: "Ciao",
-    codiceIdRPT: {
-      CF: "XX",
-      AuxDigit: "0",
-      CodIUV: "xx"
-    }
-  };
-
-  const output = await pagoPAClient.nodoVerificaRPT(input);
-  console.log(output);
-}
-
-testFunc();

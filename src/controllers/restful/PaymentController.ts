@@ -104,10 +104,7 @@ export function paymentRequestsGet(
 
     // Check PagoPA response content.
     // If it contains an error, an HTTP error will be provided to BackendApp
-    if (
-      iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.esito ===
-      PPTPortTypes.Esito.KO
-    ) {
+    if (iNodoVerificaRPTOutput.esito === PPTPortTypes.Esito.KO) {
       return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
@@ -151,7 +148,7 @@ export function paymentActivationsPost(
   return async req => {
     // Validate input provided by BackendAp
     const errorOrPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode(
-      req.params
+      req.body
     );
     if (isLeft(errorOrPaymentActivationsPostRequest)) {
       const error = errorOrPaymentActivationsPostRequest.value;
@@ -194,9 +191,7 @@ export function paymentActivationsPost(
 
     // Check PagoPA response content.
     // If it contains an error, an HTTP error will be provided to BackendApp
-    if (
-      iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.esito === PPTPortTypes.Esito.KO
-    ) {
+    if (iNodoAttivaRPTOutput.esito === PPTPortTypes.Esito.KO) {
       return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
@@ -327,5 +322,5 @@ export function paymentActivationsGet(
  * @return {Either<Error,CodiceContestoPagamento>} The generated id or an internal error
  */
 function generateCodiceContestoPagamento(): CodiceContestoPagamento {
-  return uuid.v1() as CodiceContestoPagamento;
+  return uuid.v1().replace(new RegExp("-", "g"), "") as CodiceContestoPagamento;
 }

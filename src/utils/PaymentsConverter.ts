@@ -59,8 +59,7 @@ export function getPaymentRequestsGetResponse(
   iNodoVerificaRPTOutput: InodoVerificaRPTOutput,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Validation<PaymentRequestsGetResponse> {
-  const datiPagamentoPA =
-    iNodoVerificaRPTOutput.nodoVerificaRPTRisposta.datiPagamentoPA;
+  const datiPagamentoPA = iNodoVerificaRPTOutput.datiPagamentoPA;
   return PaymentRequestsGetResponse.decode({
     importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
     codiceContestoPagamento,
@@ -137,8 +136,7 @@ export function getInodoAttivaRPTInput(
 export function getPaymentActivationsPostResponse(
   iNodoAttivaRPTOutput: InodoAttivaRPTOutput
 ): Validation<PaymentActivationsPostResponse> {
-  const datiPagamentoPA =
-    iNodoAttivaRPTOutput.nodoAttivaRPTRisposta.datiPagamentoPA;
+  const datiPagamentoPA = iNodoAttivaRPTOutput.datiPagamentoPA;
 
   return PaymentActivationsPostResponse.decode({
     importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
@@ -214,7 +212,10 @@ function getSpezzoniCausaleVersamentoForController(
   spezzoniCausaleVersamento: ReadonlyArray<
     PPTPortTypes.IspezzoniCausaleVersamento
   >
-): ReadonlyArray<PPTPortTypes.IspezzoniCausaleVersamento> {
+): ReadonlyArray<PPTPortTypes.IspezzoniCausaleVersamento> | undefined {
+  if (spezzoniCausaleVersamento === undefined) {
+    return undefined;
+  }
   return spezzoniCausaleVersamento.map(
     (value: PPTPortTypes.IspezzoniCausaleVersamento) => {
       return {

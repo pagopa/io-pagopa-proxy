@@ -27,7 +27,7 @@ export const CONFIG = {
         PAYMENT_ACTIVATIONS_GET: "/payment-activations/:codiceContestoPagamento"
       },
       SOAP: {
-        PAYMENT_ACTIVATIONS_STATUS_UPDATE: "/cdInfoPagamento"
+        PAYMENT_ACTIVATIONS_STATUS_UPDATE: "/FespCdService"
       }
     }
   },
