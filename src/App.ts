@@ -51,7 +51,6 @@ export async function startApp(config: Configuration): Promise<http.Server> {
 
   // Define a redis client necessary to handle persistent data
   // for async payment activation process
-
   const redisClient = redis.createClient(
     config.REDIS_DB.PORT,
     config.REDIS_DB.HOST
