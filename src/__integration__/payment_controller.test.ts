@@ -15,7 +15,12 @@ import * as redis from "redis";
 import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import { PagoPAConfig } from "../Configuration";
-import { paymentRequestsGet, paymentActivationsPost, updatePaymentActivationStatusIntoDB } from "../controllers/restful/PaymentController";
+import {
+  paymentRequestsGet,
+  paymentActivationsPost,
+  updatePaymentActivationStatusIntoDB,
+  paymentActivationsGet
+} from "../controllers/restful/PaymentController";
 import { CodiceContestoPagamento } from "../types/CommonTypes";
 import {
   createPagamentiTelematiciPspNodoClient,
@@ -26,7 +31,7 @@ import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPo
 import { ImportoEuroCents } from "../types/api/ImportoEuroCents";
 import { RptIdFromString } from "../types/api/RptIdFromString";
 import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
-import {Esito as cdEsito} from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType"
+import { Esito as cdEsito } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { logger } from "../utils/Logger";
 
 const aConfig = {
@@ -44,7 +49,6 @@ const aConfig = {
   }
 };
 
-
 const aMockedRedisClient = redis.createClient(6379, "localhost");
 
 const aCodiceContestoPagamento = "05245c90-7468-11e8-b9bf-91897339427e" as CodiceContestoPagamento;
@@ -54,10 +58,9 @@ const aCdInfoPagamentoInput = {
   identificativoUnivocoVersamento: "idUniv",
   codiceContestoPagamento: aCodiceContestoPagamento,
   idPagamento: "id1234"
-} as IcdInfoPagamentoInput
+} as IcdInfoPagamentoInput;
 
 // const aCdInfoPagamentoOutput = {Esito: cdEsito.OK} as IcdInfoPagamentoOutput
-
 
 describe("checkPaymentToPagoPa", async () => {
   it("should return the right response", async () => {
@@ -100,18 +103,17 @@ describe("checkPaymentToPagoPa", async () => {
         "CAUSALE01"
       );
       expect(errorOrPaymentCheckResponse.value.enteBeneficiario).toMatchObject({
-          identificativoUnivocoBeneficiario: "001",
-          denominazioneBeneficiario: "BANCA01",
-          codiceUnitOperBeneficiario: "01",
-          denomUnitOperBeneficiario: "DENOM01",
-          indirizzoBeneficiario: "VIAROMA",
-          civicoBeneficiario: "01",
-          capBeneficiario: "00000",
-          localitaBeneficiario: "ROMA",
-          provinciaBeneficiario: "ROMA",
-          nazioneBeneficiario: "IT"
-        }
-      );
+        identificativoUnivocoBeneficiario: "001",
+        denominazioneBeneficiario: "BANCA01",
+        codiceUnitOperBeneficiario: "01",
+        denomUnitOperBeneficiario: "DENOM01",
+        indirizzoBeneficiario: "VIAROMA",
+        civicoBeneficiario: "01",
+        capBeneficiario: "00000",
+        localitaBeneficiario: "ROMA",
+        provinciaBeneficiario: "ROMA",
+        nazioneBeneficiario: "IT"
+      });
 
       expect(
         isRight(
@@ -123,17 +125,16 @@ describe("checkPaymentToPagoPa", async () => {
     }
   });
 
-
-it("should return error (invalid input)", async () => {
-  const aPaymentCheckRequest: RptId = {
-    organizationFiscalCode: "1" as OrganizationFiscalCode,
-    paymentNoticeNumber: {
-      applicationCode: "99" as ApplicationCode,
-      auxDigit: "0" as AuxDigit,
-      checkDigit: "99" as CheckDigit,
-      iuv13: "1234567890123" as IUV13
-    } as PaymentNoticeNumber
-  };
+  it("should return error (invalid input)", async () => {
+    const aPaymentCheckRequest: RptId = {
+      organizationFiscalCode: "1" as OrganizationFiscalCode,
+      paymentNoticeNumber: {
+        applicationCode: "99" as ApplicationCode,
+        auxDigit: "0" as AuxDigit,
+        checkDigit: "99" as CheckDigit,
+        iuv13: "1234567890123" as IUV13
+      } as PaymentNoticeNumber
+    };
 
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
@@ -154,7 +155,6 @@ it("should return error (invalid input)", async () => {
   });
 });
 
-
 describe("activatePaymentToPagoPa", async () => {
   it("should return the right response", async () => {
     const aPaymentActivationRequest: PaymentActivationsPostRequest = {
@@ -165,12 +165,11 @@ describe("activatePaymentToPagoPa", async () => {
           auxDigit: "0" as AuxDigit,
           checkDigit: "99" as CheckDigit,
           iuv13: "1234567890123" as IUV13
-        } as PaymentNoticeNumber,
+        } as PaymentNoticeNumber
       } as RptIdFromString,
       importoSingoloVersamento: 9905 as ImportoEuroCents,
       codiceContestoPagamento: aCodiceContestoPagamento
-    }
-  
+    };
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
@@ -227,13 +226,11 @@ describe("activatePaymentToPagoPa", async () => {
           auxDigit: "0" as AuxDigit,
           checkDigit: "99" as CheckDigit,
           iuv13: "1234567890123" as IUV13
-        } as PaymentNoticeNumber,
+        } as PaymentNoticeNumber
       } as RptIdFromString,
       importoSingoloVersamento: 9905 as ImportoEuroCents,
       codiceContestoPagamento: aCodiceContestoPagamento
-    }
-  
-
+    };
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
@@ -245,10 +242,10 @@ describe("activatePaymentToPagoPa", async () => {
 
     req.params = aPaymentActivationRequest;
 
-    const errorOrPaymentActivationResponse = (await paymentActivationsPost(
+    const errorOrPaymentActivationResponse = await paymentActivationsPost(
       aConfig as PagoPAConfig,
       attivaRPTPagoPaClient
-    )(req))
+    )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe(
       "IResponseErrorValidation"
@@ -256,18 +253,57 @@ describe("activatePaymentToPagoPa", async () => {
   });
 });
 
-describe("updatePaymentActivationStatusIntoDB", () => {
+describe("paymentActivationsGet", () => {
+  it("should store payment id and payment info in redis db", async () => {
 
-  it("should store payment id and payment info in redis db", ()=>{
+    const aPaymentActivationRequest: PaymentActivationsPostRequest = {
+      rptId: {
+        organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+        paymentNoticeNumber: {
+          applicationCode: "99" as ApplicationCode,
+          auxDigit: "0" as AuxDigit,
+          checkDigit: "99" as CheckDigit,
+          iuv13: "1234567890123" as IUV13
+        } as PaymentNoticeNumber
+      } as RptIdFromString,
+      importoSingoloVersamento: 9905 as ImportoEuroCents,
+      codiceContestoPagamento: aCodiceContestoPagamento
+    };
 
-    updatePaymentActivationStatusIntoDB(aCdInfoPagamentoInput, 5000, aMockedRedisClient, (aCdInfoPagamentoOutput) => {aCdInfoPagamentoOutput.esito = cdEsito.OK})
+    const req = mockReq();
+    req.params = aPaymentActivationRequest;
 
-    aMockedRedisClient.on("connect", () => {return logger.info("Mocked Redis connected!")})
-     
-    
+    updatePaymentActivationStatusIntoDB(
+      aCdInfoPagamentoInput,
+      5000,
+      aMockedRedisClient,
+      aCdInfoPagamentoOutput => {
+        aCdInfoPagamentoOutput.esito = cdEsito.OK;
+      }
+    );
+
+    aMockedRedisClient.on("connect", () => {
+      return logger.info("Mocked Redis connected!");
+    });
+
+    const errorOrPaymentActivationResponse =  await paymentActivationsGet(aMockedRedisClient)(req);
+
     expect(aMockedRedisClient.connected).toBeTruthy();
+    const keyCodiceContestoPagamento = aMockedRedisClient.get(
+      aCodiceContestoPagamento,
+      (error, result) => {
+        if (error) {
+          throw error;
+        }
+        expect(result).toBe("id1234");
+      }
+    );
 
+    expect(keyCodiceContestoPagamento).toBeTruthy();
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseSuccessJson");
+    if (errorOrPaymentActivationResponse.kind === "IResponseSuccessJson") {
+      expect(errorOrPaymentActivationResponse.value.idPagamento).toBe("id1234")
+    }
     aMockedRedisClient.quit();
-
-  })
-})
+  });
+});
