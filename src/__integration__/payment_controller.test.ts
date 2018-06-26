@@ -122,15 +122,8 @@ describe("checkPaymentToPagoPa", async () => {
   });
 
   it("should return error (invalid input)", async () => {
-    const aPaymentCheckRequest: RptId = {
-      organizationFiscalCode: "1" as OrganizationFiscalCode,
-      paymentNoticeNumber: {
-        applicationCode: "99" as ApplicationCode,
-        auxDigit: "0" as AuxDigit,
-        checkDigit: "99" as CheckDigit,
-        iuv13: "1234567890123" as IUV13
-      } as PaymentNoticeNumber
-    };
+    const aRptId = "12345678901012123456789012399";
+   
 
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
@@ -140,7 +133,7 @@ describe("checkPaymentToPagoPa", async () => {
 
     const req = mockReq();
 
-    req.params = aPaymentCheckRequest;
+    req.params = aRptId;
 
     const errorOrPaymentCheckResponse = await paymentRequestsGet(
       aConfig as PagoPAConfig,
@@ -157,7 +150,7 @@ describe("activatePaymentToPagoPa", async () => {
       rptId: {
         organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
         paymentNoticeNumber: {
-          applicationCode: "99" as ApplicationCode,
+          applicationCode: "12" as ApplicationCode,
           auxDigit: "0" as AuxDigit,
           checkDigit: "99" as CheckDigit,
           iuv13: "1234567890123" as IUV13
