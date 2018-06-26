@@ -8,6 +8,7 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
 
       # Download and cache dependencies
       - restore_cache:
@@ -27,7 +28,6 @@ jobs:
           key: v1-dependencies-{{ checksum "yarn.lock" }}
 
       # Run tests
-      - run: docker-machine start
       - run: yarn build
       - run: yarn test
       - run: yarn test:integration
