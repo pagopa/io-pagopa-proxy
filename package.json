@@ -12,12 +12,9 @@
     "clean": "rm -r ./dist",
     "generate:proxy-api-models": "rm -f ./src/types/api/* && gen-api-models --api-spec ./api_pagopa.yaml --out-dir ./src/types/api/ --ts-spec-file ./src/api/public_api_pagopa.ts",
     "prettify": "prettier --write './**/*.ts'",
-    "docker:start": "docker run -d -p 127.0.0.1:6379:6379 --name mock-redis redis",
-    "docker:remove": "docker container rm -f mock-redis",
     "start": "node dist/index.js",
     "test:unit": "jest --runInBand",
-    "test:integration:": "npm-run-all -s docker:start jest:integration docker:remove",
-    "jest:integration": "jest --config=jest.integration.js",
+    "test:integration": "jest --config=jest.integration.js --runInBand",
     "test": "npm-run-all -s test:*",
     "lint": "tslint --project ."
   },
