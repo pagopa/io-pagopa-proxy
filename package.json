@@ -16,7 +16,8 @@
     "docker:remove": "docker container rm -f mock-redis",
     "start": "node dist/index.js",
     "test:unit": "jest --runInBand",
-    "test:integration": "npm-run-all docker:start && jest --config=jest.integration.js --runInBand && npm-run-all docker:remove",
+    "test:integration:": "npm-run-all -s docker:start jest:integration docker:remove",
+    "jest:integration": "jest --config=jest.integration.js",
     "test": "npm-run-all -s test:*",
     "lint": "tslint --project ."
   },
