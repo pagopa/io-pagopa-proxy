@@ -137,18 +137,18 @@ function getSoapServer(
   const service = {
     FespCdService: {
       FespCdPortType: {
-        cdInfoPagamento: (
+        cdInfoPagamento: async (
           iCdInfoPagamentoInput: IcdInfoPagamentoInput,
           callback: (iCdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void
-        ): void => {
+        ): Promise<IcdInfoPagamentoOutput> => {
           logger.info("Serving Payment Activation Update Request (SOAP)...");
-          callback(
-            PaymentController.updatePaymentActivationStatusIntoDB(
-              iCdInfoPagamentoInput,
-              redisTimeout,
-              redisClient
-            )
+          const iCdInfoPagamentoOutput = await PaymentController.updatePaymentActivationStatusIntoDB(
+            iCdInfoPagamentoInput,
+            redisTimeout,
+            redisClient
           );
+          callback(iCdInfoPagamentoOutput);
+          return iCdInfoPagamentoOutput;
         }
       }
     }
