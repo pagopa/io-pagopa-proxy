@@ -19,7 +19,7 @@ paths:
         '200':
           description: Payment information retrieved
           schema:
-            '$ref': '#/definitions/PaymentRequestsGetResponse'
+            $ref: '#/definitions/PaymentRequestsGetResponse'
           examples:
             application/json:
               importoSingoloVersamento: 200,
@@ -48,7 +48,7 @@ paths:
         '200':
           description: Payment activation process started
           schema:
-            '$ref': '#/definitions/PaymentActivationsPostResponse'
+            $ref: '#/definitions/PaymentActivationsPostResponse'
           examples:
             application/json:
               importoSingoloVersamento: 200
@@ -60,8 +60,8 @@ paths:
     x-swagger-router-controller: PaymentController
     get:
       operationId: getActivationStatus
-      summary: Get Activation status
-      description: Check the activation status to retrieve the paymentId
+      summary: Get the activation status
+      description: Get the activation status and the paymentId
       parameters:
         - $ref: '#/parameters/CodiceContestoPagamento' 
       responses:
@@ -161,7 +161,7 @@ definitions:
     description: Define the request received from CD App to require a payment activation
     properties:
       rptId:
-        '$ref': '#/definitions/RptIdFromString'
+        $ref: '#/definitions/RptIdFromString'
       importoSingoloVersamento:
         $ref: '#/definitions/ImportoEuroCents'
       codiceContestoPagamento:

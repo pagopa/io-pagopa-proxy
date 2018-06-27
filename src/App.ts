@@ -15,6 +15,7 @@ import {
   IcdInfoPagamentoOutput
 } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
+import * as morgan from "morgan";
 import * as redis from "redis";
 import * as soap from "soap";
 import { specs as publicApiV1Specs } from "./api/public_api_pagopa";
@@ -52,6 +53,9 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   // Define RESTful and SOAP endpoints
   const app = express();
   app.set("port", config.CONTROLLER.PORT);
+  const loggerFormat =
+    ":date[iso] [info]: :method :url :status - :response-time ms";
+  app.use(morgan(loggerFormat));
   setRestfulRoutes(app, config, redisClient, pagoPAClient);
   getSoapServer(
     redisClient,
@@ -86,14 +90,11 @@ function setRestfulRoutes(
   pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): void {
   const jsonParser = bodyParser.json();
-  const urlencodedParser = bodyParser.urlencoded({ extended: false });
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_REQUESTS_GET,
-    urlencodedParser,
     (req: express.Request, res: express.Response) => {
-      logger.info("Serving Payment Check Request (GET)...");
       toExpressHandler(
-        PaymentController.paymentRequestsGet(config.PAGOPA, pagoPAClient)
+        PaymentController.getPaymentInfo(config.PAGOPA, pagoPAClient)
       )(req, res);
     }
   );
@@ -101,18 +102,15 @@ function setRestfulRoutes(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_POST,
     jsonParser,
     (req: express.Request, res: express.Response) => {
-      logger.info("Serving Payment Activation Request (POST)...");
       toExpressHandler(
-        PaymentController.paymentActivationsPost(config.PAGOPA, pagoPAClient)
+        PaymentController.activatePayment(config.PAGOPA, pagoPAClient)
       )(req, res);
     }
   );
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_GET,
-    urlencodedParser,
     (req: express.Request, res: express.Response) => {
-      logger.info("Serving Payment Check Activation Request (GET)...");
-      toExpressHandler(PaymentController.paymentActivationsGet(redisClient))(
+      toExpressHandler(PaymentController.getActivationStatus(redisClient))(
         req,
         res
       );
@@ -141,8 +139,7 @@ function getSoapServer(
           iCdInfoPagamentoInput: IcdInfoPagamentoInput,
           callback: (iCdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void
         ): Promise<IcdInfoPagamentoOutput> => {
-          logger.info("Serving Payment Activation Update Request (SOAP)...");
-          const iCdInfoPagamentoOutput = await PaymentController.updatePaymentActivationStatusIntoDB(
+          const iCdInfoPagamentoOutput = await PaymentController.setActivationStatus(
             iCdInfoPagamentoInput,
             redisTimeout,
             redisClient
