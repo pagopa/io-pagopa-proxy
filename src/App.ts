@@ -10,8 +10,10 @@ import * as fs from "fs";
 import * as http from "http";
 import { clients as pagoPASoapClient } from "italia-pagopa-api";
 import { FespCdService_WSDL_PATH } from "italia-pagopa-api/dist/lib/wsdl-paths";
-import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
-import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import {
+  IcdInfoPagamentoInput,
+  IcdInfoPagamentoOutput
+} from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as redis from "redis";
 import * as soap from "soap";
@@ -32,20 +34,11 @@ export async function startApp(config: Configuration): Promise<http.Server> {
 
   // Define SOAP Clients for PagoPA SOAP WS
   // It is necessary to forward BackendApp requests to PagoPA
-  const verificaRPTPagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
+  const pagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
     await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-        config.PAGOPA.SERVICES.VERIFICA_RPT
-      }`,
-      envelopeKey: PPTPortTypes.envelopeKey
-    })
-  );
-  const attivaRPTPagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
-    await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
-      endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-        config.PAGOPA.SERVICES.ATTIVA_RPT
-      }`,
-      envelopeKey: PPTPortTypes.envelopeKey
+        config.PAGOPA.WS_SERVICES.PAGAMENTI
+      }?wsdl`
     })
   );
 
@@ -59,17 +52,12 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   // Define RESTful and SOAP endpoints
   const app = express();
   app.set("port", config.CONTROLLER.PORT);
-  setRestfulRoutes(
-    app,
-    config,
-    redisClient,
-    verificaRPTPagoPAClient,
-    attivaRPTPagoPAClient
-  );
+  setRestfulRoutes(app, config, redisClient, pagoPAClient);
   getSoapServer(
     redisClient,
     config.PAYMENT_ACTIVATION_STATUS_TIMEOUT as number
   )(app);
+
   const server = http.createServer(app);
   server.listen(config.CONTROLLER.PORT);
 
@@ -89,50 +77,41 @@ export function stopServer(server: http.Server): void {
  * @param {core.Express} app - Express server to set
  * @param {Configuration} config - PagoPa proxy configuration
  * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPA
- * @param {PagamentiTelematiciPspNodoAsyncClient} verificaRPTPagoPAClient - PagoPa SOAP client to call verificaRPT service
- * @param {PagamentiTelematiciPspNodoAsyncClient} attivaRPTPagoPAClient - PagoPa SOAP client to call attivaRPT service
+ * @param {PagamentiTelematiciPspNodoAsyncClient} pagoPAClient - PagoPa SOAP client to call verificaRPT and attivaRPT services
  */
 function setRestfulRoutes(
   app: core.Express,
   config: Configuration,
   redisClient: redis.RedisClient,
-  verificaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient,
-  attivaRPTPagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): void {
+  const jsonParser = bodyParser.json();
+  const urlencodedParser = bodyParser.urlencoded({ extended: false });
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_REQUESTS_GET,
+    urlencodedParser,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Check Request (GET)...");
-      app.use(bodyParser.json());
-      app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
-        PaymentController.paymentRequestsGet(
-          config.PAGOPA,
-          verificaRPTPagoPAClient
-        )
+        PaymentController.paymentRequestsGet(config.PAGOPA, pagoPAClient)
       )(req, res);
     }
   );
   app.post(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_POST,
+    jsonParser,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Activation Request (POST)...");
-      app.use(bodyParser.json());
-      app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(
-        PaymentController.paymentActivationsPost(
-          config.PAGOPA,
-          attivaRPTPagoPAClient
-        )
+        PaymentController.paymentActivationsPost(config.PAGOPA, pagoPAClient)
       )(req, res);
     }
   );
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_GET,
+    urlencodedParser,
     (req: express.Request, res: express.Response) => {
       logger.info("Serving Payment Check Activation Request (GET)...");
-      app.use(bodyParser.json());
-      app.use(bodyParser.urlencoded({ extended: false }));
       toExpressHandler(PaymentController.paymentActivationsGet(redisClient))(
         req,
         res
@@ -158,16 +137,18 @@ function getSoapServer(
   const service = {
     FespCdService: {
       FespCdPortType: {
-        cdInfoPagamento: (
-          input: IcdInfoPagamentoInput,
-          callback: () => void
-        ): void => {
-          PaymentController.updatePaymentActivationStatusIntoDB(
-            input,
+        cdInfoPagamento: async (
+          iCdInfoPagamentoInput: IcdInfoPagamentoInput,
+          callback: (iCdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void
+        ): Promise<IcdInfoPagamentoOutput> => {
+          logger.info("Serving Payment Activation Update Request (SOAP)...");
+          const iCdInfoPagamentoOutput = await PaymentController.updatePaymentActivationStatusIntoDB(
+            iCdInfoPagamentoInput,
             redisTimeout,
-            redisClient,
-            callback
+            redisClient
           );
+          callback(iCdInfoPagamentoOutput);
+          return iCdInfoPagamentoOutput;
         }
       }
     }

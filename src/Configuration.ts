@@ -27,7 +27,7 @@ export const CONFIG = {
         PAYMENT_ACTIVATIONS_GET: "/payment-activations/:codiceContestoPagamento"
       },
       SOAP: {
-        PAYMENT_ACTIVATIONS_STATUS_UPDATE: "/cdInfoPagamento"
+        PAYMENT_ACTIVATIONS_STATUS_UPDATE: "/FespCdService"
       }
     }
   },
@@ -39,7 +39,10 @@ export const CONFIG = {
   PAGOPA: {
     HOST: process.env.PAGOPA_HOST || localhost,
     PORT: process.env.PAGOPA_PORT || 3001,
-    SERVICES: {
+    WS_SERVICES: {
+      PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
+    },
+    WS_OPERATIONS: {
       VERIFICA_RPT: "nodoVerificaRPT",
       ATTIVA_RPT: "nodoAttivaRPT"
     },
@@ -90,9 +93,12 @@ export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 const PagoPAConfig = t.intersection([
   ServerConfiguration,
   t.interface({
-    SERVICES: t.interface({
-      VERIFICA_RPT: NonEmptyString,
-      ATTIVA_RPT: NonEmptyString
+    WS_SERVICES: t.interface({
+      PAGAMENTI: NonEmptyString
+    }),
+    WS_OPERATIONS: t.interface({
+      ATTIVA_RPT: NonEmptyString,
+      VERIFICA_RPT: NonEmptyString
     }),
     IDENTIFIER: t.interface({
       IDENTIFICATIVO_PSP: NonEmptyString,

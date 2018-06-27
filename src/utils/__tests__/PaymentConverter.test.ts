@@ -7,6 +7,7 @@ import {
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import {
   PaymentNoticeNumber,
+  RptId,
   RptIdFromString
 } from "italia-ts-commons/lib/pagopa";
 import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
@@ -15,276 +16,280 @@ import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import {
   getInodoAttivaRPTInput,
+  getInodoVerificaRPTInput,
   getPaymentActivationsPostResponse,
   getPaymentRequestsGetResponse
 } from "../PaymentsConverter";
 
 const aVerificaRPTOutputOk: InodoVerificaRPTOutput = {
-  nodoVerificaRPTRisposta: {
-    fault: {
-      faultCode: "01",
-      faultString: "FAULTSTRING",
-      id: "ID01",
-      description: "FAULTDESCRIPTION",
-      serial: 1
-    },
-    esito: PPTPortTypes.Esito.OK,
-    datiPagamentoPA: {
-      importoSingoloVersamento: 99.05,
-      ibanAccredito: "IT17X0605502100000001234567",
-      bicAccredito: "BPPIITRR",
-      enteBeneficiario: {
-        identificativoUnivocoBeneficiario: {
-          tipoIdentificativoUnivoco: "G",
-          codiceIdentificativoUnivoco: "001"
-        },
-        denominazioneBeneficiario: "BANCA01",
-        codiceUnitOperBeneficiario: "01",
-        denomUnitOperBeneficiario: "DENOM01",
-        indirizzoBeneficiario: "VIAROMA",
-        civicoBeneficiario: "01",
-        capBeneficiario: "00000",
-        localitaBeneficiario: "ROMA",
-        provinciaBeneficiario: "ROMA",
-        nazioneBeneficiario: "IT"
+  fault: {
+    faultCode: "01",
+    faultString: "FAULTSTRING",
+    id: "ID01",
+    description: "FAULTDESCRIPTION",
+    serial: 1
+  },
+  esito: PPTPortTypes.Esito.OK,
+  datiPagamentoPA: {
+    importoSingoloVersamento: 99.05,
+    ibanAccredito: "IT17X0605502100000001234567",
+    bicAccredito: "BPPIITRR",
+    enteBeneficiario: {
+      identificativoUnivocoBeneficiario: {
+        tipoIdentificativoUnivoco: "G",
+        codiceIdentificativoUnivoco: "001"
       },
-      credenzialiPagatore: "NOMECOGNOME",
-      causaleVersamento: "CAUSALE01",
-      spezzoniCausaleVersamento: [
-        {
-          spezzoneCausaleVersamento: "SPEZZONE1",
-          spezzoneStrutturatoCausaleVersamento: {
-            causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 99.05
-          }
+      denominazioneBeneficiario: "BANCA01",
+      codiceUnitOperBeneficiario: "01",
+      denomUnitOperBeneficiario: "DENOM01",
+      indirizzoBeneficiario: "VIAROMA",
+      civicoBeneficiario: "01",
+      capBeneficiario: "00000",
+      localitaBeneficiario: "ROMA",
+      provinciaBeneficiario: "ROMA",
+      nazioneBeneficiario: "IT"
+    },
+    credenzialiPagatore: "NOMECOGNOME",
+    causaleVersamento: "CAUSALE01",
+    spezzoniCausaleVersamento: [
+      {
+        spezzoneCausaleVersamento: "SPEZZONE1",
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone: "CAUSALE01",
+          importoSpezzone: 99.05
         }
-      ]
-    }
+      }
+    ]
   }
 };
 
 const aVerificaRPTOutputKoImporto: InodoVerificaRPTOutput = {
-  nodoVerificaRPTRisposta: {
-    fault: {
-      faultCode: "01",
-      faultString: "FAULTSTRING",
-      id: "ID01",
-      description: "FAULTDESCRIPTION",
-      serial: 1
-    },
-    esito: PPTPortTypes.Esito.KO,
-    datiPagamentoPA: {
-      importoSingoloVersamento: 0,
-      ibanAccredito: "IT17X0605502100000001234567",
-      bicAccredito: "BPPIITRR",
-      enteBeneficiario: {
-        identificativoUnivocoBeneficiario: {
-          tipoIdentificativoUnivoco: "G",
-          codiceIdentificativoUnivoco: "001"
-        },
-        denominazioneBeneficiario: "BANCA01",
-        codiceUnitOperBeneficiario: "01",
-        denomUnitOperBeneficiario: "DENOM01",
-        indirizzoBeneficiario: "VIAROMA",
-        civicoBeneficiario: "01",
-        capBeneficiario: "00000",
-        localitaBeneficiario: "ROMA",
-        provinciaBeneficiario: "ROMA",
-        nazioneBeneficiario: "IT"
+  fault: {
+    faultCode: "01",
+    faultString: "FAULTSTRING",
+    id: "ID01",
+    description: "FAULTDESCRIPTION",
+    serial: 1
+  },
+  esito: PPTPortTypes.Esito.KO,
+  datiPagamentoPA: {
+    importoSingoloVersamento: 0,
+    ibanAccredito: "IT17X0605502100000001234567",
+    bicAccredito: "BPPIITRR",
+    enteBeneficiario: {
+      identificativoUnivocoBeneficiario: {
+        tipoIdentificativoUnivoco: "G",
+        codiceIdentificativoUnivoco: "001"
       },
-      credenzialiPagatore: "NOMECOGNOME",
-      causaleVersamento: "CAUSALE01",
-      spezzoniCausaleVersamento: [
-        {
-          spezzoneCausaleVersamento: "SPEZZONE1",
-          spezzoneStrutturatoCausaleVersamento: {
-            causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 9999999999
-          }
+      denominazioneBeneficiario: "BANCA01",
+      codiceUnitOperBeneficiario: "01",
+      denomUnitOperBeneficiario: "DENOM01",
+      indirizzoBeneficiario: "VIAROMA",
+      civicoBeneficiario: "01",
+      capBeneficiario: "00000",
+      localitaBeneficiario: "ROMA",
+      provinciaBeneficiario: "ROMA",
+      nazioneBeneficiario: "IT"
+    },
+    credenzialiPagatore: "NOMECOGNOME",
+    causaleVersamento: "CAUSALE01",
+    spezzoniCausaleVersamento: [
+      {
+        spezzoneCausaleVersamento: "SPEZZONE1",
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone: "CAUSALE01",
+          importoSpezzone: 9999999999
         }
-      ]
-    }
+      }
+    ]
   }
 };
 
 const aVerificaRPTOutputKoIban: InodoVerificaRPTOutput = {
-  nodoVerificaRPTRisposta: {
-    fault: {
-      faultCode: "01",
-      faultString: "FAULTSTRING",
-      id: "ID01",
-      description: "FAULTDESCRIPTION",
-      serial: 1
-    },
-    esito: PPTPortTypes.Esito.KO,
-    datiPagamentoPA: {
-      importoSingoloVersamento: 99.05,
-      ibanAccredito: "XXX",
-      bicAccredito: "BPPIITRR",
-      enteBeneficiario: {
-        identificativoUnivocoBeneficiario: {
-          tipoIdentificativoUnivoco: "G",
-          codiceIdentificativoUnivoco: "001"
-        },
-        denominazioneBeneficiario: "BANCA01",
-        codiceUnitOperBeneficiario: "01",
-        denomUnitOperBeneficiario: "DENOM01",
-        indirizzoBeneficiario: "VIAROMA",
-        civicoBeneficiario: "01",
-        capBeneficiario: "00000",
-        localitaBeneficiario: "ROMA",
-        provinciaBeneficiario: "ROMA",
-        nazioneBeneficiario: "IT"
+  fault: {
+    faultCode: "01",
+    faultString: "FAULTSTRING",
+    id: "ID01",
+    description: "FAULTDESCRIPTION",
+    serial: 1
+  },
+  esito: PPTPortTypes.Esito.KO,
+  datiPagamentoPA: {
+    importoSingoloVersamento: 99.05,
+    ibanAccredito: "XXX",
+    bicAccredito: "BPPIITRR",
+    enteBeneficiario: {
+      identificativoUnivocoBeneficiario: {
+        tipoIdentificativoUnivoco: "G",
+        codiceIdentificativoUnivoco: "001"
       },
-      credenzialiPagatore: "NOMECOGNOME",
-      causaleVersamento: "CAUSALE01",
-      spezzoniCausaleVersamento: [
-        {
-          spezzoneCausaleVersamento: "SPEZZONE1",
-          spezzoneStrutturatoCausaleVersamento: {
-            causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 99.05
-          }
+      denominazioneBeneficiario: "BANCA01",
+      codiceUnitOperBeneficiario: "01",
+      denomUnitOperBeneficiario: "DENOM01",
+      indirizzoBeneficiario: "VIAROMA",
+      civicoBeneficiario: "01",
+      capBeneficiario: "00000",
+      localitaBeneficiario: "ROMA",
+      provinciaBeneficiario: "ROMA",
+      nazioneBeneficiario: "IT"
+    },
+    credenzialiPagatore: "NOMECOGNOME",
+    causaleVersamento: "CAUSALE01",
+    spezzoniCausaleVersamento: [
+      {
+        spezzoneCausaleVersamento: "SPEZZONE1",
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone: "CAUSALE01",
+          importoSpezzone: 99.05
         }
-      ]
-    }
+      }
+    ]
   }
 };
 
 const anAttivaRPTOutputOk: InodoAttivaRPTOutput = {
-  nodoAttivaRPTRisposta: {
-    fault: {
-      faultCode: "01",
-      faultString: "FAULTSTRING",
-      id: "ID01",
-      description: "FAULTDESCRIPTION",
-      serial: 1
-    },
-    esito: PPTPortTypes.Esito.OK,
-    datiPagamentoPA: {
-      importoSingoloVersamento: 99.05,
-      ibanAccredito: "IT17X0605502100000001234567",
-      bicAccredito: "BPPIITRR",
-      enteBeneficiario: {
-        identificativoUnivocoBeneficiario: {
-          tipoIdentificativoUnivoco: "G",
-          codiceIdentificativoUnivoco: "001"
-        },
-        denominazioneBeneficiario: "BANCA01",
-        codiceUnitOperBeneficiario: "01",
-        denomUnitOperBeneficiario: "DENOM01",
-        indirizzoBeneficiario: "VIAROMA",
-        civicoBeneficiario: "01",
-        capBeneficiario: "00000",
-        localitaBeneficiario: "ROMA",
-        provinciaBeneficiario: "ROMA",
-        nazioneBeneficiario: "IT"
+  fault: {
+    faultCode: "01",
+    faultString: "FAULTSTRING",
+    id: "ID01",
+    description: "FAULTDESCRIPTION",
+    serial: 1
+  },
+  esito: PPTPortTypes.Esito.OK,
+  datiPagamentoPA: {
+    importoSingoloVersamento: 99.05,
+    ibanAccredito: "IT17X0605502100000001234567",
+    bicAccredito: "BPPIITRR",
+    enteBeneficiario: {
+      identificativoUnivocoBeneficiario: {
+        tipoIdentificativoUnivoco: "G",
+        codiceIdentificativoUnivoco: "001"
       },
-      credenzialiPagatore: "NOMECOGNOME",
-      causaleVersamento: "CAUSALE01",
-      spezzoniCausaleVersamento: [
-        {
-          spezzoneCausaleVersamento: "SPEZZONE1",
-          spezzoneStrutturatoCausaleVersamento: {
-            causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 99.05
-          }
+      denominazioneBeneficiario: "BANCA01",
+      codiceUnitOperBeneficiario: "01",
+      denomUnitOperBeneficiario: "DENOM01",
+      indirizzoBeneficiario: "VIAROMA",
+      civicoBeneficiario: "01",
+      capBeneficiario: "00000",
+      localitaBeneficiario: "ROMA",
+      provinciaBeneficiario: "ROMA",
+      nazioneBeneficiario: "IT"
+    },
+    credenzialiPagatore: "NOMECOGNOME",
+    causaleVersamento: "CAUSALE01",
+    spezzoniCausaleVersamento: [
+      {
+        spezzoneCausaleVersamento: "SPEZZONE1",
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone: "CAUSALE01",
+          importoSpezzone: 99.05
         }
-      ]
-    }
+      }
+    ]
   }
 };
 
 const anAttivaRPTOutputKoImporto: InodoAttivaRPTOutput = {
-  nodoAttivaRPTRisposta: {
-    fault: {
-      faultCode: "01",
-      faultString: "FAULTSTRING",
-      id: "ID01",
-      description: "FAULTDESCRIPTION",
-      serial: 1
-    },
-    esito: PPTPortTypes.Esito.KO,
-    datiPagamentoPA: {
-      importoSingoloVersamento: 9999999999,
-      ibanAccredito: "IT17X0605502100000001234567",
-      bicAccredito: "BPPIITRR",
-      enteBeneficiario: {
-        identificativoUnivocoBeneficiario: {
-          tipoIdentificativoUnivoco: "G",
-          codiceIdentificativoUnivoco: "001"
-        },
-        denominazioneBeneficiario: "BANCA01",
-        codiceUnitOperBeneficiario: "01",
-        denomUnitOperBeneficiario: "DENOM01",
-        indirizzoBeneficiario: "VIAROMA",
-        civicoBeneficiario: "01",
-        capBeneficiario: "00000",
-        localitaBeneficiario: "ROMA",
-        provinciaBeneficiario: "ROMA",
-        nazioneBeneficiario: "IT"
+  fault: {
+    faultCode: "01",
+    faultString: "FAULTSTRING",
+    id: "ID01",
+    description: "FAULTDESCRIPTION",
+    serial: 1
+  },
+  esito: PPTPortTypes.Esito.KO,
+  datiPagamentoPA: {
+    importoSingoloVersamento: 9999999999,
+    ibanAccredito: "IT17X0605502100000001234567",
+    bicAccredito: "BPPIITRR",
+    enteBeneficiario: {
+      identificativoUnivocoBeneficiario: {
+        tipoIdentificativoUnivoco: "G",
+        codiceIdentificativoUnivoco: "001"
       },
-      credenzialiPagatore: "NOMECOGNOME",
-      causaleVersamento: "CAUSALE01",
-      spezzoniCausaleVersamento: [
-        {
-          spezzoneCausaleVersamento: "SPEZZONE1",
-          spezzoneStrutturatoCausaleVersamento: {
-            causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 9999999999
-          }
+      denominazioneBeneficiario: "BANCA01",
+      codiceUnitOperBeneficiario: "01",
+      denomUnitOperBeneficiario: "DENOM01",
+      indirizzoBeneficiario: "VIAROMA",
+      civicoBeneficiario: "01",
+      capBeneficiario: "00000",
+      localitaBeneficiario: "ROMA",
+      provinciaBeneficiario: "ROMA",
+      nazioneBeneficiario: "IT"
+    },
+    credenzialiPagatore: "NOMECOGNOME",
+    causaleVersamento: "CAUSALE01",
+    spezzoniCausaleVersamento: [
+      {
+        spezzoneCausaleVersamento: "SPEZZONE1",
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone: "CAUSALE01",
+          importoSpezzone: 9999999999
         }
-      ]
-    }
+      }
+    ]
   }
 };
 
 const anAttivaRPTOutputKoIban: InodoAttivaRPTOutput = {
-  nodoAttivaRPTRisposta: {
-    fault: {
-      faultCode: "01",
-      faultString: "FAULTSTRING",
-      id: "ID01",
-      description: "FAULTDESCRIPTION",
-      serial: 1
-    },
-    esito: PPTPortTypes.Esito.KO,
-    datiPagamentoPA: {
-      importoSingoloVersamento: 99.05,
-      ibanAccredito: "XXX",
-      bicAccredito: "BPPIITRR",
-      enteBeneficiario: {
-        identificativoUnivocoBeneficiario: {
-          tipoIdentificativoUnivoco: "G",
-          codiceIdentificativoUnivoco: "001"
-        },
-        denominazioneBeneficiario: "BANCA01",
-        codiceUnitOperBeneficiario: "01",
-        denomUnitOperBeneficiario: "DENOM01",
-        indirizzoBeneficiario: "VIAROMA",
-        civicoBeneficiario: "01",
-        capBeneficiario: "00000",
-        localitaBeneficiario: "ROMA",
-        provinciaBeneficiario: "ROMA",
-        nazioneBeneficiario: "IT"
+  fault: {
+    faultCode: "01",
+    faultString: "FAULTSTRING",
+    id: "ID01",
+    description: "FAULTDESCRIPTION",
+    serial: 1
+  },
+  esito: PPTPortTypes.Esito.KO,
+  datiPagamentoPA: {
+    importoSingoloVersamento: 99.05,
+    ibanAccredito: "XXX",
+    bicAccredito: "BPPIITRR",
+    enteBeneficiario: {
+      identificativoUnivocoBeneficiario: {
+        tipoIdentificativoUnivoco: "G",
+        codiceIdentificativoUnivoco: "001"
       },
-      credenzialiPagatore: "NOMECOGNOME",
-      causaleVersamento: "CAUSALE01",
-      spezzoniCausaleVersamento: [
-        {
-          spezzoneCausaleVersamento: "SPEZZONE1",
-          spezzoneStrutturatoCausaleVersamento: {
-            causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 99.05
-          }
+      denominazioneBeneficiario: "BANCA01",
+      codiceUnitOperBeneficiario: "01",
+      denomUnitOperBeneficiario: "DENOM01",
+      indirizzoBeneficiario: "VIAROMA",
+      civicoBeneficiario: "01",
+      capBeneficiario: "00000",
+      localitaBeneficiario: "ROMA",
+      provinciaBeneficiario: "ROMA",
+      nazioneBeneficiario: "IT"
+    },
+    credenzialiPagatore: "NOMECOGNOME",
+    causaleVersamento: "CAUSALE01",
+    spezzoniCausaleVersamento: [
+      {
+        spezzoneCausaleVersamento: "SPEZZONE1",
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone: "CAUSALE01",
+          importoSpezzone: 98.05
         }
-      ]
-    }
+      },
+      {
+        spezzoneCausaleVersamento: "SPEZZONE2",
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone: "CAUSALE02",
+          importoSpezzone: 1
+        }
+      }
+    ]
   }
 };
 
-const aCodiceContestoPagamento: CodiceContestoPagamento = "8447a9f0-7468-11e8-9a8d-5d4209060ab0" as CodiceContestoPagamento;
-
+const aCodiceContestoPagamento: CodiceContestoPagamento = "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento;
+const aRptId: RptId = {
+  organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+  paymentNoticeNumber: {
+    applicationCode: "12",
+    auxDigit: "0",
+    checkDigit: "12",
+    iuv13: "1234567890123"
+  } as PaymentNoticeNumber
+};
 const aPaymentActivationsPostRequest0 = PaymentActivationsPostRequest.decode({
   rptId: RptIdFromString.encode({
     organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
@@ -349,7 +354,10 @@ const aPaymentActivationsPostRequest3 = PaymentActivationsPostRequest.decode({
 const aConfig = {
   HOST: process.env.PAGOPA_HOST || "http://localhost",
   PORT: process.env.PAGOPA_PORT || "3001",
-  SERVICES: {
+  WS_SERVICES: {
+    PAGAMENTI: "/PagamentiTelematiciPspNodoservice"
+  },
+  WS_OPERATIONS: {
     VERIFICA_RPT: "nodoVerificaRPT",
     ATTIVA_RPT: "nodoAttivaRPT"
   },
@@ -361,6 +369,43 @@ const aConfig = {
     TOKEN: process.env.PAGOPA_TOKEN || "ND"
   }
 };
+
+describe("getINodoVerificaRPTInput", () => {
+  it("should return a correct nodoVerificaRPTInput", () => {
+    const errorOrNodoVerificaRPTInput = getInodoVerificaRPTInput(
+      aConfig as PagoPAConfig,
+      aRptId,
+      aCodiceContestoPagamento
+    );
+
+    expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
+    if (isRight(errorOrNodoVerificaRPTInput)) {
+      expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
+        CF: "12345678901",
+        CodStazPA: "12",
+        AuxDigit: "0",
+        CodIUV: "1234567890123"
+      });
+      expect(errorOrNodoVerificaRPTInput.value.codificaInfrastrutturaPSP).toBe(
+        "QR-CODE"
+      );
+      expect(errorOrNodoVerificaRPTInput.value.identificativoCanale).toBe(
+        "97735020584_02"
+      );
+      expect(
+        errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
+      ).toBe("97735020584");
+      expect(errorOrNodoVerificaRPTInput.value.password).toBe("ND");
+      expect(
+        isRight(
+          CodiceContestoPagamento.decode(
+            errorOrNodoVerificaRPTInput.value.codiceContestoPagamento
+          )
+        )
+      ).toBeTruthy();
+    }
+  });
+});
 
 describe("getPaymentsCheckResponse", () => {
   it("should convert InodoVerificaRPTOutput to PaymentsCheckResponse", () => {
@@ -623,10 +668,18 @@ describe("getPaymentsActivationRequestPagoPA", () => {
 
 describe("getPaymentsActivationResponse", () => {
   it("Should convert InodoAttivaRPTOutput in PaymentsActivationResponse", () => {
-    expect(
-      getPaymentActivationsPostResponse(anAttivaRPTOutputOk).isRight()
-    ).toBeTruthy();
+    const errorOrAttivaRPTOutput = getPaymentActivationsPostResponse(
+      anAttivaRPTOutputOk
+    );
+    expect(isRight(errorOrAttivaRPTOutput)).toBeTruthy();
+    if (isRight(errorOrAttivaRPTOutput)) {
+      expect(errorOrAttivaRPTOutput.value.importoSingoloVersamento).toBe(9905);
+      expect(
+        errorOrAttivaRPTOutput.value.spezzoniCausaleVersamento
+      ).toBeDefined();
+    }
   });
+
   it("should not convert to PaymentsActivationResponse (wrong importo)", () => {
     expect(
       isLeft(getPaymentActivationsPostResponse(anAttivaRPTOutputKoImporto))
