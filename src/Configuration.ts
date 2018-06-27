@@ -63,7 +63,7 @@ export const CONFIG = {
 
   // Timeout used to store PaymentId into redis db (AttivaRPT process)
   // #158387557 The value is an estimation that could be reviewed with real scenarios
-  PAYMENT_ACTIVATION_STATUS_TIMEOUT: 60 * 60 * 48
+  PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS: 60 * 60 * 48
 };
 
 // Configuration validator - Define configuration types and interfaces
@@ -121,7 +121,7 @@ export const Configuration = t.interface({
   WINSTON_LOG_LEVEL: WinstonLogLevel,
   CONTROLLER: ControllerConfig,
   PAGOPA: PagoPAConfig,
-  PAYMENT_ACTIVATION_STATUS_TIMEOUT: t.number,
+  PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS: t.number,
   REDIS_DB: ServerConfiguration
 });
 export type Configuration = t.TypeOf<typeof Configuration>;

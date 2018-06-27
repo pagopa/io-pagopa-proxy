@@ -59,7 +59,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   setRestfulRoutes(app, config, redisClient, pagoPAClient);
   getSoapServer(
     redisClient,
-    config.PAYMENT_ACTIVATION_STATUS_TIMEOUT as number
+    config.PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS as number
   )(app);
 
   const server = http.createServer(app);

@@ -273,11 +273,11 @@ export function getActivationStatus(
     // It's just a key-value mapping
     return (await redisGet(redisClient, codiceContestoPagamento))
       .fold<Either<IResponseErrorNotFound | IResponseErrorInternal, string>>(
-        error => left(ResponseErrorInternal(`PaymentActivationsGet: ${error}`)),
+        error => left(ResponseErrorInternal(`getActivationStatus: ${error}`)),
         maybeIdPagamento =>
-          fromOption(
-            ResponseErrorNotFound("Not found", "PaymentActivationsGet")
-          )(maybeIdPagamento)
+          fromOption(ResponseErrorNotFound("Not found", "getActivationStatus"))(
+            maybeIdPagamento
+          )
       )
       .fold<
         | IResponseErrorValidation
