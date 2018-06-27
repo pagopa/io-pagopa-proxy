@@ -14,14 +14,13 @@ import "jest-xml-matcher";
 import * as redis from "redis";
 import { PagoPAConfig } from "../Configuration";
 import {
-  paymentActivationsGet,
-  paymentActivationsPost,
-  paymentRequestsGet,
-  updatePaymentActivationStatusIntoDB
+  activatePayment,
+  getActivationStatus,
+  getPaymentInfo,
+  setActivationStatus
 } from "../controllers/restful/PaymentController";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../types/api/ImportoEuroCents";
-import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
 import { logger } from "../utils/Logger";
 import {
   createPagamentiTelematiciPspNodoClient,
@@ -72,7 +71,7 @@ describe("checkPaymentToPagoPa", async () => {
 
     req.params = aRptIdString;
 
-    const errorOrPaymentCheckResponse = await paymentRequestsGet(
+    const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig as PagoPAConfig,
       verificaRPTPagoPaClient
     )(req);
@@ -126,7 +125,7 @@ describe("checkPaymentToPagoPa", async () => {
 
     req.params = aRptId;
 
-    const errorOrPaymentCheckResponse = await paymentRequestsGet(
+    const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig as PagoPAConfig,
       verificaRPTPagoPaClient
     )(req);
@@ -137,7 +136,7 @@ describe("checkPaymentToPagoPa", async () => {
 
 describe("activatePaymentToPagoPa", async () => {
   it("should return the right response", async () => {
-    const aPaymentActivationRequest: PaymentActivationsPostRequest = {
+    const aPaymentActivationRequest = {
       rptId: {
         organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
         paymentNoticeNumber: {
@@ -161,7 +160,7 @@ describe("activatePaymentToPagoPa", async () => {
 
     req.body = aPaymentActivationRequest;
 
-    const errorOrPaymentActivationResponse = await paymentActivationsPost(
+    const errorOrPaymentActivationResponse = await activatePayment(
       aConfig as PagoPAConfig,
       attivaRPTPagoPaClient
     )(req);
@@ -198,7 +197,7 @@ describe("activatePaymentToPagoPa", async () => {
   });
 
   it("should return error (invalid input)", async () => {
-    const aPaymentActivationRequest: PaymentActivationsPostRequest = {
+    const aPaymentActivationRequest = {
       rptId: {
         organizationFiscalCode: "XXX" as OrganizationFiscalCode,
         paymentNoticeNumber: {
@@ -222,7 +221,7 @@ describe("activatePaymentToPagoPa", async () => {
 
     req.params = aPaymentActivationRequest;
 
-    const errorOrPaymentActivationResponse = await paymentActivationsPost(
+    const errorOrPaymentActivationResponse = await activatePayment(
       aConfig as PagoPAConfig,
       attivaRPTPagoPaClient
     )(req);
@@ -233,9 +232,9 @@ describe("activatePaymentToPagoPa", async () => {
   });
 });
 
-describe("paymentActivationsGet and paymentActivationsGet", () => {
+describe("setActivationStatus and getActivationStatus", () => {
   it("should store payment id and payment info in redis db", async () => {
-    const aPaymentActivationRequest: PaymentActivationsPostRequest = {
+    const aPaymentActivationRequest = {
       rptId: {
         organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
         paymentNoticeNumber: {
@@ -252,17 +251,13 @@ describe("paymentActivationsGet and paymentActivationsGet", () => {
     const req = mockReq();
     req.params = aPaymentActivationRequest;
 
-    await updatePaymentActivationStatusIntoDB(
-      aCdInfoPagamentoInput,
-      5000,
-      aMockedRedisClient
-    );
+    await setActivationStatus(aCdInfoPagamentoInput, 5000, aMockedRedisClient);
 
     aMockedRedisClient.on("connect", () => {
       return logger.info("Mocked Redis connected!");
     });
 
-    const errorOrPaymentActivationGet = await paymentActivationsGet(
+    const errorOrPaymentActivationGet = await getActivationStatus(
       aMockedRedisClient
     )(req);
 
