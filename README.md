@@ -54,3 +54,11 @@ logLev values: "error", "info", "debug"
 
 Swagger API specs are available at /specs/api/v1/swagger.json
 For example, running it on local enviroment it's reachable at http://localhost:3000/specs/api/v1/swagger.json
+
+## How to install and run the application
+
+1. yarn install
+2. yarn build
+3. yarn start
+
+Note: If start fails, try to remove node_modules and yarn.lock, so retry the procedure. It's a temporary bug
