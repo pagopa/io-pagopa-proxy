@@ -46,7 +46,7 @@ import { redisGet, redisSet } from "../../utils/Redis";
  * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentsActivationResponse>>} The response content to send to applicant
  */
-export function paymentRequestsGet(
+export function getPaymentInfo(
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
@@ -134,7 +134,7 @@ export function paymentRequestsGet(
  * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentActivationsPostRequest>>} The response content to send to applicant
  */
-export function paymentActivationsPost(
+export function activatePayment(
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
@@ -217,10 +217,9 @@ export function paymentActivationsPost(
  * @param {IcdInfoPagamentoInput} cdInfoPagamentoInput - The request from PagoPA
  * @param {RedisTimeout} redisTimeout - The expiration timeout for the information to store
  * @param {RedisClient} redisClient - The redis client used to store the paymentId
- * @param {(cdInfoPagamentoOutput: IcdInfoPagamentoOutput) => void} callback - Callback function to send a feedback to PagoPA
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
-export async function updatePaymentActivationStatusIntoDB(
+export async function setActivationStatus(
   cdInfoPagamentoInput: IcdInfoPagamentoInput,
   redisTimeout: number,
   redisClient: redis.RedisClient
@@ -248,7 +247,7 @@ export async function updatePaymentActivationStatusIntoDB(
  * @param {redis.RedisClient} redisClient - The redis client used to retrieve the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
-export function paymentActivationsGet(
+export function getActivationStatus(
   redisClient: redis.RedisClient
 ): (
   req: express.Request
@@ -312,5 +311,5 @@ export function paymentActivationsGet(
  * @return {Either<Error,CodiceContestoPagamento>} The generated id or an internal error
  */
 function generateCodiceContestoPagamento(): CodiceContestoPagamento {
-  return uuid.v1().replace(new RegExp("-", "g"), "") as CodiceContestoPagamento;
+  return uuid.v1().replace(/-/g, "") as CodiceContestoPagamento;
 }
