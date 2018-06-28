@@ -59,7 +59,7 @@ export function getPaymentInfo(
 > {
   return async req => {
     // Validate rptId (payment identifier) provided by BackendApp
-    const errorOrRptId = RptIdFromString.decode(req.params);
+    const errorOrRptId = RptIdFromString.decode(req.params.rptId);
 
     if (isLeft(errorOrRptId)) {
       const error = errorOrRptId.value;

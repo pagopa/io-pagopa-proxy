@@ -1,3 +1,4 @@
+import * as express from "express";
 import { isRight } from "fp-ts/lib/Either";
 import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
 import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
@@ -67,9 +68,9 @@ describe("checkPaymentToPagoPa", async () => {
       })
     );
 
-    const req = mockReq();
-
-    req.params = aRptIdString;
+    const req = {
+      params: { rptId: aRptIdString }
+    } as express.Request;
 
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig as PagoPAConfig,
