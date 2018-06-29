@@ -17,7 +17,7 @@
     "typedef": [
       true,
       "call-signature"
-    ],    
+    ],
     "readonly-keyword": true,
     "readonly-array": true,
     "no-let": true,

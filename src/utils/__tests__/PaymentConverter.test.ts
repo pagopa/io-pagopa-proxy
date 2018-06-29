@@ -299,11 +299,7 @@ const aConfig = {
   HOST: process.env.PAGOPA_HOST || "http://localhost",
   PORT: process.env.PAGOPA_PORT || "3001",
   WS_SERVICES: {
-    PAGAMENTI: "/PagamentiTelematiciPspNodoservice"
-  },
-  WS_OPERATIONS: {
-    VERIFICA_RPT: "nodoVerificaRPT",
-    ATTIVA_RPT: "nodoAttivaRPT"
+    PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
   },
   // These information will identify our system when it will access to PagoPA
   IDENTIFIER: {
