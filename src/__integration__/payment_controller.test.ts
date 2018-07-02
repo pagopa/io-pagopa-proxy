@@ -10,7 +10,10 @@ import {
   PaymentNoticeNumber,
   RptIdFromString
 } from "italia-ts-commons/lib/pagopa";
-import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
+import {
+  NonEmptyString,
+  OrganizationFiscalCode
+} from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import * as redis from "redis";
 import { PagoPAConfig } from "../Configuration";
@@ -29,22 +32,18 @@ import {
 } from "./fake/fakePagamentiTelematiciPspNodoAsyncClient";
 import mockReq from "./fake/request";
 
-const aConfig = {
-  HOST: process.env.PAGOPA_HOST || "http://localhost",
+const aConfig: PagoPAConfig = {
+  HOST: "http://localhost" as NonEmptyString,
   PORT: 3002,
   WS_SERVICES: {
-    PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
-  },
-  WS_OPERATIONS: {
-    VERIFICA_RPT: "nodoVerificaRPT",
-    ATTIVA_RPT: "nodoAttivaRPT"
+    PAGAMENTI: "/PagamentiTelematiciPspNodoservice/" as NonEmptyString
   },
   // These information will identify our system when it will access to PagoPA
   IDENTIFIER: {
-    IDENTIFICATIVO_PSP: "AGID_01",
-    IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
-    IDENTIFICATIVO_CANALE: "97735020584_02",
-    TOKEN: process.env.PAGOPA_TOKEN || "ND"
+    IDENTIFICATIVO_PSP: "AGID_01" as NonEmptyString,
+    IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584" as NonEmptyString,
+    IDENTIFICATIVO_CANALE: "97735020584_02" as NonEmptyString,
+    TOKEN: "ND" as NonEmptyString
   }
 };
 const aRptIdString = "12345678901012123456789012399";
@@ -73,7 +72,7 @@ describe("checkPaymentToPagoPa", async () => {
     } as express.Request;
 
     const errorOrPaymentCheckResponse = await getPaymentInfo(
-      aConfig as PagoPAConfig,
+      aConfig,
       verificaRPTPagoPaClient
     )(req);
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseSuccessJson");
@@ -127,7 +126,7 @@ describe("checkPaymentToPagoPa", async () => {
     req.params = aRptId;
 
     const errorOrPaymentCheckResponse = await getPaymentInfo(
-      aConfig as PagoPAConfig,
+      aConfig,
       verificaRPTPagoPaClient
     )(req);
 
@@ -162,7 +161,7 @@ describe("activatePaymentToPagoPa", async () => {
     req.body = aPaymentActivationRequest;
 
     const errorOrPaymentActivationResponse = await activatePayment(
-      aConfig as PagoPAConfig,
+      aConfig,
       attivaRPTPagoPaClient
     )(req);
 
@@ -223,7 +222,7 @@ describe("activatePaymentToPagoPa", async () => {
     req.params = aPaymentActivationRequest;
 
     const errorOrPaymentActivationResponse = await activatePayment(
-      aConfig as PagoPAConfig,
+      aConfig,
       attivaRPTPagoPaClient
     )(req);
 
