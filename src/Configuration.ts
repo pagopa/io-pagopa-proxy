@@ -6,7 +6,6 @@ import * as t from "io-ts";
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 
-// Localhost hostname used for debugging
 const localhost = "http://localhost";
 
 export const CONFIG = {
@@ -42,10 +41,6 @@ export const CONFIG = {
     WS_SERVICES: {
       PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
     },
-    WS_OPERATIONS: {
-      VERIFICA_RPT: "nodoVerificaRPT",
-      ATTIVA_RPT: "nodoAttivaRPT"
-    },
     // These information will identify our system when it will access to PagoPA
     IDENTIFIER: {
       IDENTIFICATIVO_PSP: "AGID_01",
@@ -58,12 +53,14 @@ export const CONFIG = {
   // Redis DB Server Configuration
   REDIS_DB: {
     PORT: process.env.REDIS_DB_PORT || 6379,
-    HOST: process.env.REDIS_DB_HOST || "localhost"
+    HOST: process.env.REDIS_DB_URL || "redis://localhost",
+    PASSWORD: process.env.REDIS_DB_PASSWORD || "ND",
+    USE_CLUSTER: process.env.REDIS_USE_CLUSTER || false
   },
 
   // Timeout used to store PaymentId into redis db (AttivaRPT process)
   // #158387557 The value is an estimation that could be reviewed with real scenarios
-  PAYMENT_ACTIVATION_STATUS_TIMEOUT: 60 * 60 * 48
+  PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS: 60 * 60 * 48
 };
 
 // Configuration validator - Define configuration types and interfaces
@@ -96,10 +93,6 @@ const PagoPAConfig = t.intersection([
     WS_SERVICES: t.interface({
       PAGAMENTI: NonEmptyString
     }),
-    WS_OPERATIONS: t.interface({
-      ATTIVA_RPT: NonEmptyString,
-      VERIFICA_RPT: NonEmptyString
-    }),
     IDENTIFIER: t.interface({
       IDENTIFICATIVO_PSP: NonEmptyString,
       IDENTIFICATIVO_INTERMEDIARIO_PSP: NonEmptyString,
@@ -117,11 +110,20 @@ export const WinstonLogLevel = t.keyof({
 });
 export type WinstonLogLevel = t.TypeOf<typeof WinstonLogLevel>;
 
+export const RedisConfig = t.intersection([
+  ServerConfiguration,
+  t.interface({
+    PASSWORD: t.string,
+    USE_CLUSTER: t.boolean
+  })
+]);
+export type RedisConfig = t.TypeOf<typeof RedisConfig>;
+
 export const Configuration = t.interface({
   WINSTON_LOG_LEVEL: WinstonLogLevel,
   CONTROLLER: ControllerConfig,
   PAGOPA: PagoPAConfig,
-  PAYMENT_ACTIVATION_STATUS_TIMEOUT: t.number,
-  REDIS_DB: ServerConfiguration
+  PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS: t.number,
+  REDIS_DB: RedisConfig
 });
 export type Configuration = t.TypeOf<typeof Configuration>;

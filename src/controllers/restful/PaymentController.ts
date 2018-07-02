@@ -216,13 +216,13 @@ export function activatePayment(
  * related to a previous async request (attivaRPT)
  * It just store this information into redis db. This information will be retrieved by App using polling
  * @param {IcdInfoPagamentoInput} cdInfoPagamentoInput - The request from PagoPA
- * @param {RedisTimeout} redisTimeout - The expiration timeout for the information to store
+ * @param {number} redisTimeoutSecs - The expiration timeout for the information to store
  * @param {RedisClient} redisClient - The redis client used to store the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
 export async function setActivationStatus(
   cdInfoPagamentoInput: IcdInfoPagamentoInput,
-  redisTimeout: number,
+  redisTimeoutSecs: number,
   redisClient: redis.RedisClient
 ): Promise<IcdInfoPagamentoOutput> {
   return (await redisSet(
@@ -230,7 +230,7 @@ export async function setActivationStatus(
     cdInfoPagamentoInput.codiceContestoPagamento,
     cdInfoPagamentoInput.idPagamento,
     "EX", // Set the specified expire time, in seconds.
-    redisTimeout
+    redisTimeoutSecs
   )).fold<IcdInfoPagamentoOutput>(
     _ => ({
       esito: Esito.KO
@@ -274,11 +274,11 @@ export function getActivationStatus(
     // It's just a key-value mapping
     return (await redisGet(redisClient, codiceContestoPagamento))
       .fold<Either<IResponseErrorNotFound | IResponseErrorInternal, string>>(
-        error => left(ResponseErrorInternal(`PaymentActivationsGet: ${error}`)),
+        error => left(ResponseErrorInternal(`getActivationStatus: ${error}`)),
         maybeIdPagamento =>
-          fromOption(
-            ResponseErrorNotFound("Not found", "PaymentActivationsGet")
-          )(maybeIdPagamento)
+          fromOption(ResponseErrorNotFound("Not found", "getActivationStatus"))(
+            maybeIdPagamento
+          )
       )
       .fold<
         | IResponseErrorValidation
