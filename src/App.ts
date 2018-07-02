@@ -40,7 +40,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
         config.PAGOPA.WS_SERVICES.PAGAMENTI
-      }?wsdl`
+      }`
     })
   );
 
@@ -122,7 +122,7 @@ function setRestfulRoutes(
   );
 
   // Endpoint for OpenAPI handler
-  app.get("/specs/api/v1/swagger.json", GetOpenapi(publicApiV1Specs));
+  app.get("/api/v1/swagger.json", GetOpenapi(publicApiV1Specs));
 }
 
 /**
@@ -131,26 +131,25 @@ function setRestfulRoutes(
  * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
  */
 function getRedisClient(config: Configuration): redis.RedisClient {
-  if (!config.REDIS_DB.USE_CLUSTER) {
-    logger.debug("Creating a REDIS client...");
-    return redis.createClient(config.REDIS_DB.HOST);
+  if (config.REDIS_DB.USE_CLUSTER) {
+    logger.debug("Creating a REDIS client using cluster...");
+    return new RedisClustr({
+      redisOptions: {
+        auth_pass: config.REDIS_DB.PASSWORD,
+        tls: {
+          servername: config.REDIS_DB.HOST
+        }
+      },
+      servers: [
+        {
+          host: config.REDIS_DB.HOST,
+          port: config.REDIS_DB.PORT
+        }
+      ]
+    }) as redis.RedisClient;
   }
-  logger.debug("Creating a REDIS client using cluster...");
-  return new RedisClustr({
-    redisOptions: {
-      auth_pass: config.REDIS_DB.PASSWORD,
-      tls: {
-        servername: config.REDIS_DB.HOST
-      }
-    },
-    servers: [
-      {
-        host: config.REDIS_DB.HOST,
-        port: config.REDIS_DB.PORT
-      }
-    ]
-  }) as redis.RedisClient;
-  return redis.createClient(config.REDIS_DB.PORT);
+  logger.debug("Creating a REDIS client...");
+  return redis.createClient(config.REDIS_DB.HOST);
 }
 
 /**
@@ -168,7 +167,7 @@ function getFespCdServiceHandler(
     cdInfoPagamento: (
       iCdInfoPagamentoInput: IcdInfoPagamentoInput,
       callback: (
-        err: any | null, // tslint:disable-line:no-any
+        err: any, // tslint:disable-line:no-any
         iCdInfoPagamentoOutput: IcdInfoPagamentoOutput,
         raw: string,
         soapHeader: { readonly [k: string]: any } // tslint:disable-line:no-any
@@ -183,7 +182,7 @@ function getFespCdServiceHandler(
           callback(undefined, iCdInfoPagamentoOutput, "", {});
         },
         err => {
-          logger.debug(`Error on setActivationStatus: ${err}`);
+          logger.error(`Error on setActivationStatus: ${err}`);
           callback(
             undefined,
             {
