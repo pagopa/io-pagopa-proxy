@@ -1,6 +1,6 @@
 /**
  * PaymentsService
- * Provide services related to Payments (Nodo) to communicate with PagoPa and Backend API
+ * Provide services related to Payments (Nodo) to communicate with PagoPA and Backend API
  */
 
 import { Either, left, right } from "fp-ts/lib/Either";
@@ -13,17 +13,17 @@ import {
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 
 /**
- * Send a request to PagoPa to retrieve payment info (VerificaRPT)
- * @param {InodoVerificaRPTInput} iNodoVerificaRPTInput - The request to send to PagoPa
- * @param {PagoPaConfig} pagoPaConfig - Configuration about PagoPa WS to contact
- * @return {Promise<Either<Error, InodoVerificaRPTOutput>>} The response provided by PagoPa as response
+ * Send a request to PagoPA to retrieve payment info (VerificaRPT)
+ * @param {InodoVerificaRPTInput} iNodoVerificaRPTInput - The request to send to PagoPA
+ * @param {PagamentiTelematiciPspNodoAsyncClient} pagoPASoapClient - SOAP client used to call PagoPa services
+ * @return {Promise<Either<Error, InodoVerificaRPTOutput>>} The response provided by PagoPA as response
  */
-export async function sendPaymentCheckRequestToPagoPa(
+export async function sendInodoVerificaRPTInput(
   iNodoVerificaRPTInput: InodoVerificaRPTInput,
-  pagamentiTelematiciPSPNodoClient: PagamentiTelematiciPspNodoAsyncClient
+  pagoPASoapClient: PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<Error, InodoVerificaRPTOutput>> {
   try {
-    const nodoVerificaRPT = await pagamentiTelematiciPSPNodoClient.nodoVerificaRPT(
+    const nodoVerificaRPT = await pagoPASoapClient.nodoVerificaRPT(
       iNodoVerificaRPTInput
     );
     return right(nodoVerificaRPT);
@@ -33,17 +33,17 @@ export async function sendPaymentCheckRequestToPagoPa(
 }
 
 /**
- * Send a request to PagoPa to activate (lock) a payment (AttivaRPT)
- * @param {InodoAttivaRPTInput} iNodoAttivaRPTInput - The request to send to PagoPa
- * @param {PagoPaConfig} pagoPaConfig - Configuration about PagoPa WS to contact
- * @return {Promise<Either<Error, InodoAttivaRPTOutput>>} The response provided by PagoPa as response
+ * Send a request to PagoPA to activate (lock) a payment (AttivaRPT)
+ * @param {InodoAttivaRPTInput} iNodoAttivaRPTInput - The request to send to PagoPA
+ * @param {pagamentiTelematiciPSPNodoClient} pagoPASoapClient - SOAP client used to call PagoPa services
+ * @return {Promise<Either<Error, InodoAttivaRPTOutput>>} The response provided by PagoPA as response
  */
-export async function sendPaymentsActivationRequestToPagoPaAPI(
+export async function sendInodoAttivaRPTInputToPagoPa(
   iNodoAttivaRPTInput: InodoAttivaRPTInput,
-  pagamentiTelematiciPSPNodoClient: PagamentiTelematiciPspNodoAsyncClient
+  pagoPASoapClient: PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<Error, InodoAttivaRPTOutput>> {
   try {
-    const nodoAttivaRPT = await pagamentiTelematiciPSPNodoClient.nodoAttivaRPT(
+    const nodoAttivaRPT = await pagoPASoapClient.nodoAttivaRPT(
       iNodoAttivaRPTInput
     );
     return right(nodoAttivaRPT);

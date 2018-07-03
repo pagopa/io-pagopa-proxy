@@ -22,7 +22,7 @@ This repository is configured for Nat Pryce's [adr-tools](https://github.com/npr
 
 Here's the decisions we taken so far:
 
-| ADR | Title                         | PR (discussion) |
+| ADR | Title        | PR (discussion) |
 | --- | ----------------------------- | --------------- |
 | 1   | [Record architecture decisions](doc/architecture/decisions/0001-record-architecture-decisions.md) | [PR#25](https://github.com/teamdigitale/italia-pagopa-proxy/pull/25)                |
 | 2   | [Use uuid/v1 for sequential requests](doc/adr/0002-use-uuid-v1-for-sequential-requests.md) | [PR#37](https://github.com/teamdigitale/italia-pagopa-proxy/pull/37)                |
@@ -37,19 +37,32 @@ https://github.com/vpulim/node-soap/pull/1009
 
 Those are all Environment variables needed by the application:
 
-| Variable name                          | Description                                                                       | type   |
-|----------------------------------------|-----------------------------------------------------------------------------------|--------|
-| WINSTON_LOG_LEVEL                      | The log level used for Winston logger                                             | logLev |
-| PAGOPAPROXY_HOST                       | The hostname or IP address the Express server is listening to                     | string |
-| PAGOPAPROXY_PORT                       | The HTTP port the Express server is listening to                                  | int    |
-| PAGOPA_HOST                            | The PagoPA SOAP Server hostname or IP address                                     | string |
-| PAGOPA_PORT                            | The PagoPA SOAP Server port                                                       | int    |
-| PAGOPA_TOKEN                           | The token used to authenticate to PagoPA SOAP Server                              | string |
-| BACKEND_APP_HOST                       | The AppBackend RESTful Server hostname or IP address                              | string |
-| BACKEND_APP_PORT                       | The AppBackend RESTful Server port                                                | int    |
+| Variable name       | Description                                                   | type    | default       |
+|---------------------|---------------------------------------------------------------|---------|---------------|
+| WINSTON_LOG_LEVEL   | The log level used for Winston logger                         | logLev  | debug         |
+| PAGOPAPROXY_HOST    | The hostname or IP address the Express server is listening to | string  | localhost     |
+| PAGOPAPROXY_PORT    | The HTTP port the Express server is listening to              | int     | 3000          |
+| PAGOPA_HOST         | The PagoPA SOAP Server hostname or IP address                 | string  | localhost     |
+| PAGOPA_PORT         | The PagoPA SOAP Server port                                   | int     | 3001          |
+| PAGOPA_TOKEN        | The token used to authenticate to PagoPA SOAP Server          | string  | ND            |
+| REDIS_DB_URL        | The Redis DB Server URL                                       | string  | localhost     |
+| REDIS_DB_PORT       | The Redis DB Server port                                      | int     | 6379          |
+| REDIS_DB_PASSWORD   | The Redis DB Server password                                  | string  | ND            |
+| REDIS_USE_CLUSTER   | Enable Redis Cluster                                          | boolean | false         |
 
 logLev values: "error", "info", "debug"
 
+## OpenAPI specs
+
+Swagger API specs are available at /specs/api/v1/swagger.json
+For example, running it on local enviroment it's reachable at http://localhost:3000/api/v1/swagger.json
+
+## How to install and run the application
+
+1. yarn install
+2. yarn build
+3. yarn start
 
 ## License
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy?ref=badge_large)
