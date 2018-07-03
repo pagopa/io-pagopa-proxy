@@ -60,7 +60,6 @@ export function getPaymentInfo(
   return async req => {
     // Validate rptId (payment identifier) provided by BackendApp
     const errorOrRptId = RptIdFromString.decode(req.params.rptId);
-
     if (isLeft(errorOrRptId)) {
       const error = errorOrRptId.value;
       return ResponseErrorFromValidationErrors(RptId)(error);
@@ -111,7 +110,6 @@ export function getPaymentInfo(
     // Convert the output provided by PagoPA (SOAP response)
     // to a BackendApp response (RESTful response), mapping the result information.
     // Send a response to BackendApp
-
     return PaymentsConverter.getPaymentRequestsGetResponse(
       iNodoVerificaRPTOutput,
       codiceContestoPagamento
