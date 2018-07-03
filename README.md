@@ -1,9 +1,10 @@
 [![CircleCI](https://circleci.com/gh/teamdigitale/italia-pagopa-proxy.svg?style=svg)](https://circleci.com/gh/teamdigitale/italia-pagopa-proxy)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy?ref=badge_shield)
 
 [![codecov](https://codecov.io/gh/teamdigitale/italia-pagopa-proxy/branch/master/graph/badge.svg)](https://codecov.io/gh/teamdigitale/italia-pagopa-proxy)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/5a8e35c5db40f63c3ebf/maintainability)](https://codeclimate.com/github/teamdigitale/italia-pagopa-proxy/maintainability)
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy?ref=badge_shield)
 
 # PagoPA Proxy
 
