@@ -16,7 +16,8 @@
     "test:unit": "jest --runInBand",
     "test:integration": "jest --config=jest.integration.js --runInBand",
     "test": "npm-run-all -s test:*",
-    "lint": "tslint --project ."
+    "lint": "tslint --project .",
+    "postversion": "git push && git push --tags"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
