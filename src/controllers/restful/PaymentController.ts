@@ -101,7 +101,6 @@ export function getPaymentInfo(
       );
     }
     const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.value;
-
     // Check PagoPA response content.
     // If it contains an error, an HTTP error will be provided to BackendApp
     if (iNodoVerificaRPTOutput.esito === PPTPortTypes.Esito.KO) {

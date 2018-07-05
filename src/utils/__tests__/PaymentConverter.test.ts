@@ -7,17 +7,16 @@ import {
 } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import {
   PaymentNoticeNumber,
+  RptId,
   RptIdFromString
 } from "italia-ts-commons/lib/pagopa";
-import {
-  OrganizationFiscalCode,
-  WithinRangeString
-} from "italia-ts-commons/lib/strings";
+import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import { CONFIG as Config, PagoPAConfig } from "../../Configuration";
 import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import {
   getInodoAttivaRPTInput,
+  getInodoVerificaRPTInput,
   getPaymentActivationsPostResponse,
   getPaymentRequestsGetResponse
 } from "../PaymentsConverter";
@@ -267,19 +266,31 @@ const anAttivaRPTOutputKoIban: InodoAttivaRPTOutput = {
         spezzoneCausaleVersamento: "SPEZZONE1",
         spezzoneStrutturatoCausaleVersamento: {
           causaleSpezzone: "CAUSALE01",
-          importoSpezzone: 99.05
+          importoSpezzone: 98.05
+        }
+      },
+      {
+        spezzoneCausaleVersamento: "SPEZZONE2",
+        spezzoneStrutturatoCausaleVersamento: {
+          causaleSpezzone: "CAUSALE02",
+          importoSpezzone: 1
         }
       }
     ]
   }
 };
 
-const aCodiceContestoPagamento: CodiceContestoPagamento = "12345" as WithinRangeString<
-  1,
-  35
->;
-
-const aPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode({
+const aCodiceContestoPagamento: CodiceContestoPagamento = "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento;
+const aRptId: RptId = {
+  organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+  paymentNoticeNumber: {
+    applicationCode: "12",
+    auxDigit: "0",
+    checkDigit: "12",
+    iuv13: "1234567890123"
+  } as PaymentNoticeNumber
+};
+const aPaymentActivationsPostRequest0 = PaymentActivationsPostRequest.decode({
   rptId: RptIdFromString.encode({
     organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
     paymentNoticeNumber: {
@@ -287,6 +298,51 @@ const aPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode({
       auxDigit: "0",
       checkDigit: "12",
       iuv13: "1234567890123"
+    } as PaymentNoticeNumber
+  }),
+  importoSingoloVersamento: 9905,
+  codiceContestoPagamento: aCodiceContestoPagamento
+}).getOrElseL(() => {
+  throw new Error();
+});
+
+const aPaymentActivationsPostRequest1 = PaymentActivationsPostRequest.decode({
+  rptId: RptIdFromString.encode({
+    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+    paymentNoticeNumber: {
+      auxDigit: "1",
+      iuv17: "12345678901234567"
+    } as PaymentNoticeNumber
+  }),
+  importoSingoloVersamento: 9905,
+  codiceContestoPagamento: aCodiceContestoPagamento
+}).getOrElseL(() => {
+  throw new Error();
+});
+
+const aPaymentActivationsPostRequest2 = PaymentActivationsPostRequest.decode({
+  rptId: RptIdFromString.encode({
+    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+    paymentNoticeNumber: {
+      auxDigit: "2",
+      checkDigit: "12",
+      iuv15: "123456789012345"
+    } as PaymentNoticeNumber
+  }),
+  importoSingoloVersamento: 9905,
+  codiceContestoPagamento: aCodiceContestoPagamento
+}).getOrElseL(() => {
+  throw new Error();
+});
+
+const aPaymentActivationsPostRequest3 = PaymentActivationsPostRequest.decode({
+  rptId: RptIdFromString.encode({
+    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+    paymentNoticeNumber: {
+      auxDigit: "3",
+      checkDigit: "12",
+      iuv13: "1234567890123",
+      segregationCode: "99"
     } as PaymentNoticeNumber
   }),
   importoSingoloVersamento: 9905,
@@ -309,6 +365,43 @@ const aConfig = {
     TOKEN: process.env.PAGOPA_TOKEN || "ND"
   }
 };
+
+describe("getINodoVerificaRPTInput", () => {
+  it("should return a correct nodoVerificaRPTInput", () => {
+    const errorOrNodoVerificaRPTInput = getInodoVerificaRPTInput(
+      aConfig as PagoPAConfig,
+      aRptId,
+      aCodiceContestoPagamento
+    );
+
+    expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
+    if (isRight(errorOrNodoVerificaRPTInput)) {
+      expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
+        CF: "12345678901",
+        CodStazPA: "12",
+        AuxDigit: "0",
+        CodIUV: "1234567890123"
+      });
+      expect(errorOrNodoVerificaRPTInput.value.codificaInfrastrutturaPSP).toBe(
+        "QR-CODE"
+      );
+      expect(errorOrNodoVerificaRPTInput.value.identificativoCanale).toBe(
+        "97735020584_02"
+      );
+      expect(
+        errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
+      ).toBe("97735020584");
+      expect(errorOrNodoVerificaRPTInput.value.password).toBe("ND");
+      expect(
+        isRight(
+          CodiceContestoPagamento.decode(
+            errorOrNodoVerificaRPTInput.value.codiceContestoPagamento
+          )
+        )
+      ).toBeTruthy();
+    }
+  });
+});
 
 describe("getPaymentsCheckResponse", () => {
   it("should convert InodoVerificaRPTOutput to PaymentsCheckResponse", () => {
@@ -341,7 +434,7 @@ describe("getPaymentsCheckResponse", () => {
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "codiceContestoPagamento",
-      "12345"
+      aCodiceContestoPagamento
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "ibanAccredito",
@@ -379,10 +472,10 @@ describe("getPaymentsCheckResponse", () => {
 });
 
 describe("getPaymentsActivationRequestPagoPA", () => {
-  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput", () => {
+  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput (case when Auxdigit is 0)", () => {
     const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
       aConfig as PagoPAConfig,
-      aPaymentActivationsPostRequest
+      aPaymentActivationsPostRequest0
     );
     expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
     expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
@@ -426,14 +519,163 @@ describe("getPaymentsActivationRequestPagoPA", () => {
       codificaInfrastrutturaPSPEnum.QR_CODE
     );
   });
+
+  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput (case when Auxdigit is 1)", () => {
+    const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
+      aConfig as PagoPAConfig,
+      aPaymentActivationsPostRequest1
+    );
+    expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
+    expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
+      codiceIdRPT: {
+        CF: "12345678901",
+        AuxDigit: "1",
+        CodIUV: "12345678901234567"
+      }
+    });
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoPSP",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoIntermediarioPSP",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoCanale",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "password",
+      Config.PAGOPA.IDENTIFIER.TOKEN
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "codiceContestoPagamento",
+      aCodiceContestoPagamento
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoIntermediarioPSPPagamento",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoCanalePagamento",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "codificaInfrastrutturaPSP",
+      codificaInfrastrutturaPSPEnum.QR_CODE
+    );
+  });
+
+  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput (case when Auxdigit is 2)", () => {
+    const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
+      aConfig as PagoPAConfig,
+      aPaymentActivationsPostRequest2
+    );
+    expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
+    expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
+      codiceIdRPT: {
+        CF: "12345678901",
+        AuxDigit: "2",
+        CodIUV: "123456789012345"
+      }
+    });
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoPSP",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoIntermediarioPSP",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoCanale",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "password",
+      Config.PAGOPA.IDENTIFIER.TOKEN
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "codiceContestoPagamento",
+      aCodiceContestoPagamento
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoIntermediarioPSPPagamento",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoCanalePagamento",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "codificaInfrastrutturaPSP",
+      codificaInfrastrutturaPSPEnum.QR_CODE
+    );
+  });
+
+  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput (case when Auxdigit is 3)", () => {
+    const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
+      aConfig as PagoPAConfig,
+      aPaymentActivationsPostRequest3
+    );
+    expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
+    expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
+      codiceIdRPT: {
+        CF: "12345678901",
+        AuxDigit: "3",
+        CodIUV: "1234567890123"
+      }
+    });
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoPSP",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoIntermediarioPSP",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoCanale",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "password",
+      Config.PAGOPA.IDENTIFIER.TOKEN
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "codiceContestoPagamento",
+      aCodiceContestoPagamento
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoIntermediarioPSPPagamento",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "identificativoCanalePagamento",
+      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
+    );
+    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+      "codificaInfrastrutturaPSP",
+      codificaInfrastrutturaPSPEnum.QR_CODE
+    );
+  });
 });
 
 describe("getPaymentsActivationResponse", () => {
   it("Should convert InodoAttivaRPTOutput in PaymentsActivationResponse", () => {
-    expect(
-      getPaymentActivationsPostResponse(anAttivaRPTOutputOk).isRight()
-    ).toBeTruthy();
+    const errorOrAttivaRPTOutput = getPaymentActivationsPostResponse(
+      anAttivaRPTOutputOk
+    );
+    expect(isRight(errorOrAttivaRPTOutput)).toBeTruthy();
+    if (isRight(errorOrAttivaRPTOutput)) {
+      expect(errorOrAttivaRPTOutput.value.importoSingoloVersamento).toBe(9905);
+      expect(
+        errorOrAttivaRPTOutput.value.spezzoniCausaleVersamento
+      ).toBeDefined();
+    }
   });
+
   it("should not convert to PaymentsActivationResponse (wrong importo)", () => {
     expect(
       isLeft(getPaymentActivationsPostResponse(anAttivaRPTOutputKoImporto))
