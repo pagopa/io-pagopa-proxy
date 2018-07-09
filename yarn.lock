@@ -2485,9 +2485,9 @@ italia-pagopa-api@^2.1.0:
     italia-ts-commons "^2.4.1"
     soap "^0.24.0"
 
-italia-ts-commons@^2.4.1, italia-ts-commons@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/italia-ts-commons/-/italia-ts-commons-2.5.0.tgz#bf49b82ec043041805776c7ee784a425ccd25e3b"
+italia-ts-commons@^2.4.1, italia-ts-commons@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/italia-ts-commons/-/italia-ts-commons-2.5.1.tgz#34e5d79d5ad0b65ac91b6abf6c03559e3ac0800d"
   dependencies:
     fp-ts "^1.6.0"
     io-ts "^1.1.4"
