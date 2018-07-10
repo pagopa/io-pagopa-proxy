@@ -5,13 +5,9 @@
 
 import * as express from "express";
 import { Either, fromOption, isLeft, left } from "fp-ts/lib/Either";
-import { clients as pagoPASoapClient } from "italia-pagopa-api";
-import {
-  Esito,
-  IcdInfoPagamentoInput,
-  IcdInfoPagamentoOutput
-} from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
-import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import * as PPTPortClient from "italia-pagopa-api/dist/clients/PPTPortClient";
+import { cdInfoPagamento_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/cdInfoPagamento_ppt";
+import { cdInfoPagamentoResponse_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/cdInfoPagamentoResponse_ppt";
 import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
 import {
   IResponseErrorGeneric,
@@ -34,7 +30,6 @@ import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivation
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
-
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import { redisGet, redisSet } from "../../utils/Redis";
 
@@ -48,7 +43,7 @@ import { redisGet, redisSet } from "../../utils/Redis";
  */
 export function getPaymentInfo(
   pagoPAConfig: PagoPAConfig,
-  pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<
@@ -103,7 +98,7 @@ export function getPaymentInfo(
     const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.value;
     // Check PagoPA response content.
     // If it contains an error, an HTTP error will be provided to BackendApp
-    if (iNodoVerificaRPTOutput.esito === PPTPortTypes.Esito.KO) {
+    if (iNodoVerificaRPTOutput.esito === "KO") {
       return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
@@ -135,7 +130,7 @@ export function getPaymentInfo(
  */
 export function activatePayment(
   pagoPAConfig: PagoPAConfig,
-  pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<
@@ -190,7 +185,7 @@ export function activatePayment(
 
     // Check PagoPA response content.
     // If it contains an error, an HTTP error will be provided to BackendApp
-    if (iNodoAttivaRPTOutput.esito === PPTPortTypes.Esito.KO) {
+    if (iNodoAttivaRPTOutput.esito === "KO") {
       return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
@@ -213,28 +208,28 @@ export function activatePayment(
  * This controller is invoked by PagoPA that provides a paymentId
  * related to a previous async request (attivaRPT)
  * It just store this information into redis db. This information will be retrieved by App using polling
- * @param {IcdInfoPagamentoInput} cdInfoPagamentoInput - The request from PagoPA
+ * @param {cdInfoPagamento_ppt} cdInfoPagamento_ppt - The request from PagoPA
  * @param {number} redisTimeoutSecs - The expiration timeout for the information to store
  * @param {RedisClient} redisClient - The redis client used to store the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
 export async function setActivationStatus(
-  cdInfoPagamentoInput: IcdInfoPagamentoInput,
+  cdInfoPagamentoInput: cdInfoPagamento_ppt,
   redisTimeoutSecs: number,
   redisClient: redis.RedisClient
-): Promise<IcdInfoPagamentoOutput> {
+): Promise<cdInfoPagamentoResponse_ppt> {
   return (await redisSet(
     redisClient,
     cdInfoPagamentoInput.codiceContestoPagamento,
     cdInfoPagamentoInput.idPagamento,
     "EX", // Set the specified expire time, in seconds.
     redisTimeoutSecs
-  )).fold<IcdInfoPagamentoOutput>(
+  )).fold<cdInfoPagamentoResponse_ppt>(
     _ => ({
-      esito: Esito.KO
+      esito: "KO"
     }),
     _ => ({
-      esito: Esito.OK
+      esito: "OK"
     })
   );
 }

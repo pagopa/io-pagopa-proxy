@@ -1,32 +1,36 @@
 //tslint:disable
-import { clients } from "italia-pagopa-api";
-import { createClient } from "italia-pagopa-api/dist/lib/utils";
-import { PagamentiTelematiciPspNodoService_WSDL_PATH } from "italia-pagopa-api/dist/lib/wsdl-paths";
-
-import * as PagamentiTelematiciPspNodoService from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import { PagamentiTelematiciPspNodoAsyncClient } from "italia-pagopa-api/dist/clients/PPTPortClient";
+import { createClient } from "italia-pagopa-api/dist/utils/SoapUtils";
+import * as ApiConfiguration from "italia-pagopa-api/dist/Configuration";
+import { IPPTPortSoap } from "italia-pagopa-api/dist/types/IPPTPortSoap";
 import * as soap from "soap";
+import { nodoVerificaRPT_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/nodoVerificaRPT_ppt";
+import { nodoVerificaRPTRisposta_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/nodoVerificaRPTRisposta_ppt";
+import { nodoAttivaRPT_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/nodoAttivaRPT_ppt";
+import { nodoAttivaRPTRisposta_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/nodoAttivaRPTRisposta_ppt";
 
 export async function createPagamentiTelematiciPspNodoClient(
   options: soap.IOptions
-): Promise<soap.Client & PagamentiTelematiciPspNodoService.IPPTPortSoap> {
-  return createClient<PagamentiTelematiciPspNodoService.IPPTPortSoap>(
-    PagamentiTelematiciPspNodoService_WSDL_PATH,
+): Promise<soap.Client & IPPTPortSoap> {
+  return createClient<IPPTPortSoap>(
+    ApiConfiguration.PAGAMENTI_TELEMATICI_WSDL_PATH,
     options
   );
 }
 
-export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.PagamentiTelematiciPspNodoAsyncClient {
-  constructor(client: PagamentiTelematiciPspNodoService.IPPTPortSoap) {
+export class FakePagamentiTelematiciPspNodoAsyncClient extends PagamentiTelematiciPspNodoAsyncClient {
+  constructor(client: IPPTPortSoap) {
     super(client);
   }
   public readonly nodoVerificaRPT = (
-    input: PagamentiTelematiciPspNodoService.InodoVerificaRPTInput
+    input: nodoVerificaRPT_ppt
   ) => {
     return new Promise<
-      PagamentiTelematiciPspNodoService.InodoVerificaRPTOutput
+      nodoVerificaRPTRisposta_ppt
     >((resolve, reject) => {
       if (input !== undefined) {
         resolve({
+          nodoVerificaRPTRisposta : {
           fault: {
             faultCode: "01",
             faultString: "FAULTSTRING",
@@ -34,7 +38,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.Pagamenti
             description: "FAULTDESCRIPTION",
             serial: 1
           },
-          esito: PagamentiTelematiciPspNodoService.PPTPortTypes.Esito.OK,
+          esito: "OK",
           datiPagamentoPA: {
             importoSingoloVersamento: 99.05,
             ibanAccredito: "IT17X0605502100000001234567",
@@ -66,20 +70,22 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.Pagamenti
               }
             ]
           }
+        }
         });
       } else {
-        reject("Invaild input");
+        reject("Invalid input");
       }
     });
   };
 
   public readonly nodoAttivaRPT = (
-    input: PagamentiTelematiciPspNodoService.InodoAttivaRPTInput
+    input: nodoAttivaRPT_ppt
   ) => {
-    return new Promise<PagamentiTelematiciPspNodoService.InodoAttivaRPTOutput>(
+    return new Promise<nodoAttivaRPTRisposta_ppt>(
       (resolve, reject) => {
         if (input !== undefined) {
           resolve({
+            nodoAttivaRPTRisposta: {
             fault: {
               faultCode: "01",
               faultString: "FAULTSTRING",
@@ -87,7 +93,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.Pagamenti
               description: "FAULTDESCRIPTION",
               serial: 1
             },
-            esito: PagamentiTelematiciPspNodoService.PPTPortTypes.Esito.OK,
+            esito: "OK",
             datiPagamentoPA: {
               importoSingoloVersamento: 99.05,
               ibanAccredito: "IT17X0605502100000001234567",
@@ -119,6 +125,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends clients.Pagamenti
                 }
               ]
             }
+          }
           });
         } else {
           reject("Invaild input");

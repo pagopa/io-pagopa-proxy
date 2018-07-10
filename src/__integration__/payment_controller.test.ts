@@ -1,7 +1,6 @@
 import * as express from "express";
 import { isRight } from "fp-ts/lib/Either";
-import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
-import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import { cdInfoPagamento_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/cdInfoPagamento_ppt";
 import {
   ApplicationCode,
   AuxDigit,
@@ -52,18 +51,18 @@ const aMockedRedisClient = redis.createClient(6379, "localhost");
 
 const aCodiceContestoPagamento = "05245c90746811e8b9bf91897339427e" as CodiceContestoPagamento;
 
-const aCdInfoPagamentoInput = {
+const aCdInfoPagamentoPpt = {
   identificativoDominio: "idDom",
   identificativoUnivocoVersamento: "idUniv",
   codiceContestoPagamento: aCodiceContestoPagamento,
   idPagamento: "id1234"
-} as IcdInfoPagamentoInput;
+} as cdInfoPagamento_ppt;
 
 describe("checkPaymentToPagoPa", async () => {
   it("should return the right response", async () => {
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: PPTPortTypes.envelopeKey
+        envelopeKey: "env"
       })
     );
 
@@ -117,7 +116,7 @@ describe("checkPaymentToPagoPa", async () => {
 
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: PPTPortTypes.envelopeKey
+        envelopeKey: "env"
       })
     );
 
@@ -152,7 +151,7 @@ describe("activatePaymentToPagoPa", async () => {
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: PPTPortTypes.envelopeKey
+        envelopeKey: "env"
       })
     );
 
@@ -213,7 +212,7 @@ describe("activatePaymentToPagoPa", async () => {
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: PPTPortTypes.envelopeKey
+        envelopeKey: "env"
       })
     );
 
@@ -251,7 +250,7 @@ describe("setActivationStatus and getActivationStatus", () => {
     const req = mockReq();
     req.params = aPaymentActivationRequest;
 
-    await setActivationStatus(aCdInfoPagamentoInput, 5000, aMockedRedisClient);
+    await setActivationStatus(aCdInfoPagamentoPpt, 5000, aMockedRedisClient);
 
     aMockedRedisClient.on("connect", () => {
       return logger.info("Mocked Redis connected!");

@@ -1,10 +1,6 @@
 import { isLeft, isRight } from "fp-ts/lib/Either";
-import {
-  codificaInfrastrutturaPSPEnum,
-  InodoAttivaRPTOutput,
-  InodoVerificaRPTOutput,
-  PPTPortTypes
-} from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
+import { esitoNodoAttivaRPTRisposta_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
+import { esitoNodoVerificaRPTRisposta_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
 import {
   PaymentNoticeNumber,
   RptId,
@@ -21,7 +17,7 @@ import {
   getPaymentRequestsGetResponse
 } from "../PaymentsConverter";
 
-const aVerificaRPTOutputOk: InodoVerificaRPTOutput = {
+const aVerificaRPTOutputOk: esitoNodoVerificaRPTRisposta_ppt = {
   fault: {
     faultCode: "01",
     faultString: "FAULTSTRING",
@@ -29,7 +25,7 @@ const aVerificaRPTOutputOk: InodoVerificaRPTOutput = {
     description: "FAULTDESCRIPTION",
     serial: 1
   },
-  esito: PPTPortTypes.Esito.OK,
+  esito: "OK",
   datiPagamentoPA: {
     importoSingoloVersamento: 99.05,
     ibanAccredito: "IT17X0605502100000001234567",
@@ -63,7 +59,7 @@ const aVerificaRPTOutputOk: InodoVerificaRPTOutput = {
   }
 };
 
-const aVerificaRPTOutputKoImporto: InodoVerificaRPTOutput = {
+const aVerificaRPTOutputKoImporto: esitoNodoVerificaRPTRisposta_ppt = {
   fault: {
     faultCode: "01",
     faultString: "FAULTSTRING",
@@ -71,7 +67,7 @@ const aVerificaRPTOutputKoImporto: InodoVerificaRPTOutput = {
     description: "FAULTDESCRIPTION",
     serial: 1
   },
-  esito: PPTPortTypes.Esito.KO,
+  esito: "KO",
   datiPagamentoPA: {
     importoSingoloVersamento: 0,
     ibanAccredito: "IT17X0605502100000001234567",
@@ -105,7 +101,7 @@ const aVerificaRPTOutputKoImporto: InodoVerificaRPTOutput = {
   }
 };
 
-const aVerificaRPTOutputKoIban: InodoVerificaRPTOutput = {
+const aVerificaRPTOutputKoIban: esitoNodoVerificaRPTRisposta_ppt = {
   fault: {
     faultCode: "01",
     faultString: "FAULTSTRING",
@@ -113,7 +109,7 @@ const aVerificaRPTOutputKoIban: InodoVerificaRPTOutput = {
     description: "FAULTDESCRIPTION",
     serial: 1
   },
-  esito: PPTPortTypes.Esito.KO,
+  esito: "KO",
   datiPagamentoPA: {
     importoSingoloVersamento: 99.05,
     ibanAccredito: "XXX",
@@ -147,7 +143,7 @@ const aVerificaRPTOutputKoIban: InodoVerificaRPTOutput = {
   }
 };
 
-const anAttivaRPTOutputOk: InodoAttivaRPTOutput = {
+const anAttivaRPTOutputOk: esitoNodoVerificaRPTRisposta_ppt = {
   fault: {
     faultCode: "01",
     faultString: "FAULTSTRING",
@@ -155,7 +151,7 @@ const anAttivaRPTOutputOk: InodoAttivaRPTOutput = {
     description: "FAULTDESCRIPTION",
     serial: 1
   },
-  esito: PPTPortTypes.Esito.OK,
+  esito: "OK",
   datiPagamentoPA: {
     importoSingoloVersamento: 99.05,
     ibanAccredito: "IT17X0605502100000001234567",
@@ -189,7 +185,7 @@ const anAttivaRPTOutputOk: InodoAttivaRPTOutput = {
   }
 };
 
-const anAttivaRPTOutputKoImporto: InodoAttivaRPTOutput = {
+const anAttivaRPTOutputKoImporto: esitoNodoAttivaRPTRisposta_ppt = {
   fault: {
     faultCode: "01",
     faultString: "FAULTSTRING",
@@ -197,7 +193,7 @@ const anAttivaRPTOutputKoImporto: InodoAttivaRPTOutput = {
     description: "FAULTDESCRIPTION",
     serial: 1
   },
-  esito: PPTPortTypes.Esito.KO,
+  esito: "KO",
   datiPagamentoPA: {
     importoSingoloVersamento: 9999999999,
     ibanAccredito: "IT17X0605502100000001234567",
@@ -231,7 +227,7 @@ const anAttivaRPTOutputKoImporto: InodoAttivaRPTOutput = {
   }
 };
 
-const anAttivaRPTOutputKoIban: InodoAttivaRPTOutput = {
+const anAttivaRPTOutputKoIban: esitoNodoAttivaRPTRisposta_ppt = {
   fault: {
     faultCode: "01",
     faultString: "FAULTSTRING",
@@ -239,7 +235,7 @@ const anAttivaRPTOutputKoIban: InodoAttivaRPTOutput = {
     description: "FAULTDESCRIPTION",
     serial: 1
   },
-  esito: PPTPortTypes.Esito.KO,
+  esito: "KO",
   datiPagamentoPA: {
     importoSingoloVersamento: 99.05,
     ibanAccredito: "XXX",
@@ -516,7 +512,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codificaInfrastrutturaPSP",
-      codificaInfrastrutturaPSPEnum.QR_CODE
+      "QR-CODE"
     );
   });
 
@@ -563,7 +559,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codificaInfrastrutturaPSP",
-      codificaInfrastrutturaPSPEnum.QR_CODE
+      "QR-CODE"
     );
   });
 
@@ -610,7 +606,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codificaInfrastrutturaPSP",
-      codificaInfrastrutturaPSPEnum.QR_CODE
+      "QR-CODE"
     );
   });
 
@@ -657,7 +653,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codificaInfrastrutturaPSP",
-      codificaInfrastrutturaPSPEnum.QR_CODE
+      "QR-CODE"
     );
   });
 });
