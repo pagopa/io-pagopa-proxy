@@ -8,11 +8,6 @@ import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
 import * as t from "io-ts";
-import * as PPTPortClient from "italia-pagopa-api/dist/clients/PPTPortClient";
-import * as FespCdServer from "italia-pagopa-api/dist/servers/FespCdServer";
-import { IFespCdPortTypeSoap } from "italia-pagopa-api/dist/types/IFespCdPortTypeSoap";
-import { cdInfoPagamento_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/cdInfoPagamento_ppt";
-import { cdInfoPagamentoResponse_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/cdInfoPagamentoResponse_ppt";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as morgan from "morgan";
 import * as redis from "redis";
@@ -21,6 +16,11 @@ import { specs as publicApiV1Specs } from "./api/public_api_pagopa";
 import { Configuration } from "./Configuration";
 import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
+import * as FespCdServer from "./services/pagopa_api/FespCdServer";
+import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
+import { IFespCdPortTypeSoap } from "./types/pagopa_api/IFespCdPortTypeSoap";
+import { cdInfoPagamento_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
+import { cdInfoPagamentoResponse_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoPagamentoResponse_ppt";
 import { logger } from "./utils/Logger";
 
 /**

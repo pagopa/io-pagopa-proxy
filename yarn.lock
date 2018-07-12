@@ -261,7 +261,7 @@ anymatch@^2.0.0:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
 
-apiconnect-wsdl@^1.5.103:
+apiconnect-wsdl@^1.6.3:
   version "1.6.3"
   resolved "https://registry.yarnpkg.com/apiconnect-wsdl/-/apiconnect-wsdl-1.6.3.tgz#1e59bb7617eee195d5aa65daec1cd5a2fe86a937"
   dependencies:
@@ -1978,7 +1978,7 @@ forwarded@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz#98c23dab1175657b8c0573e8ceccd91b0ff18c84"
 
-fp-ts@^1.0.0, fp-ts@^1.3.0, fp-ts@^1.6.0:
+fp-ts@^1.0.0, fp-ts@^1.6.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-1.7.0.tgz#3d6a7ab2a541125e7089c2228acaa600b271a68f"
 
@@ -2033,6 +2033,10 @@ fs-minipass@^1.2.5:
 fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
+
+fs@^0.0.1-security:
+  version "0.0.1-security"
+  resolved "https://registry.yarnpkg.com/fs/-/fs-0.0.1-security.tgz#8a7bd37186b6dddf3813f23858b57ecaaf5e41d4"
 
 fsevents@^1.0.0, fsevents@^1.2.2, fsevents@^1.2.3:
   version "1.2.4"
@@ -2418,7 +2422,7 @@ invert-kv@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/invert-kv/-/invert-kv-1.0.0.tgz#104a8e4aaca6d3d8cd157a8ef8bfab2d7a3ffdb6"
 
-io-ts@^1.0.5, io-ts@^1.1.4, io-ts@^1.2.0:
+io-ts@^1.1.4, io-ts@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/io-ts/-/io-ts-1.2.0.tgz#240f4b3da4582a4e7adcfd30a0cc2f95880e24ad"
   dependencies:
@@ -2748,20 +2752,9 @@ istanbul-reports@^1.3.0:
   dependencies:
     handlebars "^4.0.3"
 
-italia-pagopa-api@teamdigitale/italia-pagopa-api#Auto-generate-ts-from-wsdl:
-  version "1.3.1"
-  resolved "https://codeload.github.com/teamdigitale/italia-pagopa-api/tar.gz/9d4650ea3f60169241bd589fdb1f8501949b2774"
-  dependencies:
-    apiconnect-wsdl "^1.5.103"
-    io-ts "^1.2.0"
-    italia-ts-commons "^2.5.0"
-    jest-xml-matcher "^1.1.1"
-    js-yaml "^3.12.0"
-    soap "^0.24.0"
-
-italia-ts-commons@^2.5.0, italia-ts-commons@^2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/italia-ts-commons/-/italia-ts-commons-2.5.1.tgz#34e5d79d5ad0b65ac91b6abf6c03559e3ac0800d"
+italia-ts-commons@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/italia-ts-commons/-/italia-ts-commons-2.7.0.tgz#c18484e9531fcd7a14ec52c811644971d71a5cda"
   dependencies:
     fp-ts "^1.6.0"
     io-ts "^1.1.4"
@@ -2773,9 +2766,9 @@ italia-tslint-rules@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/italia-tslint-rules/-/italia-tslint-rules-0.1.1.tgz#b150373925a268ff892a545229708484ac0533ba"
 
-italia-utils@^3.11.1:
-  version "3.11.2"
-  resolved "https://registry.yarnpkg.com/italia-utils/-/italia-utils-3.11.2.tgz#bfe9335374fb0a663f905660d00701d1b99cccb3"
+italia-utils@^3.12.0:
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/italia-utils/-/italia-utils-3.12.0.tgz#78690531370d92e15233babb192b2bf1eedcd6b3"
   dependencies:
     fs-extra "^6.0.0"
     nunjucks "^3.1.2"
@@ -4271,10 +4264,6 @@ qs@6.5.1:
 qs@^6.5.1, qs@~6.5.1:
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
-
-querystring@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
 
 randomatic@^3.0.0:
   version "3.0.0"

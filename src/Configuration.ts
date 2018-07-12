@@ -5,6 +5,8 @@
 import * as t from "io-ts";
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
+import { stPassword_ppt } from "./types/pagopa_api/yaml-to-ts/stPassword_ppt";
+import { stText35_ppt } from "./types/pagopa_api/yaml-to-ts/stText35_ppt";
 
 const localhost = "http://localhost";
 
@@ -46,7 +48,7 @@ export const CONFIG = {
       IDENTIFICATIVO_PSP: "AGID_01",
       IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
       IDENTIFICATIVO_CANALE: "97735020584_02",
-      PASSWORD: process.env.PAGOPA_PASSWORD || "ND"
+      PASSWORD: process.env.PAGOPA_PASSWORD || "nopassword"
     }
   },
 
@@ -94,10 +96,10 @@ const PagoPAConfig = t.intersection([
       PAGAMENTI: NonEmptyString
     }),
     IDENTIFIER: t.interface({
-      IDENTIFICATIVO_PSP: NonEmptyString,
-      IDENTIFICATIVO_INTERMEDIARIO_PSP: NonEmptyString,
-      IDENTIFICATIVO_CANALE: NonEmptyString,
-      TOKEN: NonEmptyString
+      IDENTIFICATIVO_PSP: stText35_ppt,
+      IDENTIFICATIVO_INTERMEDIARIO_PSP: stText35_ppt,
+      IDENTIFICATIVO_CANALE: stText35_ppt,
+      PASSWORD: stPassword_ppt
     })
   })
 ]);

@@ -5,9 +5,6 @@
 
 import * as express from "express";
 import { Either, fromOption, isLeft, left } from "fp-ts/lib/Either";
-import * as PPTPortClient from "italia-pagopa-api/dist/clients/PPTPortClient";
-import { cdInfoPagamento_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/cdInfoPagamento_ppt";
-import { cdInfoPagamentoResponse_ppt } from "italia-pagopa-api/dist/types/yaml-to-ts/cdInfoPagamentoResponse_ppt";
 import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
 import {
   IResponseErrorGeneric,
@@ -24,12 +21,15 @@ import {
 import * as redis from "redis";
 import * as uuid from "uuid";
 import { PagoPAConfig } from "../../Configuration";
+import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import * as PaymentsService from "../../services/PaymentsService";
 import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
 import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivationsGetResponse";
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
+import { cdInfoPagamento_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
+import { cdInfoPagamentoResponse_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamentoResponse_ppt";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import { redisGet, redisSet } from "../../utils/Redis";
 
