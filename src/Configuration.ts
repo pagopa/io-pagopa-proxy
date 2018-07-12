@@ -48,14 +48,14 @@ export const CONFIG = {
       IDENTIFICATIVO_PSP: "AGID_01",
       IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
       IDENTIFICATIVO_CANALE: "97735020584_02",
-      PASSWORD: process.env.PAGOPA_PASSWORD || "nopassword"
+      TOKEN: process.env.PAGOPA_TOKEN || "nopassword"
     }
   },
 
   // Redis DB Server Configuration
   REDIS_DB: {
     PORT: process.env.REDIS_DB_PORT || 6380,
-    HOST: process.env.REDIS_DB_URL || "localhost",
+    HOST: process.env.REDIS_DB_URL || "redis://localhost",
     PASSWORD: process.env.REDIS_DB_PASSWORD || "ND",
     USE_CLUSTER: process.env.REDIS_USE_CLUSTER || false
   },
@@ -99,7 +99,7 @@ const PagoPAConfig = t.intersection([
       IDENTIFICATIVO_PSP: stText35_ppt,
       IDENTIFICATIVO_INTERMEDIARIO_PSP: stText35_ppt,
       IDENTIFICATIVO_CANALE: stText35_ppt,
-      PASSWORD: stPassword_ppt
+      TOKEN: stPassword_ppt
     })
   })
 ]);
