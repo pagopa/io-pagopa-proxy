@@ -118,7 +118,7 @@ const aConfig = {
     IDENTIFICATIVO_PSP: "AGID_01",
     IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
     IDENTIFICATIVO_CANALE: "97735020584_02",
-    PASSWORD: process.env.PAGOPA_TOKEN || "nopassword"
+    PASSWORD: process.env.PAGOPA_PASSWORD || "nopassword"
   }
 };
 
