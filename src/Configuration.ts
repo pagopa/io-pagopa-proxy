@@ -54,8 +54,8 @@ export const CONFIG = {
 
   // Redis DB Server Configuration
   REDIS_DB: {
-    PORT: process.env.REDIS_DB_PORT || 6379,
-    HOST: process.env.REDIS_DB_URL || "redis://localhost",
+    PORT: process.env.REDIS_DB_PORT || 6380,
+    HOST: process.env.REDIS_DB_URL || "localhost",
     PASSWORD: process.env.REDIS_DB_PASSWORD || "ND",
     USE_CLUSTER: process.env.REDIS_USE_CLUSTER || false
   },

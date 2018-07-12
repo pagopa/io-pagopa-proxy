@@ -129,25 +129,39 @@ function setRestfulRoutes(
  * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
  */
 function getRedisClient(config: Configuration): redis.RedisClient {
-  if (config.REDIS_DB.USE_CLUSTER) {
-    logger.debug("Creating a REDIS client using cluster...");
-    return new RedisClustr({
-      redisOptions: {
-        auth_pass: config.REDIS_DB.PASSWORD,
-        tls: {
-          servername: config.REDIS_DB.HOST
-        }
-      },
-      servers: [
-        {
-          host: config.REDIS_DB.HOST,
-          port: config.REDIS_DB.PORT
-        }
-      ]
-    }) as redis.RedisClient;
-  }
-  logger.debug("Creating a REDIS client...");
-  return redis.createClient(config.REDIS_DB.HOST);
+  const redisClient = (() => {
+    if (config.REDIS_DB.USE_CLUSTER) {
+      logger.debug("Creating a REDIS client using cluster...");
+      return new RedisClustr({
+        redisOptions: {
+          auth_pass: config.REDIS_DB.PASSWORD,
+          tls: {
+            servername: config.REDIS_DB.HOST
+          }
+        },
+        servers: [
+          {
+            host: config.REDIS_DB.HOST,
+            port: config.REDIS_DB.PORT
+          }
+        ]
+      }) as redis.RedisClient;
+    }
+    logger.debug("Creating a REDIS client...");
+    return redis.createClient(config.REDIS_DB.HOST);
+  })();
+
+  redisClient.on("error", err => {
+    logger.error(`REDIS Connection error: ${err}`);
+  });
+  redisClient.on("warning", err => {
+    logger.warn(`REDIS Connection warning: ${err}`);
+  });
+  redisClient.on("end", () => {
+    logger.error(`REDIS Connection lost`);
+  });
+
+  return redisClient;
 }
 
 /**
