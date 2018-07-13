@@ -60,9 +60,8 @@ For example, running it on local enviroment it's reachable at http://localhost:3
 ## How to install and run the application
 
 1. yarn install
-2. yarn generate
-3. yarn build
-4. yarn start
+2. yarn build
+3. yarn start
 
 ## License
 

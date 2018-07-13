@@ -7,7 +7,7 @@
   "author": "Federico Feroldi <federico@teamdigitale.governo.it>",
   "license": "MIT",
   "scripts": {
-    "build": "npm-run-all -s lint build:*",
+    "build": "npm-run-all -s generate lint build:*",
     "build:tsc": "tsc",
     "build:cp-wsdl": "cp -r src/wsdl dist/wsdl",
     "clean": "npm-run-all -s clean:*",
