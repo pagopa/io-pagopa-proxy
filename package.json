@@ -55,7 +55,7 @@
     "fp-ts": "^1.3.0",
     "io-ts": "^1.0.5",
     "italia-pagopa-api": "^2.1.0",
-    "italia-ts-commons": "^2.5.0",
+    "italia-ts-commons": "^2.9.0",
     "morgan": "^1.9.0",
     "node-fetch": "^2.1.2",
     "querystring": "^0.2.0",
