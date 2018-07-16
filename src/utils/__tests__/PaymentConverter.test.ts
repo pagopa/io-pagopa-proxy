@@ -362,7 +362,7 @@ const aConfig = {
     IDENTIFICATIVO_PSP: "AGID_01",
     IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
     IDENTIFICATIVO_CANALE: "97735020584_02",
-    TOKEN: process.env.PAGOPA_TOKEN || "ND"
+    PASSWORD: process.env.PAGOPA_PASSWORD || "nopassword"
   }
 };
 
@@ -500,7 +500,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "password",
-      Config.PAGOPA.IDENTIFIER.TOKEN
+      Config.PAGOPA.IDENTIFIER.PASSWORD
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",
@@ -547,7 +547,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "password",
-      Config.PAGOPA.IDENTIFIER.TOKEN
+      Config.PAGOPA.IDENTIFIER.PASSWORD
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",
@@ -594,7 +594,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "password",
-      Config.PAGOPA.IDENTIFIER.TOKEN
+      Config.PAGOPA.IDENTIFIER.PASSWORD
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",
@@ -641,7 +641,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "password",
-      Config.PAGOPA.IDENTIFIER.TOKEN
+      Config.PAGOPA.IDENTIFIER.PASSWORD
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",

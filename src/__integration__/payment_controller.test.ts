@@ -43,7 +43,7 @@ const aConfig: PagoPAConfig = {
     IDENTIFICATIVO_PSP: "AGID_01" as NonEmptyString,
     IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584" as NonEmptyString,
     IDENTIFICATIVO_CANALE: "97735020584_02" as NonEmptyString,
-    TOKEN: "ND" as NonEmptyString
+    PASSWORD: "nopassword" as NonEmptyString
   }
 };
 const aRptIdString = "12345678901012123456789012399";
