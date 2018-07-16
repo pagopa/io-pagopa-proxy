@@ -391,7 +391,7 @@ describe("getINodoVerificaRPTInput", () => {
       expect(
         errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
       ).toBe("97735020584");
-      expect(errorOrNodoVerificaRPTInput.value.password).toBe("ND");
+      expect(errorOrNodoVerificaRPTInput.value.password).toBe("nopassword");
       expect(
         isRight(
           CodiceContestoPagamento.decode(
