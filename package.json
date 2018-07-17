@@ -82,11 +82,11 @@
       "^.+\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testMatch": [
-      "**/__tests__/*.ts"
+      "**/__tests__/*.test.ts"
     ],
     "coverageDirectory": "./coverage/",
     "coveragePathIgnorePatterns": [
-      "/mocks/"
+      "MockedData.ts"
     ]
   }
 }
