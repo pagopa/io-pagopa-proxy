@@ -156,6 +156,9 @@ function getRedisClient(config: Configuration): redis.RedisClient {
   redisClient.on("error", err => {
     logger.error(`REDIS Connection error: ${err}`);
   });
+  redisClient.on("reconnecting", () => {
+    logger.info(`REDIS is trying to reconnect...`);
+  });
   redisClient.on("warning", err => {
     logger.warn(`REDIS Connection warning: ${err}`);
   });
