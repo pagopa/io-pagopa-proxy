@@ -32,20 +32,25 @@ export function getNodoVerificaRPTInput(
   rptId: RptId,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, nodoVerificaRPT_ppt> {
-  const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
-    codiceContestoPagamento
-  );
-  const codiceIdRPT = getCodiceIdRpt(rptId);
-  return right({
-    identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
-    identificativoIntermediarioPSP:
-      pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-    identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-    password: pagoPAConfig.IDENTIFIER.TOKEN,
-    codiceContestoPagamento: codiceContestoPagamentoApi,
-    codificaInfrastrutturaPSP: "QR-CODE",
-    codiceIdRPT
-  });
+  // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
+  try {
+    const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
+      codiceContestoPagamento
+    );
+    const codiceIdRPT = getCodiceIdRpt(rptId);
+    return right({
+      identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+      identificativoIntermediarioPSP:
+        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIER.TOKEN,
+      codiceContestoPagamento: codiceContestoPagamentoApi,
+      codificaInfrastrutturaPSP: "QR-CODE",
+      codiceIdRPT
+    });
+  } catch (exception) {
+    return left(Error(exception));
+  }
 }
 
 /**
@@ -103,6 +108,7 @@ export function getNodoAttivaRPTInput(
   pagoPAConfig: PagoPAConfig,
   paymentActivationsPostRequest: PaymentActivationsPostRequest
 ): Either<Error, nodoAttivaRPT_ppt> {
+  // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
     const codiceIdRPT = getCodiceIdRpt(paymentActivationsPostRequest.rptId);
     const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
