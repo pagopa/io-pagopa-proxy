@@ -2,7 +2,7 @@
  * Payments Converter
  * Data Converter for Payments Request\Responses between PagoPA and BackendAPP types
  */
-import { Either, left, right } from "fp-ts/lib/Either";
+import { Either, right } from "fp-ts/lib/Either";
 import { Validation } from "io-ts";
 import { RptId } from "italia-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../Configuration";
