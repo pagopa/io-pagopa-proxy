@@ -32,25 +32,20 @@ export function getNodoVerificaRPTInput(
   rptId: RptId,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Either<Error, nodoVerificaRPT_ppt> {
-  // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
-  try {
-    const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
-      codiceContestoPagamento
-    );
-    const codiceIdRPT = getCodiceIdRpt(rptId);
-    return right({
-      identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
-      identificativoIntermediarioPSP:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPAConfig.IDENTIFIER.TOKEN,
-      codiceContestoPagamento: codiceContestoPagamentoApi,
-      codificaInfrastrutturaPSP: "QR-CODE",
-      codiceIdRPT
-    });
-  } catch (exception) {
-    return left(Error(exception));
-  }
+  const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
+    codiceContestoPagamento
+  );
+  const codiceIdRPT = getCodiceIdRpt(rptId);
+  return right({
+    identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+    identificativoIntermediarioPSP:
+      pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+    identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+    password: pagoPAConfig.IDENTIFIER.TOKEN,
+    codiceContestoPagamento: codiceContestoPagamentoApi,
+    codificaInfrastrutturaPSP: "QR-CODE",
+    codiceIdRPT
+  });
 }
 
 /**
@@ -108,33 +103,28 @@ export function getNodoAttivaRPTInput(
   pagoPAConfig: PagoPAConfig,
   paymentActivationsPostRequest: PaymentActivationsPostRequest
 ): Either<Error, nodoAttivaRPT_ppt> {
-  // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
-  try {
-    const codiceIdRPT = getCodiceIdRpt(paymentActivationsPostRequest.rptId);
-    const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
-      paymentActivationsPostRequest.codiceContestoPagamento
-    );
-    return right({
-      identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
-      identificativoIntermediarioPSP:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPAConfig.IDENTIFIER.TOKEN,
-      codiceContestoPagamento: codiceContestoPagamentoApi,
-      identificativoIntermediarioPSPPagamento:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      identificativoCanalePagamento:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      codificaInfrastrutturaPSP: "QR-CODE",
-      codiceIdRPT,
-      datiPagamentoPSP: {
-        importoSingoloVersamento:
-          paymentActivationsPostRequest.importoSingoloVersamento / 100
-      }
-    });
-  } catch (exception) {
-    return left(Error(exception));
-  }
+  const codiceIdRPT = getCodiceIdRpt(paymentActivationsPostRequest.rptId);
+  const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
+    paymentActivationsPostRequest.codiceContestoPagamento
+  );
+  return right({
+    identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+    identificativoIntermediarioPSP:
+      pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+    identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+    password: pagoPAConfig.IDENTIFIER.TOKEN,
+    codiceContestoPagamento: codiceContestoPagamentoApi,
+    identificativoIntermediarioPSPPagamento:
+      pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+    identificativoCanalePagamento:
+      pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+    codificaInfrastrutturaPSP: "QR-CODE",
+    codiceIdRPT,
+    datiPagamentoPSP: {
+      importoSingoloVersamento:
+        paymentActivationsPostRequest.importoSingoloVersamento / 100
+    }
+  });
 }
 
 /**
