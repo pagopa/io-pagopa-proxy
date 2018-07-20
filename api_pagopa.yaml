@@ -82,7 +82,7 @@ definitions:
   CodiceContestoPagamento:
     description: Transaction Id used to identify the communication flow
     type: string
-    minlength: 32
+    minLength: 32
     maxLength: 32
   EnteBeneficiario:
     description: Beneficiary institution related to a payment
@@ -90,39 +90,39 @@ definitions:
     properties:
       identificativoUnivocoBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 35
       denominazioneBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 70
       codiceUnitOperBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 35
       denomUnitOperBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 70
       indirizzoBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 70
       civicoBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 16
       capBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 16
       localitaBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 35
       provinciaBeneficiario:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 35
       nazioneBeneficiario:
         type: string
@@ -152,7 +152,7 @@ definitions:
     properties: 
       idPagamento:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 35
     required:
     - idPagamento
@@ -180,7 +180,7 @@ definitions:
         $ref: '#/definitions/Iban'
       causaleVersamento:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 140
       enteBeneficiario:
         $ref: '#/definitions/EnteBeneficiario'
@@ -201,7 +201,7 @@ definitions:
         $ref: '#/definitions/Iban'
       causaleVersamento:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 140
       enteBeneficiario:
         $ref: '#/definitions/EnteBeneficiario'
@@ -225,7 +225,7 @@ definitions:
     properties:
       spezzoneCausaleVersamento:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 35
       spezzoneStrutturatoCausaleVersamento:
         $ref: '#/definitions/SpezzoneStrutturatoCausaleVersamento'
@@ -235,7 +235,7 @@ definitions:
     properties:
       causaleSpezzone:
         type: string
-        minlength: 1
+        minLength: 1
         maxLength: 25
       importoSpezzone:
         $ref: '#/definitions/ImportoEuroCents'                      
@@ -244,8 +244,8 @@ parameters:
     name: codice_contesto_pagamento
     description: Transaction Id used to identify the communication flow
     type: string
-    minlength: 1
-    maxLength: 35
+    minLength: 32
+    maxLength: 32
     required: true
     in: path
     x-example: A0123BC123124
@@ -253,7 +253,7 @@ parameters:
     name: rpt_id_from_string
     description: Unique identifier for payments
     type: string
-    minlength: 1
+    minLength: 1
     maxLength: 35
     required: true
     in: path

@@ -4,20 +4,21 @@
  */
 import { Either, left, right } from "fp-ts/lib/Either";
 import { Validation } from "io-ts";
-import {
-  codificaInfrastrutturaPSPEnum,
-  InodoAttivaRPTInput,
-  InodoAttivaRPTOutput,
-  InodoVerificaRPTInput,
-  InodoVerificaRPTOutput,
-  PPTPortTypes
-} from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import { RptId } from "italia-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../Configuration";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../types/api/PaymentRequestsGetResponse";
+import { SpezzoniCausaleVersamento } from "../types/api/SpezzoniCausaleVersamento";
+import { ctSpezzoneStrutturatoCausaleVersamento_ppt } from "../types/pagopa_api/yaml-to-ts/ctSpezzoneStrutturatoCausaleVersamento_ppt";
+import { ctSpezzoniCausaleVersamento_ppt } from "../types/pagopa_api/yaml-to-ts/ctSpezzoniCausaleVersamento_ppt";
+import { esitoNodoAttivaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
+import { esitoNodoVerificaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
+import { nodoAttivaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoAttivaRPT_ppt";
+import { nodoTipoCodiceIdRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoTipoCodiceIdRPT_ppt";
+import { nodoVerificaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoVerificaRPT_ppt";
+import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
 
 /**
  * Define InodoVerificaRPTInput (PagoPA request) using information provided by BackendApp
@@ -30,9 +31,12 @@ export function getInodoVerificaRPTInput(
   pagoPAConfig: PagoPAConfig,
   rptId: RptId,
   codiceContestoPagamento: CodiceContestoPagamento
-): Either<Error, InodoVerificaRPTInput> {
+): Either<Error, nodoVerificaRPT_ppt> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
+    const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
+      codiceContestoPagamento
+    );
     const codiceIdRPT = getCodiceIdRpt(rptId);
     return right({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
@@ -40,8 +44,8 @@ export function getInodoVerificaRPTInput(
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
       password: pagoPAConfig.IDENTIFIER.PASSWORD,
-      codiceContestoPagamento,
-      codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
+      codiceContestoPagamento: codiceContestoPagamentoApi,
+      codificaInfrastrutturaPSP: "QR-CODE",
       codiceIdRPT
     });
   } catch (exception) {
@@ -51,18 +55,21 @@ export function getInodoVerificaRPTInput(
 
 /**
  * Convert InodoVerificaRPTOutput (PagoPA response) to PaymentRequestsGetResponse (BackendApp response)
- * @param {InodoVerificaRPTOutput} iNodoVerificaRPTOutput - Message to convert
+ * @param {esitoNodoVerificaRPTRisposta_ppt} iNodoVerificaRPTOutput - Message to convert
  * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
  * @return {Validation<PaymentRequestsGetResponse>} Converted object
  */
 export function getPaymentRequestsGetResponse(
-  iNodoVerificaRPTOutput: InodoVerificaRPTOutput,
+  iNodoVerificaRPTOutput: esitoNodoVerificaRPTRisposta_ppt,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Validation<PaymentRequestsGetResponse> {
   const datiPagamentoPA = iNodoVerificaRPTOutput.datiPagamentoPA;
+  const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
+    codiceContestoPagamento
+  );
   return PaymentRequestsGetResponse.decode({
     importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
-    codiceContestoPagamento,
+    codiceContestoPagamento: codiceContestoPagamentoApi,
     ibanAccredito: datiPagamentoPA.ibanAccredito,
     causaleVersamento: datiPagamentoPA.causaleVersamento,
     enteBeneficiario: {
@@ -95,28 +102,30 @@ export function getPaymentRequestsGetResponse(
  * Convert PaymentActivationsPostRequest (BackendApp request) to InodoAttivaRPTInput (PagoPA request)
  * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
  * @param {PaymentActivationsPostRequest} paymentActivationsPostRequest - Message to convert
- * @return {Either<Error, InodoAttivaRPTInput>} Converted object
+ * @return {Either<Error, nodoAttivaRPT_ppt>} Converted object
  */
 export function getInodoAttivaRPTInput(
   pagoPAConfig: PagoPAConfig,
   paymentActivationsPostRequest: PaymentActivationsPostRequest
-): Either<Error, InodoAttivaRPTInput> {
+): Either<Error, nodoAttivaRPT_ppt> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
     const codiceIdRPT = getCodiceIdRpt(paymentActivationsPostRequest.rptId);
+    const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
+      paymentActivationsPostRequest.codiceContestoPagamento
+    );
     return right({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
       password: pagoPAConfig.IDENTIFIER.PASSWORD,
-      codiceContestoPagamento:
-        paymentActivationsPostRequest.codiceContestoPagamento,
+      codiceContestoPagamento: codiceContestoPagamentoApi,
       identificativoIntermediarioPSPPagamento:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanalePagamento:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      codificaInfrastrutturaPSP: codificaInfrastrutturaPSPEnum.QR_CODE,
+      codificaInfrastrutturaPSP: "QR-CODE",
       codiceIdRPT,
       datiPagamentoPSP: {
         importoSingoloVersamento:
@@ -130,14 +139,13 @@ export function getInodoAttivaRPTInput(
 
 /**
  * Convert InodoAttivaRPTOutput (PagoPA response) to PaymentActivationsPostResponse (BackendApp response)
- * @param {InodoAttivaRPTOutput} iNodoAttivaRPTOutput - Message to convert
+ * @param {esitoNodoAttivaRPTRisposta_ppt} iNodoAttivaRPTOutput - Message to convert
  * @return {Validation<PaymentActivationsPostResponse>} Converted object
  */
 export function getPaymentActivationsPostResponse(
-  iNodoAttivaRPTOutput: InodoAttivaRPTOutput
+  iNodoAttivaRPTOutput: esitoNodoAttivaRPTRisposta_ppt
 ): Validation<PaymentActivationsPostResponse> {
   const datiPagamentoPA = iNodoAttivaRPTOutput.datiPagamentoPA;
-
   return PaymentActivationsPostResponse.decode({
     importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
     ibanAccredito: datiPagamentoPA.ibanAccredito,
@@ -172,9 +180,9 @@ export function getPaymentActivationsPostResponse(
  * Define a IcodiceIdRPT object to send to PagoPA Services, containing payment information
  * Ask the pagopa service administrator or read documentation from RptId definition
  * @param {RptId} rptId - Payment information provided by BackendApp
- * @return {PPTPortTypes.IcodiceIdRPT} The result generated for PagoPa
+ * @return {nodoTipoCodiceIdRPT_ppt} The result generated for PagoPa
  */
-function getCodiceIdRpt(rptId: RptId): PPTPortTypes.IcodiceIdRPT {
+function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
   switch (rptId.paymentNoticeNumber.auxDigit) {
     case "0":
       return {
@@ -209,24 +217,43 @@ function getCodiceIdRpt(rptId: RptId): PPTPortTypes.IcodiceIdRPT {
  * parsing the SpezzoniCausaleVersamento element provided by PagoPaProxy
  */
 function getSpezzoniCausaleVersamentoForController(
-  spezzoniCausaleVersamento: ReadonlyArray<
-    PPTPortTypes.IspezzoniCausaleVersamento
-  >
-): ReadonlyArray<PPTPortTypes.IspezzoniCausaleVersamento> | undefined {
-  if (spezzoniCausaleVersamento === undefined) {
-    return undefined;
+  spezzoniCausaleVersamento: ctSpezzoniCausaleVersamento_ppt
+): SpezzoniCausaleVersamento | undefined {
+  // Content is an array of spezzoniCausaleVersamento
+  if (
+    spezzoniCausaleVersamento !== undefined &&
+    spezzoniCausaleVersamento.spezzoniCausaleVersamento !== undefined
+  ) {
+    return spezzoniCausaleVersamento.spezzoniCausaleVersamento.map(
+      (value: stText35_ppt) => {
+        return value;
+      }
+    );
   }
-  return spezzoniCausaleVersamento.map(
-    (value: PPTPortTypes.IspezzoniCausaleVersamento) => {
-      return {
-        spezzoneCausaleVersamento: value.spezzoneCausaleVersamento,
-        spezzoneStrutturatoCausaleVersamento: {
-          causaleSpezzone:
-            value.spezzoneStrutturatoCausaleVersamento.causaleSpezzone,
-          importoSpezzone:
-            value.spezzoneStrutturatoCausaleVersamento.importoSpezzone * 100
-        }
-      };
-    }
-  );
+
+  // Content is an array of spezzoniStrutturatoCausaleVersamento
+  if (
+    spezzoniCausaleVersamento !== undefined &&
+    spezzoniCausaleVersamento.spezzoniStrutturatoCausaleVersamento !== undefined
+  ) {
+    return spezzoniCausaleVersamento.spezzoniStrutturatoCausaleVersamento.map(
+      (value: ctSpezzoneStrutturatoCausaleVersamento_ppt) => {
+        return {
+          causaleSpezzone: value.causaleSpezzone,
+          importoSpezzone: value.importoSpezzone * 100
+        };
+      }
+    );
+  }
+  return undefined;
+}
+
+/**
+ * Provide CodiceContestoPagamento element for PagoPa API
+ * parsing the CodiceContestoPagamento element provided by PagoPa Backend
+ */
+function getCodiceContestoPagamentoForPagoPaApi(
+  codiceContestoPagamento: CodiceContestoPagamento
+): stText35_ppt {
+  return stText35_ppt.decode(codiceContestoPagamento).value as stText35_ppt; // tslint:disable-line:no-useless-cast
 }

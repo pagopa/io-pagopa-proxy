@@ -7,22 +7,20 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
-import { clients as pagoPASoapClient } from "italia-pagopa-api";
-import { attachFespCdServer } from "italia-pagopa-api/dist/lib/servers";
-import {
-  Esito,
-  IcdInfoPagamentoInput,
-  IcdInfoPagamentoOutput,
-  IFespCdPortTypeSoap
-} from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
+import * as t from "io-ts";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as morgan from "morgan";
 import * as redis from "redis";
 import RedisClustr = require("redis-clustr");
 import { specs as publicApiV1Specs } from "./api/public_api_pagopa";
-import { CONFIG, Configuration } from "./Configuration";
+import { Configuration } from "./Configuration";
 import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
+import * as FespCdServer from "./services/pagopa_api/FespCdServer";
+import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
+import { IFespCdPortTypeSoap } from "./types/pagopa_api/IFespCdPortTypeSoap";
+import { cdInfoPagamento_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
+import { cdInfoPagamentoResponse_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoPagamentoResponse_ppt";
 import { logger } from "./utils/Logger";
 
 /**
@@ -36,8 +34,8 @@ export async function startApp(config: Configuration): Promise<http.Server> {
 
   // Define SOAP Clients for PagoPA SOAP WS
   // It is necessary to forward BackendApp requests to PagoPA
-  const pagoPAClient = new pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient(
-    await pagoPASoapClient.createPagamentiTelematiciPspNodoClient({
+  const pagoPAClient = new PPTPortClient.PagamentiTelematiciPspNodoAsyncClient(
+    await PPTPortClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
         config.PAGOPA.WS_SERVICES.PAGAMENTI
       }`
@@ -61,9 +59,9 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     redisClient,
     config.PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS
   );
-  await attachFespCdServer(
+  await FespCdServer.attachFespCdServer(
     app,
-    CONFIG.CONTROLLER.ROUTES.SOAP.PAYMENT_ACTIVATIONS_STATUS_UPDATE,
+    config.CONTROLLER.ROUTES.SOAP.PAYMENT_ACTIVATIONS_STATUS_UPDATE,
     fespCdServiceHandler
   );
 
@@ -92,7 +90,7 @@ function setRestfulRoutes(
   app: core.Express,
   config: Configuration,
   redisClient: redis.RedisClient,
-  pagoPAClient: pagoPASoapClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
 ): void {
   const jsonParser = bodyParser.json();
 
@@ -131,25 +129,42 @@ function setRestfulRoutes(
  * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
  */
 function getRedisClient(config: Configuration): redis.RedisClient {
-  if (config.REDIS_DB.USE_CLUSTER) {
-    logger.debug("Creating a REDIS client using cluster...");
-    return new RedisClustr({
-      redisOptions: {
-        auth_pass: config.REDIS_DB.PASSWORD,
-        tls: {
-          servername: config.REDIS_DB.HOST
-        }
-      },
-      servers: [
-        {
-          host: config.REDIS_DB.HOST,
-          port: config.REDIS_DB.PORT
-        }
-      ]
-    }) as redis.RedisClient;
-  }
-  logger.debug("Creating a REDIS client...");
-  return redis.createClient(config.REDIS_DB.HOST);
+  const redisClient = (() => {
+    if (config.REDIS_DB.USE_CLUSTER) {
+      logger.debug("Creating a REDIS client using cluster...");
+      return new RedisClustr({
+        redisOptions: {
+          auth_pass: config.REDIS_DB.PASSWORD,
+          tls: {
+            servername: config.REDIS_DB.HOST
+          }
+        },
+        servers: [
+          {
+            host: config.REDIS_DB.HOST,
+            port: config.REDIS_DB.PORT
+          }
+        ]
+      }) as redis.RedisClient;
+    }
+    logger.debug("Creating a REDIS client...");
+    return redis.createClient(config.REDIS_DB.HOST);
+  })();
+
+  redisClient.on("error", err => {
+    logger.error(`REDIS Connection error: ${err}`);
+  });
+  redisClient.on("reconnecting", () => {
+    logger.info(`REDIS is trying to reconnect...`);
+  });
+  redisClient.on("warning", err => {
+    logger.warn(`REDIS Connection warning: ${err}`);
+  });
+  redisClient.on("end", () => {
+    logger.error(`REDIS Connection lost`);
+  });
+
+  return redisClient;
 }
 
 /**
@@ -165,32 +180,25 @@ function getFespCdServiceHandler(
 ): IFespCdPortTypeSoap {
   return {
     cdInfoPagamento: (
-      iCdInfoPagamentoInput: IcdInfoPagamentoInput,
-      callback: (
+      input: cdInfoPagamento_ppt,
+      cb: (
         err: any, // tslint:disable-line:no-any
-        iCdInfoPagamentoOutput: IcdInfoPagamentoOutput,
-        raw: string,
+        result: cdInfoPagamentoResponse_ppt,
+        raw: t.StringType,
         soapHeader: { readonly [k: string]: any } // tslint:disable-line:no-any
-      ) => void
+      ) => any // tslint:disable-line:no-any
     ) => {
       PaymentController.setActivationStatus(
-        iCdInfoPagamentoInput,
+        input,
         redisTimeoutSecs,
         redisClient
       ).then(
         iCdInfoPagamentoOutput => {
-          callback(undefined, iCdInfoPagamentoOutput, "", {});
+          cb(undefined, iCdInfoPagamentoOutput, new t.StringType(), {});
         },
         err => {
           logger.error(`Error on setActivationStatus: ${err}`);
-          callback(
-            undefined,
-            {
-              esito: Esito.KO
-            },
-            "",
-            {}
-          );
+          cb(undefined, { esito: "KO" }, new t.StringType(), {});
         }
       );
     }
