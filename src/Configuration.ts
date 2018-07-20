@@ -48,7 +48,7 @@ export const CONFIG = {
       IDENTIFICATIVO_PSP: "AGID_01",
       IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
       IDENTIFICATIVO_CANALE: "97735020584_02",
-      TOKEN: process.env.PAGOPA_TOKEN || "nopassword"
+      PASSWORD: process.env.PAGOPA_PASSWORD
     }
   },
 
@@ -99,7 +99,7 @@ const PagoPAConfig = t.intersection([
       IDENTIFICATIVO_PSP: stText35_ppt,
       IDENTIFICATIVO_INTERMEDIARIO_PSP: stText35_ppt,
       IDENTIFICATIVO_CANALE: stText35_ppt,
-      TOKEN: stPassword_ppt
+      PASSWORD: stPassword_ppt
     })
   })
 ]);

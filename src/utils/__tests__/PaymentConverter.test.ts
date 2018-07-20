@@ -118,7 +118,7 @@ const aConfig = {
     IDENTIFICATIVO_PSP: "AGID_01",
     IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
     IDENTIFICATIVO_CANALE: "97735020584_02",
-    TOKEN: process.env.PAGOPA_TOKEN || "nopassword"
+    PASSWORD: "nopassword"
   }
 };
 
@@ -147,9 +147,6 @@ describe("getINodoVerificaRPTInput", () => {
       expect(
         errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
       ).toBe("97735020584");
-      expect(errorOrNodoVerificaRPTInput.value.password).toBe(
-        aConfig.IDENTIFIER.TOKEN
-      );
       expect(
         isRight(
           CodiceContestoPagamento.decode(
@@ -227,10 +224,6 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "identificativoCanale",
       Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "password",
-      Config.PAGOPA.IDENTIFIER.TOKEN
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",
