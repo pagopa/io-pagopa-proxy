@@ -362,7 +362,7 @@ const aConfig = {
     IDENTIFICATIVO_PSP: "AGID_01",
     IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
     IDENTIFICATIVO_CANALE: "97735020584_02",
-    PASSWORD: process.env.PAGOPA_PASSWORD || "nopassword"
+    PASSWORD: "nopassword"
   }
 };
 
@@ -391,7 +391,6 @@ describe("getINodoVerificaRPTInput", () => {
       expect(
         errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
       ).toBe("97735020584");
-      expect(errorOrNodoVerificaRPTInput.value.password).toBe("nopassword");
       expect(
         isRight(
           CodiceContestoPagamento.decode(
@@ -499,10 +498,6 @@ describe("getPaymentsActivationRequestPagoPA", () => {
       Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "password",
-      Config.PAGOPA.IDENTIFIER.PASSWORD
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",
       aCodiceContestoPagamento
     );
@@ -544,10 +539,6 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "identificativoCanale",
       Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "password",
-      Config.PAGOPA.IDENTIFIER.PASSWORD
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",
@@ -593,10 +584,6 @@ describe("getPaymentsActivationRequestPagoPA", () => {
       Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "password",
-      Config.PAGOPA.IDENTIFIER.PASSWORD
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",
       aCodiceContestoPagamento
     );
@@ -638,10 +625,6 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "identificativoCanale",
       Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "password",
-      Config.PAGOPA.IDENTIFIER.PASSWORD
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codiceContestoPagamento",
