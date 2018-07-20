@@ -18,7 +18,7 @@ export function createClient<T>(
       if (err) {
         reject(err);
       } else {
-        resolve(client as soap.Client & T); // tslint:disable-line
+        resolve(client as soap.Client & T); // tslint:disable-line:no-useless-cast
       }
     });
   });

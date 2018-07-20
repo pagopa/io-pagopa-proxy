@@ -255,5 +255,5 @@ function getSpezzoniCausaleVersamentoForController(
 function getCodiceContestoPagamentoForPagoPaApi(
   codiceContestoPagamento: CodiceContestoPagamento
 ): stText35_ppt {
-  return stText35_ppt.decode(codiceContestoPagamento).value as stText35_ppt; // tslint:disable-line
+  return stText35_ppt.decode(codiceContestoPagamento).value as stText35_ppt; // tslint:disable-line:no-useless-cast
 }
