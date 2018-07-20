@@ -44,9 +44,9 @@ Those are all Environment variables needed by the application:
 | PAGOPAPROXY_PORT    | The HTTP port the Express server is listening to              | int     | 3000          |
 | PAGOPA_HOST         | The PagoPA SOAP Server hostname or IP address                 | string  | localhost     |
 | PAGOPA_PORT         | The PagoPA SOAP Server port                                   | int     | 3001          |
-| PAGOPA_TOKEN        | The token used to authenticate to PagoPA SOAP Server          | string  | ND            |
+| PAGOPA_TOKEN        | The password used to authenticate to PagoPA SOAP Server       | string  | nopassword    |
 | REDIS_DB_URL        | The Redis DB Server URL                                       | string  | localhost     |
-| REDIS_DB_PORT       | The Redis DB Server port                                      | int     | 6379          |
+| REDIS_DB_PORT       | The Redis DB Server port                                      | int     | 6380          |
 | REDIS_DB_PASSWORD   | The Redis DB Server password                                  | string  | ND            |
 | REDIS_USE_CLUSTER   | Enable Redis Cluster                                          | boolean | false         |
 

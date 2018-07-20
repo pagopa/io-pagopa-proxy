@@ -1,19 +1,11 @@
-import { isLeft, isRight } from "fp-ts/lib/Either";
-import {
-  codificaInfrastrutturaPSPEnum,
-  InodoAttivaRPTOutput,
-  InodoVerificaRPTOutput,
-  PPTPortTypes
-} from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
-import {
-  PaymentNoticeNumber,
-  RptId,
-  RptIdFromString
-} from "italia-ts-commons/lib/pagopa";
-import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
+import { isRight } from "fp-ts/lib/Either";
+import { reporters } from "italia-ts-commons";
+import { RptId } from "italia-ts-commons/lib/pagopa";
 import { CONFIG as Config, PagoPAConfig } from "../../Configuration";
 import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
+import { esitoNodoAttivaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
+import { esitoNodoVerificaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
 import {
   getInodoAttivaRPTInput,
   getInodoVerificaRPTInput,
@@ -21,334 +13,98 @@ import {
   getPaymentRequestsGetResponse
 } from "../PaymentsConverter";
 
-const aVerificaRPTOutputOk: InodoVerificaRPTOutput = {
-  fault: {
-    faultCode: "01",
-    faultString: "FAULTSTRING",
-    id: "ID01",
-    description: "FAULTDESCRIPTION",
-    serial: 1
-  },
-  esito: PPTPortTypes.Esito.OK,
-  datiPagamentoPA: {
-    importoSingoloVersamento: 99.05,
-    ibanAccredito: "IT17X0605502100000001234567",
-    bicAccredito: "BPPIITRR",
-    enteBeneficiario: {
-      identificativoUnivocoBeneficiario: {
-        tipoIdentificativoUnivoco: "G",
-        codiceIdentificativoUnivoco: "001"
+const aVerificaRPTOutput = esitoNodoVerificaRPTRisposta_ppt
+  .decode({
+    esito: "OK",
+    datiPagamentoPA: {
+      importoSingoloVersamento: 99.05,
+      ibanAccredito: "IT17X0605502100000001234567",
+      bicAccredito: "BPPIITRR",
+      enteBeneficiario: {
+        identificativoUnivocoBeneficiario: {
+          tipoIdentificativoUnivoco: "G",
+          codiceIdentificativoUnivoco: "001"
+        },
+        denominazioneBeneficiario: "BANCA01",
+        codiceUnitOperBeneficiario: "01",
+        denomUnitOperBeneficiario: "DENOM01",
+        indirizzoBeneficiario: "VIAROMA",
+        civicoBeneficiario: "01",
+        capBeneficiario: "00000",
+        localitaBeneficiario: "ROMA",
+        provinciaBeneficiario: "ROMA",
+        nazioneBeneficiario: "IT"
       },
-      denominazioneBeneficiario: "BANCA01",
-      codiceUnitOperBeneficiario: "01",
-      denomUnitOperBeneficiario: "DENOM01",
-      indirizzoBeneficiario: "VIAROMA",
-      civicoBeneficiario: "01",
-      capBeneficiario: "00000",
-      localitaBeneficiario: "ROMA",
-      provinciaBeneficiario: "ROMA",
-      nazioneBeneficiario: "IT"
-    },
-    credenzialiPagatore: "NOMECOGNOME",
-    causaleVersamento: "CAUSALE01",
-    spezzoniCausaleVersamento: [
-      {
-        spezzoneCausaleVersamento: "SPEZZONE1",
-        spezzoneStrutturatoCausaleVersamento: {
-          causaleSpezzone: "CAUSALE01",
-          importoSpezzone: 99.05
-        }
-      }
-    ]
-  }
-};
+      credenzialiPagatore: "NOMECOGNOME",
+      causaleVersamento: "CAUSALE01"
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
 
-const aVerificaRPTOutputKoImporto: InodoVerificaRPTOutput = {
-  fault: {
-    faultCode: "01",
-    faultString: "FAULTSTRING",
-    id: "ID01",
-    description: "FAULTDESCRIPTION",
-    serial: 1
-  },
-  esito: PPTPortTypes.Esito.KO,
-  datiPagamentoPA: {
-    importoSingoloVersamento: 0,
-    ibanAccredito: "IT17X0605502100000001234567",
-    bicAccredito: "BPPIITRR",
-    enteBeneficiario: {
-      identificativoUnivocoBeneficiario: {
-        tipoIdentificativoUnivoco: "G",
-        codiceIdentificativoUnivoco: "001"
+const anAttivaRPTOutput = esitoNodoAttivaRPTRisposta_ppt
+  .decode({
+    esito: "OK",
+    datiPagamentoPA: {
+      importoSingoloVersamento: 99.05,
+      ibanAccredito: "IT17X0605502100000001234567",
+      bicAccredito: "BPPIITRR",
+      enteBeneficiario: {
+        identificativoUnivocoBeneficiario: {
+          tipoIdentificativoUnivoco: "G",
+          codiceIdentificativoUnivoco: "001"
+        },
+        denominazioneBeneficiario: "BANCA01",
+        codiceUnitOperBeneficiario: "01",
+        denomUnitOperBeneficiario: "DENOM01",
+        indirizzoBeneficiario: "VIAROMA",
+        civicoBeneficiario: "01",
+        capBeneficiario: "00000",
+        localitaBeneficiario: "ROMA",
+        provinciaBeneficiario: "ROMA",
+        nazioneBeneficiario: "IT"
       },
-      denominazioneBeneficiario: "BANCA01",
-      codiceUnitOperBeneficiario: "01",
-      denomUnitOperBeneficiario: "DENOM01",
-      indirizzoBeneficiario: "VIAROMA",
-      civicoBeneficiario: "01",
-      capBeneficiario: "00000",
-      localitaBeneficiario: "ROMA",
-      provinciaBeneficiario: "ROMA",
-      nazioneBeneficiario: "IT"
-    },
-    credenzialiPagatore: "NOMECOGNOME",
-    causaleVersamento: "CAUSALE01",
-    spezzoniCausaleVersamento: [
-      {
-        spezzoneCausaleVersamento: "SPEZZONE1",
-        spezzoneStrutturatoCausaleVersamento: {
-          causaleSpezzone: "CAUSALE01",
-          importoSpezzone: 9999999999
-        }
-      }
-    ]
-  }
-};
-
-const aVerificaRPTOutputKoIban: InodoVerificaRPTOutput = {
-  fault: {
-    faultCode: "01",
-    faultString: "FAULTSTRING",
-    id: "ID01",
-    description: "FAULTDESCRIPTION",
-    serial: 1
-  },
-  esito: PPTPortTypes.Esito.KO,
-  datiPagamentoPA: {
-    importoSingoloVersamento: 99.05,
-    ibanAccredito: "XXX",
-    bicAccredito: "BPPIITRR",
-    enteBeneficiario: {
-      identificativoUnivocoBeneficiario: {
-        tipoIdentificativoUnivoco: "G",
-        codiceIdentificativoUnivoco: "001"
-      },
-      denominazioneBeneficiario: "BANCA01",
-      codiceUnitOperBeneficiario: "01",
-      denomUnitOperBeneficiario: "DENOM01",
-      indirizzoBeneficiario: "VIAROMA",
-      civicoBeneficiario: "01",
-      capBeneficiario: "00000",
-      localitaBeneficiario: "ROMA",
-      provinciaBeneficiario: "ROMA",
-      nazioneBeneficiario: "IT"
-    },
-    credenzialiPagatore: "NOMECOGNOME",
-    causaleVersamento: "CAUSALE01",
-    spezzoniCausaleVersamento: [
-      {
-        spezzoneCausaleVersamento: "SPEZZONE1",
-        spezzoneStrutturatoCausaleVersamento: {
-          causaleSpezzone: "CAUSALE01",
-          importoSpezzone: 99.05
-        }
-      }
-    ]
-  }
-};
-
-const anAttivaRPTOutputOk: InodoAttivaRPTOutput = {
-  fault: {
-    faultCode: "01",
-    faultString: "FAULTSTRING",
-    id: "ID01",
-    description: "FAULTDESCRIPTION",
-    serial: 1
-  },
-  esito: PPTPortTypes.Esito.OK,
-  datiPagamentoPA: {
-    importoSingoloVersamento: 99.05,
-    ibanAccredito: "IT17X0605502100000001234567",
-    bicAccredito: "BPPIITRR",
-    enteBeneficiario: {
-      identificativoUnivocoBeneficiario: {
-        tipoIdentificativoUnivoco: "G",
-        codiceIdentificativoUnivoco: "001"
-      },
-      denominazioneBeneficiario: "BANCA01",
-      codiceUnitOperBeneficiario: "01",
-      denomUnitOperBeneficiario: "DENOM01",
-      indirizzoBeneficiario: "VIAROMA",
-      civicoBeneficiario: "01",
-      capBeneficiario: "00000",
-      localitaBeneficiario: "ROMA",
-      provinciaBeneficiario: "ROMA",
-      nazioneBeneficiario: "IT"
-    },
-    credenzialiPagatore: "NOMECOGNOME",
-    causaleVersamento: "CAUSALE01",
-    spezzoniCausaleVersamento: [
-      {
-        spezzoneCausaleVersamento: "SPEZZONE1",
-        spezzoneStrutturatoCausaleVersamento: {
-          causaleSpezzone: "CAUSALE01",
-          importoSpezzone: 99.05
-        }
-      }
-    ]
-  }
-};
-
-const anAttivaRPTOutputKoImporto: InodoAttivaRPTOutput = {
-  fault: {
-    faultCode: "01",
-    faultString: "FAULTSTRING",
-    id: "ID01",
-    description: "FAULTDESCRIPTION",
-    serial: 1
-  },
-  esito: PPTPortTypes.Esito.KO,
-  datiPagamentoPA: {
-    importoSingoloVersamento: 9999999999,
-    ibanAccredito: "IT17X0605502100000001234567",
-    bicAccredito: "BPPIITRR",
-    enteBeneficiario: {
-      identificativoUnivocoBeneficiario: {
-        tipoIdentificativoUnivoco: "G",
-        codiceIdentificativoUnivoco: "001"
-      },
-      denominazioneBeneficiario: "BANCA01",
-      codiceUnitOperBeneficiario: "01",
-      denomUnitOperBeneficiario: "DENOM01",
-      indirizzoBeneficiario: "VIAROMA",
-      civicoBeneficiario: "01",
-      capBeneficiario: "00000",
-      localitaBeneficiario: "ROMA",
-      provinciaBeneficiario: "ROMA",
-      nazioneBeneficiario: "IT"
-    },
-    credenzialiPagatore: "NOMECOGNOME",
-    causaleVersamento: "CAUSALE01",
-    spezzoniCausaleVersamento: [
-      {
-        spezzoneCausaleVersamento: "SPEZZONE1",
-        spezzoneStrutturatoCausaleVersamento: {
-          causaleSpezzone: "CAUSALE01",
-          importoSpezzone: 9999999999
-        }
-      }
-    ]
-  }
-};
-
-const anAttivaRPTOutputKoIban: InodoAttivaRPTOutput = {
-  fault: {
-    faultCode: "01",
-    faultString: "FAULTSTRING",
-    id: "ID01",
-    description: "FAULTDESCRIPTION",
-    serial: 1
-  },
-  esito: PPTPortTypes.Esito.KO,
-  datiPagamentoPA: {
-    importoSingoloVersamento: 99.05,
-    ibanAccredito: "XXX",
-    bicAccredito: "BPPIITRR",
-    enteBeneficiario: {
-      identificativoUnivocoBeneficiario: {
-        tipoIdentificativoUnivoco: "G",
-        codiceIdentificativoUnivoco: "001"
-      },
-      denominazioneBeneficiario: "BANCA01",
-      codiceUnitOperBeneficiario: "01",
-      denomUnitOperBeneficiario: "DENOM01",
-      indirizzoBeneficiario: "VIAROMA",
-      civicoBeneficiario: "01",
-      capBeneficiario: "00000",
-      localitaBeneficiario: "ROMA",
-      provinciaBeneficiario: "ROMA",
-      nazioneBeneficiario: "IT"
-    },
-    credenzialiPagatore: "NOMECOGNOME",
-    causaleVersamento: "CAUSALE01",
-    spezzoniCausaleVersamento: [
-      {
-        spezzoneCausaleVersamento: "SPEZZONE1",
-        spezzoneStrutturatoCausaleVersamento: {
-          causaleSpezzone: "CAUSALE01",
-          importoSpezzone: 98.05
-        }
-      },
-      {
-        spezzoneCausaleVersamento: "SPEZZONE2",
-        spezzoneStrutturatoCausaleVersamento: {
-          causaleSpezzone: "CAUSALE02",
-          importoSpezzone: 1
-        }
-      }
-    ]
-  }
-};
+      credenzialiPagatore: "NOMECOGNOME",
+      causaleVersamento: "CAUSALE01"
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoAttivaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
 
 const aCodiceContestoPagamento: CodiceContestoPagamento = "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento;
-const aRptId: RptId = {
-  organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+
+const aRptId = RptId.decode({
+  organizationFiscalCode: "12345678901",
   paymentNoticeNumber: {
     applicationCode: "12",
     auxDigit: "0",
     checkDigit: "12",
     iuv13: "1234567890123"
-  } as PaymentNoticeNumber
-};
-const aPaymentActivationsPostRequest0 = PaymentActivationsPostRequest.decode({
-  rptId: RptIdFromString.encode({
-    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
-    paymentNoticeNumber: {
-      applicationCode: "12",
-      auxDigit: "0",
-      checkDigit: "12",
-      iuv13: "1234567890123"
-    } as PaymentNoticeNumber
-  }),
-  importoSingoloVersamento: 9905,
-  codiceContestoPagamento: aCodiceContestoPagamento
-}).getOrElseL(() => {
-  throw new Error();
+  }
+}).getOrElseL(errors => {
+  throw Error(`Invalid RptId to decode: ${reporters.readableReport(errors)}`);
 });
 
-const aPaymentActivationsPostRequest1 = PaymentActivationsPostRequest.decode({
-  rptId: RptIdFromString.encode({
-    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
-    paymentNoticeNumber: {
-      auxDigit: "1",
-      iuv17: "12345678901234567"
-    } as PaymentNoticeNumber
-  }),
+const aPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode({
+  rptId: "12345678901012123456789012399",
   importoSingoloVersamento: 9905,
   codiceContestoPagamento: aCodiceContestoPagamento
-}).getOrElseL(() => {
-  throw new Error();
-});
-
-const aPaymentActivationsPostRequest2 = PaymentActivationsPostRequest.decode({
-  rptId: RptIdFromString.encode({
-    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
-    paymentNoticeNumber: {
-      auxDigit: "2",
-      checkDigit: "12",
-      iuv15: "123456789012345"
-    } as PaymentNoticeNumber
-  }),
-  importoSingoloVersamento: 9905,
-  codiceContestoPagamento: aCodiceContestoPagamento
-}).getOrElseL(() => {
-  throw new Error();
-});
-
-const aPaymentActivationsPostRequest3 = PaymentActivationsPostRequest.decode({
-  rptId: RptIdFromString.encode({
-    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
-    paymentNoticeNumber: {
-      auxDigit: "3",
-      checkDigit: "12",
-      iuv13: "1234567890123",
-      segregationCode: "99"
-    } as PaymentNoticeNumber
-  }),
-  importoSingoloVersamento: 9905,
-  codiceContestoPagamento: aCodiceContestoPagamento
-}).getOrElseL(() => {
-  throw new Error();
+}).getOrElseL(errors => {
+  throw Error(
+    `Invalid PaymentActivationsPostRequest to decode: ${reporters.readableReport(
+      errors
+    )}`
+  );
 });
 
 const aConfig = {
@@ -362,7 +118,7 @@ const aConfig = {
     IDENTIFICATIVO_PSP: "AGID_01",
     IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
     IDENTIFICATIVO_CANALE: "97735020584_02",
-    TOKEN: process.env.PAGOPA_TOKEN || "ND"
+    TOKEN: process.env.PAGOPA_TOKEN || "nopassword"
   }
 };
 
@@ -391,7 +147,9 @@ describe("getINodoVerificaRPTInput", () => {
       expect(
         errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
       ).toBe("97735020584");
-      expect(errorOrNodoVerificaRPTInput.value.password).toBe("ND");
+      expect(errorOrNodoVerificaRPTInput.value.password).toBe(
+        aConfig.IDENTIFIER.TOKEN
+      );
       expect(
         isRight(
           CodiceContestoPagamento.decode(
@@ -406,7 +164,7 @@ describe("getINodoVerificaRPTInput", () => {
 describe("getPaymentsCheckResponse", () => {
   it("should convert InodoVerificaRPTOutput to PaymentsCheckResponse", () => {
     const errorOrPaymentCheckResponse = getPaymentRequestsGetResponse(
-      aVerificaRPTOutputOk,
+      aVerificaRPTOutput,
       aCodiceContestoPagamento
     );
     expect(isRight(errorOrPaymentCheckResponse)).toBeTruthy();
@@ -440,34 +198,6 @@ describe("getPaymentsCheckResponse", () => {
       "ibanAccredito",
       "IT17X0605502100000001234567"
     );
-
-    expect(errorOrPaymentCheckResponse.value).toMatchObject({
-      spezzoniCausaleVersamento: [
-        {
-          spezzoneCausaleVersamento: "SPEZZONE1",
-          spezzoneStrutturatoCausaleVersamento: {
-            causaleSpezzone: "CAUSALE01",
-            importoSpezzone: 9905
-          }
-        }
-      ]
-    });
-  });
-
-  it("should not convert to PaymentsCheckResponse (wrong importo) ", () => {
-    const errorOrPaymentCheckResponse = getPaymentRequestsGetResponse(
-      aVerificaRPTOutputKoImporto,
-      aCodiceContestoPagamento
-    );
-    expect(isLeft(errorOrPaymentCheckResponse)).toBeTruthy();
-  });
-
-  it("should not convert to PaymentsCheckResponse (wrong iban)", () => {
-    const errorOrPaymentCheckResponse = getPaymentRequestsGetResponse(
-      aVerificaRPTOutputKoIban,
-      aCodiceContestoPagamento
-    );
-    expect(isLeft(errorOrPaymentCheckResponse)).toBeTruthy();
   });
 });
 
@@ -475,7 +205,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
   it("should convert PaymentsActivationRequest to InodoAttivaRPTInput (case when Auxdigit is 0)", () => {
     const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
       aConfig as PagoPAConfig,
-      aPaymentActivationsPostRequest0
+      aPaymentActivationsPostRequest
     );
     expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
     expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
@@ -516,148 +246,7 @@ describe("getPaymentsActivationRequestPagoPA", () => {
     );
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
       "codificaInfrastrutturaPSP",
-      codificaInfrastrutturaPSPEnum.QR_CODE
-    );
-  });
-
-  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput (case when Auxdigit is 1)", () => {
-    const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
-      aConfig as PagoPAConfig,
-      aPaymentActivationsPostRequest1
-    );
-    expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
-    expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
-      codiceIdRPT: {
-        CF: "12345678901",
-        AuxDigit: "1",
-        CodIUV: "12345678901234567"
-      }
-    });
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoPSP",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoIntermediarioPSP",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoCanale",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "password",
-      Config.PAGOPA.IDENTIFIER.TOKEN
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "codiceContestoPagamento",
-      aCodiceContestoPagamento
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoIntermediarioPSPPagamento",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoCanalePagamento",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "codificaInfrastrutturaPSP",
-      codificaInfrastrutturaPSPEnum.QR_CODE
-    );
-  });
-
-  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput (case when Auxdigit is 2)", () => {
-    const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
-      aConfig as PagoPAConfig,
-      aPaymentActivationsPostRequest2
-    );
-    expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
-    expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
-      codiceIdRPT: {
-        CF: "12345678901",
-        AuxDigit: "2",
-        CodIUV: "123456789012345"
-      }
-    });
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoPSP",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoIntermediarioPSP",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoCanale",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "password",
-      Config.PAGOPA.IDENTIFIER.TOKEN
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "codiceContestoPagamento",
-      aCodiceContestoPagamento
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoIntermediarioPSPPagamento",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoCanalePagamento",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "codificaInfrastrutturaPSP",
-      codificaInfrastrutturaPSPEnum.QR_CODE
-    );
-  });
-
-  it("should convert PaymentsActivationRequest to InodoAttivaRPTInput (case when Auxdigit is 3)", () => {
-    const errorOrNodoAttivaRPTInput = getInodoAttivaRPTInput(
-      aConfig as PagoPAConfig,
-      aPaymentActivationsPostRequest3
-    );
-    expect(isRight(errorOrNodoAttivaRPTInput)).toBeTruthy();
-    expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
-      codiceIdRPT: {
-        CF: "12345678901",
-        AuxDigit: "3",
-        CodIUV: "1234567890123"
-      }
-    });
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoPSP",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoIntermediarioPSP",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoCanale",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "password",
-      Config.PAGOPA.IDENTIFIER.TOKEN
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "codiceContestoPagamento",
-      aCodiceContestoPagamento
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoIntermediarioPSPPagamento",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "identificativoCanalePagamento",
-      Config.PAGOPA.IDENTIFIER.IDENTIFICATIVO_CANALE
-    );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
-      "codificaInfrastrutturaPSP",
-      codificaInfrastrutturaPSPEnum.QR_CODE
+      "QR-CODE"
     );
   });
 });
@@ -665,25 +254,11 @@ describe("getPaymentsActivationRequestPagoPA", () => {
 describe("getPaymentsActivationResponse", () => {
   it("Should convert InodoAttivaRPTOutput in PaymentsActivationResponse", () => {
     const errorOrAttivaRPTOutput = getPaymentActivationsPostResponse(
-      anAttivaRPTOutputOk
+      anAttivaRPTOutput
     );
     expect(isRight(errorOrAttivaRPTOutput)).toBeTruthy();
     if (isRight(errorOrAttivaRPTOutput)) {
       expect(errorOrAttivaRPTOutput.value.importoSingoloVersamento).toBe(9905);
-      expect(
-        errorOrAttivaRPTOutput.value.spezzoniCausaleVersamento
-      ).toBeDefined();
     }
-  });
-
-  it("should not convert to PaymentsActivationResponse (wrong importo)", () => {
-    expect(
-      isLeft(getPaymentActivationsPostResponse(anAttivaRPTOutputKoImporto))
-    ).toBeTruthy();
-  });
-  it("should not convert to PaymentsActivationResponse (wrong iban)", () => {
-    expect(
-      isLeft(getPaymentActivationsPostResponse(anAttivaRPTOutputKoIban))
-    ).toBeTruthy();
   });
 });

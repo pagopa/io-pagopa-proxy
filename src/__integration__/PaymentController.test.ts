@@ -1,7 +1,5 @@
 import * as express from "express";
 import { isRight } from "fp-ts/lib/Either";
-import { IcdInfoPagamentoInput } from "italia-pagopa-api/dist/wsdl-lib/FespCdService/FespCdPortType";
-import { PPTPortTypes } from "italia-pagopa-api/dist/wsdl-lib/PagamentiTelematiciPspNodoservice/PPTPort";
 import {
   ApplicationCode,
   AuxDigit,
@@ -10,10 +8,7 @@ import {
   PaymentNoticeNumber,
   RptIdFromString
 } from "italia-ts-commons/lib/pagopa";
-import {
-  NonEmptyString,
-  OrganizationFiscalCode
-} from "italia-ts-commons/lib/strings";
+import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import * as redis from "redis";
 import { PagoPAConfig } from "../Configuration";
@@ -25,6 +20,8 @@ import {
 } from "../controllers/restful/PaymentController";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../types/api/ImportoEuroCents";
+import { cdInfoPagamento_ppt } from "../types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
+import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
 import { logger } from "../utils/Logger";
 import {
   createPagamentiTelematiciPspNodoClient,
@@ -32,49 +29,49 @@ import {
 } from "./fake/fakePagamentiTelematiciPspNodoAsyncClient";
 import mockReq from "./fake/request";
 
-const aConfig: PagoPAConfig = {
-  HOST: "http://localhost" as NonEmptyString,
+const aConfig = {
+  HOST: "http://localhost",
   PORT: 3002,
   WS_SERVICES: {
-    PAGAMENTI: "/PagamentiTelematiciPspNodoservice/" as NonEmptyString
+    PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
   },
   // These information will identify our system when it will access to PagoPA
   IDENTIFIER: {
-    IDENTIFICATIVO_PSP: "AGID_01" as NonEmptyString,
-    IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584" as NonEmptyString,
-    IDENTIFICATIVO_CANALE: "97735020584_02" as NonEmptyString,
-    TOKEN: "ND" as NonEmptyString
+    IDENTIFICATIVO_PSP: "AGID_01",
+    IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
+    IDENTIFICATIVO_CANALE: "97735020584_02",
+    TOKEN: "ND"
   }
-};
+} as PagoPAConfig;
 const aRptIdString = "12345678901012123456789012399";
 
 const aMockedRedisClient = redis.createClient(6379, "localhost");
 
-const aCodiceContestoPagamento = "05245c90746811e8b9bf91897339427e" as CodiceContestoPagamento;
+const aCodiceContestoPagamento = "05245c90746811e8b9bf91897339427e" as stText35_ppt;
 
-const aCdInfoPagamentoInput = {
+const aCdInfoPagamentoPpt = {
   identificativoDominio: "idDom",
   identificativoUnivocoVersamento: "idUniv",
   codiceContestoPagamento: aCodiceContestoPagamento,
   idPagamento: "id1234"
-} as IcdInfoPagamentoInput;
+} as cdInfoPagamento_ppt;
 
 describe("checkPaymentToPagoPa", async () => {
   it("should return the right response", async () => {
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: PPTPortTypes.envelopeKey
+        envelopeKey: "env"
       })
     );
 
     const req = {
       params: { rptId: aRptIdString }
     } as express.Request;
-
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
       verificaRPTPagoPaClient
     )(req);
+
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseSuccessJson");
     if (errorOrPaymentCheckResponse.kind === "IResponseSuccessJson") {
       expect(errorOrPaymentCheckResponse.value).toHaveProperty(
@@ -117,7 +114,7 @@ describe("checkPaymentToPagoPa", async () => {
 
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: PPTPortTypes.envelopeKey
+        envelopeKey: "env"
       })
     );
 
@@ -152,7 +149,7 @@ describe("activatePaymentToPagoPa", async () => {
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: PPTPortTypes.envelopeKey
+        envelopeKey: "env"
       })
     );
 
@@ -213,7 +210,7 @@ describe("activatePaymentToPagoPa", async () => {
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: PPTPortTypes.envelopeKey
+        envelopeKey: "env"
       })
     );
 
@@ -251,7 +248,7 @@ describe("setActivationStatus and getActivationStatus", () => {
     const req = mockReq();
     req.params = aPaymentActivationRequest;
 
-    await setActivationStatus(aCdInfoPagamentoInput, 5000, aMockedRedisClient);
+    await setActivationStatus(aCdInfoPagamentoPpt, 5000, aMockedRedisClient);
 
     aMockedRedisClient.on("connect", () => {
       return logger.info("Mocked Redis connected!");
