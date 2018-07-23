@@ -2,6 +2,8 @@ import { isRight } from "fp-ts/lib/Either";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
 
+// ts-lint:disable:max-line-length
+
 describe("getNodoVerificaRPTInput", () => {
   it(" should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
     const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
@@ -27,7 +29,7 @@ describe("getNodoVerificaRPTInput", () => {
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoVerificaRPTInput.value.password).toBe(
-      MockedData.aConfig.IDENTIFIER.TOKEN
+      MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
@@ -69,7 +71,7 @@ describe("getNodoVerificaRPTInput", () => {
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoVerificaRPTInput.value.password).toBe(
-      MockedData.aConfig.IDENTIFIER.TOKEN
+      MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
@@ -110,7 +112,7 @@ describe("getNodoVerificaRPTInput", () => {
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoVerificaRPTInput.value.password).toBe(
-      MockedData.aConfig.IDENTIFIER.TOKEN
+      MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
@@ -151,7 +153,7 @@ describe("getNodoVerificaRPTInput", () => {
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoVerificaRPTInput.value.password).toBe(
-      MockedData.aConfig.IDENTIFIER.TOKEN
+      MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
@@ -261,7 +263,7 @@ describe("getNodoAttivaRPTInput", () => {
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoAttivaRPTInput.value.password).toBe(
-      MockedData.aConfig.IDENTIFIER.TOKEN
+      MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content

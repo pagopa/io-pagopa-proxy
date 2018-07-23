@@ -43,7 +43,7 @@ export function getNodoVerificaRPTInput(
       identificativoIntermediarioPSP:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPAConfig.IDENTIFIER.TOKEN,
+      password: pagoPAConfig.IDENTIFIER.PASSWORD,
       codiceContestoPagamento: codiceContestoPagamentoApi,
       codificaInfrastrutturaPSP: "QR-CODE",
       codiceIdRPT
@@ -119,7 +119,7 @@ export function getNodoAttivaRPTInput(
       identificativoIntermediarioPSP:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPAConfig.IDENTIFIER.TOKEN,
+      password: pagoPAConfig.IDENTIFIER.PASSWORD,
       codiceContestoPagamento: codiceContestoPagamentoApi,
       identificativoIntermediarioPSPPagamento:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
