@@ -1,9 +1,8 @@
 import { isRight } from "fp-ts/lib/Either";
-import { IResponseErrorInternal } from "italia-ts-commons/lib/responses";
 import * as PaymentController from "../../controllers/restful/PaymentController";
+import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
-import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
 
 // ts-lint:disable:max-line-length
 
