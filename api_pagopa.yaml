@@ -26,8 +26,10 @@ paths:
               codiceContestoPagamento: 'ABC123'
         '400':
           description: Invalid input or PagoPA response
+        '403':
+          description: Request is rejected by PagoPa
         '500':
-          description: PagoPA services are not available or request is rejected
+          description: PagoPA services are not available
   '/payment-activations':
     x-swagger-router-controller: PaymentController
     post:
@@ -54,8 +56,10 @@ paths:
               importoSingoloVersamento: 200
         '400':
           description: Invalid input or PagoPA response
+        '403':
+          description: Request is rejected by PagoPa
         '500':
-          description: PagoPA services are not available or request is rejected
+          description: PagoPA services are not available
   '/payment-activations/{codiceContestoPagamento}':
     x-swagger-router-controller: PaymentController
     get:

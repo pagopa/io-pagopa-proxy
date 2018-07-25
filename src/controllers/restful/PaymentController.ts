@@ -7,12 +7,14 @@ import * as express from "express";
 import { Either, fromOption, isLeft, left } from "fp-ts/lib/Either";
 import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
 import {
+  HttpStatusCodeEnum,
   IResponseErrorGeneric,
   IResponseErrorInternal,
   IResponseErrorNotFound,
   IResponseErrorValidation,
   IResponseSuccessJson,
   ResponseErrorFromValidationErrors,
+  ResponseErrorGeneric,
   ResponseErrorInternal,
   ResponseErrorNotFound,
   ResponseErrorValidation,
@@ -30,6 +32,7 @@ import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivatio
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
 import { cdInfoPagamento_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
 import { cdInfoPagamentoResponse_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamentoResponse_ppt";
+import { faultBean_ppt } from "../../types/pagopa_api/yaml-to-ts/faultBean_ppt";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import { redisGet, redisSet } from "../../utils/Redis";
 
@@ -96,10 +99,15 @@ export function getPaymentInfo(
       );
     }
     const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.value;
-    // Check PagoPA response content.
-    // If it contains an error, an HTTP error will be provided to BackendApp
-    if (iNodoVerificaRPTOutput.esito === "KO") {
-      return ResponseErrorInternal("Error during payment check: esito === KO");
+
+    // Check PagoPA response content
+    // If it contains a functional error, an HTTP error will be provided to BackendApp
+    const responseError = getResponseErrorIfExists(
+      iNodoVerificaRPTOutput.esito,
+      iNodoVerificaRPTOutput.fault
+    );
+    if (responseError !== undefined) {
+      return responseError;
     }
 
     // Convert the output provided by PagoPA (SOAP response)
@@ -184,9 +192,13 @@ export function activatePayment(
     const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
 
     // Check PagoPA response content.
-    // If it contains an error, an HTTP error will be provided to BackendApp
-    if (iNodoAttivaRPTOutput.esito === "KO") {
-      return ResponseErrorInternal("Error during payment check: esito === KO");
+    // If it contains a functional error, an HTTP error will be provided to BackendApp
+    const responseError = getResponseErrorIfExists(
+      iNodoAttivaRPTOutput.esito,
+      iNodoAttivaRPTOutput.fault
+    );
+    if (responseError !== undefined) {
+      return responseError;
     }
 
     // Convert the output provided by PagoPA (SOAP response)
@@ -306,4 +318,57 @@ export function getActivationStatus(
  */
 function generateCodiceContestoPagamento(): CodiceContestoPagamento {
   return uuid.v1().replace(/-/g, "") as CodiceContestoPagamento;
+}
+
+/**
+ * Parse a PagoPa response to check if it contains functional errors.
+ * If error is found, it is mapped into a controller response for BackendApp
+ * @param {string} esito - The esito (OK or KO) provided by PagoPa
+ * @param {string} faultBean - Optional information provided by PagoPa in case of error
+ * @return {IResponseErrorGeneric | IResponseErrorInternal} A controller response or undefined if no errors exist
+ */
+function getResponseErrorIfExists(
+  esito: string,
+  faultBean: faultBean_ppt
+): IResponseErrorGeneric | IResponseErrorInternal {
+  // Case 1: Response is SUCCESS
+  if (esito === "OK") {
+    return undefined;
+  }
+  // Case 2: Response is FAILED but no additional information are provided by PagoPa
+  if (faultBean === undefined) {
+    return ResponseErrorInternal("Error during payment check: esito === KO");
+  }
+  // Case 3: Response is FAILED and additional information are provided by PagoPa
+  const errorMessageCtrl = getErrorMessageCtrlFromPagoPaError(
+    faultBean.faultCode
+  );
+  return ResponseErrorGeneric(
+    HttpStatusCodeEnum.HTTP_STATUS_403,
+    errorMessageCtrl.toString(),
+    faultBean.faultCode,
+    faultBean.faultString
+  );
+}
+
+/**
+ * Convert PagoPa message error (faultCode) to Controller message error (ErrorMessagesCtrlEnum) to send to BackendApp
+ * @param {string} faultCode - Error code provided by PagoPa
+ * @return {ErrorMessagesCtrlEnum} Error code to send to BackendApp
+ */
+function getErrorMessageCtrlFromPagoPaError(
+  faultCode: string
+): ErrorMessagesCtrlEnum {
+  switch (faultCode) {
+    case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
+      return ErrorMessagesCtrlEnum.INVALID_AMOUNT;
+    case "PAA_PAGAMENTO_DUPLICATO":
+      return ErrorMessagesCtrlEnum.PAYMENT_COMPLETED;
+    case "PAA_PAGAMENTO_IN_CORSO":
+      return ErrorMessagesCtrlEnum.PAYMENT_ONGOING;
+    case "PAA_PAGAMENTO_SCADUTO":
+      return ErrorMessagesCtrlEnum.PAYMENT_EXPIRED;
+    default:
+      return ErrorMessagesCtrlEnum.PAYMENT_UNAVAILABLE;
+  }
 }
