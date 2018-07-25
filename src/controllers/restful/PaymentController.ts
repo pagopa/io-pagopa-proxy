@@ -70,7 +70,7 @@ export function getPaymentInfo(
 
     // Convert the input provided by BackendApp (RESTful request) to a PagoPA request (SOAP request).
     // Some static information will be obtained by PagoPAConfig, to identify this client.
-    const errorOrInodoVerificaRPTInput = PaymentsConverter.getInodoVerificaRPTInput(
+    const errorOrInodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
       pagoPAConfig,
       rptId,
       codiceContestoPagamento
@@ -85,7 +85,7 @@ export function getPaymentInfo(
     const iNodoVerificaRPTInput = errorOrInodoVerificaRPTInput.value;
 
     // Send the SOAP request to PagoPA (VerificaRPT message)
-    const errorOrInodoVerificaRPTOutput = await PaymentsService.sendInodoVerificaRPTInput(
+    const errorOrInodoVerificaRPTOutput = await PaymentsService.sendNodoVerificaRPTInput(
       iNodoVerificaRPTInput,
       pagoPAClient
     );
@@ -157,22 +157,22 @@ export function activatePayment(
     // to a PagoPA request (SOAP request), mapping useful information
     // Some static information will be obtained by PagoPAConfig, to identify this client
     // If something wrong into input will be detected during mapping, and error will be provided as response
-    const errorOrInodoAttivaRPTInput = PaymentsConverter.getInodoAttivaRPTInput(
+    const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
       pagoPAConfig,
       paymentActivationsPostRequest
     );
-    if (isLeft(errorOrInodoAttivaRPTInput)) {
-      const error = errorOrInodoAttivaRPTInput.value;
+    if (isLeft(errorOrNodoAttivaRPTInput)) {
+      const error = errorOrNodoAttivaRPTInput.value;
       return ResponseErrorValidation(
         "Invalid PagoPA activation Request",
         error.message
       );
     }
-    const iNodoAttivaRPTInput = errorOrInodoAttivaRPTInput.value;
+    const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
 
     // Send the SOAP request to PagoPA (AttivaRPT message)
-    const errorOrInodoAttivaRPTOutput = await PaymentsService.sendInodoAttivaRPTInputToPagoPa(
-      iNodoAttivaRPTInput,
+    const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
+      nodoAttivaRPTInput,
       pagoPAClient
     );
     if (isLeft(errorOrInodoAttivaRPTOutput)) {
