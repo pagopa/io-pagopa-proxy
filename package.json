@@ -20,7 +20,7 @@
     "generate:ts-from-yaml:PPTPort": "gen-api-models --strict 0 --api-spec ./pagopa_api/yaml-file/PagamentiTelematiciPspNodoservice.yaml --out-dir src/types/pagopa_api/yaml-to-ts/",
     "generate:yaml-from-wsdl": "node pagopa_api/YamlGenerator.js",
     "generate:proxy-api-models": "gen-api-models --api-spec ./api_pagopa.yaml --out-dir ./src/types/api/ --ts-spec-file ./src/api/public_api_pagopa.ts",
-    "prettify": "prettier --write './**/*.ts'",
+    "prettify": "prettier --write ./**/*.ts",
     "start": "node dist/index.js",
     "test:unit": "jest --runInBand",
     "test:integration": "jest --config=jest.integration.js --runInBand",
