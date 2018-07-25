@@ -30,6 +30,7 @@ import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivation
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
+import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
 import { cdInfoPagamento_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
 import { cdInfoPagamentoResponse_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamentoResponse_ppt";
 import { faultBean_ppt } from "../../types/pagopa_api/yaml-to-ts/faultBean_ppt";
@@ -327,7 +328,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
  * @param {string} faultBean - Optional information provided by PagoPa in case of error
  * @return {IResponseErrorGeneric | IResponseErrorInternal} A controller response or undefined if no errors exist
  */
-function getResponseErrorIfExists(
+export function getResponseErrorIfExists(
   esito: string,
   faultBean: faultBean_ppt
 ): IResponseErrorGeneric | IResponseErrorInternal {
@@ -356,7 +357,7 @@ function getResponseErrorIfExists(
  * @param {string} faultCode - Error code provided by PagoPa
  * @return {ErrorMessagesCtrlEnum} Error code to send to BackendApp
  */
-function getErrorMessageCtrlFromPagoPaError(
+export function getErrorMessageCtrlFromPagoPaError(
   faultCode: string
 ): ErrorMessagesCtrlEnum {
   switch (faultCode) {

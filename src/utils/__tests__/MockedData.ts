@@ -7,6 +7,8 @@ import { ctSpezzoniCausaleVersamento_ppt } from "../../types/pagopa_api/yaml-to-
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
 
+// tslint:disable:no-identical-functions
+
 export const aVerificaRPTOutput = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "OK",
@@ -31,6 +33,74 @@ export const aVerificaRPTOutput = esitoNodoVerificaRPTRisposta_ppt
       },
       credenzialiPagatore: "NOMECOGNOME",
       causaleVersamento: "CAUSALE01"
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+export const aVerificaRPTOutputKOGeneric = esitoNodoVerificaRPTRisposta_ppt
+  .decode({
+    esito: "KO",
+    fault: {
+      id: "NodoDeiPagamentiSPC",
+      faultCode: "CANALE_RICHIEDENTE_ERRATO",
+      faultString: "Identificativo richiedente non valido."
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+export const aVerificaRPTOutputKOCompleted = esitoNodoVerificaRPTRisposta_ppt
+  .decode({
+    esito: "KO",
+    fault: {
+      id: "NodoDeiPagamentiSPC",
+      faultCode: "PAA_PAGAMENTO_DUPLICATO",
+      faultString: "Pagamento in attesa risulta concluso all’Ente Creditore."
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+export const aVerificaRPTOutputKOOnGoing = esitoNodoVerificaRPTRisposta_ppt
+  .decode({
+    esito: "KO",
+    fault: {
+      id: "NodoDeiPagamentiSPC",
+      faultCode: "PAA_PAGAMENTO_IN_CORSO",
+      faultString: "Pagamento in attesa risulta in corso all’Ente Creditore."
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+export const aVerificaRPTOutputKOExpired = esitoNodoVerificaRPTRisposta_ppt
+  .decode({
+    esito: "KO",
+    fault: {
+      id: "NodoDeiPagamentiSPC",
+      faultCode: "PAA_PAGAMENTO_SCADUTO",
+      faultString: "Pagamento in attesa risulta scaduto all’Ente Creditore."
     }
   })
   .getOrElseL(errors => {
@@ -66,6 +136,38 @@ export const anAttivaRPTOutput = esitoNodoAttivaRPTRisposta_ppt
       credenzialiPagatore: "NOMECOGNOME",
       causaleVersamento: "CAUSALE01"
     }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoAttivaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+export const aAttivaRPTOutputKOAmount = esitoNodoAttivaRPTRisposta_ppt
+  .decode({
+    esito: "KO",
+    fault: {
+      id: "NodoDeiPagamentiSPC",
+      faultCode: "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO",
+      faultString:
+        "L’importo del pagamento in attesa non è congruente con il dato indicato dal PSP"
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoAttivaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+export const aAttivaRPTOutputKOGeneric = esitoNodoAttivaRPTRisposta_ppt
+  .decode({
+    esito: "KO",
+    faultCode: "PAA_TIPOFIRMA_SCONOSCIUTO",
+    faultString: "Il campo tipoFirma non corrisponde ad alcun valore previsto."
   })
   .getOrElseL(errors => {
     throw Error(

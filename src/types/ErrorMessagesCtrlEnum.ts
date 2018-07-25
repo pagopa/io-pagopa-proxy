@@ -2,7 +2,7 @@
  * Error Messages provided to BackendApp as response for RESTFUL Controllers
  */
 
-enum ErrorMessagesCtrlEnum {
+export enum ErrorMessagesCtrlEnum {
   PAYMENT_COMPLETED,
   INVALID_AMOUNT,
   PAYMENT_ONGOING,
