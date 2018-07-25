@@ -12,17 +12,17 @@ import { PagamentiTelematiciPspNodoAsyncClient } from "./pagopa_api/PPTPortClien
 
 /**
  * Send a request to PagoPA to retrieve payment info (VerificaRPT)
- * @param {nodoVerificaRPT_ppt} iNodoVerificaRPTInput - The request to send to PagoPA
+ * @param {nodoVerificaRPT_ppt} nodoVerificaRPTInput - The request to send to PagoPA
  * @param {PagamentiTelematiciPspNodoAsyncClient} pagoPASoapClient - SOAP client used to call PagoPa services
  * @return {Promise<Either<Error, esitoNodoVerificaRPTRisposta_ppt>>} The response provided by PagoPA as response
  */
-export async function sendInodoVerificaRPTInput(
-  iNodoVerificaRPTInput: nodoVerificaRPT_ppt,
+export async function sendNodoVerificaRPTInput(
+  nodoVerificaRPTInput: nodoVerificaRPT_ppt,
   pagoPASoapClient: PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<Error, esitoNodoVerificaRPTRisposta_ppt>> {
   try {
     const nodoVerificaRPT = await pagoPASoapClient.nodoVerificaRPT(
-      iNodoVerificaRPTInput
+      nodoVerificaRPTInput
     );
     return right(nodoVerificaRPT.nodoVerificaRPTRisposta);
   } catch (exception) {
@@ -32,17 +32,17 @@ export async function sendInodoVerificaRPTInput(
 
 /**
  * Send a request to PagoPA to activate (lock) a payment (AttivaRPT)
- * @param {nodoAttivaRPT_ppt} iNodoAttivaRPTInput - The request to send to PagoPA
+ * @param {nodoAttivaRPT_ppt} nodoAttivaRPTInput - The request to send to PagoPA
  * @param {pagamentiTelematiciPSPNodoClient} pagoPASoapClient - SOAP client used to call PagoPa services
  * @return {Promise<Either<Error, esitoNodoAttivaRPTRisposta_ppt>>} The response provided by PagoPA as response
  */
-export async function sendInodoAttivaRPTInputToPagoPa(
-  iNodoAttivaRPTInput: nodoAttivaRPT_ppt,
+export async function sendNodoAttivaRPTInputToPagoPa(
+  nodoAttivaRPTInput: nodoAttivaRPT_ppt,
   pagoPASoapClient: PagamentiTelematiciPspNodoAsyncClient
 ): Promise<Either<Error, esitoNodoAttivaRPTRisposta_ppt>> {
   try {
     const nodoAttivaRPT = await pagoPASoapClient.nodoAttivaRPT(
-      iNodoAttivaRPTInput
+      nodoAttivaRPTInput
     );
     return right(nodoAttivaRPT.nodoAttivaRPTRisposta);
   } catch (exception) {
