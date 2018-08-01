@@ -331,7 +331,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
 export function getResponseErrorIfExists(
   esito: string,
   faultBean: faultBean_ppt
-): IResponseErrorGeneric | IResponseErrorInternal {
+): IResponseErrorGeneric | IResponseErrorInternal | undefined {
   // Case 1: Response is SUCCESS
   if (esito === "OK") {
     return undefined;
@@ -354,6 +354,8 @@ export function getResponseErrorIfExists(
 
 /**
  * Convert PagoPa message error (faultCode) to Controller message error (ErrorMessagesCtrlEnum) to send to BackendApp
+ * A complete list of faultCode provided by PagoPa is available at
+ * https://www.agid.gov.it/sites/default/files/repository_files/specifiche_attuative_nodo_2_1_0.pdf
  * @param {string} faultCode - Error code provided by PagoPa
  * @return {ErrorMessagesCtrlEnum} Error code to send to BackendApp
  */
