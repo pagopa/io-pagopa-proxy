@@ -63,6 +63,14 @@ For example, running it on local enviroment it's reachable at http://localhost:3
 2. yarn build
 3. yarn start
 
+The parameter `PAGOPA_PASSWORD` is required. To start the server in development mode, you must set it via ENV vars:
+
+```
+PAGOPA_PASSWORD=nopassword yarn start
+```
+
+Also be sure to use a valid configuration for REDIS server or install it on local machine.
+
 ## License
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy?ref=badge_large)
