@@ -1,4 +1,6 @@
 import { isRight } from "fp-ts/lib/Either";
+import * as PaymentController from "../../controllers/restful/PaymentController";
+import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
 
@@ -330,5 +332,64 @@ describe("getSpezzoniCausaleVersamentoForController", () => {
       MockedData.aSpezzoniCausaleVersamentoStrutturatoForController
         .spezzoniStrutturatoCausaleVersamento
     );
+  });
+});
+
+describe("getResponseErrorIfExists", () => {
+  it(" should recognize a message without errors", () => {
+    const responseError = PaymentController.getResponseErrorIfExists(
+      "OK",
+      undefined
+    );
+    expect(responseError).toBeUndefined();
+  });
+
+  it(" should convert a KO Error without fault", () => {
+    const responseError = PaymentController.getResponseErrorIfExists(
+      "KO",
+      undefined
+    );
+    expect(responseError).toBeDefined();
+    expect(responseError.kind).toEqual("IResponseErrorInternal");
+  });
+
+  it(" should convert a KO Error with fault details", () => {
+    const responseError = PaymentController.getResponseErrorIfExists(
+      MockedData.aVerificaRPTOutputKOCompleted.esito,
+      MockedData.aVerificaRPTOutputKOCompleted.fault
+    );
+    expect(responseError).toBeDefined();
+    expect(responseError.kind).toEqual("IResponseErrorGeneric");
+  });
+});
+
+describe("getErrorMessageCtrlFromPagoPaError", () => {
+  it(" should convert a KO Completed Error", () => {
+    const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      MockedData.aVerificaRPTOutputKOCompleted.fault.faultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_COMPLETED);
+  });
+  it(" should convert a KO Expired Error", () => {
+    const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      MockedData.aVerificaRPTOutputKOExpired.fault.faultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_EXPIRED);
+  });
+  it(" should convert a KO OnGoing Error", () => {
+    const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      MockedData.aVerificaRPTOutputKOOnGoing.fault.faultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_ONGOING);
+  });
+  it(" should convert a KO Generic Error", () => {
+    const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      MockedData.aVerificaRPTOutputKOGeneric.fault.faultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_UNAVAILABLE);
   });
 });
