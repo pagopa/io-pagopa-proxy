@@ -317,18 +317,7 @@ describe("getSpezzoniCausaleVersamentoForController", () => {
     );
     expect(spezzoniCausale).toBeDefined();
     expect(spezzoniCausale).toMatchObject(
-      MockedData.aSpezzoniCausaleVersamento.spezzoniCausaleVersamento
-    );
-  });
-
-  it(" should convert SpezzoniCausaleVersamentoStrutturato", () => {
-    const spezzoniCausale = PaymentsConverter.getSpezzoniCausaleVersamentoForController(
-      MockedData.aSpezzoniCausaleVersamentoStrutturato
-    );
-    expect(spezzoniCausale).toBeDefined();
-    expect(spezzoniCausale).toMatchObject(
-      MockedData.aSpezzoniCausaleVersamentoStrutturatoForController
-        .spezzoniStrutturatoCausaleVersamento
+      MockedData.aSpezzoniCausaleVersamentoForController
     );
   });
 });

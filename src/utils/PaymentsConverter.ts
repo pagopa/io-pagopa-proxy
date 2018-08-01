@@ -7,12 +7,13 @@ import { Validation } from "io-ts";
 import { RptId } from "italia-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../Configuration";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
+import { ImportoEuroCents } from "../types/api/ImportoEuroCents";
 import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../types/api/PaymentRequestsGetResponse";
 import { SpezzoniCausaleVersamento } from "../types/api/SpezzoniCausaleVersamento";
-import { ctSpezzoneStrutturatoCausaleVersamento_ppt } from "../types/pagopa_api/yaml-to-ts/ctSpezzoneStrutturatoCausaleVersamento_ppt";
 import { ctSpezzoniCausaleVersamento_ppt } from "../types/pagopa_api/yaml-to-ts/ctSpezzoniCausaleVersamento_ppt";
+import { ctSpezzoniCausaleVersamento_pptItem } from "../types/pagopa_api/yaml-to-ts/ctSpezzoniCausaleVersamento_pptItem";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
 import { nodoAttivaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoAttivaRPT_ppt";
@@ -219,33 +220,29 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
 export function getSpezzoniCausaleVersamentoForController(
   spezzoniCausaleVersamento: ctSpezzoniCausaleVersamento_ppt
 ): SpezzoniCausaleVersamento | undefined {
-  // Content is an array of spezzoniCausaleVersamento
-  if (
-    spezzoniCausaleVersamento !== undefined &&
-    spezzoniCausaleVersamento.spezzoniCausaleVersamento !== undefined
-  ) {
-    return spezzoniCausaleVersamento.spezzoniCausaleVersamento.map(
-      (value: stText35_ppt) => {
-        return value;
-      }
-    );
+  // Check if spezzoniCausaleVersamento is specified into message
+  if (spezzoniCausaleVersamento === undefined) {
+    return undefined;
   }
 
-  // Content is an array of spezzoniStrutturatoCausaleVersamento
-  if (
-    spezzoniCausaleVersamento !== undefined &&
-    spezzoniCausaleVersamento.spezzoniStrutturatoCausaleVersamento !== undefined
-  ) {
-    return spezzoniCausaleVersamento.spezzoniStrutturatoCausaleVersamento.map(
-      (value: ctSpezzoneStrutturatoCausaleVersamento_ppt) => {
+  // Define a list of SpezzoniCausaleVersamento
+  // parsing mixed elements (stText35_ppt and ctSpezzoneStrutturatoCausaleVersamento_ppt)
+  // contained into ctSpezzoniCausaleVersamento_ppt
+  const spezzoniCausaleVersamentoItemList = spezzoniCausaleVersamento.map(
+    (value: ctSpezzoniCausaleVersamento_pptItem) => {
+      if (stText35_ppt.is(value)) {
+        return {
+          causaleSpezzone: value
+        };
+      } else {
         return {
           causaleSpezzone: value.causaleSpezzone,
-          importoSpezzone: value.importoSpezzone * 100
+          importoSpezzone: (value.importoSpezzone * 100) as ImportoEuroCents
         };
       }
-    );
-  }
-  return undefined;
+    }
+  );
+  return spezzoniCausaleVersamentoItemList;
 }
 
 /**

@@ -223,22 +223,15 @@ definitions:
     description: Single element of a payment installments
     type: object
     properties:
-      spezzoneCausaleVersamento:
-        type: string
-        minLength: 1
-        maxLength: 35
-      spezzoneStrutturatoCausaleVersamento:
-        $ref: '#/definitions/SpezzoneStrutturatoCausaleVersamento'
-  SpezzoneStrutturatoCausaleVersamento:
-    description: Amount related to a single element of a payment installments
-    type: object
-    properties:
       causaleSpezzone:
         type: string
         minLength: 1
-        maxLength: 25
+        maxLength: 35
       importoSpezzone:
-        $ref: '#/definitions/ImportoEuroCents'                      
+        description: Amount related to a single element of a payment installments
+        $ref: '#/definitions/ImportoEuroCents'    
+    required:
+      - causaleSpezzone               
 parameters:
   CodiceContestoPagamento:
     name: codice_contesto_pagamento

@@ -15,7 +15,7 @@
 <!--   xmlns:pay_j="http://www.cnipa.gov.it/schemas/2010/Pagamenti/Ack_1_0/" --> 
   
 	<wsdl:types>
-		<xsd:schema version="1.0" targetNamespace="http://ws.pagamenti.telematici.gov/">
+		<xsd:schema version="2.1.1" targetNamespace="http://ws.pagamenti.telematici.gov/">
 			<xsd:import schemaLocation="PagInf_RPT_RT_6_2_0.xsd" namespace="http://www.digitpa.gov.it/schemas/2011/Pagamenti/" />
 			<!-- <xsd:import schemaLocation="ACK_PagamentiTelematici_6_0_1.xsd" namespace="http://www.cnipa.gov.it/schemas/2010/Pagamenti/Ack_1_0/" /> -->
 
@@ -50,10 +50,12 @@
 			</xsd:simpleType>
 			
 			<xsd:complexType name="ctSpezzoniCausaleVersamento">
+				<xsd:sequence minOccurs="1" maxOccurs="6">
 					<xsd:choice>
-						<xsd:element type="ppt:stText35" name="spezzoniCausaleVersamento" minOccurs="1" maxOccurs="6"/>
-						<xsd:element type="ppt:ctSpezzoneStrutturatoCausaleVersamento" name="spezzoniStrutturatoCausaleVersamento" minOccurs="1" maxOccurs="6"/>
+						<xsd:element type="ppt:stText35" name="spezzoneCausaleVersamento" minOccurs="1" />
+						<xsd:element type="ppt:ctSpezzoneStrutturatoCausaleVersamento" name="spezzoneStrutturatoCausaleVersamento" minOccurs="1" />
 					</xsd:choice>
+				</xsd:sequence>
 			</xsd:complexType>
 						
 			<xsd:complexType name="ctSpezzoneStrutturatoCausaleVersamento">
@@ -69,6 +71,14 @@
 					<xsd:maxLength value="15" />
 				</xsd:restriction>
 			</xsd:simpleType>
+
+			<xsd:simpleType name="stForzaControlloSegno">
+				<xsd:restriction base="xsd:int">
+				    <xsd:enumeration value="0"/> 
+				    <xsd:enumeration value="1"/> 
+				</xsd:restriction>
+		    	</xsd:simpleType>
+
 			<!-- Element Definition -->
 			<xsd:complexType name="risposta">
 				<xsd:sequence>
@@ -82,6 +92,9 @@
 					<xsd:element name="id" type="xsd:string" />
 					<xsd:element name="description" type="xsd:string" minOccurs="0" />
 					<xsd:element name="serial" type="xsd:int" minOccurs="0" />
+					<xsd:element name="originalFaultCode" type="xsd:string"  minOccurs="0"  />
+					<xsd:element name="originalFaultString" type="xsd:string"  minOccurs="0"  />
+					<xsd:element name="originalDescription" type="xsd:string" minOccurs="0" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -165,6 +178,7 @@
 					<xsd:element name="identificativoUnivocoVersamento" type="ppt:stText35" />
 					<xsd:element name="codiceContestoPagamento" type="ppt:stText35" />
 					<xsd:element name="tipoFirma" type="xsd:string" />
+					<xsd:element name="forzaControlloSegno" type="ppt:stForzaControlloSegno" minOccurs="0"/>
 					<xsd:element name="rt" type="xsd:base64Binary" />
 				</xsd:sequence>
 			</xsd:complexType>
@@ -400,7 +414,7 @@
 			<xsd:element name="nodoInviaEsitoStornoRisposta" type="ppt:nodoInviaEsitoStornoRisposta" />
 			
 			<xsd:element name="nodoInviaRichiestaRevoca" type="ppt:nodoInviaRichiestaRevoca" />
-			<xsd:element name="nodoInviaRichiestaRevocaResponse" type="ppt:nodoInviaRichiestaRevocaRisposta" />
+			<xsd:element name="nodoInviaRichiestaRevocaRisposta" type="ppt:nodoInviaRichiestaRevocaRisposta" />
 		</xsd:schema>
 	</wsdl:types>
 	<wsdl:message name="nodoVerificaRPT">
@@ -614,4 +628,3 @@
 		</wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>
-

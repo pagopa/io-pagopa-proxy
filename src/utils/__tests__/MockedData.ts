@@ -1,8 +1,10 @@
+// tslint:disable:no-duplicate-string
 import { reporters } from "italia-ts-commons";
 import { RptId } from "italia-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../../Configuration";
 import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
+import { SpezzoniCausaleVersamento } from "../../types/api/SpezzoniCausaleVersamento";
 import { ctSpezzoniCausaleVersamento_ppt } from "../../types/pagopa_api/yaml-to-ts/ctSpezzoniCausaleVersamento_ppt";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
@@ -161,43 +163,43 @@ export const aConfig = PagoPAConfig.decode({
 });
 
 export const aSpezzoniCausaleVersamento = ctSpezzoniCausaleVersamento_ppt
-  .decode({
-    spezzoniCausaleVersamento: ["RATA GENNAIO", "RATA FEBBRAIO"]
-  })
+  .decode([
+    "RATA GENNAIO",
+    "RATA FEBBRAIO",
+    {
+      causaleSpezzone: "RATA MARZO",
+      importoSpezzone: 100.01
+    },
+    {
+      causaleSpezzone: "RATA APRILE",
+      importoSpezzone: 98.33
+    },
+    "RATA MAGGIO"
+  ])
   .getOrElseL(errors => {
     throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
   });
 
-export const aSpezzoniCausaleVersamentoStrutturato = ctSpezzoniCausaleVersamento_ppt
-  .decode({
-    spezzoniStrutturatoCausaleVersamento: [
-      {
-        causaleSpezzone: "RATA 1",
-        importoSpezzone: 1000
-      },
-      {
-        causaleSpezzone: "RATA 2",
-        importoSpezzone: 500
-      }
-    ]
-  })
-  .getOrElseL(errors => {
-    throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
-  });
-
-export const aSpezzoniCausaleVersamentoStrutturatoForController = ctSpezzoniCausaleVersamento_ppt
-  .decode({
-    spezzoniStrutturatoCausaleVersamento: [
-      {
-        causaleSpezzone: "RATA 1",
-        importoSpezzone: 100000
-      },
-      {
-        causaleSpezzone: "RATA 2",
-        importoSpezzone: 50000
-      }
-    ]
-  })
-  .getOrElseL(errors => {
-    throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
-  });
+export const aSpezzoniCausaleVersamentoForController = SpezzoniCausaleVersamento.decode(
+  [
+    {
+      causaleSpezzone: "RATA GENNAIO"
+    },
+    {
+      causaleSpezzone: "RATA FEBBRAIO"
+    },
+    {
+      causaleSpezzone: "RATA MARZO",
+      importoSpezzone: 10001
+    },
+    {
+      causaleSpezzone: "RATA APRILE",
+      importoSpezzone: 9833
+    },
+    {
+      causaleSpezzone: "RATA MAGGIO"
+    }
+  ]
+).getOrElseL(errors => {
+  throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
+});
