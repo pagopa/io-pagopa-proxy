@@ -63,10 +63,12 @@ For example, running it on local enviroment it's reachable at http://localhost:3
 2. yarn build
 3. yarn start
 
-The parameter PAGOPA_PASSWORD is required. To start the server on development context, set it on ENV vars or specify it starting server:
+The parameter `PAGOPA_PASSWORD` is required. To start the server in development mode, you must set it via ENV vars:
+
 ```
 PAGOPA_PASSWORD=nopassword yarn start
 ```
+
 Also be sure to use a valid configuration for REDIS server or install it on local machine.
 
 ## License
