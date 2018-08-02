@@ -7,7 +7,7 @@ basePath: /api/v1
 schemes:
   - https
 paths:
-  '/payment-requests/{rptId}':
+  '/payment-requests/{rpt_id_from_string}':
     x-swagger-router-controller: PaymentController
     get:
       operationId: getPaymentInfo
@@ -60,7 +60,7 @@ paths:
           description: Request is rejected by PagoPa
         '500':
           description: PagoPA services are not available
-  '/payment-activations/{codiceContestoPagamento}':
+  '/payment-activations/{codice_contesto_pagamento}':
     x-swagger-router-controller: PaymentController
     get:
       operationId: getActivationStatus
