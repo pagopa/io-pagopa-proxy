@@ -121,6 +121,11 @@ function setRestfulRoutes(
 
   // Endpoint for OpenAPI handler
   app.get("/api/v1/swagger.json", GetOpenapi(publicApiV1Specs));
+
+  // Liveness probe for Kubernetes.
+  // @see
+  // https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#define-a-liveness-http-request
+  app.get("/ping", (_, res) => res.status(200).send("ok"));
 }
 
 /**
