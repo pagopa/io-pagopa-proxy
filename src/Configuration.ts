@@ -40,6 +40,7 @@ export const CONFIG = {
   PAGOPA: {
     HOST: process.env.PAGOPA_HOST || localhost,
     PORT: Number(process.env.PAGOPA_PORT) || 3001,
+    HOST_HEADER: process.env.PAGOPA_HOST_HEADER,
     WS_SERVICES: {
       PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
     },
@@ -101,6 +102,9 @@ export const PagoPAConfig = t.intersection([
       IDENTIFICATIVO_CANALE: stText35_ppt,
       PASSWORD: stPassword_ppt
     })
+  }),
+  t.partial({
+    HOST_HEADER: t.string
   })
 ]);
 export type PagoPAConfig = t.TypeOf<typeof PagoPAConfig>;

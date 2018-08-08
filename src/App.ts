@@ -38,7 +38,11 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     await PPTPortClient.createPagamentiTelematiciPspNodoClient({
       endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
         config.PAGOPA.WS_SERVICES.PAGAMENTI
-      }`
+      }`,
+      // Custom HTTP headers to be sent on WSDL requests
+      wsdl_headers: {
+        Host: config.PAGOPA.HOST_HEADER
+      }
     })
   );
 
