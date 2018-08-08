@@ -35,15 +35,14 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   // Define SOAP Clients for PagoPA SOAP WS
   // It is necessary to forward BackendApp requests to PagoPA
   const pagoPAClient = new PPTPortClient.PagamentiTelematiciPspNodoAsyncClient(
-    await PPTPortClient.createPagamentiTelematiciPspNodoClient({
-      endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-        config.PAGOPA.WS_SERVICES.PAGAMENTI
-      }`,
-      // Custom HTTP headers to be sent on WSDL requests
-      wsdl_headers: {
-        Host: config.PAGOPA.HOST_HEADER
-      }
-    })
+    await PPTPortClient.createPagamentiTelematiciPspNodoClient(
+      {
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
+          config.PAGOPA.WS_SERVICES.PAGAMENTI
+        }`
+      },
+      config.PAGOPA.HOST_HEADER
+    )
   );
 
   // Define a redis client necessary to handle persistent data
