@@ -11,13 +11,17 @@ import * as soap from "soap";
 
 export function createClient<T>(
   wsdlUri: string,
-  options: soap.IOptions
+  options: soap.IOptions,
+  hostHeader?: string
 ): Promise<soap.Client & T> {
   return new Promise((resolve, reject) => {
     soap.createClient(wsdlUri, options, (err, client) => {
       if (err) {
         reject(err);
       } else {
+        if (hostHeader !== undefined) {
+          client.addHttpHeader("Host", hostHeader);
+        }
         resolve(client as soap.Client & T); // tslint:disable-line:no-useless-cast
       }
     });
