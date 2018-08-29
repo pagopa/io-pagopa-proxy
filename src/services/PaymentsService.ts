@@ -8,6 +8,7 @@ import { esitoNodoAttivaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/e
 import { esitoNodoVerificaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
 import { nodoAttivaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoAttivaRPT_ppt";
 import { nodoVerificaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoVerificaRPT_ppt";
+import { logger } from "../utils/Logger";
 import { PagamentiTelematiciPspNodoAsyncClient } from "./pagopa_api/PPTPortClient";
 
 /**
@@ -26,6 +27,11 @@ export async function sendNodoVerificaRPTInput(
     );
     return right(nodoVerificaRPT.nodoVerificaRPTRisposta);
   } catch (exception) {
+    logger.error(
+      `Exception catched sending VerificaRPTRequest to PagoPA: ${
+        exception.message
+      }`
+    );
     return left(Error(exception));
   }
 }
@@ -46,6 +52,11 @@ export async function sendNodoAttivaRPTInputToPagoPa(
     );
     return right(nodoAttivaRPT.nodoAttivaRPTRisposta);
   } catch (exception) {
+    logger.error(
+      `Exception catched sending AttivaRPTRequest to PagoPA: ${
+        exception.message
+      }`
+    );
     return left(Error(exception));
   }
 }

@@ -42,7 +42,9 @@ export const CONFIG = {
     PORT: Number(process.env.PAGOPA_PORT) || 3001,
     HOST_HEADER: process.env.PAGOPA_HOST_HEADER,
     WS_SERVICES: {
-      PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
+      PAGAMENTI:
+        process.env.PAGOPA_WS_URI ||
+        "/webservices/pof/PagamentiTelematiciPspNodoservice"
     },
     // These information will identify our system when it will access to PagoPA
     IDENTIFIER: {
