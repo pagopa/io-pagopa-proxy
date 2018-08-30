@@ -11,6 +11,7 @@
   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
   xmlns:tns="http://PuntoAccessoPSP.spcoop.gov.it/servizi/PagamentiTelematiciPspNodo" 
   xmlns:pay_i="http://www.digitpa.gov.it/schemas/2011/Pagamenti/" 
+	xmlns:qrc="http://PuntoAccessoPSP.spcoop.gov.it/QrCode"
   targetNamespace="http://PuntoAccessoPSP.spcoop.gov.it/servizi/PagamentiTelematiciPspNodo">
 <!--   xmlns:pay_j="http://www.cnipa.gov.it/schemas/2010/Pagamenti/Ack_1_0/" --> 
   
