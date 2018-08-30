@@ -345,7 +345,7 @@ export function getResponseErrorIfExists(
     faultBean.faultCode
   );
   return ResponseErrorGeneric(
-    HttpStatusCodeEnum.HTTP_STATUS_403,
+    HttpStatusCodeEnum.HTTP_STATUS_500,
     errorMessageCtrl,
     faultBean.faultCode,
     faultBean.faultString
