@@ -2,6 +2,7 @@
  * Payments Converter
  * Data Converter for Payments Request\Responses between PagoPA and BackendAPP types
  */
+
 import { Either, left, right } from "fp-ts/lib/Either";
 import { Validation } from "io-ts";
 import { RptId } from "italia-ts-commons/lib/pagopa";
@@ -19,6 +20,7 @@ import { nodoAttivaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoAttivaRPT_
 import { nodoTipoCodiceIdRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoTipoCodiceIdRPT_ppt";
 import { nodoVerificaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoVerificaRPT_ppt";
 import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
+// tslint:disable:no-duplicate-string
 
 /**
  * Define NodoVerificaRPTInput (PagoPA request) using information provided by BackendApp
@@ -186,28 +188,36 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
   switch (rptId.paymentNoticeNumber.auxDigit) {
     case "0":
       return {
-        CF: rptId.organizationFiscalCode,
-        AuxDigit: rptId.paymentNoticeNumber.auxDigit,
-        CodStazPA: rptId.paymentNoticeNumber.applicationCode,
-        CodIUV: rptId.paymentNoticeNumber.iuv13
+        "qrc:QrCode": {
+          "qrc:CF": rptId.organizationFiscalCode,
+          "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
+          "qrc:CodStazPA": rptId.paymentNoticeNumber.applicationCode,
+          "qrc:CodIUV": rptId.paymentNoticeNumber.iuv13
+        }
       };
     case "1":
       return {
-        CF: rptId.organizationFiscalCode,
-        AuxDigit: rptId.paymentNoticeNumber.auxDigit,
-        CodIUV: rptId.paymentNoticeNumber.iuv17
+        "qrc:QrCode": {
+          "qrc:CF": rptId.organizationFiscalCode,
+          "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
+          "qrc:CodIUV": rptId.paymentNoticeNumber.iuv17
+        }
       };
     case "2":
       return {
-        CF: rptId.organizationFiscalCode,
-        AuxDigit: rptId.paymentNoticeNumber.auxDigit,
-        CodIUV: rptId.paymentNoticeNumber.iuv15
+        "qrc:QrCode": {
+          "qrc:CF": rptId.organizationFiscalCode,
+          "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
+          "qrc:CodIUV": rptId.paymentNoticeNumber.iuv15
+        }
       };
     case "3":
       return {
-        CF: rptId.organizationFiscalCode,
-        AuxDigit: rptId.paymentNoticeNumber.auxDigit,
-        CodIUV: rptId.paymentNoticeNumber.iuv13
+        "qrc:QrCode": {
+          "qrc:CF": rptId.organizationFiscalCode,
+          "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
+          "qrc:CodIUV": rptId.paymentNoticeNumber.iuv13
+        }
       };
   }
 }

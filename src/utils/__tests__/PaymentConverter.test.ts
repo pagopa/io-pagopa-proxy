@@ -4,7 +4,7 @@ import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
 
-// ts-lint:disable:max-line-length
+// tslint:disable:max-line-length no-duplicate-string
 
 describe("getNodoVerificaRPTInput", () => {
   it(" should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
@@ -39,10 +39,12 @@ describe("getNodoVerificaRPTInput", () => {
       "QR-CODE"
     );
     expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
-      CF: MockedData.aRptId0.organizationFiscalCode,
-      CodStazPA: MockedData.applicationCode,
-      AuxDigit: MockedData.aRptId0.paymentNoticeNumber.auxDigit,
-      CodIUV: MockedData.iuv13
+      "qrc:QrCode": {
+        "qrc:CF": MockedData.aRptId0.organizationFiscalCode,
+        "qrc:CodStazPA": MockedData.applicationCode,
+        "qrc:AuxDigit": MockedData.aRptId0.paymentNoticeNumber.auxDigit,
+        "qrc:CodIUV": MockedData.iuv13
+      }
     });
     expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
       MockedData.aCodiceContestoPagamento
@@ -81,9 +83,11 @@ describe("getNodoVerificaRPTInput", () => {
       "QR-CODE"
     );
     expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
-      CF: MockedData.aRptId1.organizationFiscalCode,
-      AuxDigit: MockedData.aRptId1.paymentNoticeNumber.auxDigit,
-      CodIUV: MockedData.iuv17
+      "qrc:QrCode": {
+        "qrc:CF": MockedData.aRptId1.organizationFiscalCode,
+        "qrc:AuxDigit": MockedData.aRptId1.paymentNoticeNumber.auxDigit,
+        "qrc:CodIUV": MockedData.iuv17
+      }
     });
     expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
       MockedData.aCodiceContestoPagamento
@@ -122,9 +126,11 @@ describe("getNodoVerificaRPTInput", () => {
       "QR-CODE"
     );
     expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
-      CF: MockedData.aRptId2.organizationFiscalCode,
-      AuxDigit: MockedData.aRptId2.paymentNoticeNumber.auxDigit,
-      CodIUV: MockedData.iuv15
+      "qrc:QrCode": {
+        "qrc:CF": MockedData.aRptId2.organizationFiscalCode,
+        "qrc:AuxDigit": MockedData.aRptId2.paymentNoticeNumber.auxDigit,
+        "qrc:CodIUV": MockedData.iuv15
+      }
     });
     expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
       MockedData.aCodiceContestoPagamento
@@ -163,9 +169,11 @@ describe("getNodoVerificaRPTInput", () => {
       "QR-CODE"
     );
     expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
-      CF: MockedData.aRptId3.organizationFiscalCode,
-      AuxDigit: MockedData.aRptId3.paymentNoticeNumber.auxDigit,
-      CodIUV: MockedData.iuv13
+      "qrc:QrCode": {
+        "qrc:CF": MockedData.aRptId3.organizationFiscalCode,
+        "qrc:AuxDigit": MockedData.aRptId3.paymentNoticeNumber.auxDigit,
+        "qrc:CodIUV": MockedData.iuv13
+      }
     });
     expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
       MockedData.aCodiceContestoPagamento
@@ -271,10 +279,12 @@ describe("getNodoAttivaRPTInput", () => {
     // Check input content
     expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
       codiceIdRPT: {
-        CF: "12345678901",
-        AuxDigit: "0",
-        CodIUV: "1234567890123",
-        CodStazPA: "12"
+        "qrc:QrCode": {
+          "qrc:CF": "12345678901",
+          "qrc:AuxDigit": "0",
+          "qrc:CodIUV": "1234567890123",
+          "qrc:CodStazPA": "12"
+        }
       }
     });
     expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
