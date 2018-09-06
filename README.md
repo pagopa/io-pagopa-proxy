@@ -47,6 +47,9 @@ Those are all Environment variables needed by the application:
 | PAGOPA_WS_URI       | The PagoPA SAAP Server URI for SOAP WebService                | string  | /webservices/pof/PagamentiTelematiciPspNodoservice |
 | PAGOPA_HOST_HEADER  | The PagoPA SOAP Server Host option for HTTP header            | string  |                                                    |
 | PAGOPA_PASSWORD     | The password used to authenticate to PagoPA SOAP Server       | string  |                                                    |
+| PAGOPA_ID_PSP       | The IDENTIFICATIVO_PSP value provided to PagoPA               | string  |                                                    |
+| PAGOPA_ID_INT_PSP   | The IDENTIFICATIVO_INTERMEDIARIO_PSP value provided to PagoPA | string  |                                                    |
+| PAGOPA_ID_CANALE    | The IDENTIFICATIVO_CANALE value provided to PagoPA            | string  |                                                    |
 | REDIS_DB_URL        | The Redis DB Server URL                                       | string  | localhost                                          |
 | REDIS_DB_PORT       | The Redis DB Server port                                      | int     | 6379                                               |
 | REDIS_DB_PASSWORD   | The Redis DB Server password                                  | string  |                                                    |
