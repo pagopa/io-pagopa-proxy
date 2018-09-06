@@ -48,9 +48,9 @@ export const CONFIG = {
     },
     // These information will identify our system when it will access to PagoPA
     IDENTIFIER: {
-      IDENTIFICATIVO_PSP: "AGID_01",
-      IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
-      IDENTIFICATIVO_CANALE: "97735020584_02",
+      IDENTIFICATIVO_PSP: process.env.PAGOPA_ID_PSP,
+      IDENTIFICATIVO_INTERMEDIARIO_PSP: process.env.PAGOPA_ID_INT_PSP,
+      IDENTIFICATIVO_CANALE: process.env.PAGOPA_ID_CANALE,
       PASSWORD: process.env.PAGOPA_PASSWORD
     }
   },
