@@ -190,8 +190,8 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
       return {
         "qrc:QrCode": {
           "qrc:CF": rptId.organizationFiscalCode,
-          "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
           "qrc:CodStazPA": rptId.paymentNoticeNumber.applicationCode,
+          "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
           "qrc:CodIUV": rptId.paymentNoticeNumber.iuv13
         }
       };
