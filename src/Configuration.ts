@@ -41,6 +41,7 @@ export const CONFIG = {
     HOST: process.env.PAGOPA_HOST || localhost,
     PORT: Number(process.env.PAGOPA_PORT) || 3001,
     HOST_HEADER: process.env.PAGOPA_HOST_HEADER,
+    CLIENT_TIMEOUT_MSEC: Number(process.env.PAGOPA_TIMEOUT_MSEC) || 60000,
     WS_SERVICES: {
       PAGAMENTI:
         process.env.PAGOPA_WS_URI ||
@@ -95,6 +96,7 @@ export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 export const PagoPAConfig = t.intersection([
   ServerConfiguration,
   t.interface({
+    CLIENT_TIMEOUT_MSEC: t.number,
     WS_SERVICES: t.interface({
       PAGAMENTI: NonEmptyString
     }),
