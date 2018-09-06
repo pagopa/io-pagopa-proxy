@@ -43,7 +43,9 @@ describe("getNodoVerificaRPTInput", () => {
         "qrc:CF": MockedData.aRptId0.organizationFiscalCode,
         "qrc:CodStazPA": MockedData.applicationCode,
         "qrc:AuxDigit": MockedData.aRptId0.paymentNoticeNumber.auxDigit,
-        "qrc:CodIUV": MockedData.iuv13
+        "qrc:CodIUV": String(MockedData.iuv13).concat(
+          String(MockedData.checkDigit)
+        )
       }
     });
     expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
@@ -129,7 +131,9 @@ describe("getNodoVerificaRPTInput", () => {
       "qrc:QrCode": {
         "qrc:CF": MockedData.aRptId2.organizationFiscalCode,
         "qrc:AuxDigit": MockedData.aRptId2.paymentNoticeNumber.auxDigit,
-        "qrc:CodIUV": MockedData.iuv15
+        "qrc:CodIUV": String(MockedData.iuv15).concat(
+          String(MockedData.checkDigit)
+        )
       }
     });
     expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
@@ -172,7 +176,9 @@ describe("getNodoVerificaRPTInput", () => {
       "qrc:QrCode": {
         "qrc:CF": MockedData.aRptId3.organizationFiscalCode,
         "qrc:AuxDigit": MockedData.aRptId3.paymentNoticeNumber.auxDigit,
-        "qrc:CodIUV": MockedData.iuv13
+        "qrc:CodIUV": String(MockedData.iuv13).concat(
+          String(MockedData.checkDigit)
+        )
       }
     });
     expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
@@ -282,7 +288,7 @@ describe("getNodoAttivaRPTInput", () => {
         "qrc:QrCode": {
           "qrc:CF": "12345678901",
           "qrc:AuxDigit": "0",
-          "qrc:CodIUV": "1234567890123",
+          "qrc:CodIUV": "123456789012312",
           "qrc:CodStazPA": "12"
         }
       }

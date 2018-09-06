@@ -192,7 +192,9 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
           "qrc:CF": rptId.organizationFiscalCode,
           "qrc:CodStazPA": rptId.paymentNoticeNumber.applicationCode,
           "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
-          "qrc:CodIUV": rptId.paymentNoticeNumber.iuv13
+          "qrc:CodIUV": String(rptId.paymentNoticeNumber.iuv13).concat(
+            String(rptId.paymentNoticeNumber.checkDigit)
+          )
         }
       };
     case "1":
@@ -208,7 +210,9 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
         "qrc:QrCode": {
           "qrc:CF": rptId.organizationFiscalCode,
           "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
-          "qrc:CodIUV": rptId.paymentNoticeNumber.iuv15
+          "qrc:CodIUV": String(rptId.paymentNoticeNumber.iuv15).concat(
+            String(rptId.paymentNoticeNumber.checkDigit)
+          )
         }
       };
     case "3":
@@ -216,7 +220,9 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
         "qrc:QrCode": {
           "qrc:CF": rptId.organizationFiscalCode,
           "qrc:AuxDigit": rptId.paymentNoticeNumber.auxDigit,
-          "qrc:CodIUV": rptId.paymentNoticeNumber.iuv13
+          "qrc:CodIUV": String(rptId.paymentNoticeNumber.iuv13).concat(
+            String(rptId.paymentNoticeNumber.checkDigit)
+          )
         }
       };
   }
