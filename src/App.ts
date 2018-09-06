@@ -39,7 +39,10 @@ export async function startApp(config: Configuration): Promise<http.Server> {
       {
         endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
           config.PAGOPA.WS_SERVICES.PAGAMENTI
-        }`
+        }`,
+        wsdl_options: {
+          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
+        }
       },
       config.PAGOPA.HOST_HEADER
     )
