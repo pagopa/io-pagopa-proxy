@@ -233,7 +233,7 @@ export const aRptId3 = RptId.decode({
 
 export const aPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode(
   {
-    rptId: "12345678901012123456789012399",
+    rptId: "12345678901012123456789012312",
     importoSingoloVersamento: 9905,
     codiceContestoPagamento: aCodiceContestoPagamento
   }
