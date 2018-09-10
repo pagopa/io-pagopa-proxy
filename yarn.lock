@@ -16,9 +16,9 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@octokit/rest@^15.5.0":
-  version "15.9.4"
-  resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-15.9.4.tgz#c6cf0f483275d9c798b18419b7c9d417493bb70f"
+"@octokit/rest@^15.9.5":
+  version "15.11.1"
+  resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-15.11.1.tgz#ef4e7462ec8f94e535a82220f7b5212111fc2647"
   dependencies:
     before-after-hook "^1.1.0"
     btoa-lite "^1.0.0"
@@ -1132,11 +1132,11 @@ danger-plugin-yarn@^1.2.1:
   optionalDependencies:
     esdoc "^0.5.2"
 
-danger@^3.8.4:
-  version "3.8.4"
-  resolved "https://registry.yarnpkg.com/danger/-/danger-3.8.4.tgz#e84b8398a3b7dd5707d7628a833f529efa4d1354"
+danger@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/danger/-/danger-3.9.0.tgz#41e6257fcfd4b92dcde16a47c96f5731931b5108"
   dependencies:
-    "@octokit/rest" "^15.5.0"
+    "@octokit/rest" "^15.9.5"
     babel-polyfill "^6.23.0"
     chalk "^2.3.0"
     commander "^2.13.0"
