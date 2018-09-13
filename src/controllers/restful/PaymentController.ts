@@ -386,7 +386,7 @@ export function getErrorMessageCtrlFromPagoPaError(
           );
         }
       }
-      logger.debug(
+      logger.warn(
         `Retrieved a generic PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
       );
       return ErrorMessagesCtrlEnum.PAYMENT_UNAVAILABLE;
