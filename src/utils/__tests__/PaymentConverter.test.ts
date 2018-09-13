@@ -328,29 +328,6 @@ describe("getCodiceContestoPagamentoForPagoPaApi", () => {
   });
 });
 
-describe("getSpezzoniCausaleVersamentoForController", () => {
-  it(" should convert SpezzoniCausaleVersamento", () => {
-    const spezzoniCausale = PaymentsConverter.getSpezzoniCausaleVersamentoForController(
-      MockedData.aSpezzoniCausaleVersamento
-    );
-    expect(spezzoniCausale).toBeDefined();
-    expect(spezzoniCausale).toMatchObject(
-      MockedData.aSpezzoniCausaleVersamento.spezzoniCausaleVersamento
-    );
-  });
-
-  it(" should convert SpezzoniCausaleVersamentoStrutturato", () => {
-    const spezzoniCausale = PaymentsConverter.getSpezzoniCausaleVersamentoForController(
-      MockedData.aSpezzoniCausaleVersamentoStrutturato
-    );
-    expect(spezzoniCausale).toBeDefined();
-    expect(spezzoniCausale).toMatchObject(
-      MockedData.aSpezzoniCausaleVersamentoStrutturatoForController
-        .spezzoniStrutturatoCausaleVersamento
-    );
-  });
-});
-
 describe("getResponseErrorIfExists", () => {
   it(" should recognize a message without errors", () => {
     const responseError = PaymentController.getResponseErrorIfExists(
