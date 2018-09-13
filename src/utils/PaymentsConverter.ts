@@ -4,21 +4,22 @@
  */
 
 import { Either, isRight, left, right } from "fp-ts/lib/Either";
-import { Validation } from "io-ts";
+import * as t from "io-ts";
 import { RptId } from "italia-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../Configuration";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../types/api/PaymentRequestsGetResponse";
-import { ctSpezzoneStrutturatoCausaleVersamento_ppt } from "../types/pagopa_api/yaml-to-ts/ctSpezzoneStrutturatoCausaleVersamento_ppt";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
 import { nodoAttivaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoAttivaRPT_ppt";
 import { nodoTipoCodiceIdRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoTipoCodiceIdRPT_ppt";
 import { nodoTipoDatiPagamentoPA_ppt } from "../types/pagopa_api/yaml-to-ts/nodoTipoDatiPagamentoPA_ppt";
 import { nodoVerificaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoVerificaRPT_ppt";
+import { stImporto_ppt } from "../types/pagopa_api/yaml-to-ts/stImporto_ppt";
 import { stText140_ppt } from "../types/pagopa_api/yaml-to-ts/stText140_ppt";
+import { stText25_ppt } from "../types/pagopa_api/yaml-to-ts/stText25_ppt";
 import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
 // tslint:disable:no-duplicate-string
 
@@ -64,7 +65,7 @@ export function getNodoVerificaRPTInput(
 export function getPaymentRequestsGetResponse(
   esitoNodoVerificaRPTRisposta: esitoNodoVerificaRPTRisposta_ppt,
   codiceContestoPagamento: CodiceContestoPagamento
-): Validation<PaymentRequestsGetResponse> {
+): t.Validation<PaymentRequestsGetResponse> {
   const datiPagamentoPA = esitoNodoVerificaRPTRisposta.datiPagamentoPA;
   const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
     codiceContestoPagamento
@@ -143,7 +144,7 @@ export function getNodoAttivaRPTInput(
  */
 export function getPaymentActivationsPostResponse(
   esitoNodoAttivaRPTRisposta: esitoNodoAttivaRPTRisposta_ppt
-): Validation<PaymentActivationsPostResponse> {
+): t.Validation<PaymentActivationsPostResponse> {
   const datiPagamentoPA = esitoNodoAttivaRPTRisposta.datiPagamentoPA;
   return PaymentActivationsPostResponse.decode({
     importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
@@ -278,14 +279,14 @@ function getCausaleVersamentoForController(
 }
 
 /**
- * Extract causaleVersamento from ctSpezzoneStrutturatoCausaleVersamento_ppt
- * @param {ctSpezzoneStrutturatoCausaleVersamento_ppt} spezzoneStrutturatoCausaleVersamento
+ * Extract causaleVersamento from ctSpezzoneStrutturatoCausaleVersamento
+ * @param {ctSpezzoneStrutturatoCausaleVersamento} spezzoneStrutturatoCausaleVersamento
  * @return {stText140_ppt | undefined} The causaleVersamento value
  */
 function getCausaleVersamentoFromSpezzoneStrutturatoCausaleVersamento(
-  spezzoneStrutturatoCausaleVersamento: ctSpezzoneStrutturatoCausaleVersamento_ppt
+  spezzoneStrutturatoCausaleVersamento: ctSpezzoneStrutturatoCausaleVersamento
 ): stText140_ppt | undefined {
-  const spezzoneStrutturatoCausaleVersamentoOrError = ctSpezzoneStrutturatoCausaleVersamento_ppt.decode(
+  const spezzoneStrutturatoCausaleVersamentoOrError = ctSpezzoneStrutturatoCausaleVersamento.decode(
     spezzoneStrutturatoCausaleVersamento
   );
   if (isRight(spezzoneStrutturatoCausaleVersamentoOrError)) {
@@ -294,7 +295,7 @@ function getCausaleVersamentoFromSpezzoneStrutturatoCausaleVersamento(
     ).value as stText140_ppt; // tslint:disable-line
   }
   if (spezzoneStrutturatoCausaleVersamento instanceof Array) {
-    const firstSpezzoneStrutturatoCausaleVersamentoOrError = ctSpezzoneStrutturatoCausaleVersamento_ppt.decode(
+    const firstSpezzoneStrutturatoCausaleVersamentoOrError = ctSpezzoneStrutturatoCausaleVersamento.decode(
       spezzoneStrutturatoCausaleVersamento[0]
     );
     if (isRight(firstSpezzoneStrutturatoCausaleVersamentoOrError)) {
@@ -314,3 +315,12 @@ export function getCodiceContestoPagamentoForPagoPaApi(
 ): stText35_ppt {
   return stText35_ppt.decode(codiceContestoPagamento).value as stText35_ppt; // tslint:disable-line
 }
+
+// Interface used to validate ctSpezzoneStrutturatoCausaleVersamento from PagoPA
+const ctSpezzoneStrutturatoCausaleVersamento = t.interface({
+  causaleSpezzone: stText25_ppt,
+  importoSpezzone: stImporto_ppt
+});
+export type ctSpezzoneStrutturatoCausaleVersamento = t.TypeOf<
+  typeof ctSpezzoneStrutturatoCausaleVersamento
+>;
