@@ -34,6 +34,7 @@ import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
 import { cdInfoPagamento_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
 import { cdInfoPagamentoResponse_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamentoResponse_ppt";
 import { faultBean_ppt } from "../../types/pagopa_api/yaml-to-ts/faultBean_ppt";
+import { logger } from "../../utils/Logger";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import { redisGet, redisSet } from "../../utils/Redis";
 
@@ -385,6 +386,9 @@ export function getErrorMessageCtrlFromPagoPaError(
           );
         }
       }
+      logger.debug(
+        `Retrieved a generic PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
+      );
       return ErrorMessagesCtrlEnum.PAYMENT_UNAVAILABLE;
   }
 }
