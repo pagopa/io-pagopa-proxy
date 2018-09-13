@@ -51,10 +51,9 @@
 			</xsd:simpleType>
 			
 			<xsd:complexType name="ctSpezzoniCausaleVersamento">
-					<xsd:choice>
-						<xsd:element type="ppt:stText35" name="spezzoniCausaleVersamento" minOccurs="1" maxOccurs="6"/>
-						<xsd:element type="ppt:ctSpezzoneStrutturatoCausaleVersamento" name="spezzoniStrutturatoCausaleVersamento" minOccurs="1" maxOccurs="6"/>
-					</xsd:choice>
+				<xsd:sequence>
+					<xsd:any minOccurs="0" maxOccurs="6" namespace="##any" />
+				</xsd:sequence>
 			</xsd:complexType>
 						
 			<xsd:complexType name="ctSpezzoneStrutturatoCausaleVersamento">

@@ -3,7 +3,7 @@
  * Data Converter for Payments Request\Responses between PagoPA and BackendAPP types
  */
 
-import { Either, left, right } from "fp-ts/lib/Either";
+import { Either, isRight, left, right } from "fp-ts/lib/Either";
 import { Validation } from "io-ts";
 import { RptId } from "italia-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../Configuration";
@@ -11,14 +11,14 @@ import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../types/api/PaymentRequestsGetResponse";
-import { SpezzoniCausaleVersamento } from "../types/api/SpezzoniCausaleVersamento";
 import { ctSpezzoneStrutturatoCausaleVersamento_ppt } from "../types/pagopa_api/yaml-to-ts/ctSpezzoneStrutturatoCausaleVersamento_ppt";
-import { ctSpezzoniCausaleVersamento_ppt } from "../types/pagopa_api/yaml-to-ts/ctSpezzoniCausaleVersamento_ppt";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
 import { nodoAttivaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoAttivaRPT_ppt";
 import { nodoTipoCodiceIdRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoTipoCodiceIdRPT_ppt";
+import { nodoTipoDatiPagamentoPA_ppt } from "../types/pagopa_api/yaml-to-ts/nodoTipoDatiPagamentoPA_ppt";
 import { nodoVerificaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoVerificaRPT_ppt";
+import { stText140_ppt } from "../types/pagopa_api/yaml-to-ts/stText140_ppt";
 import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
 // tslint:disable:no-duplicate-string
 
@@ -73,7 +73,7 @@ export function getPaymentRequestsGetResponse(
     importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
     codiceContestoPagamento: codiceContestoPagamentoApi,
     ibanAccredito: datiPagamentoPA.ibanAccredito,
-    causaleVersamento: datiPagamentoPA.causaleVersamento,
+    causaleVersamento: getCausaleVersamentoForController(datiPagamentoPA),
     enteBeneficiario: {
       identificativoUnivocoBeneficiario:
         datiPagamentoPA.enteBeneficiario.identificativoUnivocoBeneficiario
@@ -93,10 +93,7 @@ export function getPaymentRequestsGetResponse(
       provinciaBeneficiario:
         datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
       nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
-    },
-    spezzoniCausaleVersamento: getSpezzoniCausaleVersamentoForController(
-      datiPagamentoPA.spezzoniCausaleVersamento
-    )
+    }
   });
 }
 
@@ -171,10 +168,7 @@ export function getPaymentActivationsPostResponse(
       provinciaBeneficiario:
         datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
       nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
-    },
-    spezzoniCausaleVersamento: getSpezzoniCausaleVersamentoForController(
-      datiPagamentoPA.spezzoniCausaleVersamento
-    )
+    }
   });
 }
 
@@ -229,39 +223,86 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
 }
 
 /**
- * Provide SpezzoniCausaleVersamento element for BackendApp
- * parsing the SpezzoniCausaleVersamento element provided by PagoPaProxy
+ * Extract causaleVersamento from esitoNodoVerificaRPTRisposta_ppt
+ * @param {esitoNodoVerificaRPTRisposta_ppt} datiPagamentoPA - Payment information provided by BackendApp
+ * @return {stText140_ppt | undefined} The causaleVersamento value
  */
-export function getSpezzoniCausaleVersamentoForController(
-  spezzoniCausaleVersamento: ctSpezzoniCausaleVersamento_ppt
-): SpezzoniCausaleVersamento | undefined {
-  // Content is an array of spezzoniCausaleVersamento
-  if (
-    spezzoniCausaleVersamento !== undefined &&
-    spezzoniCausaleVersamento.spezzoniCausaleVersamento !== undefined
-  ) {
-    return spezzoniCausaleVersamento.spezzoniCausaleVersamento.map(
-      (value: stText35_ppt) => {
-        return value;
-      }
-    );
+function getCausaleVersamentoForController(
+  datiPagamentoPA: nodoTipoDatiPagamentoPA_ppt
+): stText140_ppt | undefined {
+  if (datiPagamentoPA.causaleVersamento !== undefined) {
+    return datiPagamentoPA.causaleVersamento;
+  }
+  if (datiPagamentoPA.spezzoniCausaleVersamento === undefined) {
+    return undefined;
   }
 
-  // Content is an array of spezzoniStrutturatoCausaleVersamento
   if (
-    spezzoniCausaleVersamento !== undefined &&
-    spezzoniCausaleVersamento.spezzoniStrutturatoCausaleVersamento !== undefined
+    datiPagamentoPA.spezzoniCausaleVersamento.spezzoneCausaleVersamento !==
+    undefined
   ) {
-    return spezzoniCausaleVersamento.spezzoniStrutturatoCausaleVersamento.map(
-      (value: ctSpezzoneStrutturatoCausaleVersamento_ppt) => {
-        return {
-          causaleSpezzone: value.causaleSpezzone,
-          importoSpezzone: value.importoSpezzone * 100
-        };
-      }
+    const spezzoneCausaleVersamento =
+      datiPagamentoPA.spezzoniCausaleVersamento.spezzoneCausaleVersamento;
+    const spezzoneCausaleVersamentoOrError = stText35_ppt.decode(
+      spezzoneCausaleVersamento
     );
+    if (isRight(spezzoneCausaleVersamentoOrError)) {
+      return stText140_ppt.decode(spezzoneCausaleVersamentoOrError.value)
+        .value as stText140_ppt; // tslint:disable-line
+    }
+    if (spezzoneCausaleVersamento instanceof Array) {
+      const firstSpezzoneCausaleVersamentoOrError = stText35_ppt.decode(
+        spezzoneCausaleVersamento[0]
+      );
+      if (isRight(firstSpezzoneCausaleVersamentoOrError)) {
+        return stText140_ppt.decode(firstSpezzoneCausaleVersamentoOrError.value)
+          .value as stText140_ppt; // tslint:disable-line
+      }
+    }
   }
+
+  if (
+    datiPagamentoPA.spezzoniCausaleVersamento
+      .spezzoneStrutturatoCausaleVersamento !== undefined
+  ) {
+    const causaleVersamentoFromSpezzone = getCausaleVersamentoFromSpezzoneStrutturatoCausaleVersamento(
+      datiPagamentoPA.spezzoniCausaleVersamento
+        .spezzoneStrutturatoCausaleVersamento
+    );
+    if (causaleVersamentoFromSpezzone !== undefined) {
+      return causaleVersamentoFromSpezzone;
+    }
+  }
+
   return undefined;
+}
+
+/**
+ * Extract causaleVersamento from ctSpezzoneStrutturatoCausaleVersamento_ppt
+ * @param {ctSpezzoneStrutturatoCausaleVersamento_ppt} spezzoneStrutturatoCausaleVersamento
+ * @return {stText140_ppt | undefined} The causaleVersamento value
+ */
+function getCausaleVersamentoFromSpezzoneStrutturatoCausaleVersamento(
+  spezzoneStrutturatoCausaleVersamento: ctSpezzoneStrutturatoCausaleVersamento_ppt
+): stText140_ppt | undefined {
+  const spezzoneStrutturatoCausaleVersamentoOrError = ctSpezzoneStrutturatoCausaleVersamento_ppt.decode(
+    spezzoneStrutturatoCausaleVersamento
+  );
+  if (isRight(spezzoneStrutturatoCausaleVersamentoOrError)) {
+    return stText140_ppt.decode(
+      spezzoneStrutturatoCausaleVersamentoOrError.value.causaleSpezzone
+    ).value as stText140_ppt; // tslint:disable-line
+  }
+  if (spezzoneStrutturatoCausaleVersamento instanceof Array) {
+    const firstSpezzoneStrutturatoCausaleVersamentoOrError = ctSpezzoneStrutturatoCausaleVersamento_ppt.decode(
+      spezzoneStrutturatoCausaleVersamento[0]
+    );
+    if (isRight(firstSpezzoneStrutturatoCausaleVersamentoOrError)) {
+      return stText140_ppt.decode(
+        firstSpezzoneStrutturatoCausaleVersamentoOrError.value.causaleSpezzone
+      ).value as stText140_ppt; // tslint:disable-line
+    }
+  }
 }
 
 /**
