@@ -342,7 +342,8 @@ export function getResponseErrorIfExists(
   }
   // Case 3: Response is FAILED and additional information are provided by PagoPa
   const errorMessageCtrl = getErrorMessageCtrlFromPagoPaError(
-    faultBean.faultCode
+    faultBean.faultCode,
+    faultBean.description
   );
   return ResponseErrorGeneric(
     HttpStatusCodeEnum.HTTP_STATUS_500,
@@ -360,7 +361,8 @@ export function getResponseErrorIfExists(
  * @return {ErrorMessagesCtrlEnum} Error code to send to BackendApp
  */
 export function getErrorMessageCtrlFromPagoPaError(
-  faultCode: string
+  faultCode: string,
+  faultDescription: string | undefined
 ): ErrorMessagesCtrlEnum {
   switch (faultCode) {
     case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
@@ -372,6 +374,17 @@ export function getErrorMessageCtrlFromPagoPaError(
     case "PAA_PAGAMENTO_SCADUTO":
       return ErrorMessagesCtrlEnum.PAYMENT_EXPIRED;
     default:
+      if (faultDescription !== undefined) {
+        const extractedFaultCode = faultDescription.match(
+          /PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO|PAA_PAGAMENTO_DUPLICATO|PAA_PAGAMENTO_IN_CORSO|PAA_PAGAMENTO_SCADUTO/
+        );
+        if (extractedFaultCode !== null) {
+          return getErrorMessageCtrlFromPagoPaError(
+            extractedFaultCode[0],
+            undefined
+          );
+        }
+      }
       return ErrorMessagesCtrlEnum.PAYMENT_UNAVAILABLE;
   }
 }
