@@ -196,43 +196,38 @@ describe("getPaymentsCheckResponse", () => {
 
     // Check correct field mapping
     expect(isRight(errorOrPaymentCheckResponse)).toBeTruthy();
+
+    const datiPagamentoPA = MockedData.aVerificaRPTOutput.datiPagamentoPA;
+    expect(datiPagamentoPA).toBeDefined();
+    if (datiPagamentoPA === undefined) {
+      return;
+    }
+
+    const enteBeneficiario = datiPagamentoPA.enteBeneficiario;
+    expect(enteBeneficiario).toBeDefined();
+    if (enteBeneficiario === undefined) {
+      return;
+    }
+
     expect(errorOrPaymentCheckResponse.value).toMatchObject({
       enteBeneficiario: {
         identificativoUnivocoBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .identificativoUnivocoBeneficiario.codiceIdentificativoUnivoco,
-        denominazioneBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .denominazioneBeneficiario,
-        codiceUnitOperBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .codiceUnitOperBeneficiario,
-        denomUnitOperBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .denomUnitOperBeneficiario,
-        indirizzoBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .indirizzoBeneficiario,
-        civicoBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .civicoBeneficiario,
-        capBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .capBeneficiario,
-        localitaBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .localitaBeneficiario,
-        provinciaBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .provinciaBeneficiario,
-        nazioneBeneficiario:
-          MockedData.aVerificaRPTOutput.datiPagamentoPA.enteBeneficiario
-            .nazioneBeneficiario
+          enteBeneficiario.identificativoUnivocoBeneficiario
+            .codiceIdentificativoUnivoco,
+        denominazioneBeneficiario: enteBeneficiario.denominazioneBeneficiario,
+        codiceUnitOperBeneficiario: enteBeneficiario.codiceUnitOperBeneficiario,
+        denomUnitOperBeneficiario: enteBeneficiario.denomUnitOperBeneficiario,
+        indirizzoBeneficiario: enteBeneficiario.indirizzoBeneficiario,
+        civicoBeneficiario: enteBeneficiario.civicoBeneficiario,
+        capBeneficiario: enteBeneficiario.capBeneficiario,
+        localitaBeneficiario: enteBeneficiario.localitaBeneficiario,
+        provinciaBeneficiario: enteBeneficiario.provinciaBeneficiario,
+        nazioneBeneficiario: enteBeneficiario.nazioneBeneficiario
       }
     });
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "causaleVersamento",
-      MockedData.aVerificaRPTOutput.datiPagamentoPA.causaleVersamento
+      datiPagamentoPA.causaleVersamento
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "importoSingoloVersamento",
@@ -244,7 +239,7 @@ describe("getPaymentsCheckResponse", () => {
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "ibanAccredito",
-      MockedData.aVerificaRPTOutput.datiPagamentoPA.ibanAccredito
+      datiPagamentoPA.ibanAccredito
     );
   });
 });
@@ -343,7 +338,9 @@ describe("getResponseErrorIfExists", () => {
       undefined
     );
     expect(responseError).toBeDefined();
-    expect(responseError.kind).toEqual("IResponseErrorInternal");
+    if (responseError !== undefined) {
+      expect(responseError.kind).toEqual("IResponseErrorInternal");
+    }
   });
 
   it(" should convert a KO Error with fault details", () => {
@@ -352,76 +349,118 @@ describe("getResponseErrorIfExists", () => {
       MockedData.aVerificaRPTOutputKOCompleted.fault
     );
     expect(responseError).toBeDefined();
-    expect(responseError.kind).toEqual("IResponseErrorGeneric");
+    if (responseError !== undefined) {
+      expect(responseError.kind).toEqual("IResponseErrorGeneric");
+    }
   });
 });
 
 describe("getErrorMessageCtrlFromPagoPaError", () => {
   it(" should convert a KO Completed Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOCompleted.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
-      MockedData.aVerificaRPTOutputKOCompleted.fault.faultCode,
+      fault.faultCode,
       undefined
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_COMPLETED);
   });
   it(" should convert a KO Completed Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOCompleted.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
       "",
       `FaultCode PA: ${
-        MockedData.aVerificaRPTOutputKOCompleted.fault.faultCode
+        fault.faultCode
       } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_COMPLETED);
   });
   it(" should convert a KO Expired Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOExpired.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
-      MockedData.aVerificaRPTOutputKOExpired.fault.faultCode,
+      fault.faultCode,
       undefined
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_EXPIRED);
   });
   it(" should convert a KO Expired Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOExpired.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
       "",
       `FaultCode PA: ${
-        MockedData.aVerificaRPTOutputKOExpired.fault.faultCode
+        fault.faultCode
       } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_EXPIRED);
   });
   it(" should convert a KO OnGoing Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
-      MockedData.aVerificaRPTOutputKOOnGoing.fault.faultCode,
+      fault.faultCode,
       undefined
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_ONGOING);
   });
   it(" should convert a KO OnGoing Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
       "",
       `FaultCode PA:  ${
-        MockedData.aVerificaRPTOutputKOOnGoing.fault.faultCode
+        fault.faultCode
       } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_ONGOING);
   });
   it(" should convert a KO Generic Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOGeneric.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
-      MockedData.aVerificaRPTOutputKOGeneric.fault.faultCode,
+      fault.faultCode,
       undefined
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_UNAVAILABLE);
   });
   it(" should convert a KO Generic Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOGeneric.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
-      MockedData.aVerificaRPTOutputKOGeneric.fault.faultCode,
+      fault.faultCode,
       "Pagamento in attesa risulta in corso all’Ente Creditore. "
     );
     expect(errorMsg).toBeDefined();

@@ -330,8 +330,8 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
  * @return {IResponseErrorGeneric | IResponseErrorInternal} A controller response or undefined if no errors exist
  */
 export function getResponseErrorIfExists(
-  esito: string,
-  faultBean: faultBean_ppt
+  esito: string | undefined,
+  faultBean: faultBean_ppt | undefined
 ): IResponseErrorGeneric | IResponseErrorInternal | undefined {
   // Case 1: Response is SUCCESS
   if (esito === "OK") {

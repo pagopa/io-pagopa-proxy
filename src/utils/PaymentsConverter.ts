@@ -68,32 +68,43 @@ export function getPaymentRequestsGetResponse(
   const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
     codiceContestoPagamento
   );
-  return PaymentRequestsGetResponse.decode({
-    importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
-    codiceContestoPagamento: codiceContestoPagamentoApi,
-    ibanAccredito: datiPagamentoPA.ibanAccredito,
-    causaleVersamento: getCausaleVersamentoForController(datiPagamentoPA),
-    enteBeneficiario: {
-      identificativoUnivocoBeneficiario:
-        datiPagamentoPA.enteBeneficiario.identificativoUnivocoBeneficiario
-          .codiceIdentificativoUnivoco,
-      denominazioneBeneficiario:
-        datiPagamentoPA.enteBeneficiario.denominazioneBeneficiario,
-      codiceUnitOperBeneficiario:
-        datiPagamentoPA.enteBeneficiario.codiceUnitOperBeneficiario,
-      denomUnitOperBeneficiario:
-        datiPagamentoPA.enteBeneficiario.denomUnitOperBeneficiario,
-      indirizzoBeneficiario:
-        datiPagamentoPA.enteBeneficiario.indirizzoBeneficiario,
-      civicoBeneficiario: datiPagamentoPA.enteBeneficiario.civicoBeneficiario,
-      capBeneficiario: datiPagamentoPA.enteBeneficiario.capBeneficiario,
-      localitaBeneficiario:
-        datiPagamentoPA.enteBeneficiario.localitaBeneficiario,
-      provinciaBeneficiario:
-        datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
-      nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
-    }
-  });
+
+  const response = datiPagamentoPA
+    ? {
+        importoSingoloVersamento:
+          datiPagamentoPA.importoSingoloVersamento * 100,
+        codiceContestoPagamento: codiceContestoPagamentoApi,
+        ibanAccredito: datiPagamentoPA.ibanAccredito,
+        causaleVersamento: getCausaleVersamentoForController(datiPagamentoPA),
+        enteBeneficiario: datiPagamentoPA.enteBeneficiario
+          ? {
+              identificativoUnivocoBeneficiario:
+                datiPagamentoPA.enteBeneficiario
+                  .identificativoUnivocoBeneficiario
+                  .codiceIdentificativoUnivoco,
+              denominazioneBeneficiario:
+                datiPagamentoPA.enteBeneficiario.denominazioneBeneficiario,
+              codiceUnitOperBeneficiario:
+                datiPagamentoPA.enteBeneficiario.codiceUnitOperBeneficiario,
+              denomUnitOperBeneficiario:
+                datiPagamentoPA.enteBeneficiario.denomUnitOperBeneficiario,
+              indirizzoBeneficiario:
+                datiPagamentoPA.enteBeneficiario.indirizzoBeneficiario,
+              civicoBeneficiario:
+                datiPagamentoPA.enteBeneficiario.civicoBeneficiario,
+              capBeneficiario: datiPagamentoPA.enteBeneficiario.capBeneficiario,
+              localitaBeneficiario:
+                datiPagamentoPA.enteBeneficiario.localitaBeneficiario,
+              provinciaBeneficiario:
+                datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
+              nazioneBeneficiario:
+                datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
+            }
+          : undefined
+      }
+    : undefined;
+
+  return PaymentRequestsGetResponse.decode(response);
 }
 
 /**
@@ -144,31 +155,44 @@ export function getPaymentActivationsPostResponse(
   esitoNodoAttivaRPTRisposta: esitoNodoAttivaRPTRisposta_ppt
 ): t.Validation<PaymentActivationsPostResponse> {
   const datiPagamentoPA = esitoNodoAttivaRPTRisposta.datiPagamentoPA;
-  return PaymentActivationsPostResponse.decode({
-    importoSingoloVersamento: datiPagamentoPA.importoSingoloVersamento * 100,
-    ibanAccredito: datiPagamentoPA.ibanAccredito,
-    causaleVersamento: datiPagamentoPA.causaleVersamento,
-    enteBeneficiario: {
-      identificativoUnivocoBeneficiario:
-        datiPagamentoPA.enteBeneficiario.identificativoUnivocoBeneficiario
-          .codiceIdentificativoUnivoco,
-      denominazioneBeneficiario:
-        datiPagamentoPA.enteBeneficiario.denominazioneBeneficiario,
-      codiceUnitOperBeneficiario:
-        datiPagamentoPA.enteBeneficiario.codiceUnitOperBeneficiario,
-      denomUnitOperBeneficiario:
-        datiPagamentoPA.enteBeneficiario.denomUnitOperBeneficiario,
-      indirizzoBeneficiario:
-        datiPagamentoPA.enteBeneficiario.indirizzoBeneficiario,
-      civicoBeneficiario: datiPagamentoPA.enteBeneficiario.civicoBeneficiario,
-      capBeneficiario: datiPagamentoPA.enteBeneficiario.capBeneficiario,
-      localitaBeneficiario:
-        datiPagamentoPA.enteBeneficiario.localitaBeneficiario,
-      provinciaBeneficiario:
-        datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
-      nazioneBeneficiario: datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
-    }
-  });
+
+  const response =
+    datiPagamentoPA !== undefined
+      ? {
+          importoSingoloVersamento:
+            datiPagamentoPA.importoSingoloVersamento * 100,
+          ibanAccredito: datiPagamentoPA.ibanAccredito,
+          causaleVersamento: datiPagamentoPA.causaleVersamento,
+          enteBeneficiario: datiPagamentoPA.enteBeneficiario
+            ? {
+                identificativoUnivocoBeneficiario:
+                  datiPagamentoPA.enteBeneficiario
+                    .identificativoUnivocoBeneficiario
+                    .codiceIdentificativoUnivoco,
+                denominazioneBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.denominazioneBeneficiario,
+                codiceUnitOperBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.codiceUnitOperBeneficiario,
+                denomUnitOperBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.denomUnitOperBeneficiario,
+                indirizzoBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.indirizzoBeneficiario,
+                civicoBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.civicoBeneficiario,
+                capBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.capBeneficiario,
+                localitaBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.localitaBeneficiario,
+                provinciaBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
+                nazioneBeneficiario:
+                  datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
+              }
+            : undefined
+        }
+      : undefined;
+
+  return PaymentActivationsPostResponse.decode(response);
 }
 
 /**
