@@ -5,7 +5,10 @@
     "sourceMap": false,
     "declaration": false,
     "outDir": "dist",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true
   },
   "include": [
     "src/**/*.ts"
