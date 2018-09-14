@@ -5,6 +5,7 @@
     "sourceMap": false,
     "declaration": false,
     "outDir": "dist",
+    "noImplicitAny": true
   },
   "include": [
     "src/**/*.ts"
