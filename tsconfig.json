@@ -5,6 +5,11 @@
     "sourceMap": false,
     "declaration": false,
     "outDir": "dist",
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true
   },
   "include": [
     "src/**/*.ts"
