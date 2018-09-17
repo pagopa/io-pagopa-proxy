@@ -9,7 +9,7 @@ import { cdInfoPagamento_ppt } from "./yaml-to-ts/cdInfoPagamento_ppt";
 import { cdInfoPagamentoResponse_ppt } from "./yaml-to-ts/cdInfoPagamentoResponse_ppt";
 
 export interface IFespCdPortTypeSoap {
-  readonly cdInfoPagamento: (
+  readonly cdInfoWisp: (
     input: cdInfoPagamento_ppt,
     cb: (
       result: cdInfoPagamentoResponse_ppt,

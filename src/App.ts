@@ -190,7 +190,7 @@ function getFespCdServiceHandler(
   redisTimeoutSecs: number
 ): IFespCdPortTypeSoap {
   return {
-    cdInfoPagamento: (
+    cdInfoWisp: (
       input: cdInfoPagamento_ppt,
       cb: (
         err: any, // tslint:disable-line:no-any
