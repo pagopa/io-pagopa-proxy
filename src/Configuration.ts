@@ -52,6 +52,7 @@ export const CONFIG = {
       IDENTIFICATIVO_PSP: process.env.PAGOPA_ID_PSP,
       IDENTIFICATIVO_INTERMEDIARIO_PSP: process.env.PAGOPA_ID_INT_PSP,
       IDENTIFICATIVO_CANALE: process.env.PAGOPA_ID_CANALE,
+      IDENTIFICATIVO_CANALE_PAGAMENTO: process.env.PAGOPA_ID_CANALE_PAGAMENTO,
       PASSWORD: process.env.PAGOPA_PASSWORD
     }
   },
@@ -104,6 +105,7 @@ export const PagoPAConfig = t.intersection([
       IDENTIFICATIVO_PSP: stText35_ppt,
       IDENTIFICATIVO_INTERMEDIARIO_PSP: stText35_ppt,
       IDENTIFICATIVO_CANALE: stText35_ppt,
+      IDENTIFICATIVO_CANALE_PAGAMENTO: stText35_ppt,
       PASSWORD: stPassword_ppt
     })
   }),
