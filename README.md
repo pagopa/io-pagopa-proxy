@@ -51,6 +51,7 @@ Those are all Environment variables needed by the application:
 | PAGOPA_ID_PSP       | The IDENTIFICATIVO_PSP value provided to PagoPA               | string  |                                                    |
 | PAGOPA_ID_INT_PSP   | The IDENTIFICATIVO_INTERMEDIARIO_PSP value provided to PagoPA | string  |                                                    |
 | PAGOPA_ID_CANALE    | The IDENTIFICATIVO_CANALE value provided to PagoPA            | string  |                                                    |
+| PAGOPA_ID_CANALE_PAGAMENTO    | The IDENTIFICATIVO_CANALE_PAGAMENTO value provided to PagoPA            | string  |                                                    |
 | REDIS_DB_URL        | The Redis DB Server URL                                       | string  | localhost                                          |
 | REDIS_DB_PORT       | The Redis DB Server port                                      | int     | 6379                                               |
 | REDIS_DB_PASSWORD   | The Redis DB Server password                                  | string  |                                                    |
