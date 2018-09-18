@@ -268,7 +268,7 @@ describe("getNodoAttivaRPTInput", () => {
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
     );
     expect(errorOrNodoAttivaRPTInput.value.identificativoCanalePagamento).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
+      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE_PAGAMENTO
     );
     expect(errorOrNodoAttivaRPTInput.value.identificativoPSP).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP

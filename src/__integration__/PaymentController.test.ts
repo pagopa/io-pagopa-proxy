@@ -20,7 +20,7 @@ import {
 } from "../controllers/restful/PaymentController";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../types/api/ImportoEuroCents";
-import { cdInfoPagamento_ppt } from "../types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
+import { cdInfoWisp_ppt } from "../types/pagopa_api/yaml-to-ts/cdInfoWisp_ppt";
 import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
 import { logger } from "../utils/Logger";
 import {
@@ -49,12 +49,12 @@ const aMockedRedisClient = redis.createClient(6379, "localhost");
 
 const aCodiceContestoPagamento = "05245c90746811e8b9bf91897339427e" as stText35_ppt;
 
-const aCdInfoPagamentoPpt = {
+const aCdInfoWispPpt = {
   identificativoDominio: "idDom",
   identificativoUnivocoVersamento: "idUniv",
   codiceContestoPagamento: aCodiceContestoPagamento,
   idPagamento: "id1234"
-} as cdInfoPagamento_ppt;
+} as cdInfoWisp_ppt;
 
 describe("checkPaymentToPagoPa", async () => {
   it("should return the right response", async () => {
@@ -248,7 +248,7 @@ describe("setActivationStatus and getActivationStatus", () => {
     const req = mockReq();
     req.params = aPaymentActivationRequest;
 
-    await setActivationStatus(aCdInfoPagamentoPpt, 5000, aMockedRedisClient);
+    await setActivationStatus(aCdInfoWispPpt, 5000, aMockedRedisClient);
 
     aMockedRedisClient.on("connect", () => {
       return logger.info("Mocked Redis connected!");

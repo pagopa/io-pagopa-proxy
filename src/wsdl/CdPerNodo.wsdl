@@ -20,10 +20,10 @@
 			targetNamespace="http://ws.pagamenti.telematici.gov/">
 			
 			<!-- Wrapper Elements -->
-            <xsd:element name="cdInfoPagamento" type="ppt:ctCdInfoPagamento"/>
-            <xsd:element name="cdInfoPagamentoResponse" type="ppt:ctCdInfoPagamentoResponse"/>
+            <xsd:element name="cdInfoWisp" type="ppt:ctCdInfoWisp"/>
+            <xsd:element name="cdInfoWispResponse" type="ppt:ctCdInfoWispResponse"/>
 			
-			<xsd:complexType name="ctCdInfoPagamento">
+			<xsd:complexType name="ctCdInfoWisp">
                 <xsd:sequence>
                     <xsd:element name="identificativoDominio" type="ppt:stText35"/>
                     <xsd:element name="identificativoUnivocoVersamento" type="ppt:stText35"/>
@@ -32,7 +32,7 @@
                 </xsd:sequence>
             </xsd:complexType>
 			
-			<xsd:complexType name="ctCdInfoPagamentoResponse">
+			<xsd:complexType name="ctCdInfoWispResponse">
                 <xsd:complexContent>
 					<xsd:extension base="ppt:risposta">
 						<xsd:sequence>
@@ -72,26 +72,26 @@
 	</wsdl:types>
 	
 	<!-- definition of the data being communicated... -->
-	<wsdl:message name="cdInfoPagamento">
-		<wsdl:part name="bodyRequest" element="ppt:cdInfoPagamento" />
+	<wsdl:message name="cdInfoWisp">
+		<wsdl:part name="bodyRequest" element="ppt:cdInfoWisp" />
 	</wsdl:message>
-	<wsdl:message name="cdInfoPagamentoResponse">
-		<wsdl:part name="bodyResponse" element="ppt:cdInfoPagamentoResponse" />
+	<wsdl:message name="cdInfoWispResponse">
+		<wsdl:part name="bodyResponse" element="ppt:cdInfoWispResponse" />
 	</wsdl:message>
 
 	<!-- set of operations... -->
 	<wsdl:portType name="FespCdPortType">
-		<wsdl:operation name="cdInfoPagamento">
-			<wsdl:input message="tns:cdInfoPagamento" wsam:Action="http://nodoPSP.fesp.it/ws/FespPsp/PSP/cdInfoPagamento"></wsdl:input>
-			<wsdl:output message="tns:cdInfoPagamentoResponse" wsam:Action="http://nodoPSP.fesp.it/ws/FespPsp/PSP/cdInfoPagamentoRisposta"></wsdl:output>
+		<wsdl:operation name="cdInfoWisp">
+			<wsdl:input message="tns:cdInfoWisp" wsam:Action="http://nodoPSP.fesp.it/ws/FespPsp/PSP/cdInfoWisp"></wsdl:input>
+			<wsdl:output message="tns:cdInfoWispResponse" wsam:Action="http://nodoPSP.fesp.it/ws/FespPsp/PSP/cdInfoWispRisposta"></wsdl:output>
 		</wsdl:operation>
 	</wsdl:portType>
 	
 	<!-- protocol and data format specification... -->
 	<wsdl:binding name="FespCdBinding" type="tns:FespCdPortType">
 		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
-		<wsdl:operation name="cdInfoPagamento">
-			<soap:operation soapAction="cdInfoPagamento" />
+		<wsdl:operation name="cdInfoWisp">
+			<soap:operation soapAction="cdInfoWisp" />
 			<wsdl:input>
 				<soap:body use="literal" />
 			</wsdl:input>

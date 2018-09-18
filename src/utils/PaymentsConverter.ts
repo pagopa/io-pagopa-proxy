@@ -133,7 +133,7 @@ export function getNodoAttivaRPTInput(
       identificativoIntermediarioPSPPagamento:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanalePagamento:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE_PAGAMENTO,
       codificaInfrastrutturaPSP: "QR-CODE",
       codiceIdRPT,
       datiPagamentoPSP: {
