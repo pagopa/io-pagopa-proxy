@@ -19,8 +19,8 @@ import * as PaymentController from "./controllers/restful/PaymentController";
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
 import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
 import { IFespCdPortTypeSoap } from "./types/pagopa_api/IFespCdPortTypeSoap";
-import { cdInfoPagamento_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
-import { cdInfoPagamentoResponse_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoPagamentoResponse_ppt";
+import { cdInfoWisp_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoWisp_ppt";
+import { cdInfoWispResponse_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoWispResponse_ppt";
 import { logger } from "./utils/Logger";
 
 /**
@@ -190,11 +190,11 @@ function getFespCdServiceHandler(
   redisTimeoutSecs: number
 ): IFespCdPortTypeSoap {
   return {
-    cdInfoPagamento: (
-      input: cdInfoPagamento_ppt,
+    cdInfoWisp: (
+      input: cdInfoWisp_ppt,
       cb: (
         err: any, // tslint:disable-line:no-any
-        result: cdInfoPagamentoResponse_ppt,
+        result: cdInfoWispResponse_ppt,
         raw: t.StringType,
         soapHeader: { readonly [k: string]: any } // tslint:disable-line:no-any
       ) => any // tslint:disable-line:no-any
@@ -204,8 +204,8 @@ function getFespCdServiceHandler(
         redisTimeoutSecs,
         redisClient
       ).then(
-        iCdInfoPagamentoOutput => {
-          cb(undefined, iCdInfoPagamentoOutput, new t.StringType(), {});
+        iCdInfoWispOutput => {
+          cb(undefined, iCdInfoWispOutput, new t.StringType(), {});
         },
         err => {
           logger.error(`Error on setActivationStatus: ${err}`);

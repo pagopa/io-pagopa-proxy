@@ -31,8 +31,8 @@ import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivation
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
 import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
-import { cdInfoPagamento_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamento_ppt";
-import { cdInfoPagamentoResponse_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoPagamentoResponse_ppt";
+import { cdInfoWisp_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoWisp_ppt";
+import { cdInfoWispResponse_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoWispResponse_ppt";
 import { faultBean_ppt } from "../../types/pagopa_api/yaml-to-ts/faultBean_ppt";
 import { logger } from "../../utils/Logger";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
@@ -222,23 +222,23 @@ export function activatePayment(
  * This controller is invoked by PagoPA that provides a paymentId
  * related to a previous async request (attivaRPT)
  * It just store this information into redis db. This information will be retrieved by App using polling
- * @param {cdInfoPagamento_ppt} cdInfoPagamento_ppt - The request from PagoPA
+ * @param {cdInfoWisp_ppt} cdInfoWisp_ppt - The request from PagoPA
  * @param {number} redisTimeoutSecs - The expiration timeout for the information to store
  * @param {RedisClient} redisClient - The redis client used to store the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
 export async function setActivationStatus(
-  cdInfoPagamentoInput: cdInfoPagamento_ppt,
+  cdInfoWispInput: cdInfoWisp_ppt,
   redisTimeoutSecs: number,
   redisClient: redis.RedisClient
-): Promise<cdInfoPagamentoResponse_ppt> {
+): Promise<cdInfoWispResponse_ppt> {
   return (await redisSet(
     redisClient,
-    cdInfoPagamentoInput.codiceContestoPagamento,
-    cdInfoPagamentoInput.idPagamento,
+    cdInfoWispInput.codiceContestoPagamento,
+    cdInfoWispInput.idPagamento,
     "EX", // Set the specified expire time, in seconds.
     redisTimeoutSecs
-  )).fold<cdInfoPagamentoResponse_ppt>(
+  )).fold<cdInfoWispResponse_ppt>(
     _ => ({
       esito: "KO"
     }),
@@ -250,7 +250,7 @@ export async function setActivationStatus(
 
 /**
  * This controller is invoked by BackendApp to check the status of a previous activation request (async process)
- * If PagoPA sent an activation result (via cdInfoPagamento), a paymentId will be retrieved into redis
+ * If PagoPA sent an activation result (via cdInfoWisp), a paymentId will be retrieved into redis
  * The paymentId is necessary for App to proceed with the payment process
  * @param {redis.RedisClient} redisClient - The redis client used to retrieve the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
