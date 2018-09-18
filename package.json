@@ -57,7 +57,7 @@
     "tslint-plugin-prettier": "^2.0.0",
     "tslint-sonarts": "^1.8.0",
     "typescript": "^3.0.3",
-    "typestrict": "^0.0.9"
+    "typestrict": "^1.0.0"
   },
   "dependencies": {
     "express": "^4.16.3",
