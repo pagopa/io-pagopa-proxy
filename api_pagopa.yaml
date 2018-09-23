@@ -14,7 +14,7 @@ paths:
       summary: Get Payment Info
       description: Retrieve information about a payment
       parameters:
-        - $ref: '#/parameters/RptIdFromString'     
+        - $ref: '#/parameters/RptIdFromString'
       responses:
         '200':
           description: Payment information retrieved
@@ -26,8 +26,12 @@ paths:
               codiceContestoPagamento: 'ABC123'
         '400':
           description: Invalid input or PagoPA response
+          schema:
+            $ref: "#/definitions/ProblemJson"
         '500':
           description: PagoPA services are not available or request is rejected by PagoPa
+          schema:
+            $ref: "#/definitions/ProblemJson"
   '/payment-activations':
     x-swagger-router-controller: PaymentController
     post:
@@ -54,8 +58,12 @@ paths:
               importoSingoloVersamento: 200
         '400':
           description: Invalid input or PagoPA response
+          schema:
+            $ref: "#/definitions/ProblemJson"
         '500':
           description: PagoPA services are not available
+          schema:
+            $ref: "#/definitions/ProblemJson"
   '/payment-activations/{codice_contesto_pagamento}':
     x-swagger-router-controller: PaymentController
     get:
@@ -63,7 +71,7 @@ paths:
       summary: Get the activation status
       description: Get the activation status and the paymentId
       parameters:
-        - $ref: '#/parameters/CodiceContestoPagamento' 
+        - $ref: '#/parameters/CodiceContestoPagamento'
       responses:
         '200':
           description: Activation information
@@ -79,6 +87,8 @@ paths:
         '500':
           description: Service unavailable
 definitions:
+  ProblemJson:
+    $ref: "https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
   CodiceContestoPagamento:
     description: Transaction Id used to identify the communication flow
     type: string
@@ -141,7 +151,7 @@ definitions:
   PaymentActivationsGetResponse:
     type: object
     description: Define the response to send to App to provide the payment activation status related to a codiceContestoPagamento
-    properties: 
+    properties:
       idPagamento:
         type: string
         minLength: 1
@@ -165,7 +175,7 @@ definitions:
   PaymentActivationsPostResponse:
     type: object
     description: Define the response to send to CD App containing activation information
-    properties:      
+    properties:
       importoSingoloVersamento:
         $ref: '#/definitions/ImportoEuroCents'
       ibanAccredito:
@@ -206,7 +216,7 @@ definitions:
     type: string
     format: RptIdFromString
     x-import: italia-ts-commons/lib/pagopa
-  SpezzoniCausaleVersamento: 
+  SpezzoniCausaleVersamento:
     description: Payment installments (optional)
     type: array
     items:
@@ -230,7 +240,7 @@ definitions:
         minLength: 1
         maxLength: 25
       importoSpezzone:
-        $ref: '#/definitions/ImportoEuroCents'                      
+        $ref: '#/definitions/ImportoEuroCents'
 parameters:
   CodiceContestoPagamento:
     name: codice_contesto_pagamento
