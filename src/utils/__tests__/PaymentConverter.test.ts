@@ -350,7 +350,7 @@ describe("getResponseErrorIfExists", () => {
     );
     expect(responseError).toBeDefined();
     if (responseError !== undefined) {
-      expect(responseError.kind).toEqual("IResponseErrorGeneric");
+      expect(responseError.kind).toEqual("IResponseErrorInternal");
     }
   });
 });

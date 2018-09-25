@@ -4,17 +4,14 @@
  */
 
 import * as express from "express";
-import { Either, fromOption, isLeft, left } from "fp-ts/lib/Either";
+import { isLeft } from "fp-ts/lib/Either";
 import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
+import { TypeofApiResponse } from "italia-ts-commons/lib/requests";
 import {
-  HttpStatusCodeEnum,
-  IResponseErrorGeneric,
   IResponseErrorInternal,
-  IResponseErrorNotFound,
   IResponseErrorValidation,
   IResponseSuccessJson,
   ResponseErrorFromValidationErrors,
-  ResponseErrorGeneric,
   ResponseErrorInternal,
   ResponseErrorNotFound,
   ResponseErrorValidation,
@@ -30,6 +27,11 @@ import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivation
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
+import {
+  ActivatePaymentT,
+  GetActivationStatusT,
+  GetPaymentInfoT
+} from "../../types/api/requestTypes";
 import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
 import { cdInfoWisp_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoWisp_ppt";
 import { cdInfoWispResponse_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoWispResponse_ppt";
@@ -37,6 +39,85 @@ import { faultBean_ppt } from "../../types/pagopa_api/yaml-to-ts/faultBean_ppt";
 import { logger } from "../../utils/Logger";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import { redisGet, redisSet } from "../../utils/Redis";
+import {
+  AsControllerFunction,
+  AsControllerResponseType
+} from "../../utils/types";
+
+const getGetPaymentInfoController: (
+  pagoPAConfig: PagoPAConfig,
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
+) => AsControllerFunction<GetPaymentInfoT> = (
+  pagoPAConfig,
+  pagoPAClient
+) => async params => {
+  // Validate rptId (payment identifier) provided by BackendApp
+  const errorOrRptId = RptIdFromString.decode(params.rptIdFromString);
+  if (isLeft(errorOrRptId)) {
+    const error = errorOrRptId.value;
+    return ResponseErrorFromValidationErrors(RptId)(error);
+  }
+  const rptId = errorOrRptId.value;
+
+  // Generate a Transaction ID called CodiceContestoPagamento
+  // to follow a stream of requests with PagoPA.
+  // It will be generated here after the first interaction
+  // started by BackendApp (checkPayment)
+  // For the next messages, BackendApp will provide the same codiceContestoPagamento
+  const codiceContestoPagamento = generateCodiceContestoPagamento();
+
+  // Convert the input provided by BackendApp (RESTful request) to a PagoPA request (SOAP request).
+  // Some static information will be obtained by PagoPAConfig, to identify this client.
+  const errorOrInodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
+    pagoPAConfig,
+    rptId,
+    codiceContestoPagamento
+  );
+  if (isLeft(errorOrInodoVerificaRPTInput)) {
+    const error = errorOrInodoVerificaRPTInput.value;
+    return ResponseErrorValidation(
+      "Invalid PagoPA check Request",
+      error.message
+    );
+  }
+  const iNodoVerificaRPTInput = errorOrInodoVerificaRPTInput.value;
+
+  // Send the SOAP request to PagoPA (VerificaRPT message)
+  const errorOrInodoVerificaRPTOutput = await PaymentsService.sendNodoVerificaRPTInput(
+    iNodoVerificaRPTInput,
+    pagoPAClient
+  );
+  if (isLeft(errorOrInodoVerificaRPTOutput)) {
+    const error = errorOrInodoVerificaRPTOutput.value;
+    return ResponseErrorInternal(
+      `PagoPA Server communication error: ${error.message}`
+    );
+  }
+  const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.value;
+
+  // Check PagoPA response content
+  // If it contains a functional error, an HTTP error will be provided to BackendApp
+  const responseError = getResponseErrorIfExists(
+    iNodoVerificaRPTOutput.esito,
+    iNodoVerificaRPTOutput.fault
+  );
+  if (responseError !== undefined) {
+    return responseError;
+  }
+
+  // Convert the output provided by PagoPA (SOAP response)
+  // to a BackendApp response (RESTful response), mapping the result information.
+  // Send a response to BackendApp
+  return PaymentsConverter.getPaymentRequestsGetResponse(
+    iNodoVerificaRPTOutput,
+    codiceContestoPagamento
+  ).fold<
+    IResponseErrorValidation | IResponseSuccessJson<PaymentRequestsGetResponse>
+  >(
+    ResponseErrorFromValidationErrors(PaymentRequestsGetResponse),
+    ResponseSuccessJson
+  );
+};
 
 /**
  * This controller is invoked by BackendApp
@@ -51,82 +132,74 @@ export function getPaymentInfo(
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
   req: express.Request
-) => Promise<
-  | IResponseErrorValidation
-  | IResponseErrorGeneric
-  | IResponseErrorInternal
-  | IResponseSuccessJson<PaymentRequestsGetResponse>
-> {
-  return async req => {
-    // Validate rptId (payment identifier) provided by BackendApp
-    const errorOrRptId = RptIdFromString.decode(req.params.rptId);
-    if (isLeft(errorOrRptId)) {
-      const error = errorOrRptId.value;
-      return ResponseErrorFromValidationErrors(RptId)(error);
-    }
-    const rptId = errorOrRptId.value;
-
-    // Generate a Transaction ID called CodiceContestoPagamento
-    // to follow a stream of requests with PagoPA.
-    // It will be generated here after the first interaction
-    // started by BackendApp (checkPayment)
-    // For the next messages, BackendApp will provide the same codiceContestoPagamento
-    const codiceContestoPagamento = generateCodiceContestoPagamento();
-
-    // Convert the input provided by BackendApp (RESTful request) to a PagoPA request (SOAP request).
-    // Some static information will be obtained by PagoPAConfig, to identify this client.
-    const errorOrInodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
-      pagoPAConfig,
-      rptId,
-      codiceContestoPagamento
-    );
-    if (isLeft(errorOrInodoVerificaRPTInput)) {
-      const error = errorOrInodoVerificaRPTInput.value;
-      return ResponseErrorValidation(
-        "Invalid PagoPA check Request",
-        error.message
-      );
-    }
-    const iNodoVerificaRPTInput = errorOrInodoVerificaRPTInput.value;
-
-    // Send the SOAP request to PagoPA (VerificaRPT message)
-    const errorOrInodoVerificaRPTOutput = await PaymentsService.sendNodoVerificaRPTInput(
-      iNodoVerificaRPTInput,
-      pagoPAClient
-    );
-    if (isLeft(errorOrInodoVerificaRPTOutput)) {
-      const error = errorOrInodoVerificaRPTOutput.value;
-      return ResponseErrorInternal(
-        `PagoPA Server communication error: ${error.message}`
-      );
-    }
-    const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.value;
-
-    // Check PagoPA response content
-    // If it contains a functional error, an HTTP error will be provided to BackendApp
-    const responseError = getResponseErrorIfExists(
-      iNodoVerificaRPTOutput.esito,
-      iNodoVerificaRPTOutput.fault
-    );
-    if (responseError !== undefined) {
-      return responseError;
-    }
-
-    // Convert the output provided by PagoPA (SOAP response)
-    // to a BackendApp response (RESTful response), mapping the result information.
-    // Send a response to BackendApp
-    return PaymentsConverter.getPaymentRequestsGetResponse(
-      iNodoVerificaRPTOutput,
-      codiceContestoPagamento
-    ).fold<
-      | IResponseErrorValidation
-      | IResponseSuccessJson<PaymentRequestsGetResponse>
-    >(
-      ResponseErrorFromValidationErrors(PaymentRequestsGetResponse),
-      ResponseSuccessJson
-    );
-  };
+) => Promise<AsControllerResponseType<TypeofApiResponse<GetPaymentInfoT>>> {
+  const controller = getGetPaymentInfoController(pagoPAConfig, pagoPAClient);
+  return async req =>
+    controller({
+      rptIdFromString: req.params.rptId
+    });
 }
+
+const getActivatePaymentController: (
+  pagoPAConfig: PagoPAConfig,
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
+) => AsControllerFunction<ActivatePaymentT> = (
+  pagoPAConfig,
+  pagoPAClient
+) => async params => {
+  // Convert the input provided by BackendApp (RESTful request)
+  // to a PagoPA request (SOAP request), mapping useful information
+  // Some static information will be obtained by PagoPAConfig, to identify this client
+  // If something wrong into input will be detected during mapping, and error will be provided as response
+  const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
+    pagoPAConfig,
+    params.paymentActivationsPostRequest
+  );
+  if (isLeft(errorOrNodoAttivaRPTInput)) {
+    const error = errorOrNodoAttivaRPTInput.value;
+    return ResponseErrorValidation(
+      "Invalid PagoPA activation Request",
+      error.message
+    );
+  }
+  const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
+
+  // Send the SOAP request to PagoPA (AttivaRPT message)
+  const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
+    nodoAttivaRPTInput,
+    pagoPAClient
+  );
+  if (isLeft(errorOrInodoAttivaRPTOutput)) {
+    const error = errorOrInodoAttivaRPTOutput.value;
+    return ResponseErrorInternal(
+      `PagoPA Server communication error: ${error.message}`
+    );
+  }
+  const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
+
+  // Check PagoPA response content.
+  // If it contains a functional error, an HTTP error will be provided to BackendApp
+  const responseError = getResponseErrorIfExists(
+    iNodoAttivaRPTOutput.esito,
+    iNodoAttivaRPTOutput.fault
+  );
+  if (responseError !== undefined) {
+    return responseError;
+  }
+
+  // Convert the output provided by PagoPA (SOAP response)
+  // to a BackendApp response (RESTful response), mapping the result information.
+  // Send a response to BackendApp
+  return PaymentsConverter.getPaymentActivationsPostResponse(
+    iNodoAttivaRPTOutput
+  ).fold<
+    | IResponseErrorValidation
+    | IResponseSuccessJson<PaymentActivationsPostResponse>
+  >(
+    ResponseErrorFromValidationErrors(PaymentActivationsPostResponse),
+    ResponseSuccessJson
+  );
+};
 
 /**
  * This controller will be invoked by BackendApp.
@@ -143,12 +216,8 @@ export function activatePayment(
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
 ): (
   req: express.Request
-) => Promise<
-  | IResponseErrorValidation
-  | IResponseErrorGeneric
-  | IResponseErrorInternal
-  | IResponseSuccessJson<PaymentActivationsPostResponse>
-> {
+) => Promise<AsControllerResponseType<TypeofApiResponse<ActivatePaymentT>>> {
+  const controller = getActivatePaymentController(pagoPAConfig, pagoPAClient);
   return async req => {
     // Validate input provided by BackendAp
     const errorOrPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode(
@@ -162,59 +231,7 @@ export function activatePayment(
     }
     const paymentActivationsPostRequest =
       errorOrPaymentActivationsPostRequest.value;
-
-    // Convert the input provided by BackendApp (RESTful request)
-    // to a PagoPA request (SOAP request), mapping useful information
-    // Some static information will be obtained by PagoPAConfig, to identify this client
-    // If something wrong into input will be detected during mapping, and error will be provided as response
-    const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
-      pagoPAConfig,
-      paymentActivationsPostRequest
-    );
-    if (isLeft(errorOrNodoAttivaRPTInput)) {
-      const error = errorOrNodoAttivaRPTInput.value;
-      return ResponseErrorValidation(
-        "Invalid PagoPA activation Request",
-        error.message
-      );
-    }
-    const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
-
-    // Send the SOAP request to PagoPA (AttivaRPT message)
-    const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
-      nodoAttivaRPTInput,
-      pagoPAClient
-    );
-    if (isLeft(errorOrInodoAttivaRPTOutput)) {
-      const error = errorOrInodoAttivaRPTOutput.value;
-      return ResponseErrorInternal(
-        `PagoPA Server communication error: ${error.message}`
-      );
-    }
-    const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
-
-    // Check PagoPA response content.
-    // If it contains a functional error, an HTTP error will be provided to BackendApp
-    const responseError = getResponseErrorIfExists(
-      iNodoAttivaRPTOutput.esito,
-      iNodoAttivaRPTOutput.fault
-    );
-    if (responseError !== undefined) {
-      return responseError;
-    }
-
-    // Convert the output provided by PagoPA (SOAP response)
-    // to a BackendApp response (RESTful response), mapping the result information.
-    // Send a response to BackendApp
-    return PaymentsConverter.getPaymentActivationsPostResponse(
-      iNodoAttivaRPTOutput
-    ).fold<
-      | IResponseErrorValidation
-      | IResponseSuccessJson<PaymentActivationsPostResponse>
-    >(
-      ResponseErrorFromValidationErrors(PaymentActivationsPostResponse),
-      ResponseSuccessJson
-    );
+    return controller({ paymentActivationsPostRequest });
   };
 }
 
@@ -248,6 +265,46 @@ export async function setActivationStatus(
   );
 }
 
+const getGetActivationStatusController: (
+  redisClient: redis.RedisClient
+) => AsControllerFunction<
+  GetActivationStatusT
+> = redisClient => async params => {
+  // Retrieve idPayment related to a codiceContestoPagamento from DB
+  // It's just a key-value mapping
+
+  const maybeIdPaymentOrError = await redisGet(
+    redisClient,
+    params.codiceContestoPagamento
+  );
+
+  if (maybeIdPaymentOrError.isLeft()) {
+    return ResponseErrorInternal(
+      `getActivationStatus: ${maybeIdPaymentOrError.value}`
+    );
+  }
+
+  const maybeIdPayment = maybeIdPaymentOrError.value;
+
+  if (maybeIdPayment.isNone()) {
+    return ResponseErrorNotFound("Not found", "getActivationStatus");
+  }
+
+  const idPayment = maybeIdPayment.value;
+
+  const responseOrError = PaymentActivationsGetResponse.decode({
+    idPagamento: idPayment
+  });
+
+  if (responseOrError.isLeft()) {
+    return ResponseErrorFromValidationErrors(PaymentActivationsGetResponse)(
+      responseOrError.value
+    );
+  }
+
+  return ResponseSuccessJson(responseOrError.value);
+};
+
 /**
  * This controller is invoked by BackendApp to check the status of a previous activation request (async process)
  * If PagoPA sent an activation result (via cdInfoWisp), a paymentId will be retrieved into redis
@@ -260,12 +317,9 @@ export function getActivationStatus(
 ): (
   req: express.Request
 ) => Promise<
-  | IResponseErrorValidation
-  | IResponseErrorGeneric
-  | IResponseErrorInternal
-  | IResponseErrorNotFound
-  | IResponseSuccessJson<PaymentActivationsGetResponse>
+  AsControllerResponseType<TypeofApiResponse<GetActivationStatusT>>
 > {
+  const controller = getGetActivationStatusController(redisClient);
   return async req => {
     // Validate codiceContestoPagamento (transaction id) data provided by BackendApp
     const errorOrCodiceContestoPagamento = CodiceContestoPagamento.decode(
@@ -276,37 +330,9 @@ export function getActivationStatus(
       return ResponseErrorFromValidationErrors(CodiceContestoPagamento)(error);
     }
     const codiceContestoPagamento = errorOrCodiceContestoPagamento.value;
-
-    // Retrieve idPayment related to a codiceContestoPagamento from DB
-    // It's just a key-value mapping
-    return (await redisGet(redisClient, codiceContestoPagamento))
-      .fold<Either<IResponseErrorNotFound | IResponseErrorInternal, string>>(
-        error => left(ResponseErrorInternal(`getActivationStatus: ${error}`)),
-        maybeIdPagamento =>
-          fromOption(ResponseErrorNotFound("Not found", "getActivationStatus"))(
-            maybeIdPagamento
-          )
-      )
-      .fold<
-        | IResponseErrorValidation
-        | IResponseErrorGeneric
-        | IResponseErrorInternal
-        | IResponseErrorNotFound
-        | IResponseSuccessJson<PaymentActivationsGetResponse>
-      >(
-        errorResponse => errorResponse,
-        // Define a response to send to the applicant containing an error or the retrieved data
-        idPagamento =>
-          PaymentActivationsGetResponse.decode({
-            idPagamento
-          }).fold<
-            | IResponseErrorValidation
-            | IResponseSuccessJson<PaymentActivationsGetResponse>
-          >(
-            ResponseErrorFromValidationErrors(PaymentActivationsGetResponse),
-            ResponseSuccessJson
-          )
-      );
+    return controller({
+      codiceContestoPagamento
+    });
   };
 }
 
@@ -332,7 +358,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
 export function getResponseErrorIfExists(
   esito: string | undefined,
   faultBean: faultBean_ppt | undefined
-): IResponseErrorGeneric | IResponseErrorInternal | undefined {
+): IResponseErrorInternal | undefined {
   // Case 1: Response is SUCCESS
   if (esito === "OK") {
     return undefined;
@@ -346,12 +372,7 @@ export function getResponseErrorIfExists(
     faultBean.faultCode,
     faultBean.description
   );
-  return ResponseErrorGeneric(
-    HttpStatusCodeEnum.HTTP_STATUS_500,
-    errorMessageCtrl,
-    faultBean.faultCode,
-    faultBean.faultString
-  );
+  return ResponseErrorInternal(errorMessageCtrl);
 }
 
 /**
