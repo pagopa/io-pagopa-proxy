@@ -43,6 +43,7 @@ paths:
           name: body
           schema:
             $ref: '#/definitions/PaymentActivationsPostRequest'
+          required: true
           x-examples:
             application/json:
               rptId: '12345678901012123456789012345'
@@ -82,10 +83,16 @@ paths:
               idPagamento: '123455'
         '400':
           description: Invalid input
+          schema:
+            $ref: "#/definitions/ProblemJson"
         '404':
           description: Activation status not found
+          schema:
+            $ref: "#/definitions/ProblemJson"
         '500':
           description: Service unavailable
+          schema:
+            $ref: "#/definitions/ProblemJson"
 definitions:
   ProblemJson:
     $ref: "https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
