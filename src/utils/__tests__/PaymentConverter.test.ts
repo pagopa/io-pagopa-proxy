@@ -324,34 +324,17 @@ describe("getCodiceContestoPagamentoForPagoPaApi", () => {
 });
 
 describe("getResponseErrorIfExists", () => {
-  it("should recognize a message without errors", () => {
-    const responseError = PaymentController.getResponseErrorIfExists(
-      "OK",
-      undefined
-    );
-    expect(responseError).toBeUndefined();
-  });
-
   it("should convert a KO Error without fault", () => {
-    const responseError = PaymentController.getResponseErrorIfExists(
-      "KO",
-      undefined
-    );
-    expect(responseError).toBeDefined();
-    if (responseError !== undefined) {
-      expect(responseError.kind).toEqual("IResponseErrorInternal");
-    }
+    const responseError = PaymentController.getResponseErrorIfExists(undefined);
+    expect(responseError).toBeUndefined();
   });
 
   it("should convert a KO Error with fault details", () => {
     const responseError = PaymentController.getResponseErrorIfExists(
-      MockedData.aVerificaRPTOutputKOCompleted.esito,
       MockedData.aVerificaRPTOutputKOCompleted.fault
     );
     expect(responseError).toBeDefined();
-    if (responseError !== undefined) {
-      expect(responseError.kind).toEqual("IResponseErrorInternal");
-    }
+    expect(responseError).toEqual(GetPaymentFaultEnum.PAYMENT_DUPLICATED);
   });
 });
 
