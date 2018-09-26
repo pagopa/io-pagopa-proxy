@@ -5,12 +5,10 @@
 
 import * as express from "express";
 import { isLeft } from "fp-ts/lib/Either";
+import { PathReporter } from "io-ts/lib/PathReporter";
 import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
 import { TypeofApiResponse } from "italia-ts-commons/lib/requests";
 import {
-  IResponseErrorInternal,
-  IResponseErrorValidation,
-  IResponseSuccessJson,
   ResponseErrorFromValidationErrors,
   ResponseErrorInternal,
   ResponseErrorNotFound,
@@ -19,6 +17,7 @@ import {
 } from "italia-ts-commons/lib/responses";
 import * as redis from "redis";
 import * as uuid from "uuid";
+
 import { PagoPAConfig } from "../../Configuration";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import * as PaymentsService from "../../services/PaymentsService";
@@ -55,6 +54,11 @@ const getGetPaymentInfoController: (
   const errorOrRptId = RptIdFromString.decode(params.rptId);
   if (isLeft(errorOrRptId)) {
     const error = errorOrRptId.value;
+    logger.error(
+      `GetPaymentInfo|Cannot decode rptid|${params.rptId}|${PathReporter.report(
+        errorOrRptId
+      )}`
+    );
     return ResponseErrorFromValidationErrors(RptId)(error);
   }
   const rptId = errorOrRptId.value;
@@ -75,6 +79,9 @@ const getGetPaymentInfoController: (
   );
   if (isLeft(errorOrInodoVerificaRPTInput)) {
     const error = errorOrInodoVerificaRPTInput.value;
+    logger.error(
+      `GetPaymentInfo|Cannot construct request|${params.rptId}|${error.message}`
+    );
     return ResponseErrorValidation(
       "Invalid PagoPA check Request",
       error.message
@@ -89,6 +96,11 @@ const getGetPaymentInfoController: (
   );
   if (isLeft(errorOrInodoVerificaRPTOutput)) {
     const error = errorOrInodoVerificaRPTOutput.value;
+    logger.error(
+      `GetPaymentInfo|Error while calling pagopa|${params.rptId}|${
+        error.message
+      }`
+    );
     return ResponseErrorInternal(
       `PagoPA Server communication error: ${error.message}`
     );
@@ -96,27 +108,42 @@ const getGetPaymentInfoController: (
   const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.value;
 
   // Check PagoPA response content
-  // If it contains a functional error, an HTTP error will be provided to BackendApp
-  const responseError = getResponseErrorIfExists(
-    iNodoVerificaRPTOutput.esito,
-    iNodoVerificaRPTOutput.fault
-  );
-  if (responseError !== undefined) {
-    return responseError;
+  if (iNodoVerificaRPTOutput.esito !== "OK") {
+    // If it contains a functional error, an HTTP error will be provided to BackendApp
+    const responseError = getResponseErrorIfExists(
+      iNodoVerificaRPTOutput.fault
+    );
+    logger.error(
+      `GetPaymentInfo|Error from pagopa|${params.rptId}|${responseError ||
+        "GENERIC_ERROR"}`
+    );
+    if (responseError === undefined) {
+      return ResponseErrorInternal("Error during payment check: esito === KO");
+    } else {
+      return ResponseErrorInternal(responseError);
+    }
   }
 
   // Convert the output provided by PagoPA (SOAP response)
   // to a BackendApp response (RESTful response), mapping the result information.
   // Send a response to BackendApp
-  return PaymentsConverter.getPaymentRequestsGetResponse(
+  const responseOrError = PaymentsConverter.getPaymentRequestsGetResponse(
     iNodoVerificaRPTOutput,
     codiceContestoPagamento
-  ).fold<
-    IResponseErrorValidation | IResponseSuccessJson<PaymentRequestsGetResponse>
-  >(
-    ResponseErrorFromValidationErrors(PaymentRequestsGetResponse),
-    ResponseSuccessJson
   );
+
+  if (isLeft(responseOrError)) {
+    logger.error(
+      `GetPaymentInfo|Cannot construct valid response|${
+        params.rptId
+      }|${PathReporter.report(responseOrError)}`
+    );
+    return ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
+      responseOrError.value
+    );
+  }
+
+  return ResponseSuccessJson(responseOrError.value);
 };
 
 /**
@@ -157,12 +184,14 @@ const getActivatePaymentController: (
   );
   if (isLeft(errorOrNodoAttivaRPTInput)) {
     const error = errorOrNodoAttivaRPTInput.value;
+    logger.error(`ActivatePayment|Invalid request|${error}`);
     return ResponseErrorValidation(
       "Invalid PagoPA activation Request",
       error.message
     );
   }
   const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
+  const rptId = params.paymentActivationsPostRequest.rptId;
 
   // Send the SOAP request to PagoPA (AttivaRPT message)
   const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
@@ -171,6 +200,9 @@ const getActivatePaymentController: (
   );
   if (isLeft(errorOrInodoAttivaRPTOutput)) {
     const error = errorOrInodoAttivaRPTOutput.value;
+    logger.error(
+      `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`
+    );
     return ResponseErrorInternal(
       `PagoPA Server communication error: ${error.message}`
     );
@@ -178,27 +210,41 @@ const getActivatePaymentController: (
   const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
 
   // Check PagoPA response content.
-  // If it contains a functional error, an HTTP error will be provided to BackendApp
-  const responseError = getResponseErrorIfExists(
-    iNodoAttivaRPTOutput.esito,
-    iNodoAttivaRPTOutput.fault
-  );
-  if (responseError !== undefined) {
-    return responseError;
+  if (iNodoAttivaRPTOutput.esito !== "OK") {
+    // If it contains a functional error, an HTTP error will be provided to BackendApp
+    const responseError = getResponseErrorIfExists(iNodoAttivaRPTOutput.fault);
+    logger.error(
+      `ActivatePayment|${rptId}|Error from pagopa|${responseError ||
+        "GENERIC_ERROR"}`
+    );
+    if (responseError === undefined) {
+      return ResponseErrorInternal(
+        "Error during payment activate: esito === KO"
+      );
+    } else {
+      return ResponseErrorInternal(responseError);
+    }
   }
 
   // Convert the output provided by PagoPA (SOAP response)
   // to a BackendApp response (RESTful response), mapping the result information.
   // Send a response to BackendApp
-  return PaymentsConverter.getPaymentActivationsPostResponse(
+  const responseOrError = PaymentsConverter.getPaymentActivationsPostResponse(
     iNodoAttivaRPTOutput
-  ).fold<
-    | IResponseErrorValidation
-    | IResponseSuccessJson<PaymentActivationsPostResponse>
-  >(
-    ResponseErrorFromValidationErrors(PaymentActivationsPostResponse),
-    ResponseSuccessJson
   );
+
+  if (isLeft(responseOrError)) {
+    logger.error(
+      `ActivatePayment|${rptId}|Cannot construct valid response|${PathReporter.report(
+        responseOrError
+      )}`
+    );
+    return ResponseErrorFromValidationErrors(PaymentActivationsPostResponse)(
+      responseOrError.value
+    );
+  }
+
+  return ResponseSuccessJson(responseOrError.value);
 };
 
 /**
@@ -356,23 +402,17 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
  * @return {IResponseErrorGeneric | IResponseErrorInternal} A controller response or undefined if no errors exist
  */
 export function getResponseErrorIfExists(
-  esito: string | undefined,
   faultBean: faultBean_ppt | undefined
-): IResponseErrorInternal | undefined {
-  // Case 1: Response is SUCCESS
-  if (esito === "OK") {
+): GetPaymentFaultEnum | undefined {
+  // Response is FAILED but no additional information are provided by PagoPa
+  if (faultBean === undefined) {
     return undefined;
   }
-  // Case 2: Response is FAILED but no additional information are provided by PagoPa
-  if (faultBean === undefined) {
-    return ResponseErrorInternal("Error during payment check: esito === KO");
-  }
-  // Case 3: Response is FAILED and additional information are provided by PagoPa
-  const errorMessageCtrl = getErrorMessageCtrlFromPagoPaError(
+  // Response is FAILED and additional information are provided by PagoPa
+  return getErrorMessageCtrlFromPagoPaError(
     faultBean.faultCode,
     faultBean.description
   );
-  return ResponseErrorInternal(errorMessageCtrl);
 }
 
 /**
