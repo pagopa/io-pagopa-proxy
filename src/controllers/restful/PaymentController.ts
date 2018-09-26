@@ -397,8 +397,6 @@ export function getErrorMessageCtrlFromPagoPaError(
       return GetPaymentFaultEnum.PAYMENT_EXPIRED;
     case "PPT_DOMINIO_SCONOSCIUTO":
       return GetPaymentFaultEnum.DOMAIN_UNKNOWN;
-    case "PPT_ERRORE_EMESSO_DA_PAA":
-      return GetPaymentFaultEnum.PAA_GENERIC_ERROR;
     default:
       // faultCode doesn't match anything
       if (faultDescription !== undefined) {

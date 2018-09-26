@@ -288,7 +288,6 @@ definitions:
       - PAYMENT_ONGOING
       - PAYMENT_EXPIRED
       - PAYMENT_UNAVAILABLE
-      - PAA_GENERIC_ERROR
       - DOMAIN_UNKNOWN
 parameters:
   CodiceContestoPagamento:
