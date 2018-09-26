@@ -1,13 +1,13 @@
 import { isRight } from "fp-ts/lib/Either";
 import * as PaymentController from "../../controllers/restful/PaymentController";
-import { ErrorMessagesCtrlEnum } from "../../types/ErrorMessagesCtrlEnum";
+import { GetPaymentFaultEnum } from "../../types/api/GetPaymentFault";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
 
 // tslint:disable:max-line-length no-duplicate-string
 
 describe("getNodoVerificaRPTInput", () => {
-  it(" should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
+  it("should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
     const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
       MockedData.aConfig,
       MockedData.aRptId0,
@@ -53,7 +53,7 @@ describe("getNodoVerificaRPTInput", () => {
     );
   });
 
-  it(" should return a correct NodoVerificaRPTInput with auxDigit=1", () => {
+  it("should return a correct NodoVerificaRPTInput with auxDigit=1", () => {
     const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
       MockedData.aConfig,
       MockedData.aRptId1,
@@ -96,7 +96,7 @@ describe("getNodoVerificaRPTInput", () => {
     );
   });
 
-  it(" should return a correct NodoVerificaRPTInput with auxDigit=2", () => {
+  it("should return a correct NodoVerificaRPTInput with auxDigit=2", () => {
     const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
       MockedData.aConfig,
       MockedData.aRptId2,
@@ -141,7 +141,7 @@ describe("getNodoVerificaRPTInput", () => {
     );
   });
 
-  it(" should return a correct NodoVerificaRPTInput with auxDigit=3", () => {
+  it("should return a correct NodoVerificaRPTInput with auxDigit=3", () => {
     const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
       MockedData.aConfig,
       MockedData.aRptId3,
@@ -188,7 +188,7 @@ describe("getNodoVerificaRPTInput", () => {
 });
 
 describe("getPaymentsCheckResponse", () => {
-  it(" should convert NodoVerificaRPTOutput to PaymentsCheckResponse", () => {
+  it("should convert NodoVerificaRPTOutput to PaymentsCheckResponse", () => {
     const errorOrPaymentCheckResponse = PaymentsConverter.getPaymentRequestsGetResponse(
       MockedData.aVerificaRPTOutput,
       MockedData.aCodiceContestoPagamento
@@ -245,7 +245,7 @@ describe("getPaymentsCheckResponse", () => {
 });
 
 describe("getNodoAttivaRPTInput", () => {
-  it(" should convert PaymentsActivationPostRequest to NodoAttivaRPTInput", () => {
+  it("should convert PaymentsActivationPostRequest to NodoAttivaRPTInput", () => {
     const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
       MockedData.aConfig,
       MockedData.aPaymentActivationsPostRequest
@@ -300,7 +300,7 @@ describe("getNodoAttivaRPTInput", () => {
 });
 
 describe("getPaymentsActivationResponse", () => {
-  it(" should convert NodoAttivaRPTOutput in PaymentsActivationResponse", () => {
+  it("should convert NodoAttivaRPTOutput in PaymentsActivationResponse", () => {
     const errorOrPaymentActivationsPostResponse = PaymentsConverter.getPaymentActivationsPostResponse(
       MockedData.anAttivaRPTOutput
     );
@@ -315,7 +315,7 @@ describe("getPaymentsActivationResponse", () => {
 });
 
 describe("getCodiceContestoPagamentoForPagoPaApi", () => {
-  it(" should convert CodiceContestoPagamento", () => {
+  it("should convert CodiceContestoPagamento", () => {
     const codiceContesto = PaymentsConverter.getCodiceContestoPagamentoForPagoPaApi(
       MockedData.aCodiceContestoPagamento
     );
@@ -324,7 +324,7 @@ describe("getCodiceContestoPagamentoForPagoPaApi", () => {
 });
 
 describe("getResponseErrorIfExists", () => {
-  it(" should recognize a message without errors", () => {
+  it("should recognize a message without errors", () => {
     const responseError = PaymentController.getResponseErrorIfExists(
       "OK",
       undefined
@@ -332,7 +332,7 @@ describe("getResponseErrorIfExists", () => {
     expect(responseError).toBeUndefined();
   });
 
-  it(" should convert a KO Error without fault", () => {
+  it("should convert a KO Error without fault", () => {
     const responseError = PaymentController.getResponseErrorIfExists(
       "KO",
       undefined
@@ -343,7 +343,7 @@ describe("getResponseErrorIfExists", () => {
     }
   });
 
-  it(" should convert a KO Error with fault details", () => {
+  it("should convert a KO Error with fault details", () => {
     const responseError = PaymentController.getResponseErrorIfExists(
       MockedData.aVerificaRPTOutputKOCompleted.esito,
       MockedData.aVerificaRPTOutputKOCompleted.fault
@@ -356,7 +356,7 @@ describe("getResponseErrorIfExists", () => {
 });
 
 describe("getErrorMessageCtrlFromPagoPaError", () => {
-  it(" should convert a KO Completed Error", () => {
+  it("should convert a KO Completed Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOCompleted.fault;
     expect(fault).toBeDefined();
     if (fault === undefined) {
@@ -367,9 +367,9 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       undefined
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_COMPLETED);
+    expect(errorMsg).toEqual(GetPaymentFaultEnum.PAYMENT_DUPLICATED);
   });
-  it(" should convert a KO Completed Error", () => {
+  it("should convert a KO Completed Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOCompleted.fault;
     expect(fault).toBeDefined();
     if (fault === undefined) {
@@ -382,9 +382,9 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_COMPLETED);
+    expect(errorMsg).toEqual(GetPaymentFaultEnum.PAYMENT_DUPLICATED);
   });
-  it(" should convert a KO Expired Error", () => {
+  it("should convert a KO Expired Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOExpired.fault;
     expect(fault).toBeDefined();
     if (fault === undefined) {
@@ -395,9 +395,9 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       undefined
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_EXPIRED);
+    expect(errorMsg).toEqual(GetPaymentFaultEnum.PAYMENT_EXPIRED);
   });
-  it(" should convert a KO Expired Error", () => {
+  it("should convert a KO Expired Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOExpired.fault;
     expect(fault).toBeDefined();
     if (fault === undefined) {
@@ -410,9 +410,9 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_EXPIRED);
+    expect(errorMsg).toEqual(GetPaymentFaultEnum.PAYMENT_EXPIRED);
   });
-  it(" should convert a KO OnGoing Error", () => {
+  it("should convert a KO OnGoing Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
     expect(fault).toBeDefined();
     if (fault === undefined) {
@@ -423,9 +423,9 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       undefined
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_ONGOING);
+    expect(errorMsg).toEqual(GetPaymentFaultEnum.PAYMENT_ONGOING);
   });
-  it(" should convert a KO OnGoing Error", () => {
+  it("should convert a KO OnGoing Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
     expect(fault).toBeDefined();
     if (fault === undefined) {
@@ -438,9 +438,9 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_ONGOING);
+    expect(errorMsg).toEqual(GetPaymentFaultEnum.PAYMENT_ONGOING);
   });
-  it(" should convert a KO Generic Error", () => {
+  it("should convert a KO Generic Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOGeneric.fault;
     expect(fault).toBeDefined();
     if (fault === undefined) {
@@ -451,9 +451,9 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       undefined
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_UNAVAILABLE);
+    expect(errorMsg).toEqual(GetPaymentFaultEnum.PAYMENT_UNAVAILABLE);
   });
-  it(" should convert a KO Generic Error", () => {
+  it("should convert a KO Generic Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOGeneric.fault;
     expect(fault).toBeDefined();
     if (fault === undefined) {
@@ -464,6 +464,6 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       "Pagamento in attesa risulta in corso all’Ente Creditore. "
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(ErrorMessagesCtrlEnum.PAYMENT_UNAVAILABLE);
+    expect(errorMsg).toEqual(GetPaymentFaultEnum.PAYMENT_UNAVAILABLE);
   });
 });

@@ -31,7 +31,7 @@ paths:
         '500':
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
-            $ref: "#/definitions/ProblemJson"
+            $ref: "#/definitions/GetPaymentProblemJson"
   '/payment-activations':
     x-swagger-router-controller: PaymentController
     post:
@@ -96,6 +96,39 @@ paths:
 definitions:
   ProblemJson:
     $ref: "https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
+  GetPaymentProblemJson:
+    description: A ProblemJson-like type specific for the GetPayment operation
+    type: object
+    properties:
+      type:
+        type: string
+        format: uri
+        description: |-
+          An absolute URI that identifies the problem type. When dereferenced,
+          it SHOULD provide human-readable documentation for the problem type
+          (e.g., using HTML).
+        default: about:blank
+        example: https://example.com/problem/constraint-violation
+      title:
+        type: string
+        description: |-
+          A short, summary of the problem type. Written in english and readable
+          for engineers (usually not suited for non technical stakeholders and
+          not localized); example: Service Unavailable
+      status:
+        type: integer
+        format: int32
+        minimum: 100
+        maximum: 600
+        exclusiveMaximum: true
+      detail:
+        $ref: "#/definitions/GetPaymentFault"
+      instance:
+        type: string
+        format: uri
+        description: |-
+          An absolute URI that identifies the specific occurrence of the problem.
+          It may or may not yield further information if dereferenced.
   CodiceContestoPagamento:
     description: Transaction Id used to identify the communication flow
     type: string
@@ -246,6 +279,17 @@ definitions:
         maxLength: 25
       importoSpezzone:
         $ref: '#/definitions/ImportoEuroCents'
+  GetPaymentFault:
+    description: Fault codes for the PagoPA Verifica operation
+    type: string
+    x-extensible-enum:
+      - PAYMENT_DUPLICATED
+      - INVALID_AMOUNT
+      - PAYMENT_ONGOING
+      - PAYMENT_EXPIRED
+      - PAYMENT_UNAVAILABLE
+      - PAA_GENERIC_ERROR
+      - DOMAIN_UNKNOWN
 parameters:
   CodiceContestoPagamento:
     name: codice_contesto_pagamento
