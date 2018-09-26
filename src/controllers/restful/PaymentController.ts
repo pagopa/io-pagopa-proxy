@@ -52,7 +52,7 @@ const getGetPaymentInfoController: (
   pagoPAClient
 ) => async params => {
   // Validate rptId (payment identifier) provided by BackendApp
-  const errorOrRptId = RptIdFromString.decode(params.rptIdFromString);
+  const errorOrRptId = RptIdFromString.decode(params.rptId);
   if (isLeft(errorOrRptId)) {
     const error = errorOrRptId.value;
     return ResponseErrorFromValidationErrors(RptId)(error);
@@ -136,7 +136,7 @@ export function getPaymentInfo(
   const controller = getGetPaymentInfoController(pagoPAConfig, pagoPAClient);
   return async req =>
     controller({
-      rptIdFromString: req.params.rptId
+      rptId: req.params.rptId
     });
 }
 

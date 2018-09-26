@@ -134,7 +134,7 @@ describe("checkPaymentToPagoPa", async () => {
 describe("activatePaymentToPagoPa", async () => {
   it("should return the right response", async () => {
     const aPaymentActivationRequest = {
-      rptId: {
+      rptId: RptIdFromString.encode({
         organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
         paymentNoticeNumber: {
           applicationCode: "12" as ApplicationCode,
@@ -142,7 +142,7 @@ describe("activatePaymentToPagoPa", async () => {
           checkDigit: "99" as CheckDigit,
           iuv13: "1234567890123" as IUV13
         } as PaymentNoticeNumber
-      } as RptIdFromString,
+      }),
       importoSingoloVersamento: 9905 as ImportoEuroCents,
       codiceContestoPagamento: aCodiceContestoPagamento
     };
