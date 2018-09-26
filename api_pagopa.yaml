@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 1.0.0
+  version: 1.1.0
   title: Proxy PagoPA
   description: Proxy for PagoPA payment services
 basePath: /api/v1
@@ -14,7 +14,7 @@ paths:
       summary: Get Payment Info
       description: Retrieve information about a payment
       parameters:
-        - $ref: '#/parameters/RptIdFromString'
+        - $ref: '#/parameters/RptId'
       responses:
         '200':
           description: Payment information retrieved
@@ -170,7 +170,7 @@ definitions:
     description: Define the request received from CD App to require a payment activation
     properties:
       rptId:
-        $ref: '#/definitions/RptIdFromString'
+        $ref: '#/definitions/RptId'
       importoSingoloVersamento:
         $ref: '#/definitions/ImportoEuroCents'
       codiceContestoPagamento:
@@ -219,10 +219,8 @@ definitions:
     required:
       - importoSingoloVersamento
       - codiceContestoPagamento
-  RptIdFromString:
+  RptId:
     type: string
-    format: RptIdFromString
-    x-import: italia-ts-commons/lib/pagopa
   SpezzoniCausaleVersamento:
     description: Payment installments (optional)
     type: array
@@ -258,7 +256,7 @@ parameters:
     required: true
     in: path
     x-example: A0123BC123124
-  RptIdFromString:
+  RptId:
     name: rpt_id_from_string
     description: Unique identifier for payments
     type: string

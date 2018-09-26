@@ -5,7 +5,7 @@
 
 import { Either, isRight, left, right } from "fp-ts/lib/Either";
 import * as t from "io-ts";
-import { RptId } from "italia-ts-commons/lib/pagopa";
+import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../Configuration";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
@@ -119,7 +119,12 @@ export function getNodoAttivaRPTInput(
 ): Either<Error, nodoAttivaRPT_ppt> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
-    const codiceIdRPT = getCodiceIdRpt(paymentActivationsPostRequest.rptId);
+    const rptId = RptIdFromString.decode(
+      paymentActivationsPostRequest.rptId
+    ).getOrElseL(_ => {
+      throw Error("Cannot parse rptId");
+    });
+    const codiceIdRPT = getCodiceIdRpt(rptId);
     const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
       paymentActivationsPostRequest.codiceContestoPagamento
     );
