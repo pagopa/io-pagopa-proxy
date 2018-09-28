@@ -31,7 +31,7 @@ paths:
         '500':
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
-            $ref: "#/definitions/GetPaymentProblemJson"
+            $ref: "#/definitions/PaymentProblemJson"
   '/payment-activations':
     x-swagger-router-controller: PaymentController
     post:
@@ -64,7 +64,7 @@ paths:
         '500':
           description: PagoPA services are not available
           schema:
-            $ref: "#/definitions/ProblemJson"
+            $ref: "#/definitions/PaymentProblemJson"
   '/payment-activations/{codice_contesto_pagamento}':
     x-swagger-router-controller: PaymentController
     get:
@@ -96,8 +96,8 @@ paths:
 definitions:
   ProblemJson:
     $ref: "https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
-  GetPaymentProblemJson:
-    description: A ProblemJson-like type specific for the GetPayment operation
+  PaymentProblemJson:
+    description: A ProblemJson-like type specific for the GetPayment and ActivatePayment operations
     type: object
     properties:
       type:
@@ -122,13 +122,15 @@ definitions:
         maximum: 600
         exclusiveMaximum: true
       detail:
-        $ref: "#/definitions/GetPaymentFault"
+        $ref: "#/definitions/PaymentFault"
       instance:
         type: string
         format: uri
         description: |-
           An absolute URI that identifies the specific occurrence of the problem.
           It may or may not yield further information if dereferenced.
+    required:
+      - detail
   CodiceContestoPagamento:
     description: Transaction Id used to identify the communication flow
     type: string
@@ -279,8 +281,8 @@ definitions:
         maxLength: 25
       importoSpezzone:
         $ref: '#/definitions/ImportoEuroCents'
-  GetPaymentFault:
-    description: Fault codes for the PagoPA Verifica operation
+  PaymentFault:
+    description: Fault codes for the PagoPA Verifica and Attiva operations
     type: string
     x-extensible-enum:
       - PAYMENT_DUPLICATED
