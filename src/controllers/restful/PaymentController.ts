@@ -22,10 +22,10 @@ import { PagoPAConfig } from "../../Configuration";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import * as PaymentsService from "../../services/PaymentsService";
 import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
-import { GetPaymentFaultEnum } from "../../types/api/GetPaymentFault";
 import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivationsGetResponse";
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
+import { PaymentFaultEnum } from "../../types/api/PaymentFault";
 import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
 import {
   ActivatePaymentT,
@@ -403,7 +403,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
  */
 export function getResponseErrorIfExists(
   faultBean: faultBean_ppt | undefined
-): GetPaymentFaultEnum | undefined {
+): PaymentFaultEnum | undefined {
   // Response is FAILED but no additional information are provided by PagoPa
   if (faultBean === undefined) {
     return undefined;
@@ -420,25 +420,25 @@ export function getResponseErrorIfExists(
  * A complete list of faultCode provided by PagoPa is available at
  * https://www.agid.gov.it/sites/default/files/repository_files/specifiche_attuative_nodo_2_1_0.pdf
  * @param {string} faultCode - Error code provided by PagoPa
- * @return {GetPaymentFaultEnum} Error code to send to BackendApp
+ * @return {PaymentFaultEnum} Error code to send to BackendApp
  */
 export function getErrorMessageCtrlFromPagoPaError(
   faultCode: string,
   faultDescription: string | undefined
-): GetPaymentFaultEnum {
+): PaymentFaultEnum {
   switch (faultCode) {
     case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
-      return GetPaymentFaultEnum.INVALID_AMOUNT;
+      return PaymentFaultEnum.INVALID_AMOUNT;
     case "PAA_PAGAMENTO_DUPLICATO":
-      return GetPaymentFaultEnum.PAYMENT_DUPLICATED;
+      return PaymentFaultEnum.PAYMENT_DUPLICATED;
     case "PAA_PAGAMENTO_IN_CORSO":
-      return GetPaymentFaultEnum.PAYMENT_ONGOING;
+      return PaymentFaultEnum.PAYMENT_ONGOING;
     case "PAA_PAGAMENTO_SCADUTO":
-      return GetPaymentFaultEnum.PAYMENT_EXPIRED;
+      return PaymentFaultEnum.PAYMENT_EXPIRED;
     case "PAA_PAGAMENTO_SCONOSCIUTO":
-      return GetPaymentFaultEnum.PAYMENT_UNKNOWN;
+      return PaymentFaultEnum.PAYMENT_UNKNOWN;
     case "PPT_DOMINIO_SCONOSCIUTO":
-      return GetPaymentFaultEnum.DOMAIN_UNKNOWN;
+      return PaymentFaultEnum.DOMAIN_UNKNOWN;
     default:
       // faultCode doesn't match anything
       if (faultDescription !== undefined) {
@@ -455,6 +455,6 @@ export function getErrorMessageCtrlFromPagoPaError(
       logger.warn(
         `Retrieved a generic PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
       );
-      return GetPaymentFaultEnum.PAYMENT_UNAVAILABLE;
+      return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
   }
 }
