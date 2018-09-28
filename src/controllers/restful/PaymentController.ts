@@ -435,6 +435,8 @@ export function getErrorMessageCtrlFromPagoPaError(
       return GetPaymentFaultEnum.PAYMENT_ONGOING;
     case "PAA_PAGAMENTO_SCADUTO":
       return GetPaymentFaultEnum.PAYMENT_EXPIRED;
+    case "PAA_PAGAMENTO_SCONOSCIUTO":
+      return GetPaymentFaultEnum.PAYMENT_UNKNOWN;
     case "PPT_DOMINIO_SCONOSCIUTO":
       return GetPaymentFaultEnum.DOMAIN_UNKNOWN;
     default:

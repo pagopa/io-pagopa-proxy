@@ -288,6 +288,7 @@ definitions:
       - PAYMENT_ONGOING
       - PAYMENT_EXPIRED
       - PAYMENT_UNAVAILABLE
+      - PAYMENT_UNKNOWN
       - DOMAIN_UNKNOWN
 parameters:
   CodiceContestoPagamento:
