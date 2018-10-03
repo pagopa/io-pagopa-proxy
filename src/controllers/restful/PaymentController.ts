@@ -114,8 +114,9 @@ const getGetPaymentInfoController: (
       iNodoVerificaRPTOutput.fault
     );
     logger.error(
-      `GetPaymentInfo|Error from pagopa|${params.rptId}|${responseError ||
-        "GENERIC_ERROR"}`
+      `GetPaymentInfo|Error from pagopa|${
+        params.rptId
+      }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
     );
     if (responseError === undefined) {
       return ResponseErrorInternal("Error during payment check: esito === KO");
@@ -214,8 +215,9 @@ const getActivatePaymentController: (
     // If it contains a functional error, an HTTP error will be provided to BackendApp
     const responseError = getResponseErrorIfExists(iNodoAttivaRPTOutput.fault);
     logger.error(
-      `ActivatePayment|${rptId}|Error from pagopa|${responseError ||
-        "GENERIC_ERROR"}`
+      `ActivatePayment|${rptId}|Error from pagopa|${responseError}|${JSON.stringify(
+        iNodoAttivaRPTOutput.fault
+      )}`
     );
     if (responseError === undefined) {
       return ResponseErrorInternal(
