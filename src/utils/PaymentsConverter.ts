@@ -71,8 +71,9 @@ export function getPaymentRequestsGetResponse(
 
   const response = datiPagamentoPA
     ? {
-        importoSingoloVersamento:
-          datiPagamentoPA.importoSingoloVersamento * 100,
+        importoSingoloVersamento: Math.round(
+          datiPagamentoPA.importoSingoloVersamento * 100
+        ),
         codiceContestoPagamento: codiceContestoPagamentoApi,
         ibanAccredito: datiPagamentoPA.ibanAccredito,
         causaleVersamento: getCausaleVersamentoForController(datiPagamentoPA),

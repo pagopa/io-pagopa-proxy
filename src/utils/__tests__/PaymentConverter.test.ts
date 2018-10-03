@@ -242,6 +242,29 @@ describe("getPaymentsCheckResponse", () => {
       datiPagamentoPA.ibanAccredito
     );
   });
+
+  it("should convert non integer amounts to integer amounts", () => {
+    const verificaOutputWithFloating = {
+      ...MockedData.aVerificaRPTOutput,
+      datiPagamentoPA: {
+        ...MockedData.aVerificaRPTOutput.datiPagamentoPA,
+        importoSingoloVersamento: 6656.999999999999
+      }
+    };
+
+    const errorOrPaymentCheckResponse = PaymentsConverter.getPaymentRequestsGetResponse(
+      verificaOutputWithFloating,
+      MockedData.aCodiceContestoPagamento
+    );
+
+    // Check correct field mapping
+    expect(isRight(errorOrPaymentCheckResponse)).toBeTruthy();
+
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "importoSingoloVersamento",
+      665700
+    );
+  });
 });
 
 describe("getNodoAttivaRPTInput", () => {
