@@ -30,7 +30,7 @@ export async function sendNodoVerificaRPTInput(
     logger.error(
       `Exception catched sending VerificaRPTRequest to PagoPA: ${
         exception.message
-      }`
+      }|${exception.response}|${exception.body}`
     );
     return left(Error(exception));
   }
@@ -55,7 +55,7 @@ export async function sendNodoAttivaRPTInputToPagoPa(
     logger.error(
       `Exception catched sending AttivaRPTRequest to PagoPA: ${
         exception.message
-      }`
+      }|${exception.response}|${exception.body}`
     );
     return left(Error(exception));
   }

@@ -199,6 +199,13 @@ function getFespCdServiceHandler(
         soapHeader: { readonly [k: string]: any } // tslint:disable-line:no-any
       ) => any // tslint:disable-line:no-any
     ) => {
+      logger.info(
+        `idpayment=${input.idPagamento}|contesto=${
+          input.codiceContestoPagamento
+        }|dominio=${input.identificativoDominio}|versamento=${
+          input.identificativoUnivocoVersamento
+        }`
+      );
       PaymentController.setActivationStatus(
         input,
         redisTimeoutSecs,
