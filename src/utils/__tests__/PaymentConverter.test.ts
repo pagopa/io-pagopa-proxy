@@ -176,9 +176,11 @@ describe("getNodoVerificaRPTInput", () => {
       "qrc:QrCode": {
         "qrc:CF": MockedData.aRptId3.organizationFiscalCode,
         "qrc:AuxDigit": MockedData.aRptId3.paymentNoticeNumber.auxDigit,
-        "qrc:CodIUV": String(MockedData.iuv13).concat(
-          String(MockedData.checkDigit)
-        )
+        "qrc:CodIUV": [
+          MockedData.segregationCode,
+          MockedData.iuv13,
+          MockedData.checkDigit
+        ].join("")
       }
     });
     expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
