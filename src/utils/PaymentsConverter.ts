@@ -19,6 +19,7 @@ import { nodoTipoDatiPagamentoPA_ppt } from "../types/pagopa_api/yaml-to-ts/nodo
 import { nodoVerificaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoVerificaRPT_ppt";
 import { stText140_ppt } from "../types/pagopa_api/yaml-to-ts/stText140_ppt";
 import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
+import { exactConvertToCents } from "./money";
 // tslint:disable:no-duplicate-string
 
 /**
@@ -71,8 +72,9 @@ export function getPaymentRequestsGetResponse(
 
   const response = datiPagamentoPA
     ? {
-        importoSingoloVersamento:
-          datiPagamentoPA.importoSingoloVersamento * 100,
+        importoSingoloVersamento: exactConvertToCents(
+          datiPagamentoPA.importoSingoloVersamento
+        ),
         codiceContestoPagamento: codiceContestoPagamentoApi,
         ibanAccredito: datiPagamentoPA.ibanAccredito,
         causaleVersamento: getCausaleVersamentoForController(datiPagamentoPA),

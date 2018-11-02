@@ -233,7 +233,7 @@ describe("getPaymentsCheckResponse", () => {
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "importoSingoloVersamento",
-      9905
+      15098
     );
     expect(errorOrPaymentCheckResponse.value).toHaveProperty(
       "codiceContestoPagamento",

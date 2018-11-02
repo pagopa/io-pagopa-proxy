@@ -13,7 +13,7 @@ export const aVerificaRPTOutput = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "OK",
     datiPagamentoPA: {
-      importoSingoloVersamento: 99.05,
+      importoSingoloVersamento: 150.98,
       ibanAccredito: "IT17X0605502100000001234567",
       bicAccredito: "BPPIITRR",
       enteBeneficiario: {
