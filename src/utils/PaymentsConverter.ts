@@ -166,8 +166,9 @@ export function getPaymentActivationsPostResponse(
   const response =
     datiPagamentoPA !== undefined
       ? {
-          importoSingoloVersamento:
-            datiPagamentoPA.importoSingoloVersamento * 100,
+          importoSingoloVersamento: exactConvertToCents(
+            datiPagamentoPA.importoSingoloVersamento
+          ),
           ibanAccredito: datiPagamentoPA.ibanAccredito,
           causaleVersamento: datiPagamentoPA.causaleVersamento,
           enteBeneficiario: datiPagamentoPA.enteBeneficiario
