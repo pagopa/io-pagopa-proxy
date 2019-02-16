@@ -3,7 +3,7 @@
   "version": "0.8.11",
   "description": "Proxy that handles interactions with pagoPA",
   "main": "index.ts",
-  "repository": "https://github.com/teamdigitale/italia-pagopa-proxy",
+  "repository": "https://github.com/teamdigitale/io-pagopa-proxy",
   "author": "Federico Feroldi <federico@teamdigitale.governo.it>",
   "license": "MIT",
   "scripts": {

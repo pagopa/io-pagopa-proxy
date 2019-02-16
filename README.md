@@ -1,8 +1,8 @@
-[![CircleCI](https://circleci.com/gh/teamdigitale/italia-pagopa-proxy.svg?style=svg)](https://circleci.com/gh/teamdigitale/italia-pagopa-proxy)
+[![CircleCI](https://circleci.com/gh/teamdigitale/io-pagopa-proxy.svg?style=svg)](https://circleci.com/gh/teamdigitale/io-pagopa-proxy)
 
-[![codecov](https://codecov.io/gh/teamdigitale/italia-pagopa-proxy/branch/master/graph/badge.svg)](https://codecov.io/gh/teamdigitale/italia-pagopa-proxy)
+[![codecov](https://codecov.io/gh/teamdigitale/io-pagopa-proxy/branch/master/graph/badge.svg)](https://codecov.io/gh/teamdigitale/io-pagopa-proxy)
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/5a8e35c5db40f63c3ebf/maintainability)](https://codeclimate.com/github/teamdigitale/italia-pagopa-proxy/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/5a8e35c5db40f63c3ebf/maintainability)](https://codeclimate.com/github/teamdigitale/io-pagopa-proxy/maintainability)
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy?ref=badge_shield)
 
@@ -24,8 +24,8 @@ Here's the decisions we taken so far:
 
 | ADR | Title        | PR (discussion) |
 | --- | ----------------------------- | --------------- |
-| 1   | [Record architecture decisions](doc/architecture/decisions/0001-record-architecture-decisions.md) | [PR#25](https://github.com/teamdigitale/italia-pagopa-proxy/pull/25)                |
-| 2   | [Use uuid/v1 for sequential requests](doc/adr/0002-use-uuid-v1-for-sequential-requests.md) | [PR#37](https://github.com/teamdigitale/italia-pagopa-proxy/pull/37)                |
+| 1   | [Record architecture decisions](doc/architecture/decisions/0001-record-architecture-decisions.md) | [PR#25](https://github.com/teamdigitale/io-pagopa-proxy/pull/25)                |
+| 2   | [Use uuid/v1 for sequential requests](doc/adr/0002-use-uuid-v1-for-sequential-requests.md) | [PR#37](https://github.com/teamdigitale/io-pagopa-proxy/pull/37)                |
 
 ## NOTES
 

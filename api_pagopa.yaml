@@ -95,7 +95,7 @@ paths:
             $ref: "#/definitions/ProblemJson"
 definitions:
   ProblemJson:
-    $ref: "https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
+    $ref: "https://raw.githubusercontent.com/teamdigitale/io-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
   PaymentProblemJson:
     description: A ProblemJson-like type specific for the GetPayment and ActivatePayment operations
     type: object
