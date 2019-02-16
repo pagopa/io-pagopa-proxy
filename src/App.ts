@@ -8,7 +8,7 @@ import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
 import * as t from "io-ts";
-import { toExpressHandler } from "italia-ts-commons/lib/express";
+import { toExpressHandler } from "io-ts-commons/lib/express";
 import * as morgan from "morgan";
 import * as redis from "redis";
 import RedisClustr = require("redis-clustr");

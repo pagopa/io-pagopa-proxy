@@ -1,4 +1,4 @@
-import { reporters } from "italia-ts-commons";
+import { reporters } from "io-ts-commons";
 import * as soap from "soap";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import { IPPTPortSoap } from "../../types/pagopa_api/IPPTPortSoap";

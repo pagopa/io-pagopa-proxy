@@ -3,8 +3,8 @@
  */
 
 import * as t from "io-ts";
-import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
+import { WithinRangeNumber } from "io-ts-commons/lib/numbers";
+import { NonEmptyString } from "io-ts-commons/lib/strings";
 import { stPassword_ppt } from "./types/pagopa_api/yaml-to-ts/stPassword_ppt";
 import { stText35_ppt } from "./types/pagopa_api/yaml-to-ts/stText35_ppt";
 

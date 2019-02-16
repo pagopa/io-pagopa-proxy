@@ -5,7 +5,7 @@
 
 import { Either, isRight, left, right } from "fp-ts/lib/Either";
 import * as t from "io-ts";
-import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
+import { RptId, RptIdFromString } from "io-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../Configuration";
 import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";

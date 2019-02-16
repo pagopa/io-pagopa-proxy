@@ -2,7 +2,7 @@
  * Create and Run the server
  */
 
-import { reporters } from "italia-ts-commons";
+import { reporters } from "io-ts-commons";
 import * as App from "./App";
 import { CONFIG, Configuration } from "./Configuration";
 import { logger } from "./utils/Logger";

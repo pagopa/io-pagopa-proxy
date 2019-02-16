@@ -6,7 +6,7 @@
 // tslint:disable:no-any
 
 import * as fs from "fs";
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
+import { NonEmptyString } from "io-ts-commons/lib/strings";
 import * as soap from "soap";
 
 export function createClient<T>(

@@ -7,8 +7,8 @@ import {
   IUV13,
   PaymentNoticeNumber,
   RptIdFromString
-} from "italia-ts-commons/lib/pagopa";
-import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
+} from "io-ts-commons/lib/pagopa";
+import { OrganizationFiscalCode } from "io-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import * as redis from "redis";
 import { PagoPAConfig } from "../Configuration";

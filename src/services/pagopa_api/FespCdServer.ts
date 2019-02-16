@@ -3,7 +3,7 @@
  */
 
 import * as core from "express-serve-static-core";
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
+import { NonEmptyString } from "io-ts-commons/lib/strings";
 import * as soap from "soap";
 import { IFespCdPortTypeSoap } from "../../types/pagopa_api/IFespCdPortTypeSoap";
 import { readWsdl } from "../../utils/SoapUtils";

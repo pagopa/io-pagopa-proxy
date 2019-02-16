@@ -6,15 +6,15 @@
 import * as express from "express";
 import { isLeft } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
-import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
-import { TypeofApiResponse } from "italia-ts-commons/lib/requests";
+import { RptId, RptIdFromString } from "io-ts-commons/lib/pagopa";
+import { TypeofApiResponse } from "io-ts-commons/lib/requests";
 import {
   ResponseErrorFromValidationErrors,
   ResponseErrorInternal,
   ResponseErrorNotFound,
   ResponseErrorValidation,
   ResponseSuccessJson
-} from "italia-ts-commons/lib/responses";
+} from "io-ts-commons/lib/responses";
 import * as redis from "redis";
 import * as uuid from "uuid";
 

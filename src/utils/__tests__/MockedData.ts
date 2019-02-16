@@ -1,5 +1,5 @@
-import { reporters } from "italia-ts-commons";
-import { RptId } from "italia-ts-commons/lib/pagopa";
+import { reporters } from "io-ts-commons";
+import { RptId } from "io-ts-commons/lib/pagopa";
 import { PagoPAConfig } from "../../Configuration";
 import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
