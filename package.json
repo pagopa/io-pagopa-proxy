@@ -40,7 +40,7 @@
     "@types/supertest": "^2.0.6",
     "@types/uuid": "^3.4.4",
     "apiconnect-wsdl": "^1.6.3",
-    "danger": "^4.3.8",
+    "danger": "^7.0.16",
     "danger-plugin-digitalcitizenship": "^0.3.1",
     "italia-tslint-rules": "^0.1.1",
     "italia-utils": "^3.14.6",
