@@ -1,33 +1,11 @@
 {
-  "defaultSeverity": "error",
-  "extends": [
-    "typestrict",
-    "tslint:recommended",
-    "tslint-immutable",
-    "tslint-sonarts",
-    "tslint-plugin-prettier",
-    "tslint-config-prettier",
-    "italia-tslint-rules"
-  ],
-  "jsRules": {},
-  "rules": {
-    "no-null-keyword": true,
-    "no-any": true,
-    "no-var-keyword": true,
-    "typedef": [
-      true,
-      "call-signature"
+    "defaultSeverity": "error",
+    "extends": [
+      "italia-tslint-rules/strong"
     ],
-    "readonly-keyword": true,
-    "readonly-array": true,
-    "no-let": true,
-    "no-method-signature": true,
-    "no-mixed-interface": false,
-    "prettier": true,
-    "no-console": false,
-    "object-literal-sort-keys": false,
-    "max-union-size": false,
-    "no-tslint-disable-all": true
-  },
-  "rulesDirectory": []
+    "jsRules": {},
+    "rules": {
+      "object-literal-sort-keys": false
+    },
+    "rulesDirectory": []
 }
