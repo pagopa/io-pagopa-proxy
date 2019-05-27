@@ -5,8 +5,8 @@
 import * as core from "express-serve-static-core";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import * as soap from "soap";
-import { IFespCdPortTypeSoap } from "../../types/pagopa_api/IFespCdPortTypeSoap";
 import { readWsdl } from "../../utils/SoapUtils";
+import { IFespCdPortTypeSoap } from "./IFespCdPortTypeSoap";
 
 // WSDL path for FespCd
 const FESP_CD_WSDL_PATH = `${__dirname}/../../wsdl/CdPerNodo.wsdl` as NonEmptyString;

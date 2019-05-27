@@ -1,11 +1,11 @@
+import { RptId } from "italia-pagopa-commons/lib/pagopa";
 import { reporters } from "italia-ts-commons";
-import { RptId } from "italia-ts-commons/lib/pagopa";
+import { CodiceContestoPagamento } from "../../../generated/api/CodiceContestoPagamento";
+import { PaymentActivationsPostRequest } from "../../../generated/api/PaymentActivationsPostRequest";
+import { ctSpezzoniCausaleVersamento_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/ctSpezzoniCausaleVersamento_ppt";
+import { esitoNodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
+import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
 import { PagoPAConfig } from "../../Configuration";
-import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
-import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
-import { ctSpezzoniCausaleVersamento_ppt } from "../../types/pagopa_api/yaml-to-ts/ctSpezzoniCausaleVersamento_ppt";
-import { esitoNodoAttivaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
-import { esitoNodoVerificaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
 
 // tslint:disable:no-identical-functions
 

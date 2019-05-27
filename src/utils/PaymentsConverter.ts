@@ -5,20 +5,20 @@
 
 import { Either, isRight, left, right } from "fp-ts/lib/Either";
 import * as t from "io-ts";
-import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
+import { RptId, RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
+import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
+import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
+import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
+import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
+import { esitoNodoAttivaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
+import { esitoNodoVerificaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
+import { nodoAttivaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
+import { nodoTipoCodiceIdRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoCodiceIdRPT_ppt";
+import { nodoTipoDatiPagamentoPA_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoDatiPagamentoPA_ppt";
+import { nodoVerificaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
+import { stText140_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText140_ppt";
+import { stText35_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText35_ppt";
 import { PagoPAConfig } from "../Configuration";
-import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
-import { PaymentActivationsPostRequest } from "../types/api/PaymentActivationsPostRequest";
-import { PaymentActivationsPostResponse } from "../types/api/PaymentActivationsPostResponse";
-import { PaymentRequestsGetResponse } from "../types/api/PaymentRequestsGetResponse";
-import { esitoNodoAttivaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
-import { esitoNodoVerificaRPTRisposta_ppt } from "../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
-import { nodoAttivaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoAttivaRPT_ppt";
-import { nodoTipoCodiceIdRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoTipoCodiceIdRPT_ppt";
-import { nodoTipoDatiPagamentoPA_ppt } from "../types/pagopa_api/yaml-to-ts/nodoTipoDatiPagamentoPA_ppt";
-import { nodoVerificaRPT_ppt } from "../types/pagopa_api/yaml-to-ts/nodoVerificaRPT_ppt";
-import { stText140_ppt } from "../types/pagopa_api/yaml-to-ts/stText140_ppt";
-import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
 import { exactConvertToCents } from "./money";
 // tslint:disable:no-duplicate-string
 

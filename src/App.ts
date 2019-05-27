@@ -12,15 +12,15 @@ import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as morgan from "morgan";
 import * as redis from "redis";
 import RedisClustr = require("redis-clustr");
-import { specs as publicApiV1Specs } from "./api/public_api_pagopa";
+import { specs as publicApiV1Specs } from "../generated/api/public_api_pagopa";
+import { cdInfoWisp_ppt } from "../generated/FespCdService/cdInfoWisp_ppt";
+import { cdInfoWispResponse_ppt } from "../generated/FespCdService/cdInfoWispResponse_ppt";
 import { Configuration } from "./Configuration";
 import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
+import { IFespCdPortTypeSoap } from "./services/pagopa_api/IFespCdPortTypeSoap";
 import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
-import { IFespCdPortTypeSoap } from "./types/pagopa_api/IFespCdPortTypeSoap";
-import { cdInfoWisp_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoWisp_ppt";
-import { cdInfoWispResponse_ppt } from "./types/pagopa_api/yaml-to-ts/cdInfoWispResponse_ppt";
 import { logger } from "./utils/Logger";
 
 /**

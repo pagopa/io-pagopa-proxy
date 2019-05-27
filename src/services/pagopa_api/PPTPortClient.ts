@@ -3,8 +3,8 @@
  */
 
 import * as soap from "soap";
-import { IPPTPortSoap } from "../../types/pagopa_api/IPPTPortSoap";
 import { createClient, promisifySoapMethod } from "../../utils/SoapUtils";
+import { IPPTPortSoap } from "./IPPTPortSoap";
 
 // WSDL path for PagamentiTelematiciPspNodo
 export const PAGAMENTI_TELEMATICI_PSP_WSDL_PATH = `${__dirname}/../../wsdl/NodoPerPsp.wsdl`;

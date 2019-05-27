@@ -2,7 +2,7 @@
  * Utility used to generate YAML from WSDL
  */
 
- // TODO: [#159009939] Evaluate to refactor this module using typescript
+// TODO: [#159009939] Evaluate to refactor this module using typescript
 const apiconnWsdl = require("apiconnect-wsdl");
 const fs = require("fs");
 const yaml = require("js-yaml");
@@ -40,6 +40,9 @@ async function generateYamlFilesForWsdl(wsdlPath) {
       serviceName,
       wsdlId
     );
-    fs.writeFileSync(`./pagopa_api/yaml-file/${serviceName}.yaml`, yaml.safeDump(swagger));
+    fs.writeFileSync(
+      `generated/yaml-file/${serviceName}.yaml`,
+      yaml.safeDump(swagger)
+    );
   }
 }

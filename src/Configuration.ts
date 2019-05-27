@@ -5,8 +5,8 @@
 import * as t from "io-ts";
 import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
-import { stPassword_ppt } from "./types/pagopa_api/yaml-to-ts/stPassword_ppt";
-import { stText35_ppt } from "./types/pagopa_api/yaml-to-ts/stText35_ppt";
+import { stText35_ppt } from "../generated/PagamentiTelematiciPspNodoservice//stText35_ppt";
+import { stPassword_ppt } from "../generated/PagamentiTelematiciPspNodoservice/stPassword_ppt";
 
 const localhost = "http://localhost";
 

@@ -7,10 +7,14 @@ import {
   IUV13,
   PaymentNoticeNumber,
   RptIdFromString
-} from "italia-ts-commons/lib/pagopa";
+} from "italia-pagopa-commons/lib/pagopa";
 import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import * as redis from "redis";
+import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
+import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
+import { cdInfoWisp_ppt } from "../../generated/FespCdService/cdInfoWisp_ppt";
+import { stText35_ppt } from "../../generated/FespCdService/stText35_ppt";
 import { PagoPAConfig } from "../Configuration";
 import {
   activatePayment,
@@ -18,10 +22,6 @@ import {
   getPaymentInfo,
   setActivationStatus
 } from "../controllers/restful/PaymentController";
-import { CodiceContestoPagamento } from "../types/api/CodiceContestoPagamento";
-import { ImportoEuroCents } from "../types/api/ImportoEuroCents";
-import { cdInfoWisp_ppt } from "../types/pagopa_api/yaml-to-ts/cdInfoWisp_ppt";
-import { stText35_ppt } from "../types/pagopa_api/yaml-to-ts/stText35_ppt";
 import { logger } from "../utils/Logger";
 import {
   createPagamentiTelematiciPspNodoClient,

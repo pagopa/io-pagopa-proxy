@@ -5,8 +5,8 @@
 // tslint:disable:no-any
 
 import * as t from "io-ts";
-import { cdInfoWisp_ppt } from "./yaml-to-ts/cdInfoWisp_ppt";
-import { cdInfoWispResponse_ppt } from "./yaml-to-ts/cdInfoWispResponse_ppt";
+import { cdInfoWisp_ppt } from "../../../generated/FespCdService/cdInfoWisp_ppt";
+import { cdInfoWispResponse_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_ppt";
 
 export interface IFespCdPortTypeSoap {
   readonly cdInfoWisp: (
