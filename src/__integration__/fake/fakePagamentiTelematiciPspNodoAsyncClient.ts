@@ -1,13 +1,13 @@
 import { reporters } from "italia-ts-commons";
 import * as soap from "soap";
+import { esitoNodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
+import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
+import { nodoAttivaRPT_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
+import { nodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPTRisposta_ppt";
+import { nodoVerificaRPT_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
+import { nodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPTRisposta_ppt";
+import { IPPTPortSoap } from "../../services/pagopa_api/IPPTPortSoap";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
-import { IPPTPortSoap } from "../../types/pagopa_api/IPPTPortSoap";
-import { esitoNodoAttivaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoAttivaRPTRisposta_ppt";
-import { esitoNodoVerificaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/esitoNodoVerificaRPTRisposta_ppt";
-import { nodoAttivaRPT_ppt } from "../../types/pagopa_api/yaml-to-ts/nodoAttivaRPT_ppt";
-import { nodoAttivaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/nodoAttivaRPTRisposta_ppt";
-import { nodoVerificaRPT_ppt } from "../../types/pagopa_api/yaml-to-ts/nodoVerificaRPT_ppt";
-import { nodoVerificaRPTRisposta_ppt } from "../../types/pagopa_api/yaml-to-ts/nodoVerificaRPTRisposta_ppt";
 import { createClient } from "../../utils/SoapUtils";
 
 export async function createPagamentiTelematiciPspNodoClient(

@@ -1,6 +1,6 @@
 import { isRight } from "fp-ts/lib/Either";
+import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
 import * as PaymentController from "../../controllers/restful/PaymentController";
-import { PaymentFaultEnum } from "../../types/api/PaymentFault";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
 

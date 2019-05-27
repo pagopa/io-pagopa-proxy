@@ -6,7 +6,7 @@
 import * as express from "express";
 import { isLeft } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
-import { RptId, RptIdFromString } from "italia-ts-commons/lib/pagopa";
+import { RptId, RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
 import { TypeofApiResponse } from "italia-ts-commons/lib/requests";
 import {
   ResponseErrorFromValidationErrors,
@@ -18,23 +18,23 @@ import {
 import * as redis from "redis";
 import * as uuid from "uuid";
 
-import { PagoPAConfig } from "../../Configuration";
-import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
-import * as PaymentsService from "../../services/PaymentsService";
-import { CodiceContestoPagamento } from "../../types/api/CodiceContestoPagamento";
-import { PaymentActivationsGetResponse } from "../../types/api/PaymentActivationsGetResponse";
-import { PaymentActivationsPostRequest } from "../../types/api/PaymentActivationsPostRequest";
-import { PaymentActivationsPostResponse } from "../../types/api/PaymentActivationsPostResponse";
-import { PaymentFaultEnum } from "../../types/api/PaymentFault";
-import { PaymentRequestsGetResponse } from "../../types/api/PaymentRequestsGetResponse";
+import { CodiceContestoPagamento } from "../../../generated/api/CodiceContestoPagamento";
+import { PaymentActivationsGetResponse } from "../../../generated/api/PaymentActivationsGetResponse";
+import { PaymentActivationsPostRequest } from "../../../generated/api/PaymentActivationsPostRequest";
+import { PaymentActivationsPostResponse } from "../../../generated/api/PaymentActivationsPostResponse";
+import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
+import { PaymentRequestsGetResponse } from "../../../generated/api/PaymentRequestsGetResponse";
 import {
   ActivatePaymentT,
   GetActivationStatusT,
   GetPaymentInfoT
-} from "../../types/api/requestTypes";
-import { cdInfoWisp_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoWisp_ppt";
-import { cdInfoWispResponse_ppt } from "../../types/pagopa_api/yaml-to-ts/cdInfoWispResponse_ppt";
-import { faultBean_ppt } from "../../types/pagopa_api/yaml-to-ts/faultBean_ppt";
+} from "../../../generated/api/requestTypes";
+import { cdInfoWisp_ppt } from "../../../generated/FespCdService/cdInfoWisp_ppt";
+import { cdInfoWispResponse_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_ppt";
+import { faultBean_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_ppt";
+import { PagoPAConfig } from "../../Configuration";
+import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
+import * as PaymentsService from "../../services/PaymentsService";
 import { logger } from "../../utils/Logger";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import { redisGet, redisSet } from "../../utils/Redis";
