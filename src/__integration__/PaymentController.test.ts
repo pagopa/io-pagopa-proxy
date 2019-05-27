@@ -120,6 +120,7 @@ describe("checkPaymentToPagoPa", async () => {
 
     const req = mockReq();
 
+    // tslint:disable-next-line:no-object-mutation
     req.params = aRptId;
 
     const errorOrPaymentCheckResponse = await getPaymentInfo(
@@ -155,6 +156,7 @@ describe("activatePaymentToPagoPa", async () => {
 
     const req = mockReq();
 
+    // tslint:disable-next-line:no-object-mutation
     req.body = aPaymentActivationRequest;
 
     const errorOrPaymentActivationResponse = await activatePayment(
@@ -216,6 +218,7 @@ describe("activatePaymentToPagoPa", async () => {
 
     const req = mockReq();
 
+    // tslint:disable-next-line:no-object-mutation
     req.params = aPaymentActivationRequest;
 
     const errorOrPaymentActivationResponse = await activatePayment(
@@ -246,6 +249,8 @@ describe("setActivationStatus and getActivationStatus", () => {
     };
 
     const req = mockReq();
+
+    // tslint:disable-next-line:no-object-mutation
     req.params = aPaymentActivationRequest;
 
     await setActivationStatus(aCdInfoWispPpt, 5000, aMockedRedisClient);
