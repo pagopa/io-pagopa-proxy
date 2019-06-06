@@ -5,8 +5,8 @@
 import * as core from "express-serve-static-core";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import * as soap from "soap";
+
 import { readWsdl } from "../../utils/SoapUtils";
-import { IFespCdPortTypeSoap } from "./IFespCdPortTypeSoap";
 
 // WSDL path for FespCd
 const FESP_CD_WSDL_PATH = `${__dirname}/../../wsdl/CdPerNodo.wsdl` as NonEmptyString;
@@ -21,7 +21,7 @@ const FESP_CD_WSDL_PATH = `${__dirname}/../../wsdl/CdPerNodo.wsdl` as NonEmptySt
 export async function attachFespCdServer(
   server: core.Express,
   path: NonEmptyString,
-  fespCdHandlers: IFespCdPortTypeSoap
+  fespCdHandlers: soap.IServicePort
 ): Promise<soap.Server> {
   const wsdl = await readWsdl(FESP_CD_WSDL_PATH);
   const service = {

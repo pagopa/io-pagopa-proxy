@@ -298,6 +298,9 @@ describe("getNodoAttivaRPTInput", () => {
       "codificaInfrastrutturaPSP",
       "QR-CODE"
     );
+    expect(
+      errorOrNodoAttivaRPTInput.value.datiPagamentoPSP.importoSingoloVersamento
+    ).toEqual(99.05);
   });
 });
 

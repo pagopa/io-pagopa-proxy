@@ -11,6 +11,7 @@ import {
 import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import * as redis from "redis";
+
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { cdInfoWisp_ppt } from "../../generated/FespCdService/cdInfoWisp_ppt";
@@ -22,6 +23,7 @@ import {
   getPaymentInfo,
   setActivationStatus
 } from "../controllers/restful/PaymentController";
+import { PagamentiTelematiciPspNodoAsyncClient } from "../services/pagopa_api/PPTPortClient";
 import { logger } from "../utils/Logger";
 import {
   createPagamentiTelematiciPspNodoClient,
@@ -55,6 +57,20 @@ const aCdInfoWispPpt = {
   codiceContestoPagamento: aCodiceContestoPagamento,
   idPagamento: "id1234"
 } as cdInfoWisp_ppt;
+
+const aPaymentActivationRequest = {
+  rptId: RptIdFromString.encode({
+    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+    paymentNoticeNumber: {
+      applicationCode: "12" as ApplicationCode,
+      auxDigit: "0" as AuxDigit,
+      checkDigit: "99" as CheckDigit,
+      iuv13: "1234567890123" as IUV13
+    } as PaymentNoticeNumber
+  }),
+  importoSingoloVersamento: 9905 as ImportoEuroCents,
+  codiceContestoPagamento: aCodiceContestoPagamento
+};
 
 describe("checkPaymentToPagoPa", async () => {
   it("should return the right response", async () => {
@@ -133,21 +149,37 @@ describe("checkPaymentToPagoPa", async () => {
 });
 
 describe("activatePaymentToPagoPa", async () => {
-  it("should return the right response", async () => {
-    const aPaymentActivationRequest = {
-      rptId: RptIdFromString.encode({
-        organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
-        paymentNoticeNumber: {
-          applicationCode: "12" as ApplicationCode,
-          auxDigit: "0" as AuxDigit,
-          checkDigit: "99" as CheckDigit,
-          iuv13: "1234567890123" as IUV13
-        } as PaymentNoticeNumber
-      }),
-      importoSingoloVersamento: 9905 as ImportoEuroCents,
-      codiceContestoPagamento: aCodiceContestoPagamento
+  it("should correctly format amounts", async () => {
+    const clientRequest = jest.fn((_, __, cb) => cb());
+    const client = await createPagamentiTelematiciPspNodoClient({
+      // tslint:disable-next-line: no-any
+      request: clientRequest as any
+    });
+
+    const attivaRPTPagoPaClient = new PagamentiTelematiciPspNodoAsyncClient(
+      client
+    );
+    const activateRequest = mockReq();
+
+    // tslint:disable-next-line:no-object-mutation
+    activateRequest.body = {
+      ...aPaymentActivationRequest,
+      importoSingoloVersamento: 9900 as ImportoEuroCents
     };
 
+    await activatePayment(aConfig, attivaRPTPagoPaClient)(activateRequest);
+
+    expect(clientRequest).toHaveBeenCalledTimes(1);
+    expect(clientRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body:
+          '<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:ppt="http://ws.pagamenti.telematici.gov/" xmlns:tns="http://PuntoAccessoPSP.spcoop.gov.it/servizi/PagamentiTelematiciPspNodo" xmlns:pay_i="http://www.digitpa.gov.it/schemas/2011/Pagamenti/" xmlns:qrc="http://PuntoAccessoPSP.spcoop.gov.it/QrCode"><soap:Body><ppt:nodoAttivaRPT xmlns:ppt="http://ws.pagamenti.telematici.gov/"><identificativoPSP>AGID_01</identificativoPSP><identificativoIntermediarioPSP>97735020584</identificativoIntermediarioPSP><identificativoCanale>97735020584_02</identificativoCanale><password>nopassword</password><codiceContestoPagamento>05245c90746811e8b9bf91897339427e</codiceContestoPagamento><identificativoIntermediarioPSPPagamento>97735020584</identificativoIntermediarioPSPPagamento><codificaInfrastrutturaPSP>QR-CODE</codificaInfrastrutturaPSP><codiceIdRPT><qrc:QrCode><qrc:CF>12345678901</qrc:CF><qrc:CodStazPA>12</qrc:CodStazPA><qrc:AuxDigit>0</qrc:AuxDigit><qrc:CodIUV>123456789012399</qrc:CodIUV></qrc:QrCode></codiceIdRPT><datiPagamentoPSP><importoSingoloVersamento>99.00</importoSingoloVersamento></datiPagamentoPSP></ppt:nodoAttivaRPT></soap:Body></soap:Envelope>'
+      }),
+      expect.anything()
+    );
+  });
+
+  it("should return the right response", async () => {
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
         envelopeKey: "env"
@@ -196,20 +228,6 @@ describe("activatePaymentToPagoPa", async () => {
   });
 
   it("should return error (invalid input)", async () => {
-    const aPaymentActivationRequest = {
-      rptId: {
-        organizationFiscalCode: "XXX" as OrganizationFiscalCode,
-        paymentNoticeNumber: {
-          applicationCode: "99" as ApplicationCode,
-          auxDigit: "0" as AuxDigit,
-          checkDigit: "99" as CheckDigit,
-          iuv13: "1234567890123" as IUV13
-        } as PaymentNoticeNumber
-      } as RptIdFromString,
-      importoSingoloVersamento: 9905 as ImportoEuroCents,
-      codiceContestoPagamento: aCodiceContestoPagamento
-    };
-
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
         envelopeKey: "env"
@@ -234,20 +252,6 @@ describe("activatePaymentToPagoPa", async () => {
 
 describe("setActivationStatus and getActivationStatus", () => {
   it("should store payment id and payment info in redis db", async () => {
-    const aPaymentActivationRequest = {
-      rptId: {
-        organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
-        paymentNoticeNumber: {
-          applicationCode: "99" as ApplicationCode,
-          auxDigit: "0" as AuxDigit,
-          checkDigit: "99" as CheckDigit,
-          iuv13: "1234567890123" as IUV13
-        } as PaymentNoticeNumber
-      } as RptIdFromString,
-      importoSingoloVersamento: 9905 as ImportoEuroCents,
-      codiceContestoPagamento: aCodiceContestoPagamento
-    };
-
     const req = mockReq();
 
     // tslint:disable-next-line:no-object-mutation

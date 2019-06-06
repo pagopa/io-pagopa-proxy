@@ -2,8 +2,14 @@
  * Define SOAP Clients to call PPTPort services provided by PagoPa
  */
 
+import { curry, flip } from "fp-ts/lib/function";
 import * as soap from "soap";
-import { createClient, promisifySoapMethod } from "../../utils/SoapUtils";
+
+import {
+  createClient,
+  fixImportoSingoloVersamentoDigits,
+  promisifySoapMethod
+} from "../../utils/SoapUtils";
 import { IPPTPortSoap } from "./IPPTPortSoap";
 
 // WSDL path for PagamentiTelematiciPspNodo
@@ -33,8 +39,8 @@ export class PagamentiTelematiciPspNodoAsyncClient {
   public readonly nodoVerificaRPT = promisifySoapMethod(
     this.client.nodoVerificaRPT
   );
-  public readonly nodoAttivaRPT = promisifySoapMethod(
-    this.client.nodoAttivaRPT
-  );
+  public readonly nodoAttivaRPT = flip(
+    curry(promisifySoapMethod(this.client.nodoAttivaRPT))
+  )({ postProcess: fixImportoSingoloVersamentoDigits });
   constructor(private readonly client: IPPTPortSoap) {}
 }

@@ -7,21 +7,64 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as core from "express-serve-static-core";
 import * as http from "http";
-import * as t from "io-ts";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as morgan from "morgan";
 import * as redis from "redis";
 import RedisClustr = require("redis-clustr");
+import * as soap from "soap";
+
 import { specs as publicApiV1Specs } from "../generated/api/public_api_pagopa";
-import { cdInfoWisp_ppt } from "../generated/FespCdService/cdInfoWisp_ppt";
-import { cdInfoWispResponse_ppt } from "../generated/FespCdService/cdInfoWispResponse_ppt";
 import { Configuration } from "./Configuration";
 import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
-import { IFespCdPortTypeSoap } from "./services/pagopa_api/IFespCdPortTypeSoap";
 import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
 import { logger } from "./utils/Logger";
+
+/**
+ * Define a Service Handler for FespCdService SOAP service
+ * It's an endpoint for PagoPA to confirm a payment activation result
+ * @param {redis.RedisClient} redisClient - Redis Client to store persistente paymentId into DB
+ * @param {number} redisTimeoutSecs - Timeout set for information stored into DB
+ * @return {IFespCdPortTypeSoap} An object containing the service handler
+ */
+const getFespCdServiceHandler = (
+  redisClient: redis.RedisClient,
+  redisTimeoutSecs: number
+): soap.IServicePort => ({
+  cdInfoWisp: (input, cb) => {
+    logger.info(
+      `idpayment=${input.idPagamento}|contesto=${
+        input.codiceContestoPagamento
+      }|dominio=${input.identificativoDominio}|versamento=${
+        input.identificativoUnivocoVersamento
+      }`
+    );
+    PaymentController.setActivationStatus(
+      input,
+      redisTimeoutSecs,
+      redisClient
+    ).then(
+      iCdInfoWispOutput => {
+        if (cb) {
+          // we need to cast the callback to any as the type definition doesn't
+          // include all the actual parameters
+          // tslint:disable-next-line: no-any no-useless-cast
+          (cb as any)(undefined, iCdInfoWispOutput);
+        }
+      },
+      err => {
+        logger.error(`Error on setActivationStatus: ${err}`);
+        if (cb) {
+          // we need to cast the callback to any as the type definition doesn't
+          // include all the actual parameters
+          // tslint:disable-next-line: no-any no-useless-cast
+          (cb as any)(undefined, { esito: "KO" });
+        }
+      }
+    );
+  }
+});
 
 /**
  * Define and start an express Server
@@ -176,49 +219,4 @@ function getRedisClient(config: Configuration): redis.RedisClient {
   });
 
   return redisClient;
-}
-
-/**
- * Define a Service Handler for FespCdService SOAP service
- * It's an endpoint for PagoPA to confirm a payment activation result
- * @param {redis.RedisClient} redisClient - Redis Client to store persistente paymentId into DB
- * @param {number} redisTimeoutSecs - Timeout set for information stored into DB
- * @return {IFespCdPortTypeSoap} An object containing the service handler
- */
-function getFespCdServiceHandler(
-  redisClient: redis.RedisClient,
-  redisTimeoutSecs: number
-): IFespCdPortTypeSoap {
-  return {
-    cdInfoWisp: (
-      input: cdInfoWisp_ppt,
-      cb: (
-        err: any, // tslint:disable-line:no-any
-        result: cdInfoWispResponse_ppt,
-        raw: t.StringType,
-        soapHeader: { readonly [k: string]: any } // tslint:disable-line:no-any
-      ) => any // tslint:disable-line:no-any
-    ) => {
-      logger.info(
-        `idpayment=${input.idPagamento}|contesto=${
-          input.codiceContestoPagamento
-        }|dominio=${input.identificativoDominio}|versamento=${
-          input.identificativoUnivocoVersamento
-        }`
-      );
-      PaymentController.setActivationStatus(
-        input,
-        redisTimeoutSecs,
-        redisClient
-      ).then(
-        iCdInfoWispOutput => {
-          cb(undefined, iCdInfoWispOutput, new t.StringType(), {});
-        },
-        err => {
-          logger.error(`Error on setActivationStatus: ${err}`);
-          cb(undefined, { esito: "KO" }, new t.StringType(), {});
-        }
-      );
-    }
-  };
 }
