@@ -36,28 +36,20 @@ export type SoapMethodCB<I, O> = (
     result: O,
     raw: string,
     soapHeader: { readonly [k: string]: any }
-  ) => any
+  ) => any,
+  options?: Pick<soap.ISecurity, "postProcess">
 ) => void;
-
-// type signature for Promise based async soap methods
-export type SoapMethodPromise<I, O> = (input: I) => Promise<O>;
 
 /**
  * Converts a SoapMethodCB into a SoapMethodPromise
  */
-export function promisifySoapMethod<I, O>(
-  f: SoapMethodCB<I, O>
-): SoapMethodPromise<I, O> {
-  return (input: I) =>
-    new Promise((resolve, reject) => {
-      f(input, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
-}
+export const promisifySoapMethod = <I, O>(f: SoapMethodCB<I, O>) => (
+  input: I,
+  options?: Pick<soap.ISecurity, "postProcess">
+) =>
+  new Promise<O>((resolve, reject) => {
+    f(input, (err, result) => (err ? reject(err) : resolve(result)), options);
+  });
 
 /**
  * Retrieve wsdl file content
@@ -74,3 +66,16 @@ export async function readWsdl(path: NonEmptyString): Promise<string> {
     });
   });
 }
+
+/**
+ * Makes sure that importoSingoloVersamento is formatted with 2 decimals
+ */
+export const fixImportoSingoloVersamentoDigits = (xml: string): string =>
+  xml.replace(
+    /(\d+)(\.\d+)?([\n\s]*<\/importoSingoloVersamento)/,
+    (_, p1, p2, p3) => {
+      const decimals = p2 !== undefined ? String(p2).slice(0, 3) : ".";
+      const padded = decimals.padEnd(3, "0");
+      return `${p1}${padded}${p3}`;
+    }
+  );
