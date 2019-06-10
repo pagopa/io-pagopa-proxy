@@ -4618,9 +4618,10 @@ realpath-native@^1.0.0:
   dependencies:
     util.promisify "^1.0.0"
 
-redis-clustr@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/redis-clustr/-/redis-clustr-1.6.0.tgz#cd4fb47cc273902411e9b178b066de8b267116fd"
+redis-clustr@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/redis-clustr/-/redis-clustr-1.7.0.tgz#803e815ce2b3d87dae619bde530ca9fc04bd36a0"
+  integrity sha512-2ymAf9r25Kp/C1X9WhvCtlu3kaH5D/MaUPW0JQ1dddueGzMzK9oOZUsD9yZH/kmc2ss/f89onZYcFHNAfm7WcQ==
   dependencies:
     cluster-key-slot "^1.0.5"
     denque "^1.1.0"
