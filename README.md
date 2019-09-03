@@ -80,7 +80,7 @@ Also be sure to use a valid configuration for REDIS server or install it on loca
 
 ## Production deployments and Kubernetes settings
 
-In real-world deployments, the application communicates with PagoPA performing a TLS mutual authentication and establishing a TLS encrypted tunnel.
+In production deployments, the application communicates with PagoPA performing a TLS mutual authentication and establishing a TLS encrypted tunnel.
 
 Authentication and tunnel mechanisms are transparent for the pagopa-proxy application and are offloaded to third-party components.
 
