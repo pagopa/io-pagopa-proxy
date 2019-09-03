@@ -78,7 +78,7 @@ PAGOPA_PASSWORD=nopassword yarn start
 
 Also be sure to use a valid configuration for REDIS server or install it on local machine.
 
-## Real-world deployments and Kubernetes settings
+## Production deployments and Kubernetes settings
 
 In real-world deployments, the application communicates with PagoPA performing a TLS mutual authentication and establishing a TLS encrypted tunnel.
 
