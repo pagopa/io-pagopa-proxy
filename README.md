@@ -78,6 +78,16 @@ PAGOPA_PASSWORD=nopassword yarn start
 
 Also be sure to use a valid configuration for REDIS server or install it on local machine.
 
+## Production deployments and Kubernetes settings
+
+In production deployments, the application communicates with PagoPA performing a TLS mutual authentication and establishing a TLS encrypted tunnel.
+
+Authentication and tunnel mechanisms are transparent for the pagopa-proxy application and are offloaded to third-party components.
+
+Normally, the pagopa-proxy application is deployed as a set of Kubernetes resources. A specific *helm-chart* has been developed and currently used to deploy the application. The chart includes some configuration files that deploy a sidecar container that manages the authentication and encryption mechanisms with PagoPA.
+
+More information about how the pagopa-proxy application communicates with PagoPA, and how to deploy the helm-chart can be found in the [pagopa-proxy helm-chart folder in the io-infrastructure-post-config repository](https://github.com/teamdigitale/io-infrastructure-post-config/tree/master/pagopa-proxy).
+
 ## License
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy?ref=badge_large)
