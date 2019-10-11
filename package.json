@@ -27,7 +27,9 @@
     "test:integration": "jest --config=jest.integration.js --runInBand",
     "test": "npm-run-all -s test:*",
     "lint": "tslint --project .",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.24",
@@ -66,7 +68,8 @@
     "redis-clustr": "^1.6.0",
     "soap": "^0.27.1",
     "uuid": "^3.2.1",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "snyk": "^1.189.0"
   },
   "jest": {
     "verbose": true,
@@ -86,5 +89,6 @@
     "coveragePathIgnorePatterns": [
       "MockedData.ts"
     ]
-  }
+  },
+  "snyk": true
 }
