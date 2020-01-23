@@ -82,6 +82,9 @@
 					<xsd:element name="id" type="xsd:string" />
 					<xsd:element name="description" type="xsd:string" minOccurs="0" />
 					<xsd:element name="serial" type="xsd:int" minOccurs="0" />
+					<xsd:element name="originalFaultCode" type="xsd:string"  minOccurs="0"  />
+					<xsd:element name="originalFaultString" type="xsd:string"  minOccurs="0"  />
+					<xsd:element name="originalDescription" type="xsd:string" minOccurs="0" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -209,7 +212,7 @@
 				<xsd:complexContent>
 					<xsd:extension base="ppt:risposta">
 						<xsd:sequence>
-							<xsd:element name="esito" type="xsd:string" minOccurs="0" />
+							<xsd:element name="esito" type="xsd:string" minOccurs="1" />
 							<xsd:element name="datiPagamentoPA" type="ppt:nodoTipoDatiPagamentoPA" minOccurs="0" />
 						</xsd:sequence>
 					</xsd:extension>
@@ -219,8 +222,8 @@
 			<xsd:complexType name="nodoInviaFlussoRendicontazione">
 				<xsd:sequence>
 					<xsd:element name="identificativoPSP" type="ppt:stText35" />
-					<xsd:element name="identificativoIntermediarioPSP" type="ppt:stText35" minOccurs="0" />
-					<xsd:element name="identificativoCanale" type="ppt:stText35" minOccurs="0" />
+					<xsd:element name="identificativoIntermediarioPSP" type="ppt:stText35" />
+					<xsd:element name="identificativoCanale" type="ppt:stText35" />
 					<xsd:element name="password" type="ppt:stPassword" />
 					<xsd:element name="identificativoDominio" type="ppt:stText35" />
 					<xsd:element name="identificativoFlusso" type="xsd:string" />
@@ -232,7 +235,7 @@
 				<xsd:complexContent>
 					<xsd:extension base="ppt:risposta">
 						<xsd:sequence>
-							<xsd:element name="esito" type="xsd:string" minOccurs="0" />
+							<xsd:element name="esito" type="xsd:string" minOccurs="1" />
 						</xsd:sequence>
 					</xsd:extension>
 				</xsd:complexContent>
@@ -240,7 +243,7 @@
 
 			<xsd:complexType name="nodoChiediInformativaPA">
 				<xsd:sequence>
-					<xsd:element name="identificativoPSP" type="ppt:stText35" minOccurs="0" />
+					<xsd:element name="identificativoPSP" type="ppt:stText35" />
 					<xsd:element name="identificativoIntermediarioPSP" type="ppt:stText35" />
 					<xsd:element name="identificativoCanale" type="ppt:stText35" />
 					<xsd:element name="password" type="ppt:stPassword" />
@@ -333,7 +336,7 @@
 					<xsd:element name="identificativoDominio" type="ppt:stText35" />
 					<xsd:element name="identificativoUnivocoVersamento" type="ppt:stText35" />
 					<xsd:element name="codiceContestoPagamento" type="ppt:stText35" />
-					<xsd:element name="er" type="xsd:base64Binary" minOccurs="0"  xmime:expectedContentTypes="application/octet-stream" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" />
+					<xsd:element name="er" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" />
 				</xsd:sequence>
 			</xsd:complexType>
 						
@@ -341,7 +344,7 @@
 				<xsd:complexContent>
 					<xsd:extension base="ppt:risposta">
 						<xsd:sequence>
-							<xsd:element name="esito" type="xsd:string" minOccurs="0" />
+							<xsd:element name="esito" type="xsd:string" minOccurs="1" />
 						</xsd:sequence>
 					</xsd:extension>
 				</xsd:complexContent>
@@ -364,7 +367,7 @@
 				<xsd:complexContent>
 					<xsd:extension base="ppt:risposta">
 						<xsd:sequence>
-							<xsd:element name="esito" type="xsd:string" minOccurs="0" />
+							<xsd:element name="esito" type="xsd:string" minOccurs="1" />
 						</xsd:sequence>
 					</xsd:extension>
 				</xsd:complexContent>
