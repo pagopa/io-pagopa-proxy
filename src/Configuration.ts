@@ -21,6 +21,9 @@ export const CONFIG = {
   CONTROLLER: {
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
     PORT: Number(process.env.PAGOPAPROXY_PORT) || 3000,
+    // SHA256 client certificate fingerprint (without `:` separators)
+    CLIENT_CERTIFICATE_FINGERPRINT:
+      process.env.PAGOPAPROXY_CLIENT_CERTIFICATE_FINGERPRINT,
     ROUTES: {
       RESTFUL: {
         PAYMENT_ACTIVATIONS_GET:
@@ -74,7 +77,8 @@ export const CONFIG = {
 // Configuration validator - Define configuration types and interfaces
 const ServerConfiguration = t.interface({
   HOST: NonEmptyString,
-  PORT: WithinRangeNumber(0, 65535)
+  PORT: WithinRangeNumber(0, 65535),
+  CLIENT_CERTIFICATE_FINGERPRINT: NonEmptyString
 });
 export type ServerConfiguration = t.TypeOf<typeof ServerConfiguration>;
 
