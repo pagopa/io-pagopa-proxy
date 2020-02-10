@@ -1,3 +1,8 @@
+/**
+ * Extract base64 client certificate from the header and verify
+ * if the fingerprint is valid.
+ */
+
 import * as express from "express";
 
 import { asn1, md, pki } from "node-forge";
@@ -15,6 +20,7 @@ export function requireClientCertificateFingerprint(
     next: express.NextFunction
   ) => {
     try {
+      // Get the base64 representation of client certificate from the header
       const clientCertificateBase64 = req.get(CLIENT_CERTIFICATE_HEADER_NAME);
 
       if (
@@ -24,6 +30,7 @@ export function requireClientCertificateFingerprint(
         const pem = `-----BEGIN CERTIFICATE-----${clientCertificateBase64}-----END CERTIFICATE-----`;
         const clientCertificate = pki.certificateFromPem(pem);
 
+        // Extract the fingerprint
         const fingerprint = md.sha256
           .create()
           .update(
@@ -33,6 +40,7 @@ export function requireClientCertificateFingerprint(
           .toHex()
           .toUpperCase();
 
+        // Very the fingerprint
         if (fingerprint !== validFingerprint) {
           res.status(403).send("Invalid client certificate");
         } else {
