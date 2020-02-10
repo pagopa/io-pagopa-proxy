@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
+    "fast-memoize": "^2.5.1",
     "io-ts": "1.8.5",
     "italia-pagopa-commons": "^1.0.0",
     "italia-ts-commons": "^5.1.0",

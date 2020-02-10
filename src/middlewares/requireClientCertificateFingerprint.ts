@@ -5,15 +5,27 @@
 
 import * as express from "express";
 
+import memoize from "fast-memoize";
 import { asn1, md, pki } from "node-forge";
-
-import { ExpressMiddleware } from "./types";
 
 const CLIENT_CERTIFICATE_HEADER_NAME = "x-arr-clientcert";
 
+function getFingerprintFromCertificate(certificate: pki.Certificate): string {
+  return md.sha256
+    .create()
+    .update(asn1.toDer(pki.certificateToAsn1(certificate)).getBytes())
+    .digest()
+    .toHex()
+    .toUpperCase();
+}
+
+const getFingerprintFromCertificateMemoized = memoize(
+  getFingerprintFromCertificate
+);
+
 export function requireClientCertificateFingerprint(
   validFingerprint: string
-): ExpressMiddleware {
+): express.Handler {
   return (
     req: express.Request,
     res: express.Response,
@@ -31,14 +43,9 @@ export function requireClientCertificateFingerprint(
         const clientCertificate = pki.certificateFromPem(pem);
 
         // Extract the fingerprint
-        const fingerprint = md.sha256
-          .create()
-          .update(
-            asn1.toDer(pki.certificateToAsn1(clientCertificate)).getBytes()
-          )
-          .digest()
-          .toHex()
-          .toUpperCase();
+        const fingerprint = getFingerprintFromCertificateMemoized(
+          clientCertificate
+        );
 
         // Very the fingerprint
         if (fingerprint !== validFingerprint) {

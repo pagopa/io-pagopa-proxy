@@ -17,7 +17,7 @@ import { specs as publicApiV1Specs } from "../generated/api/public_api_pagopa";
 import { Configuration } from "./Configuration";
 import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
-import { requireClientCertificateFingerprint } from "./midlewares/requireClientCertificateFingerprint";
+import { requireClientCertificateFingerprint } from "./middlewares/requireClientCertificateFingerprint";
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
 import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
 import { logger } from "./utils/Logger";
