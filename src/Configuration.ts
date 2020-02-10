@@ -77,14 +77,14 @@ export const CONFIG = {
 // Configuration validator - Define configuration types and interfaces
 const ServerConfiguration = t.interface({
   HOST: NonEmptyString,
-  PORT: WithinRangeNumber(0, 65535),
-  CLIENT_CERTIFICATE_FINGERPRINT: NonEmptyString
+  PORT: WithinRangeNumber(0, 65535)
 });
 export type ServerConfiguration = t.TypeOf<typeof ServerConfiguration>;
 
 const ControllerConfig = t.intersection([
   ServerConfiguration,
   t.interface({
+    CLIENT_CERTIFICATE_FINGERPRINT: NonEmptyString,
     ROUTES: t.interface({
       RESTFUL: t.interface({
         PAYMENT_ACTIVATIONS_GET: NonEmptyString,
