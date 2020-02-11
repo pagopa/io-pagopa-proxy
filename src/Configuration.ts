@@ -45,6 +45,8 @@ export const CONFIG = {
     CLIENT_TIMEOUT_MSEC: Number(process.env.PAGOPA_TIMEOUT_MSEC) || 60000,
     HOST: process.env.PAGOPA_HOST || localhost,
     HOST_HEADER: process.env.PAGOPA_HOST_HEADER,
+    CERT: process.env.PAGOPA_CERT,
+    KEY: process.env.PAGOPA_KEY,
     // These information will identify our system when it will access to PagoPA
     IDENTIFIER: {
       IDENTIFICATIVO_CANALE: process.env.PAGOPA_ID_CANALE,
@@ -104,6 +106,8 @@ export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 export const PagoPAConfig = t.intersection([
   ServerConfiguration,
   t.interface({
+    CERT: NonEmptyString,
+    KEY: NonEmptyString,
     CLIENT_TIMEOUT_MSEC: t.number,
     IDENTIFIER: t.interface({
       IDENTIFICATIVO_CANALE: stText35_ppt,

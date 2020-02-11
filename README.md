@@ -37,26 +37,28 @@ https://github.com/vpulim/node-soap/pull/1009
 
 Those are all Environment variables needed by the application:
 
-| Variable name                              | Description                                                    | type    | default                                            |
-| ------------------------------------------ | -------------------------------------------------------------- | ------- | -------------------------------------------------- |
-| WINSTON_LOG_LEVEL                          | The log level used for Winston logger                          | logLev  | debug                                              |
-| PAGOPAPROXY_HOST                           | The hostname or IP address the Express server is listening to  | string  | localhost                                          |
-| PAGOPAPROXY_PORT                           | The HTTP port the Express server is listening to               | int     | 3000                                               |
-| PAGOPAPROXY_CLIENT_CERTIFICATE_FINGERPRINT | SHA256 client certificate fingerprint (without `:` separators) | string  |                                                    |
-| PAGOPA_HOST                                | The PagoPA SOAP Server hostname or IP address                  | string  | localhost                                          |
-| PAGOPA_PORT                                | The PagoPA SOAP Server port                                    | int     | 3001                                               |
-| PAGOPA_WS_URI                              | The PagoPA SAAP Server URI for SOAP WebService                 | string  | /webservices/pof/PagamentiTelematiciPspNodoservice |
-| PAGOPA_HOST_HEADER                         | The PagoPA SOAP Server Host option for HTTP header             | string  |                                                    |
-| PAGOPA_PASSWORD                            | The password used to authenticate to PagoPA SOAP Server        | string  |                                                    |
-| PAGOPA_TIMEOUT_MSEC                        | The PagoPA SOAP Client Timeout in milliseconds                 | int     | 60000                                              |
-| PAGOPA_ID_PSP                              | The IDENTIFICATIVO_PSP value provided to PagoPA                | string  |                                                    |
-| PAGOPA_ID_INT_PSP                          | The IDENTIFICATIVO_INTERMEDIARIO_PSP value provided to PagoPA  | string  |                                                    |
-| PAGOPA_ID_CANALE                           | The IDENTIFICATIVO_CANALE value provided to PagoPA             | string  |                                                    |
-| PAGOPA_ID_CANALE_PAGAMENTO                 | The IDENTIFICATIVO_CANALE_PAGAMENTO value provided to PagoPA   | string  |                                                    |
-| REDIS_DB_URL                               | The Redis DB Server URL                                        | string  | localhost                                          |
-| REDIS_DB_PORT                              | The Redis DB Server port                                       | int     | 6379                                               |
-| REDIS_DB_PASSWORD                          | The Redis DB Server password                                   | string  |                                                    |
-| REDIS_USE_CLUSTER                          | Enable Redis Cluster                                           | boolean | false                                              |
+| Variable name                              | Description                                                     | type    | default                                            |
+| ------------------------------------------ | --------------------------------------------------------------- | ------- | -------------------------------------------------- |
+| WINSTON_LOG_LEVEL                          | The log level used for Winston logger                           | logLev  | debug                                              |
+| PAGOPAPROXY_HOST                           | The hostname or IP address the Express server is listening to   | string  | localhost                                          |
+| PAGOPAPROXY_PORT                           | The HTTP port the Express server is listening to                | int     | 3000                                               |
+| PAGOPAPROXY_CLIENT_CERTIFICATE_FINGERPRINT | SHA256 client certificate fingerprint (without `:` separators)  | string  |                                                    |
+| PAGOPA_HOST                                | The PagoPA SOAP Server hostname or IP address                   | string  | localhost                                          |
+| PAGOPA_PORT                                | The PagoPA SOAP Server port                                     | int     | 3001                                               |
+| PAGOPA_CERT                                | The PagoPA SOAP Server client certificate in base64             | string  |                                                    |
+| PAGOPA_KEY                                 | The PagoPA SOAP Server client certificate private key in base64 | string  |                                                    |
+| PAGOPA_WS_URI                              | The PagoPA SAAP Server URI for SOAP WebService                  | string  | /webservices/pof/PagamentiTelematiciPspNodoservice |
+| PAGOPA_HOST_HEADER                         | The PagoPA SOAP Server Host option for HTTP header              | string  |                                                    |
+| PAGOPA_PASSWORD                            | The password used to authenticate to PagoPA SOAP Server         | string  |                                                    |
+| PAGOPA_TIMEOUT_MSEC                        | The PagoPA SOAP Client Timeout in milliseconds                  | int     | 60000                                              |
+| PAGOPA_ID_PSP                              | The IDENTIFICATIVO_PSP value provided to PagoPA                 | string  |                                                    |
+| PAGOPA_ID_INT_PSP                          | The IDENTIFICATIVO_INTERMEDIARIO_PSP value provided to PagoPA   | string  |                                                    |
+| PAGOPA_ID_CANALE                           | The IDENTIFICATIVO_CANALE value provided to PagoPA              | string  |                                                    |
+| PAGOPA_ID_CANALE_PAGAMENTO                 | The IDENTIFICATIVO_CANALE_PAGAMENTO value provided to PagoPA    | string  |                                                    |
+| REDIS_DB_URL                               | The Redis DB Server URL                                         | string  | localhost                                          |
+| REDIS_DB_PORT                              | The Redis DB Server port                                        | int     | 6379                                               |
+| REDIS_DB_PASSWORD                          | The Redis DB Server password                                    | string  |                                                    |
+| REDIS_USE_CLUSTER                          | Enable Redis Cluster                                            | boolean | false                                              |
 
 logLev values: "error", "info", "debug"
 
