@@ -84,7 +84,6 @@ export type ServerConfiguration = t.TypeOf<typeof ServerConfiguration>;
 const ControllerConfig = t.intersection([
   ServerConfiguration,
   t.interface({
-    CLIENT_CERTIFICATE_FINGERPRINT: NonEmptyString,
     ROUTES: t.interface({
       RESTFUL: t.interface({
         PAYMENT_ACTIVATIONS_GET: NonEmptyString,
@@ -95,6 +94,9 @@ const ControllerConfig = t.intersection([
         PAYMENT_ACTIVATIONS_STATUS_UPDATE: NonEmptyString
       })
     })
+  }),
+  t.partial({
+    CLIENT_CERTIFICATE_FINGERPRINT: NonEmptyString
   })
 ]);
 export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;

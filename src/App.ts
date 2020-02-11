@@ -102,11 +102,14 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const loggerFormat =
     ":date[iso] [info]: :method :url :status - :response-time ms";
   app.use(morgan(loggerFormat));
-  app.use(
-    requireClientCertificateFingerprint(
-      config.CONTROLLER.CLIENT_CERTIFICATE_FINGERPRINT
-    )
-  );
+
+  const clientCertificateFingerprint =
+    config.CONTROLLER.CLIENT_CERTIFICATE_FINGERPRINT;
+  // Verify client certificate fingerprint if required
+  if (clientCertificateFingerprint !== undefined) {
+    app.use(requireClientCertificateFingerprint(clientCertificateFingerprint));
+  }
+
   setRestfulRoutes(app, config, redisClient, pagoPAClient);
 
   // Define SOAP endpoints
