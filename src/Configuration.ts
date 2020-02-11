@@ -21,6 +21,9 @@ export const CONFIG = {
   CONTROLLER: {
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
     PORT: Number(process.env.PAGOPAPROXY_PORT) || 3000,
+    // SHA256 client certificate fingerprint (without `:` separators)
+    CLIENT_CERTIFICATE_FINGERPRINT:
+      process.env.PAGOPAPROXY_CLIENT_CERTIFICATE_FINGERPRINT,
     ROUTES: {
       RESTFUL: {
         PAYMENT_ACTIVATIONS_GET:
@@ -91,6 +94,9 @@ const ControllerConfig = t.intersection([
         PAYMENT_ACTIVATIONS_STATUS_UPDATE: NonEmptyString
       })
     })
+  }),
+  t.partial({
+    CLIENT_CERTIFICATE_FINGERPRINT: NonEmptyString
   })
 ]);
 export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
