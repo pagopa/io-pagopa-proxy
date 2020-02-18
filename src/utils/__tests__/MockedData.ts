@@ -48,7 +48,7 @@ export const aVerificaRPTOutputKOGeneric = esitoNodoVerificaRPTRisposta_ppt
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
-      faultCode: "PPT_DOMINIO_SCONOCIUTO",
+      faultCode: "PPT_DOMINIO_SCONOSCIUTO",
       faultString: "Identificativo richiedente non valido."
     }
   })

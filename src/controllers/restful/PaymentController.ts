@@ -464,7 +464,7 @@ function getErrorMessageFromPA(
       return PaymentFaultEnum.DOMAIN_UNKNOWN;
     default:
       // faultCode doesn't match anything
-      logger.warn(`Unexected originalFaultCode : ${originalFaultCode} from PA`);
+      logger.warn(`Unexpected originalFaultCode : ${originalFaultCode} from PA`);
       return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
   }
 }
