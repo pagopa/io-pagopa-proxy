@@ -433,7 +433,7 @@ export function getErrorMessageCtrlFromPagoPaError(
   originalFaultCode: string | undefined
 ): PaymentFaultEnum {
   switch (faultCode) {
-    case "PPT_EMESSO_DA_PAA":
+    case "PPT_ERRORE_EMESSO_DA_PAA":
       return getErrorMessageFromPA(originalFaultCode);
     case "PPT_DOMINIO_SCONOSCIUTO":
       return PaymentFaultEnum.DOMAIN_UNKNOWN;
