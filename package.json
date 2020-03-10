@@ -28,7 +28,7 @@
     "test": "npm-run-all -s test:*",
     "lint": "tslint --project .",
     "postversion": "git push && git push --tags",
-    "dist:modules": "modclean -r -n default:safe && npm prune --production",
+    "dist:modules": "modclean -r -n default:safe",
     "predeploy": "npm-run-all build dist:modules"
   },
   "devDependencies": {
