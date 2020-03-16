@@ -249,6 +249,8 @@ export const aPaymentActivationsPostRequest = PaymentActivationsPostRequest.deco
 export const aConfig = PagoPAConfig.decode({
   HOST: process.env.PAGOPA_HOST || "http://localhost",
   PORT: process.env.PAGOPA_PORT || 3001,
+  CERT: process.env.PAGOPA_CERT || "fakecert",
+  KEY: process.env.PAGOPA_KEY || "fakekey",
   CLIENT_TIMEOUT_MSEC: process.env.PAGOPA_TIMEOUT_MSEC || 60000,
   WS_SERVICES: {
     PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
