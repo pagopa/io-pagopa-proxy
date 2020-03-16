@@ -20,7 +20,7 @@ export const CONFIG = {
   // Used to expose services
   CONTROLLER: {
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
-    PORT: Number(process.env.PAGOPAPROXY_PORT) || 3000,
+    PORT: Number(process.env.PAGOPAPROXY_PORT) || process.env.PORT || 3000,
     // SHA256 client certificate fingerprint (without `:` separators)
     CLIENT_CERTIFICATE_FINGERPRINT:
       process.env.PAGOPAPROXY_CLIENT_CERTIFICATE_FINGERPRINT,
@@ -79,7 +79,8 @@ export const CONFIG = {
 // Configuration validator - Define configuration types and interfaces
 const ServerConfiguration = t.interface({
   HOST: NonEmptyString,
-  PORT: WithinRangeNumber(0, 65535)
+  // We allow t.string to use socket pipe address in Azure App Services
+  PORT: WithinRangeNumber(0, 65535) || t.string
 });
 export type ServerConfiguration = t.TypeOf<typeof ServerConfiguration>;
 
