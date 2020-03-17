@@ -17,6 +17,7 @@ import { specs as publicApiV1Specs } from "../generated/api/public_api_pagopa";
 import { Configuration } from "./Configuration";
 import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
+import { requireClientCertificateFingerprint } from "./middlewares/requireClientCertificateFingerprint";
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
 import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
 import { logger } from "./utils/Logger";
@@ -84,7 +85,9 @@ export async function startApp(config: Configuration): Promise<http.Server> {
           config.PAGOPA.WS_SERVICES.PAGAMENTI
         }`,
         wsdl_options: {
-          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
+          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC,
+          cert: config.PAGOPA.CERT,
+          key: config.PAGOPA.KEY
         }
       },
       config.PAGOPA.HOST_HEADER
@@ -101,6 +104,14 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const loggerFormat =
     ":date[iso] [info]: :method :url :status - :response-time ms";
   app.use(morgan(loggerFormat));
+
+  const clientCertificateFingerprint =
+    config.CONTROLLER.CLIENT_CERTIFICATE_FINGERPRINT;
+  // Verify client certificate fingerprint if required
+  if (clientCertificateFingerprint !== undefined) {
+    app.use(requireClientCertificateFingerprint(clientCertificateFingerprint));
+  }
+
   setRestfulRoutes(app, config, redisClient, pagoPAClient);
 
   // Define SOAP endpoints

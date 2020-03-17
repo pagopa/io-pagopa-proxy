@@ -20,7 +20,10 @@ export const CONFIG = {
   // Used to expose services
   CONTROLLER: {
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
-    PORT: Number(process.env.PAGOPAPROXY_PORT) || 3000,
+    PORT: Number(process.env.PAGOPAPROXY_PORT) || process.env.PORT || 3000,
+    // SHA256 client certificate fingerprint (without `:` separators)
+    CLIENT_CERTIFICATE_FINGERPRINT:
+      process.env.PAGOPAPROXY_CLIENT_CERTIFICATE_FINGERPRINT,
     ROUTES: {
       RESTFUL: {
         PAYMENT_ACTIVATIONS_GET:
@@ -42,6 +45,8 @@ export const CONFIG = {
     CLIENT_TIMEOUT_MSEC: Number(process.env.PAGOPA_TIMEOUT_MSEC) || 60000,
     HOST: process.env.PAGOPA_HOST || localhost,
     HOST_HEADER: process.env.PAGOPA_HOST_HEADER,
+    CERT: process.env.PAGOPA_CERT,
+    KEY: process.env.PAGOPA_KEY,
     // These information will identify our system when it will access to PagoPA
     IDENTIFIER: {
       IDENTIFICATIVO_CANALE: process.env.PAGOPA_ID_CANALE,
@@ -74,7 +79,8 @@ export const CONFIG = {
 // Configuration validator - Define configuration types and interfaces
 const ServerConfiguration = t.interface({
   HOST: NonEmptyString,
-  PORT: WithinRangeNumber(0, 65535)
+  // We allow t.string to use socket pipe address in Azure App Services
+  PORT: WithinRangeNumber(0, 65535) || t.string
 });
 export type ServerConfiguration = t.TypeOf<typeof ServerConfiguration>;
 
@@ -91,6 +97,9 @@ const ControllerConfig = t.intersection([
         PAYMENT_ACTIVATIONS_STATUS_UPDATE: NonEmptyString
       })
     })
+  }),
+  t.partial({
+    CLIENT_CERTIFICATE_FINGERPRINT: NonEmptyString
   })
 ]);
 export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
@@ -98,6 +107,8 @@ export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 export const PagoPAConfig = t.intersection([
   ServerConfiguration,
   t.interface({
+    CERT: NonEmptyString,
+    KEY: NonEmptyString,
     CLIENT_TIMEOUT_MSEC: t.number,
     IDENTIFIER: t.interface({
       IDENTIFICATIVO_CANALE: stText35_ppt,
