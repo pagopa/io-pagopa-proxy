@@ -3,7 +3,6 @@
  */
 
 import * as t from "io-ts";
-import { WithinRangeNumber } from "italia-ts-commons/lib/numbers";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import { stText35_ppt } from "../generated/PagamentiTelematiciPspNodoservice//stText35_ppt";
 import { stPassword_ppt } from "../generated/PagamentiTelematiciPspNodoservice/stPassword_ppt";
@@ -20,7 +19,7 @@ export const CONFIG = {
   // Used to expose services
   CONTROLLER: {
     HOST: process.env.PAGOPAPROXY_HOST || localhost,
-    PORT: Number(process.env.PAGOPAPROXY_PORT) || process.env.PORT || 3000,
+    PORT: process.env.PAGOPAPROXY_PORT || process.env.PORT || 3000,
     // SHA256 client certificate fingerprint (without `:` separators)
     CLIENT_CERTIFICATE_FINGERPRINT:
       process.env.PAGOPAPROXY_CLIENT_CERTIFICATE_FINGERPRINT,
@@ -55,7 +54,7 @@ export const CONFIG = {
       IDENTIFICATIVO_PSP: process.env.PAGOPA_ID_PSP,
       PASSWORD: process.env.PAGOPA_PASSWORD
     },
-    PORT: Number(process.env.PAGOPA_PORT) || 3001,
+    PORT: process.env.PAGOPA_PORT || 3001,
     WS_SERVICES: {
       PAGAMENTI:
         process.env.PAGOPA_WS_URI ||
@@ -67,7 +66,7 @@ export const CONFIG = {
   REDIS_DB: {
     HOST: process.env.REDIS_DB_URL || "redis://localhost",
     PASSWORD: process.env.REDIS_DB_PASSWORD || "ND",
-    PORT: Number(process.env.REDIS_DB_PORT) || 6379,
+    PORT: process.env.REDIS_DB_PORT || 6379,
     USE_CLUSTER: Boolean(process.env.REDIS_USE_CLUSTER) || false
   },
 
@@ -80,7 +79,7 @@ export const CONFIG = {
 const ServerConfiguration = t.interface({
   HOST: NonEmptyString,
   // We allow t.string to use socket pipe address in Azure App Services
-  PORT: WithinRangeNumber(0, 65535) || t.string
+  PORT: t.any
 });
 export type ServerConfiguration = t.TypeOf<typeof ServerConfiguration>;
 

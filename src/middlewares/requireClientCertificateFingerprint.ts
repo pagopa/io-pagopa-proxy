@@ -4,8 +4,6 @@
  */
 
 import * as express from "express";
-
-import memoize from "fast-memoize";
 import { asn1, md, pki } from "node-forge";
 
 const CLIENT_CERTIFICATE_HEADER_NAME = "x-arr-clientcert";
@@ -18,10 +16,6 @@ function getFingerprintFromCertificate(certificate: pki.Certificate): string {
     .toHex()
     .toUpperCase();
 }
-
-const getFingerprintFromCertificateMemoized = memoize(
-  getFingerprintFromCertificate
-);
 
 export function requireClientCertificateFingerprint(
   validFingerprint: string
@@ -43,9 +37,7 @@ export function requireClientCertificateFingerprint(
         const clientCertificate = pki.certificateFromPem(pem);
 
         // Extract the fingerprint
-        const fingerprint = getFingerprintFromCertificateMemoized(
-          clientCertificate
-        );
+        const fingerprint = getFingerprintFromCertificate(clientCertificate);
 
         // Very the fingerprint
         if (fingerprint !== validFingerprint) {
