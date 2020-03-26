@@ -106,8 +106,6 @@ export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 export const PagoPAConfig = t.intersection([
   ServerConfiguration,
   t.interface({
-    CERT: NonEmptyString,
-    KEY: NonEmptyString,
     CLIENT_TIMEOUT_MSEC: t.number,
     IDENTIFIER: t.interface({
       IDENTIFICATIVO_CANALE: stText35_ppt,
@@ -121,6 +119,8 @@ export const PagoPAConfig = t.intersection([
     })
   }),
   t.partial({
+    CERT: NonEmptyString,
+    KEY: NonEmptyString,
     HOST_HEADER: t.string
   })
 ]);
