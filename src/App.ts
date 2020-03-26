@@ -85,11 +85,11 @@ export async function startApp(config: Configuration): Promise<http.Server> {
           config.PAGOPA.WS_SERVICES.PAGAMENTI
         }`,
         wsdl_options: {
-          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC,
-          cert: config.PAGOPA.CERT,
-          key: config.PAGOPA.KEY
+          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
         }
       },
+      config.PAGOPA.CERT,
+      config.PAGOPA.KEY,
       config.PAGOPA.HOST_HEADER
     )
   );

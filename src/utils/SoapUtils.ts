@@ -12,6 +12,8 @@ import * as soap from "soap";
 export function createClient<T>(
   wsdlUri: string,
   options: soap.IOptions,
+  cert: string,
+  key: string,
   hostHeader?: string
 ): Promise<soap.Client & T> {
   return new Promise((resolve, reject) => {
@@ -19,6 +21,9 @@ export function createClient<T>(
       if (err) {
         reject(err);
       } else {
+        client.setSecurity(
+          new soap.ClientSSLSecurity(Buffer.from(key), Buffer.from(cert))
+        );
         if (hostHeader !== undefined) {
           client.addHttpHeader("Host", hostHeader);
         }
