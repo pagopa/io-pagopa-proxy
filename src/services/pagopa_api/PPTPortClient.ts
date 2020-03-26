@@ -22,8 +22,8 @@ export const PAGAMENTI_TELEMATICI_PSP_WSDL_PATH = `${__dirname}/../../wsdl/NodoP
  */
 export function createPagamentiTelematiciPspNodoClient(
   options: soap.IOptions,
-  cert: string,
-  key: string,
+  cert?: string,
+  key?: string,
   hostHeader?: string
 ): Promise<soap.Client & IPPTPortSoap> {
   return createClient<IPPTPortSoap>(
