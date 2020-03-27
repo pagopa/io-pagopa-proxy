@@ -15,9 +15,7 @@ export async function createPagamentiTelematiciPspNodoClient(
 ): Promise<soap.Client & IPPTPortSoap> {
   return createClient<IPPTPortSoap>(
     PPTPortClient.PAGAMENTI_TELEMATICI_PSP_WSDL_PATH,
-    options,
-    "mycert",
-    "mykey"
+    options
   );
 }
 
