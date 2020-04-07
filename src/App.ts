@@ -3,6 +3,7 @@
  * Define a Restful and a SOAP Webservice and routes incoming requests to controllers
  */
 
+import * as appInsights from "applicationinsights";
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as core from "express-serve-static-core";
@@ -41,12 +42,22 @@ const getFespCdServiceHandler = (
         input.identificativoUnivocoVersamento
       }`
     );
+    const aiEventProps = {
+      idpayment: input.idPagamento,
+      ccp: input.codiceContestoPagamento,
+      iddominio: input.identificativoDominio,
+      iuv: input.identificativoUnivocoVersamento
+    };
     PaymentController.setActivationStatus(
       input,
       redisTimeoutSecs,
       redisClient
     ).then(
       iCdInfoWispOutput => {
+        appInsights.defaultClient.trackEvent({
+          name: "CDINFO_COMPLETE",
+          properties: aiEventProps
+        });
         if (cb) {
           // we need to cast the callback to any as the type definition doesn't
           // include all the actual parameters
@@ -56,6 +67,10 @@ const getFespCdServiceHandler = (
       },
       err => {
         logger.error(`Error on setActivationStatus: ${err}`);
+        appInsights.defaultClient.trackEvent({
+          name: "CDINFO_ERROR",
+          properties: aiEventProps
+        });
         if (cb) {
           // we need to cast the callback to any as the type definition doesn't
           // include all the actual parameters

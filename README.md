@@ -59,6 +59,7 @@ Those are all Environment variables needed by the application:
 | REDIS_DB_PORT                              | The Redis DB Server port                                        | int     | 6379                                               |
 | REDIS_DB_PASSWORD                          | The Redis DB Server password                                    | string  |                                                    |
 | REDIS_USE_CLUSTER                          | Enable Redis Cluster                                            | boolean | false                                              |
+| APPINSIGHTS_INSTRUMENTATIONKEY | Instrumentation key for application insights | string | |
 
 logLev values: "error", "info", "debug"
 
