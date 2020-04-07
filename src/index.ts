@@ -14,8 +14,21 @@ const config = Configuration.decode(CONFIG).getOrElseL(errors => {
   throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
 });
 
-logger.verbose("Starting application insights agent");
-appInsights.setup().setUseDiskRetryCaching(false); // do not buffer request data on disk
+// see https://github.com/projectkudu/kudu/wiki/Azure-runtime-environment#website-environment-variables
+const aiCloudRole = process.env.WEBSITE_SITE_NAME || "pagopa-proxy";
+logger.verbose(
+  `Starting application insights agent - cloudRole[${aiCloudRole}]`
+);
+
+appInsights
+  .setup()
+  // do not buffer request data on disk
+  .setUseDiskRetryCaching(false);
+
+// tslint:disable-next-line: no-object-mutation
+appInsights.defaultClient.context.tags[
+  appInsights.defaultClient.context.keys.cloudRole
+] = aiCloudRole;
 
 appInsights.start();
 
