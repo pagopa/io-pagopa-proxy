@@ -20,7 +20,8 @@
 #    -- 'deployToStagingSlotAndSwap': deploy to 'staging' slot and then swap 
 # - PRODUCTION_AZURE_SUBSCRIPTION
 # - PRODUCTION_RESOURCE_GROUP_NAME
-# - PRODUCTION_APP_NAME
+# - PRODUCTION_PROXYPROD_APP_NAME: app service connecting to Pagopa prod node 
+# - PRODUCTION_PROXYTEST_APP_NAME: app service connecting to Pagopa test node
 #
 # - TEST_DEPLOY_TYPE:
 #      -- 'deployToTestSlot' (default): deploy to 'test' slot 
@@ -234,11 +235,21 @@ stages:
         - Build
         - Test
       jobs:
-        - job: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}'
+        - job: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}_proxyprod'
           steps:
           - template: azure-templates/deploy-steps.yml
             parameters:
               deployType: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}'
               azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
               resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
-              appName: '$(PRODUCTION_APP_NAME)'
+              appName: '$(PRODUCTION_PROXYPROD_APP_NAME)'
+
+        - job: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}_proxytest'
+          steps:
+          - template: azure-templates/deploy-steps.yml
+            parameters:
+              deployType: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}'
+              azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+              resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
+              appName: '$(PRODUCTION_PROXYTEST_APP_NAME)'
+    
