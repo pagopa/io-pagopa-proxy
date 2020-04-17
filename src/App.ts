@@ -201,6 +201,8 @@ function setRestfulRoutes(
   // @see
   // https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#define-a-liveness-http-request
   app.get("/ping", (_, res) => res.status(200).send("ok"));
+
+  app.get("/", (_, res) => res.status(200).send());
 }
 
 /**
