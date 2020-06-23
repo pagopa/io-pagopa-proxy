@@ -6,6 +6,7 @@
 import { Either, isRight, left, right } from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { RptId, RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
+import { IWithinRangeStringTag } from "italia-ts-commons/lib/strings";
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
@@ -145,7 +146,20 @@ export function getNodoAttivaRPTInput(
       codiceIdRPT,
       datiPagamentoPSP: {
         importoSingoloVersamento:
-          paymentActivationsPostRequest.importoSingoloVersamento / 100
+          paymentActivationsPostRequest.importoSingoloVersamento / 100,
+        soggettoPagatore: paymentActivationsPostRequest.soggettoPagatore
+          ? {
+              identificativoUnivocoPagatore: {
+                tipoIdentificativoUnivoco:
+                  paymentActivationsPostRequest.soggettoPagatore.tipo,
+                codiceIdentificativoUnivoco: (paymentActivationsPostRequest
+                  .soggettoPagatore.fiscal_code as unknown) as string &
+                  IWithinRangeStringTag<1, 36>
+              },
+              anagraficaPagatore:
+                paymentActivationsPostRequest.soggettoPagatore.anagrafica
+            }
+          : undefined
       }
     });
   } catch (exception) {
