@@ -134,16 +134,14 @@ export function getNodoAttivaRPTInput(
     );
     const maybeSoggettoPagatore = fromNullable(
       paymentActivationsPostRequest.soggettoPagatore
-    )
-      .map(soggettoPagatore => ({
-        identificativoUnivocoPagatore: {
-          tipoIdentificativoUnivoco: soggettoPagatore.tipo,
-          codiceIdentificativoUnivoco: (soggettoPagatore.fiscal_code as unknown) as string &
-            IWithinRangeStringTag<1, 36>
-        },
-        anagraficaPagatore: soggettoPagatore.anagrafica
-      }))
-      .toUndefined();
+    ).map(({ tipo, fiscal_code, anagrafica }) => ({
+      identificativoUnivocoPagatore: {
+        tipoIdentificativoUnivoco: tipo,
+        codiceIdentificativoUnivoco: (fiscal_code as unknown) as string &
+          IWithinRangeStringTag<1, 36>
+      },
+      anagraficaPagatore: anagrafica
+    }));
     return right({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
@@ -160,7 +158,7 @@ export function getNodoAttivaRPTInput(
       datiPagamentoPSP: {
         importoSingoloVersamento:
           paymentActivationsPostRequest.importoSingoloVersamento / 100,
-        soggettoPagatore: maybeSoggettoPagatore
+        soggettoPagatore: maybeSoggettoPagatore.toUndefined()
       }
     });
   } catch (exception) {
