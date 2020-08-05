@@ -94,6 +94,8 @@ paths:
           schema:
             $ref: "#/definitions/ProblemJson"
 definitions:
+  FiscalCode:
+    $ref: "https://raw.githubusercontent.com/pagopa/io-functions-commons/v10.2.3/openapi/definitions.yaml#/FiscalCode"
   ProblemJson:
     $ref: "https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
   PaymentProblemJson:
@@ -200,6 +202,23 @@ definitions:
         maxLength: 36
     required:
     - idPagamento
+  SoggettoPagatore:
+    type: object
+    properties:
+      tipo:
+        type: string
+        minLength: 1
+        maxLength: 2
+      fiscal_code:
+        $ref: "#/definitions/FiscalCode"
+      anagrafica:
+        type: string
+        minLength: 1
+        maxLength: 71
+    required:
+      - tipo
+      - fiscal_code
+      - anagrafica
   PaymentActivationsPostRequest:
     type: object
     description: Define the request received from CD App to require a payment activation
@@ -210,6 +229,8 @@ definitions:
         $ref: '#/definitions/ImportoEuroCents'
       codiceContestoPagamento:
         $ref: '#/definitions/CodiceContestoPagamento'
+      soggettoPagatore:
+        $ref: "#/definitions/SoggettoPagatore"
     required:
       - rptId
       - importoSingoloVersamento
