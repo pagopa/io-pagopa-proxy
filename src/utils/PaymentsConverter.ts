@@ -4,6 +4,7 @@
  */
 
 import { Either, isRight, left, right } from "fp-ts/lib/Either";
+import { fromNullable } from "fp-ts/lib/Option";
 import * as t from "io-ts";
 import { RptId, RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
 import { IWithinRangeStringTag } from "italia-ts-commons/lib/strings";
@@ -131,6 +132,18 @@ export function getNodoAttivaRPTInput(
     const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
       paymentActivationsPostRequest.codiceContestoPagamento
     );
+    const maybeSoggettoPagatore = fromNullable(
+      paymentActivationsPostRequest.soggettoPagatore
+    )
+      .map(soggettoPagatore => ({
+        identificativoUnivocoPagatore: {
+          tipoIdentificativoUnivoco: soggettoPagatore.tipo,
+          codiceIdentificativoUnivoco: (soggettoPagatore.fiscal_code as unknown) as string &
+            IWithinRangeStringTag<1, 36>
+        },
+        anagraficaPagatore: soggettoPagatore.anagrafica
+      }))
+      .toUndefined();
     return right({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
@@ -147,19 +160,7 @@ export function getNodoAttivaRPTInput(
       datiPagamentoPSP: {
         importoSingoloVersamento:
           paymentActivationsPostRequest.importoSingoloVersamento / 100,
-        soggettoPagatore: paymentActivationsPostRequest.soggettoPagatore
-          ? {
-              identificativoUnivocoPagatore: {
-                tipoIdentificativoUnivoco:
-                  paymentActivationsPostRequest.soggettoPagatore.tipo,
-                codiceIdentificativoUnivoco: (paymentActivationsPostRequest
-                  .soggettoPagatore.fiscal_code as unknown) as string &
-                  IWithinRangeStringTag<1, 36>
-              },
-              anagraficaPagatore:
-                paymentActivationsPostRequest.soggettoPagatore.anagrafica
-            }
-          : undefined
+        soggettoPagatore: maybeSoggettoPagatore
       }
     });
   } catch (exception) {
