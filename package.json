@@ -69,7 +69,7 @@
     "italia-pagopa-commons": "^1.0.0",
     "italia-ts-commons": "^5.1.0",
     "morgan": "^1.9.1",
-    "node-forge": "^0.9.1",
+    "node-forge": "^0.10.0",
     "redis": "^2.8.0",
     "redis-clustr": "^1.6.0",
     "soap": "^0.27.1",
