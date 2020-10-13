@@ -2,6 +2,7 @@
  * Common configurations for Proxy PagoPA and external resources
  */
 
+import { fromNullable } from "fp-ts/lib/Option";
 import * as t from "io-ts";
 import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import { stText35_ppt } from "../generated/PagamentiTelematiciPspNodoservice//stText35_ppt";
@@ -67,7 +68,9 @@ export const CONFIG = {
     HOST: process.env.REDIS_DB_URL || "redis://localhost",
     PASSWORD: process.env.REDIS_DB_PASSWORD || "ND",
     PORT: process.env.REDIS_DB_PORT || 6379,
-    USE_CLUSTER: Boolean(process.env.REDIS_USE_CLUSTER) || false
+    USE_CLUSTER: fromNullable(process.env.REDIS_USE_CLUSTER)
+      .map(_ => _.toLocaleLowerCase() === "true")
+      .getOrElse(false)
   },
 
   // Timeout used to store PaymentId into redis db (AttivaRPT process)
