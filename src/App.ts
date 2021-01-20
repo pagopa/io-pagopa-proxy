@@ -23,6 +23,12 @@ import * as FespCdServer from "./services/pagopa_api/FespCdServer";
 import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
 import { logger } from "./utils/Logger";
 
+import * as packageJson from "../package.json";
+
+interface IInfo {
+  version: string;
+}
+
 /**
  * Define a Service Handler for FespCdService SOAP service
  * It's an endpoint for PagoPA to confirm a payment activation result
@@ -203,6 +209,16 @@ function setRestfulRoutes(
   app.get("/ping", (_, res) => res.status(200).send("ok"));
 
   app.get("/", (_, res) => res.status(200).send());
+
+  //
+  // Healthcheck endpoint
+  //
+  app.get("/info", (_, res) => {
+    const info = {
+      version: packageJson.version
+    } as IInfo;
+    return info;
+  });
 }
 
 /**
