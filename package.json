@@ -29,7 +29,9 @@
     "lint": "tslint --project .",
     "postversion": "git push && git push --tags",
     "dist:modules": "modclean -r -n default:safe",
-    "predeploy": "npm-run-all build dist:modules"
+    "predeploy": "npm-run-all build dist:modules",
+    "preversion": "auto-changelog  --config .auto-changelog.json --unreleased --commit-limit false --stdout --template preview.hbs",
+    "version": "auto-changelog -p --config .auto-changelog.json --unreleased && git add CHANGELOG.md"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.24",
@@ -44,6 +46,7 @@
     "@types/supertest": "^2.0.6",
     "@types/uuid": "^3.4.4",
     "apiconnect-wsdl": "^1.6.3",
+    "auto-changelog": "^2.2.1",
     "danger": "^7.1.4",
     "danger-plugin-digitalcitizenship": "^0.3.1",
     "italia-tslint-rules": "^1.1.3",
