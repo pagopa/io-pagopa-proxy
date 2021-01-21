@@ -14,8 +14,6 @@ parameters:
       - patch
     default: minor
 
-
-parameters:
   - name: 'TEST_ENABLE_DEPLOY'
     displayName: 'Enable deploy in test environment'
     type: boolean
