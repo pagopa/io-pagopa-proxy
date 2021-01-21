@@ -64,9 +64,9 @@ stages:
         steps:
           - template: azure-templates/setup-project.yml
         
-        - script: |
-            yarn generate
-          displayName: 'Generate definitions'        
+          - script: |
+              yarn generate
+            displayName: 'Generate definitions'        
         
           - script: |
               yarn test:unit
