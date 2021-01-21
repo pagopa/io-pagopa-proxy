@@ -16,10 +16,34 @@ parameters:
 
 
 parameters:
-  - name: 'ENABLE_DEPLOY'
-    displayName: 'Enable deploy'
+  - name: 'TEST_ENABLE_DEPLOY'
+    displayName: 'Enable deploy in test environment'
     type: boolean
     default: false
+
+  - name: 'TEST_DEPLOY_TYPE'
+    displayName: 'Method to achieve deployment in Test (if enabled):'
+    type: string
+    default: deployToTestSlot
+    values:
+      - deployToTestSlot  
+      - deployToProductionSlot
+
+  - name: 'PRODUCTION_ENABLE_DEPLOY'
+    displayName: 'Enable deploy in production environment'
+    type: boolean
+    default: true
+
+  - name: 'PRODUCTION_DEPLOY_TYPE'
+    displayName: 'Method to achieve deployment in Production (if enabled):'
+    type: string
+    default: deployToProductionSlot
+    values:
+      - deployToStagingSlot  
+      - deployToProductionSlot
+      - deployToStagingSlotAndSwap
+
+
 
 # Only manual activations are intended
 trigger: none
@@ -81,94 +105,61 @@ stages:
             displayName: 'Skip release bundle'
 
 
-  # Prepare Artifact
-  - stage: Deploy_staging
-    dependsOn:
-      - Release
-    jobs:
-      - job: 'prepare_artifact_and_deploy'
-        steps:
-          # Build application
-          - template: azure-templates/setup-project.yml
+  # C) Deploy to TEST environment if the following conditions apply:
+  #    - manual deployment:
+  #       - $DO_DEPLOY == true and TEST_ENABLE_DEPLOY == true
+  - ${{ if eq(parameters.TEST_ENABLE_DEPLOY, true) }}:
+    - stage: Deploy_test
+      condition: 
+        and(
+          succeeded(),
+          and (
+            eq(variables['DO_DEPLOY'], true),
+            eq(variables['Build.Reason'], 'Manual')
+          )
+        )    
+      dependsOn:
+        - Release
+      jobs:
+        - job: '${{ parameters.TEST_DEPLOY_TYPE }}'
+          steps:
+          - template: azure-templates/deploy-steps.yml
             parameters:
-              # On the assumption that this stage is executed only when Relase stage is,
-              #  with this parameter we set the reference the deploy script must pull changes from.
-              # The branch/tag name is calculated from the source branch
-              #  ex: Build.SourceBranch=refs/heads/master --> master
-              #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
-              gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
-          - script: |
-              yarn predeploy
-            displayName: 'Build'
+              deployType: '${{ parameters.TEST_DEPLOY_TYPE }}'
+              azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
+              resourceGroupName: '$(TEST_RESOURCE_GROUP_NAME)'
+              appName: '$(TEST_APP_NAME)'
 
-          # Copy application to  
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: '$(System.DefaultWorkingDirectory)'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
-              Contents: |
-                **/*
-                !.git/**/*
-                !**/*.js.map
-                !**/*.ts
-                !.vscode/**/*
-                !.devops/**/*
-                !.prettierrc
-                !.gitignore
-                !README.md
-                !jest.config.js
-                !local.settings.json
-                !test
-                !tsconfig.json
-                !tslint.json
-                !yarn.lock
-                !Dangerfile.js
-                !CODEOWNERS
-                !__*/**/*
-            displayName: 'Copy deploy files'
-            
-          - task: AzureFunctionApp@1  
-            inputs:
+  # D) Deploy to PRODUCTION environment if one of the following conditions apply:
+  #    - manual deployment:
+  #       - $DO_DEPLOY == true and PRODUCTION_ENABLE_DEPLOY == true
+  - ${{ if eq(parameters.PRODUCTION_ENABLE_DEPLOY, true) }}:
+    - stage: Deploy_production
+      condition: 
+        and(
+          succeeded(),
+          and (
+            eq(variables['DO_DEPLOY'], true),
+            eq(variables['Build.Reason'], 'Manual')
+          )
+        )
+      dependsOn:
+        - Release
+      jobs:
+        - job: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}_proxyprod'
+          steps:
+          - template: azure-templates/deploy-steps.yml
+            parameters:
+              deployType: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}'
               azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
               resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
-              appType: 'functionApp'
-              appName: '$(PRODUCTION_APP_NAME)'
-              package: '$(Build.ArtifactStagingDirectory)/'
-              deploymentMethod: 'auto'
-              deployToSlotOrASE: true
-              slotName: 'staging'
-            displayName: Deploy to staging slot
+              appName: '$(PRODUCTION_PROXYPROD_APP_NAME)'
 
-  # Check that the staging instance is healthy
-  - stage: Healthcheck
-    dependsOn:
-      - Deploy_staging
-    jobs:
-      - job: 'do_healthcheck'       
-        steps:  
-          - template: templates/rest-healthcheck/template.yaml@pagopaCommons 
+        - job: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}_proxytest'
+          steps:
+          - template: azure-templates/deploy-steps.yml
             parameters:
-              azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
-              appName: '$(PRODUCTION_APP_NAME)'
-              endpoint: 'https://$(PRODUCTION_APP_NAME)-staging.azurewebsites.net/info'
-              endpointType: 'private'
-              containerInstanceResourceGroup: 'io-p-rg-common'
-              containerInstanceVNet: 'io-p-vnet-common'
-              containerInstanceSubnet: 'azure-devops' 
-
-  # Promote the staging instance to production
-  - stage: Deploy_production
-    dependsOn:
-      - Healthcheck
-      - Deploy_staging
-    jobs:
-      - job: 'do_deploy'       
-        steps:  
-          - task: AzureAppServiceManage@0   
-            inputs:
+              deployType: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}'
               azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
               resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
-              webAppName: '$(PRODUCTION_APP_NAME)'
-              sourceSlot: staging
-              swapWithProduction: true
-            displayName: Swap with production slot
+              appName: '$(PRODUCTION_PROXYTEST_APP_NAME)'

@@ -17,9 +17,7 @@
   "rulesDirectory": [],
   "linterOptions": {
     "exclude": [
-      "generated/**/*",
-      "dist",
-      "package.json"
+      "generated/**/*"
     ]
   }
 }

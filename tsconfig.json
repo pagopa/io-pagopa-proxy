@@ -9,8 +9,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "resolveJsonModule": true
+    "strictFunctionTypes": true
   },
   "include": [
     "src/**/*.ts"
