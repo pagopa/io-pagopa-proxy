@@ -62,10 +62,7 @@ stages:
     jobs:
       - job: unit_tests
         steps:
-          - template: azure-templates/make-build-steps.yml
-            parameters:
-              make: build
-
+          - template: azure-templates/setup-project.yml
           - script: |
               yarn test:unit
             displayName: 'Unit tests'
