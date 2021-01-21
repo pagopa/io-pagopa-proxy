@@ -76,11 +76,60 @@ stages:
 
 
   # Prepare Artifact
-  - stage: Deploy_production
+  - stage: Prepare_artifact
     dependsOn:
       - Release
     jobs:
-      - job: 'prepare_artifact_and_deploy'
+      - job: make_build
+        steps:
+          - template: azure-templates/setup-project.yml
+            parameters:
+              # On the assumption that this stage is executed only when Relase stage is,
+              #  with this parameter we set the reference the deploy script must pull changes from.
+              # The branch/tag name is calculated from the source branch
+              #  ex: Build.SourceBranch=refs/heads/master --> master
+              #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
+              gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
+
+          - script: |
+              yarn build
+            displayName: 'Build'
+
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)'
+              TargetFolder: '$(System.DefaultWorkingDirectory)/bundle'
+              Contents: |
+                **/*
+                !.git/**/*
+                !**/*.js.map
+                !**/*.ts
+                !.vscode/**/*
+                !.devops/**/*
+                !.prettierrc
+                !.gitignore
+                !README.md
+                !jest.config.js
+                !local.settings.json
+                !test
+                !tsconfig.json
+                !tslint.json
+                !yarn.lock
+                !Dangerfile.js
+                !CODEOWNERS
+                !__*/**/*
+            displayName: 'Copy bundle files'
+          
+          - publish: $(System.DefaultWorkingDirectory)/bundle
+            artifact: Bundle
+
+
+  # Prepare Artifact
+  - stage: Prepare_artifact
+    dependsOn:
+      - Release
+    jobs:
+      - job: 'prepare_artifact'
         steps:
           # Build application
           - template: azure-templates/setup-project.yml
@@ -121,23 +170,44 @@ stages:
                 !__*/**/*
             displayName: 'Copy deploy files'
             
-          - task: AzureWebApp@1  
-            inputs:
-              azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
-              resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
-              appType: 'webApp'
-              appName: '$(PRODUCTION_PROXYPROD_APP_NAME)'
-              package: '$(Build.ArtifactStagingDirectory)/'
-              deploymentMethod: 'auto'
-            displayName: Deploy to production slot
-          
+  - stage: Deploy_test
+    dependsOn:
+      - Release
+    jobs:
+      - job: 'deploy'
+        steps:
+          - checkout: none
+
+          - download: current
+            artifact: Bundle
+
           - task: AzureWebApp@1  
             inputs:
               azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
               resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
               appType: 'webApp'
               appName: '$(PRODUCTION_PROXYTEST_APP_NAME)'
-              package: '$(Build.ArtifactStagingDirectory)/'
+              package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
-            displayName: Deploy to test environment production slot
+            displayName: Deploy to production slot
+  
+  - stage: Deploy_production
+    dependsOn:
+      - Release
+    jobs:
+      - job: 'deploy'
+        steps:
+          - checkout: none
 
+          - download: current
+            artifact: Bundle
+
+          - task: AzureWebApp@1  
+            inputs:
+              azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+              resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
+              appType: 'webApp'
+              appName: '$(PRODUCTION_PROXYPROD_APP_NAME)'
+              package: '$(Pipeline.Workspace)/Bundle'
+              deploymentMethod: 'auto'
+            displayName: Deploy to production slot
