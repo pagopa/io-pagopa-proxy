@@ -107,16 +107,13 @@ stages:
 
   # C) Deploy to TEST environment if the following conditions apply:
   #    - manual deployment:
-  #       - $DO_DEPLOY == true and TEST_ENABLE_DEPLOY == true
+  #       - TEST_ENABLE_DEPLOY == true
   - ${{ if eq(parameters.TEST_ENABLE_DEPLOY, true) }}:
     - stage: Deploy_test
       condition: 
         and(
           succeeded(),
-          and (
-            eq(variables['DO_DEPLOY'], true),
-            eq(variables['Build.Reason'], 'Manual')
-          )
+          eq(variables['Build.Reason'], 'Manual')
         )    
       dependsOn:
         - Release
@@ -132,16 +129,13 @@ stages:
 
   # D) Deploy to PRODUCTION environment if one of the following conditions apply:
   #    - manual deployment:
-  #       - $DO_DEPLOY == true and PRODUCTION_ENABLE_DEPLOY == true
+  #       - PRODUCTION_ENABLE_DEPLOY == true
   - ${{ if eq(parameters.PRODUCTION_ENABLE_DEPLOY, true) }}:
     - stage: Deploy_production
       condition: 
         and(
           succeeded(),
-          and (
-            eq(variables['DO_DEPLOY'], true),
-            eq(variables['Build.Reason'], 'Manual')
-          )
+          eq(variables['Build.Reason'], 'Manual')
         )
       dependsOn:
         - Release
