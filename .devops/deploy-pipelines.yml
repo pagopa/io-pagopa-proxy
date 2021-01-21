@@ -14,18 +14,6 @@ parameters:
       - patch
     default: minor
 
-  - name: 'TEST_ENABLE_DEPLOY'
-    displayName: 'Enable deploy in test environment'
-    type: boolean
-    default: false
-
-  - name: 'TEST_DEPLOY_TYPE'
-    displayName: 'Method to achieve deployment in Test (if enabled):'
-    type: string
-    default: deployToTestSlot
-    values:
-      - deployToTestSlot  
-      - deployToProductionSlot
 
   - name: 'PRODUCTION_ENABLE_DEPLOY'
     displayName: 'Enable deploy in production environment'
@@ -103,31 +91,9 @@ stages:
             displayName: 'Skip release bundle'
 
 
-  # C) Deploy to TEST environment if the following conditions apply:
+  # Deploy to PRODUCTION environment if one of the following conditions apply:
   #    - manual deployment:
-  #       - TEST_ENABLE_DEPLOY == true
-  - ${{ if eq(parameters.TEST_ENABLE_DEPLOY, true) }}:
-    - stage: Deploy_test
-      condition: 
-        and(
-          succeeded(),
-          eq(variables['Build.Reason'], 'Manual')
-        )    
-      dependsOn:
-        - Release
-      jobs:
-        - job: '${{ parameters.TEST_DEPLOY_TYPE }}'
-          steps:
-          - template: azure-templates/deploy-steps.yml
-            parameters:
-              deployType: '${{ parameters.TEST_DEPLOY_TYPE }}'
-              azureSubscription: '$(TEST_AZURE_SUBSCRIPTION)'
-              resourceGroupName: '$(TEST_RESOURCE_GROUP_NAME)'
-              appName: '$(TEST_APP_NAME)'
-
-  # D) Deploy to PRODUCTION environment if one of the following conditions apply:
-  #    - manual deployment:
-  #       - PRODUCTION_ENABLE_DEPLOY == true
+  #    - PRODUCTION_ENABLE_DEPLOY == true
   - ${{ if eq(parameters.PRODUCTION_ENABLE_DEPLOY, true) }}:
     - stage: Deploy_production
       condition: 
