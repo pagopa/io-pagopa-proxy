@@ -28,9 +28,18 @@ parameters:
     default: ''
     
 steps:
-  - template: ./make-build-steps.yml
+  # Build application
+  - template: azure-templates/setup-project.yml
     parameters:
-      make: predeploy_build
+      # On the assumption that this stage is executed only when Relase stage is,
+      #  with this parameter we set the reference the deploy script must pull changes from.
+      # The branch/tag name is calculated from the source branch
+      #  ex: Build.SourceBranch=refs/heads/master --> master
+      #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
+      gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
+  - script: |
+      yarn predeploy
+    displayName: 'Build'
   
   - task: CopyFiles@2
     inputs:
