@@ -15,22 +15,6 @@ parameters:
     default: minor
 
 
-  - name: 'PRODUCTION_ENABLE_DEPLOY'
-    displayName: 'Enable deploy in production environment'
-    type: boolean
-    default: true
-
-  - name: 'PRODUCTION_DEPLOY_TYPE'
-    displayName: 'Method to achieve deployment in Production (if enabled):'
-    type: string
-    default: deployToProductionSlot
-    values:
-      - deployToStagingSlot  
-      - deployToProductionSlot
-      - deployToStagingSlotAndSwap
-
-
-
 # Only manual activations are intended
 trigger: none
 pr: none
@@ -91,33 +75,69 @@ stages:
             displayName: 'Skip release bundle'
 
 
-  # Deploy to PRODUCTION environment if one of the following conditions apply:
-  #    - manual deployment:
-  #    - PRODUCTION_ENABLE_DEPLOY == true
-  - ${{ if eq(parameters.PRODUCTION_ENABLE_DEPLOY, true) }}:
-    - stage: Deploy_production
-      condition: 
-        and(
-          succeeded(),
-          eq(variables['Build.Reason'], 'Manual')
-        )
-      dependsOn:
-        - Release
-      jobs:
-        - job: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}_proxyprod'
-          steps:
-          - template: azure-templates/deploy-steps.yml
+  # Prepare Artifact
+  - stage: Deploy_production
+    dependsOn:
+      - Release
+    jobs:
+      - job: 'prepare_artifact_and_deploy'
+        steps:
+          # Build application
+          - template: azure-templates/setup-project.yml
             parameters:
-              deployType: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}'
-              azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
-              resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
-              appName: '$(PRODUCTION_PROXYPROD_APP_NAME)'
+              # On the assumption that this stage is executed only when Relase stage is,
+              #  with this parameter we set the reference the deploy script must pull changes from.
+              # The branch/tag name is calculated from the source branch
+              #  ex: Build.SourceBranch=refs/heads/master --> master
+              #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
+              gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
+          - script: |
+              yarn predeploy
+            displayName: 'Build'
 
-        - job: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}_proxytest'
-          steps:
-          - template: azure-templates/deploy-steps.yml
-            parameters:
-              deployType: '${{ parameters.PRODUCTION_DEPLOY_TYPE }}'
+          # Copy application to  
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+              Contents: |
+                **/*
+                !.git/**/*
+                !**/*.js.map
+                !**/*.ts
+                !.vscode/**/*
+                !.devops/**/*
+                !.prettierrc
+                !.gitignore
+                !README.md
+                !jest.config.js
+                !local.settings.json
+                !test
+                !tsconfig.json
+                !tslint.json
+                !yarn.lock
+                !Dangerfile.js
+                !CODEOWNERS
+                !__*/**/*
+            displayName: 'Copy deploy files'
+            
+          - task: AzureWebApp@1  
+            inputs:
               azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
               resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
+              appType: 'webApp'
+              appName: '$(PRODUCTION_PROXYPROD_APP_NAME)'
+              package: '$(Build.ArtifactStagingDirectory)/'
+              deploymentMethod: 'auto'
+            displayName: Deploy to production slot
+          
+          - task: AzureWebApp@1  
+            inputs:
+              azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+              resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
+              appType: 'webApp'
               appName: '$(PRODUCTION_PROXYTEST_APP_NAME)'
+              package: '$(Build.ArtifactStagingDirectory)/'
+              deploymentMethod: 'auto'
+            displayName: Deploy to test environment production slot
+

@@ -81,7 +81,7 @@ stages:
       vmImage: 'ubuntu-latest'
     dependsOn: []
     jobs:
-      - job: unit_tests
+      - job: integration_tests
         steps:
           - template: azure-templates/setup-project.yml
         
