@@ -55,7 +55,7 @@ stages:
               DANGER_GITHUB_API_TOKEN: '$(DANGER_GITHUB_API_TOKEN)'
             displayName: 'Danger CI'
 
-  - stage: Unit Tests
+  - stage: Unit_Tests
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: []
@@ -76,7 +76,7 @@ stages:
               bash <(curl -s https://codecov.io/bash)
             displayName: 'Code coverage'
 
-  - stage: Integration Tests
+  - stage: Integration_Tests
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: []
@@ -97,4 +97,4 @@ stages:
               yarn test:integration
             displayName: 'Unit tests integration'
 
-  
+
