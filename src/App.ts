@@ -213,11 +213,10 @@ function setRestfulRoutes(
   //
   // Healthcheck endpoint
   //
-  app.get("/info", (_, res) => {
-    const info = {
+  app.get("/info", _ => {
+    return {
       version: packageJson.version
     } as IInfo;
-    return info;
   });
 }
 
