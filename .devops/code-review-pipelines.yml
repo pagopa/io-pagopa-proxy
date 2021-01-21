@@ -55,7 +55,7 @@ stages:
               DANGER_GITHUB_API_TOKEN: '$(DANGER_GITHUB_API_TOKEN)'
             displayName: 'Danger CI'
 
-  - stage: Test
+  - stage: Unit Tests
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: []
@@ -69,8 +69,25 @@ stages:
             displayName: 'Generate definitions'        
         
           - script: |
-              yarn test:unit
+              yarn test:coverage
             displayName: 'Unit tests'
+
+          - bash: |
+              bash <(curl -s https://codecov.io/bash)
+            displayName: 'Code coverage'
+
+  - stage: Integration Tests
+    pool:
+      vmImage: 'ubuntu-latest'
+    dependsOn: []
+    jobs:
+      - job: unit_tests
+        steps:
+          - template: azure-templates/setup-project.yml
+        
+          - script: |
+              yarn generate
+            displayName: 'Generate definitions'        
 
           - script: |
               docker run -d -p 6379:6379 --name redis redis
@@ -80,7 +97,4 @@ stages:
               yarn test:integration
             displayName: 'Unit tests integration'
 
-          - bash: |
-              bash <(curl -s https://codecov.io/bash)
-            displayName: 'Code coverage'
   
