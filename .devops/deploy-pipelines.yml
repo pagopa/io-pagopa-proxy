@@ -126,6 +126,7 @@ stages:
   - stage: Deploy_test
     dependsOn:
       - Release
+      - Prepare_artifact
     jobs:
       - job: 'deploy'
         steps:
@@ -147,6 +148,7 @@ stages:
   - stage: Deploy_production
     dependsOn:
       - Release
+      - Prepare_artifact
     jobs:
       - job: 'deploy'
         steps:
