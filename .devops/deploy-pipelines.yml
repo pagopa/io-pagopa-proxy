@@ -101,6 +101,7 @@ stages:
               TargetFolder: '$(System.DefaultWorkingDirectory)/bundle'
               Contents: |
                 **/*
+                web.config
                 !.git/**/*
                 !**/*.js.map
                 !**/*.ts
@@ -109,14 +110,17 @@ stages:
                 !.prettierrc
                 !.gitignore
                 !README.md
-                !jest.config.js
-                !local.settings.json
+                !jest.integration.js
                 !test
                 !tsconfig.json
                 !tslint.json
                 !yarn.lock
                 !Dangerfile.js
                 !CODEOWNERS
+                !Dockerfile
+                !preview.hbs
+                !.auto-changelog.json
+                !api_pagopa.yaml
                 !__*/**/*
             displayName: 'Copy bundle files'
           
@@ -125,7 +129,6 @@ stages:
             
   - stage: Deploy_test
     dependsOn:
-      - Release
       - Prepare_artifact
     jobs:
       - job: 'deploy'
@@ -147,7 +150,6 @@ stages:
   
   - stage: Deploy_production
     dependsOn:
-      - Release
       - Prepare_artifact
     jobs:
       - job: 'deploy'
