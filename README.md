@@ -92,6 +92,47 @@ Normally, the pagopa-proxy application is deployed as a set of Kubernetes resour
 
 More information about how the pagopa-proxy application communicates with PagoPA, and how to deploy the helm-chart can be found in the [pagopa-proxy helm-chart folder in the io-infrastructure-post-config repository](https://github.com/teamdigitale/io-infrastructure-post-config/tree/master/pagopa-proxy).
 
+## Run with `Docker`
+
+Create your environment typing :
+```sh
+cp .env.example .env
+``` 
+
+Then from current project directory run :
+```sh
+docker-compose up
+```
+
+if all right you'll see something like that :
+
+```sh
+redis               | 1:M 20 Jul 15:30:46.209 # Server started, Redis version 3.2.11
+redis               | 1:M 20 Jul 15:30:46.209 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+redis               | 1:M 20 Jul 15:30:46.209 * The server is now ready to accept connections on port 6379
+pagopaproxy_1       | {"message":"Starting Proxy PagoPA Server...","level":"info"}
+pagopaproxy_1       | {"message":"Creating a REDIS client...","level":"debug"}
+pagopaproxy_1       | {"message":"Server started at http://localhost:3000","level":"info"}
+```
+
+Then to verify connection : 
+
+```sh
+curl --location --request GET 'http://localhost:3000/payment-requests/01234567891010001234567890123' \
+--data-raw ''
+```
+
+and you'd see the following response :
+
+```json
+{
+    "importoSingoloVersamento": 100,
+    "codiceContestoPagamento": "cabd73a0e96e11eb9894b3d8ede8e6ab",
+    "ibanAccredito": "IT47L0300203280645139156879",
+    "causaleVersamento": "Causale versamento mock"
+}
+```
+
 ## License
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fteamdigitale%2Fitalia-pagopa-proxy?ref=badge_large)
