@@ -9,3 +9,5 @@ package-lock.json
 .vscode/settings.json
 dump.rdb
 generated
+.env
+.DS_Store
