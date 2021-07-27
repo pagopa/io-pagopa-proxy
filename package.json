@@ -70,7 +70,7 @@
     "fast-memoize": "^2.5.1",
     "io-ts": "1.8.5",
     "italia-pagopa-commons": "^1.0.0",
-    "italia-ts-commons": "^5.1.0",
+    "italia-ts-commons": "^5.1.13",
     "morgan": "^1.9.1",
     "node-forge": "^0.9.1",
     "redis": "^2.8.0",
