@@ -10,14 +10,13 @@ import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagam
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
+import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
 import { nodoAttivaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
 import { nodoTipoCodiceIdRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoCodiceIdRPT_ppt";
 import { nodoTipoDatiPagamentoPA_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoDatiPagamentoPA_ppt";
 import { nodoVerificaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
-import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
-import { stNoticeNumber_nfpsp } from "../../generated/nodeNm3psp/stNoticeNumber_nfpsp";
 
 import { stText140_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText140_ppt";
 import { stText35_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText35_ppt";
@@ -61,7 +60,7 @@ export function getNodoVerificaRPTInput(
 export function getNodoVerifyPaymentNoticeInput(
   pagoPAConfig: PagoPAConfig,
   rptId: RptId
-): Either<any, verifyPaymentNoticeReq_nfpsp> {
+): Either<Error, verifyPaymentNoticeReq_nfpsp> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
 
   return verifyPaymentNoticeReq_nfpsp
@@ -75,7 +74,7 @@ export function getNodoVerifyPaymentNoticeInput(
         noticeNumber: rptId.paymentNoticeNumber
       }
     })
-    .bimap(e => left(e), v => right(v));
+    .bimap(e => Error(e.values.toString()), t.identity);
 }
 
 /**
