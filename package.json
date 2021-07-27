@@ -19,6 +19,8 @@
     "generate": "npm-run-all -s generate:yaml-from-wsdl generate:ts-from-yaml:* generate:proxy-api-models",
     "generate:ts-from-yaml:FespCdService": "shx mkdir -p generated/FespCdService && rimraf generated/FespCdService/* && gen-api-models --strict 0 --api-spec generated/yaml-file/FespCdService.yaml --out-dir generated/FespCdService",
     "generate:ts-from-yaml:PPTPort": "shx mkdir -p generated/PagamentiTelematiciPspNodoservice && rimraf generated/PagamentiTelematiciPspNodoservice/* && gen-api-models --strict 0 --api-spec generated/yaml-file/PagamentiTelematiciPspNodoservice.yaml --out-dir generated/PagamentiTelematiciPspNodoservice",
+    "generate:ts-from-yaml:nodeNm3psp": "shx mkdir -p generated/nodeNm3psp && rimraf generated/nodeNm3psp/* && gen-api-models --strict 0 --api-spec generated/yaml-file/nodeForPsp_service.yaml --out-dir generated/nodeNm3psp",
+    "generate:ts-from-yaml:nodeNm3io": "shx mkdir -p generated/nodeNm3io && rimraf generated/nodeNm3io/* && gen-api-models --strict 0 --api-spec generated/yaml-file/nodeForIO_service.yaml --out-dir generated/nodeNm3io",
     "generate:yaml-from-wsdl": "shx mkdir -p generated/yaml-file && rimraf generated/yaml-file/* && node pagopa_api/YamlGenerator.js",
     "generate:proxy-api-models": "shx mkdir -p generated/api && rimraf generated/api/* && gen-api-models --api-spec ./api_pagopa.yaml --out-dir generated/api --ts-spec-file generated/api/public_api_pagopa.ts --request-types",
     "prettify": "prettier --write \"./**/*.ts\"",

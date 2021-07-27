@@ -21,6 +21,8 @@ import * as PaymentController from "./controllers/restful/PaymentController";
 import { requireClientCertificateFingerprint } from "./middlewares/requireClientCertificateFingerprint";
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
 import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
+import * as NodoNM3PortClient from "./services/pagopa_api/NodoNM3PortClient";
+
 import { logger } from "./utils/Logger";
 
 /**
@@ -109,6 +111,38 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     )
   );
 
+  const pagoPANm3PspClient = new NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient(
+    await NodoNM3PortClient.createNm3NodoPspClient(
+      {
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
+          config.PAGOPA.WS_SERVICES.PAGAMENTI
+        }`,
+        wsdl_options: {
+          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
+        }
+      },
+      config.PAGOPA.CERT,
+      config.PAGOPA.KEY,
+      config.PAGOPA.HOST_HEADER
+    )
+  );
+
+  const pagoPANm3IoClient = new NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient(
+    await NodoNM3PortClient.createNm3NodoIoClient(
+      {
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
+          config.PAGOPA.WS_SERVICES.PAGAMENTI
+        }`,
+        wsdl_options: {
+          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
+        }
+      },
+      config.PAGOPA.CERT,
+      config.PAGOPA.KEY,
+      config.PAGOPA.HOST_HEADER
+    )
+  );
+
   // Define a redis client necessary to handle persistent data
   // for async payment activation process
   const redisClient = getRedisClient(config);
@@ -127,7 +161,14 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     app.use(requireClientCertificateFingerprint(clientCertificateFingerprint));
   }
 
-  setRestfulRoutes(app, config, redisClient, pagoPAClient);
+  setRestfulRoutes(
+    app,
+    config,
+    redisClient,
+    pagoPAClient,
+    pagoPANm3PspClient,
+    pagoPANm3IoClient
+  );
 
   // Define SOAP endpoints
   const fespCdServiceHandler = getFespCdServiceHandler(
@@ -165,20 +206,32 @@ function setRestfulRoutes(
   app: core.Express,
   config: Configuration,
   redisClient: redis.RedisClient,
-  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
+  pagoPAClientPspNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
+  pagoPAClientIoNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
 ): void {
   const jsonParser = bodyParser.json();
 
+  // 1 - verifica
   const getPaymentInfoHandler = toExpressHandler(
-    PaymentController.getPaymentInfo(config.PAGOPA, pagoPAClient)
+    PaymentController.getPaymentInfo(
+      config.PAGOPA,
+      pagoPAClient,
+      pagoPAClientPspNm3
+    )
   );
   app.get(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_REQUESTS_GET,
     getPaymentInfoHandler
   );
 
+  // 2 - attiva
   const activatePaymentHandler = toExpressHandler(
-    PaymentController.activatePayment(config.PAGOPA, pagoPAClient)
+    PaymentController.activatePayment(
+      config.PAGOPA,
+      pagoPAClient,
+      pagoPAClientIoNm3
+    )
   );
   app.post(
     config.CONTROLLER.ROUTES.RESTFUL.PAYMENT_ACTIVATIONS_POST,
@@ -186,6 +239,7 @@ function setRestfulRoutes(
     activatePaymentHandler
   );
 
+  // 3 - getPayment ( polling )
   const getActivationStatusHandler = toExpressHandler(
     PaymentController.getActivationStatus(redisClient)
   );

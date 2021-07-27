@@ -16,6 +16,8 @@ async function startYamlGenerator() {
   console.info("YAML Generator STARTED!");
   await generateYamlFilesForWsdl(`${__dirname}/../src/wsdl/CdPerNodo.wsdl`);
   await generateYamlFilesForWsdl(`${__dirname}/../src/wsdl/NodoPerPsp.wsdl`);
+  await generateYamlFilesForWsdl(`${__dirname}/../src/wsdl/nodeForPsp.wsdl`);
+  await generateYamlFilesForWsdl(`${__dirname}/../src/wsdl/nodeForIO.wsdl`);
   console.info("YAML Generator COMPLETED!");
 }
 

@@ -34,6 +34,7 @@ import { cdInfoWispResponse_ppt } from "../../../generated/FespCdService/cdInfoW
 import { faultBean_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_ppt";
 import { PagoPAConfig } from "../../Configuration";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
+import * as NodoNM3PortClient from "../../services/pagopa_api/NodoNM3PortClient";
 import * as PaymentsService from "../../services/PaymentsService";
 import { logger } from "../../utils/Logger";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
@@ -45,10 +46,12 @@ import {
 
 const getGetPaymentInfoController: (
   pagoPAConfig: PagoPAConfig,
-  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
 ) => AsControllerFunction<GetPaymentInfoT> = (
   pagoPAConfig,
-  pagoPAClient
+  pagoPAClient,
+  pagoPAClientNm3
 ) => async params => {
   // Validate rptId (payment identifier) provided by BackendApp
   const errorOrRptId = RptIdFromString.decode(params.rptId);
@@ -113,15 +116,25 @@ const getGetPaymentInfoController: (
     const responseError = getResponseErrorIfExists(
       iNodoVerificaRPTOutput.fault
     );
-    logger.error(
-      `GetPaymentInfo|Error from pagopa|${
-        params.rptId
-      }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
-    );
-    if (responseError === undefined) {
-      return ResponseErrorInternal("Error during payment check: esito === KO");
+    if (responseError !== "PPT_MULTI_BENEFICIARIO") {
+      logger.error(
+        `GetPaymentInfo|Error from pagopa|${
+          params.rptId
+        }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
+      );
+      if (responseError === undefined) {
+        return ResponseErrorInternal(
+          "Error during payment check: esito === KO"
+        );
+      } else {
+        return ResponseErrorInternal(responseError);
+      }
     } else {
-      return ResponseErrorInternal(responseError);
+      // Send the SOAP request to PagoPA (new VerificaRPT message)
+      const errorOrIverifyPaymentNoticeutput = await PaymentsService.sendNodoVerifyPaymentNoticeInput(
+        iNodoVerificaRPTInput,
+        pagoPAClientNm3
+      );
     }
   }
 
@@ -155,13 +168,18 @@ const getGetPaymentInfoController: (
  * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentsActivationResponse>>} The response content to send to applicant
  */
-export function getPaymentInfo(
+export function getPaymentInfo( // 1 - verifica
   pagoPAConfig: PagoPAConfig,
-  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<AsControllerResponseType<TypeofApiResponse<GetPaymentInfoT>>> {
-  const controller = getGetPaymentInfoController(pagoPAConfig, pagoPAClient);
+  const controller = getGetPaymentInfoController(
+    pagoPAConfig,
+    pagoPAClient,
+    pagoPAClientNm3
+  );
   return async req =>
     controller({
       rptId: req.params.rptId
@@ -170,7 +188,8 @@ export function getPaymentInfo(
 
 const getActivatePaymentController: (
   pagoPAConfig: PagoPAConfig,
-  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
 ) => AsControllerFunction<ActivatePaymentT> = (
   pagoPAConfig,
   pagoPAClient
@@ -259,13 +278,18 @@ const getActivatePaymentController: (
  * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentActivationsPostRequest>>} The response content to send to applicant
  */
-export function activatePayment(
+export function activatePayment( // 2 - attiva
   pagoPAConfig: PagoPAConfig,
-  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient
+  pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<AsControllerResponseType<TypeofApiResponse<ActivatePaymentT>>> {
-  const controller = getActivatePaymentController(pagoPAConfig, pagoPAClient);
+  const controller = getActivatePaymentController(
+    pagoPAConfig,
+    pagoPAClient,
+    pagoPAClientNm3
+  );
   return async req => {
     // Validate input provided by BackendAp
     const errorOrPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode(
@@ -360,7 +384,7 @@ const getGetActivationStatusController: (
  * @param {redis.RedisClient} redisClient - The redis client used to retrieve the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
-export function getActivationStatus(
+export function getActivationStatus( // 3 - getIdPagamento
   redisClient: redis.RedisClient
 ): (
   req: express.Request
@@ -441,6 +465,8 @@ export function getErrorMessageCtrlFromPagoPaError(
       return PaymentFaultEnum.PAYMENT_UNKNOWN;
     case "PPT_DOMINIO_SCONOSCIUTO":
       return PaymentFaultEnum.DOMAIN_UNKNOWN;
+    case "PPT_MULTI_BENEFICIARIO":
+      return PaymentFaultEnum.PPT_MULTI_BENEFICIARIO;
     default:
       // faultCode doesn't match anything
       if (faultDescription !== undefined) {

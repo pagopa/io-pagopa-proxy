@@ -10,6 +10,8 @@ import { nodoAttivaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoser
 import { nodoVerificaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
 import { logger } from "../utils/Logger";
 import { PagamentiTelematiciPspNodoAsyncClient } from "./pagopa_api/PPTPortClient";
+import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
+import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
 
 /**
  * Send a request to PagoPA to retrieve payment info (VerificaRPT)
@@ -29,6 +31,25 @@ export async function sendNodoVerificaRPTInput(
   } catch (exception) {
     logger.error(
       `Exception catched sending VerificaRPTRequest to PagoPA: ${
+        exception.message
+      }|${exception.response}|${exception.body}`
+    );
+    return left(Error(exception));
+  }
+}
+
+export async function sendNodoVerifyPaymentNoticeInput(
+  verifyPaymentNoticeInput: verifyPaymentNoticeReq_nfpsp,
+  pagoPASoapClient: PagamentiTelematiciPspNm3NodoAsyncClient
+): Promise<Either<Error, esitoNodoVerificaRPTRisposta_ppt>> {
+  try {
+    const verifyPaymentNoticeR = await pagoPASoapClient.verifyPaymentNotice(
+      verifyPaymentNoticeInput
+    );
+    return right(verifyPaymentNoticeR);
+  } catch (exception) {
+    logger.error(
+      `Exception catched sending verifyPaymentNoticeRequest to PagoPA: ${
         exception.message
       }|${exception.response}|${exception.body}`
     );
