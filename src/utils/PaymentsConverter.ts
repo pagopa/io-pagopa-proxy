@@ -16,6 +16,9 @@ import { nodoAttivaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoser
 import { nodoTipoCodiceIdRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoCodiceIdRPT_ppt";
 import { nodoTipoDatiPagamentoPA_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoDatiPagamentoPA_ppt";
 import { nodoVerificaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
+import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
+import { stNoticeNumber_nfpsp } from "../../generated/nodeNm3psp/stNoticeNumber_nfpsp";
+
 import { stText140_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText140_ppt";
 import { stText35_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText35_ppt";
 import { PagoPAConfig } from "../Configuration";
@@ -53,6 +56,26 @@ export function getNodoVerificaRPTInput(
   } catch (exception) {
     return left(Error(exception));
   }
+}
+
+export function getNodoVerifyPaymentNoticeInput(
+  pagoPAConfig: PagoPAConfig,
+  rptId: RptId
+): Either<any, verifyPaymentNoticeReq_nfpsp> {
+  // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
+
+  return verifyPaymentNoticeReq_nfpsp
+    .decode({
+      idPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+      idBrokerPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      idChannel: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIER.PASSWORD,
+      qrCode: {
+        fiscalCode: rptId.organizationFiscalCode,
+        noticeNumber: rptId.paymentNoticeNumber
+      }
+    })
+    .bimap(e => left(e), v => right(v));
 }
 
 /**
