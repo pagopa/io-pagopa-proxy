@@ -65,7 +65,7 @@
     "typescript": "^3.4.5"
   },
   "dependencies": {
-    "applicationinsights": "^1.7.3",
+    "applicationinsights": "^1.8.5",
     "express": "^4.17.1",
     "fast-memoize": "^2.5.1",
     "io-ts": "1.8.5",
