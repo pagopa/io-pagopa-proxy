@@ -10,6 +10,7 @@ import { IPPTPortSoap } from "../../services/pagopa_api/IPPTPortSoap";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import { createClient } from "../../utils/SoapUtils";
 
+const invalidInput = "Invalid input";
 export async function createPagamentiTelematiciPspNodoClient(
   options: soap.IOptions
 ): Promise<soap.Client & IPPTPortSoap> {
@@ -98,7 +99,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.Pag
           nodoVerificaRPTRisposta: aNodoVerificaRPTRispostaOK
         });
       } else {
-        reject("Invalid input");
+        reject(invalidInput);
       }
     });
   };
@@ -110,7 +111,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.Pag
           nodoAttivaRPTRisposta: aNodoAttivaRPTRispostaOK
         });
       } else {
-        reject("Invalid input");
+        reject(invalidInput);
       }
     });
   };

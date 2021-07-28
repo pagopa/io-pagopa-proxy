@@ -5,6 +5,7 @@
 
 import * as express from "express";
 import { isLeft } from "fp-ts/lib/Either";
+import { fromNullable } from "fp-ts/lib/Option";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { RptId, RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
 import { TypeofApiResponse } from "italia-ts-commons/lib/requests";
@@ -33,8 +34,8 @@ import { cdInfoWisp_ppt } from "../../../generated/FespCdService/cdInfoWisp_ppt"
 import { cdInfoWispResponse_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_ppt";
 import { faultBean_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_ppt";
 import { PagoPAConfig } from "../../Configuration";
-import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import * as NodoNM3PortClient from "../../services/pagopa_api/NodoNM3PortClient";
+import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import * as PaymentsService from "../../services/PaymentsService";
 import { logger } from "../../utils/Logger";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
@@ -47,11 +48,15 @@ import {
 const getGetPaymentInfoController: (
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
-  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
+  redisClient: redis.RedisClient,
+  redisTimeoutSecs: number
 ) => AsControllerFunction<GetPaymentInfoT> = (
   pagoPAConfig,
   pagoPAClient,
-  pagoPAClientNm3
+  pagoPAClientNm3,
+  redisClient,
+  redisTimeoutSecs
 ) => async params => {
   // Validate rptId (payment identifier) provided by BackendApp
   const errorOrRptId = RptIdFromString.decode(params.rptId);
@@ -116,7 +121,10 @@ const getGetPaymentInfoController: (
     const responseError = getResponseErrorIfExists(
       iNodoVerificaRPTOutput.fault
     );
-    if (responseError !== "PPT_MULTI_BENEFICIARIO") {
+    if (
+      responseError &&
+      responseError.toString() !== "PPT_MULTI_BENEFICIARIO"
+    ) {
       logger.error(
         `GetPaymentInfo|Error from pagopa|${
           params.rptId
@@ -130,11 +138,90 @@ const getGetPaymentInfoController: (
         return ResponseErrorInternal(responseError);
       }
     } else {
-      // Send the SOAP request to PagoPA (new VerificaRPT message)
-      const errorOrIverifyPaymentNoticeutput = await PaymentsService.sendNodoVerifyPaymentNoticeInput(
-        iNodoVerificaRPTInput,
+      // call NM3
+      const errorOrIverifyPaymentNoticeutput = PaymentsConverter.getNodoVerifyPaymentNoticeInput(
+        pagoPAConfig,
+        rptId
+      );
+
+      if (isLeft(errorOrIverifyPaymentNoticeutput)) {
+        const error = errorOrIverifyPaymentNoticeutput.value;
+        logger.error(
+          `GetPaymentInfo|Cannot construct request|${params.rptId}|${
+            error.message
+          }`
+        );
+        return ResponseErrorValidation(
+          "Invalid PagoPA check Request",
+          error.message
+        );
+      }
+      const iverifyPaymentNoticeInput = errorOrIverifyPaymentNoticeutput.value;
+
+      // Send the SOAP request to PagoPA (VerificaRPT message)
+      const errorOrIverifyPaymentNoticeOutput = await PaymentsService.sendNodoVerifyPaymentNoticeInput(
+        iverifyPaymentNoticeInput,
         pagoPAClientNm3
       );
+
+      if (isLeft(errorOrIverifyPaymentNoticeOutput)) {
+        const error = errorOrIverifyPaymentNoticeOutput.value;
+        logger.error(
+          `GetPaymentInfo|Error while calling pagopa|${params.rptId}|${
+            error.message
+          }`
+        );
+        return ResponseErrorInternal(
+          `PagoPA Server communication error: ${error.message}`
+        );
+      }
+      const iverifyPaymentNoticeOutput =
+        errorOrIverifyPaymentNoticeOutput.value;
+
+      // Check PagoPA response content
+      if (iverifyPaymentNoticeOutput.outcome !== "OK") {
+        // error
+        const responseErrorVerifyPaymentNotice = getResponseErrorIfExists(
+          iverifyPaymentNoticeOutput.fault
+        );
+
+        return ResponseErrorInternal(
+          fromNullable(responseErrorVerifyPaymentNotice).getOrElse(
+            PaymentFaultEnum.PAYMENT_UNAVAILABLE // GENERIC_ERROR
+          )
+        );
+      } else {
+        // ok case
+        // redis + response
+        setNm3PaymentOption(
+          codiceContestoPagamento,
+          redisTimeoutSecs,
+          redisClient
+        ).then(
+          _ => {
+            // risposta
+            const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
+              iverifyPaymentNoticeOutput,
+              codiceContestoPagamento
+            );
+
+            if (isLeft(responseOrErrorNm3)) {
+              logger.error(
+                `GetPaymentInfo|Cannot construct valid response|${
+                  params.rptId
+                }|${PathReporter.report(responseOrErrorNm3)}`
+              );
+              return ResponseErrorFromValidationErrors(
+                PaymentRequestsGetResponse
+              )(responseOrErrorNm3.value);
+            }
+            return ResponseSuccessJson(responseOrErrorNm3.value);
+          },
+          _ => {
+            return ResponseErrorInternal(PaymentFaultEnum.PAYMENT_UNAVAILABLE); // GENERIC_ERROR
+          }
+        );
+      }
     }
   }
 
@@ -171,14 +258,18 @@ const getGetPaymentInfoController: (
 export function getPaymentInfo( // 1 - verifica
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
-  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
+  redisClient: redis.RedisClient,
+  redisTimeoutSecs: number
 ): (
   req: express.Request
 ) => Promise<AsControllerResponseType<TypeofApiResponse<GetPaymentInfoT>>> {
   const controller = getGetPaymentInfoController(
     pagoPAConfig,
     pagoPAClient,
-    pagoPAClientNm3
+    pagoPAClientNm3,
+    redisClient,
+    redisTimeoutSecs
   );
   return async req =>
     controller({
@@ -335,6 +426,20 @@ export async function setActivationStatus(
       esito: "OK"
     })
   );
+}
+
+export async function setNm3PaymentOption(
+  codiceContestoPagamento: CodiceContestoPagamento,
+  redisTimeoutSecs: number,
+  redisClient: redis.RedisClient
+): Promise<boolean> {
+  return (await redisSet(
+    redisClient,
+    codiceContestoPagamento,
+    "", // empty stroing for NM3 payments
+    "EX", // Set the specified expire time, in seconds.
+    redisTimeoutSecs
+  )).fold<boolean>(_ => false, _ => true);
 }
 
 const getGetActivationStatusController: (

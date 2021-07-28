@@ -8,10 +8,12 @@ import { nodoAttivaRPT_ppt } from "../../../generated/PagamentiTelematiciPspNodo
 import { nodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPTRisposta_ppt";
 import { nodoVerificaRPT_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
 import { nodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPTRisposta_ppt";
-import { verifyPaymentNoticeReq_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
+
 import { activateIOPaymentReq_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentReq_nfpsp";
-import { verifyPaymentNoticeRes_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
 import { activateIOPaymentRes_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
+
+import { verifyPaymentNoticeReq_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
+import { verifyPaymentNoticeRes_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
 
 import { SoapMethodCB } from "../../utils/SoapUtils";
 
