@@ -9,9 +9,11 @@ import { esitoNodoVerificaRPTRisposta_ppt } from "../../generated/PagamentiTelem
 import { nodoAttivaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
 import { nodoVerificaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
 import { logger } from "../utils/Logger";
-import { PagamentiTelematiciPspNodoAsyncClient } from "./pagopa_api/PPTPortClient";
 import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
+import { PagamentiTelematiciPspNodoAsyncClient } from "./pagopa_api/PPTPortClient";
+
 import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
+import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
 
 /**
  * Send a request to PagoPA to retrieve payment info (VerificaRPT)
@@ -41,7 +43,7 @@ export async function sendNodoVerificaRPTInput(
 export async function sendNodoVerifyPaymentNoticeInput(
   verifyPaymentNoticeInput: verifyPaymentNoticeReq_nfpsp,
   pagoPASoapClient: PagamentiTelematiciPspNm3NodoAsyncClient
-): Promise<Either<Error, esitoNodoVerificaRPTRisposta_ppt>> {
+): Promise<Either<Error, verifyPaymentNoticeRes_nfpsp>> {
   try {
     const verifyPaymentNoticeR = await pagoPASoapClient.verifyPaymentNotice(
       verifyPaymentNoticeInput

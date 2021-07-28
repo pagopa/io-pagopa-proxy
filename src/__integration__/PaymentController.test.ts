@@ -29,6 +29,10 @@ import {
   createPagamentiTelematiciPspNodoClient,
   FakePagamentiTelematiciPspNodoAsyncClient
 } from "./fake/fakePagamentiTelematiciPspNodoAsyncClient";
+import {
+  createPagamentiTelematiciPspNm3NodoClient,
+  FakePagamentiTelematiciPspNodoNm3PspAsyncClient
+} from "./fake/fakePagamentiTelematiciPspNodoNm3AsyncClient";
 import mockReq from "./fake/request";
 
 const aConfig = {
@@ -80,12 +84,21 @@ describe("checkPaymentToPagoPa", async () => {
       })
     );
 
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      })
+    );
+
     const req = {
       params: { rptId: aRptIdString }
     } as express.Request;
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
-      verificaRPTPagoPaClient
+      verificaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3,
+      aMockedRedisClient,
+      0.0
     )(req);
 
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseSuccessJson");
@@ -134,6 +147,12 @@ describe("checkPaymentToPagoPa", async () => {
       })
     );
 
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      })
+    );
+
     const req = mockReq();
 
     // tslint:disable-next-line:no-object-mutation
@@ -141,7 +160,10 @@ describe("checkPaymentToPagoPa", async () => {
 
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
-      verificaRPTPagoPaClient
+      verificaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3,
+      aMockedRedisClient,
+      0.0
     )(req);
 
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
@@ -159,6 +181,13 @@ describe("activatePaymentToPagoPa", async () => {
     const attivaRPTPagoPaClient = new PagamentiTelematiciPspNodoAsyncClient(
       client
     );
+
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      })
+    );
+
     const activateRequest = mockReq();
 
     // tslint:disable-next-line:no-object-mutation
@@ -167,7 +196,11 @@ describe("activatePaymentToPagoPa", async () => {
       importoSingoloVersamento: 9900 as ImportoEuroCents
     };
 
-    await activatePayment(aConfig, attivaRPTPagoPaClient)(activateRequest);
+    await activatePayment(
+      aConfig,
+      attivaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3 // TOFIX
+    )(activateRequest);
 
     expect(clientRequest).toHaveBeenCalledTimes(1);
     expect(clientRequest).toHaveBeenCalledWith(
@@ -186,6 +219,12 @@ describe("activatePaymentToPagoPa", async () => {
       })
     );
 
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      })
+    );
+
     const req = mockReq();
 
     // tslint:disable-next-line:no-object-mutation
@@ -193,7 +232,8 @@ describe("activatePaymentToPagoPa", async () => {
 
     const errorOrPaymentActivationResponse = await activatePayment(
       aConfig,
-      attivaRPTPagoPaClient
+      attivaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3 // TOFIX
     )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe("IResponseSuccessJson");
@@ -233,6 +273,11 @@ describe("activatePaymentToPagoPa", async () => {
         envelopeKey: "env"
       })
     );
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      })
+    );
 
     const req = mockReq();
 
@@ -241,7 +286,8 @@ describe("activatePaymentToPagoPa", async () => {
 
     const errorOrPaymentActivationResponse = await activatePayment(
       aConfig,
-      attivaRPTPagoPaClient
+      attivaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3
     )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe(

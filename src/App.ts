@@ -20,8 +20,8 @@ import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
 import { requireClientCertificateFingerprint } from "./middlewares/requireClientCertificateFingerprint";
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
-import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
 import * as NodoNM3PortClient from "./services/pagopa_api/NodoNM3PortClient";
+import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
 
 import { logger } from "./utils/Logger";
 
@@ -217,7 +217,9 @@ function setRestfulRoutes(
     PaymentController.getPaymentInfo(
       config.PAGOPA,
       pagoPAClient,
-      pagoPAClientPspNm3
+      pagoPAClientPspNm3,
+      redisClient,
+      config.PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS
     )
   );
   app.get(

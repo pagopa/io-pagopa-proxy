@@ -11,6 +11,7 @@ import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActiva
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
 import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
+import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
 import { nodoAttivaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
@@ -131,6 +132,47 @@ export function getPaymentRequestsGetResponse(
   return PaymentRequestsGetResponse.decode(response);
 }
 
+export function getPaymentRequestsGetResponseNm3(
+  verifyPaymentNoticeResponse: verifyPaymentNoticeRes_nfpsp,
+  codiceContestoPagamento: CodiceContestoPagamento
+): t.Validation<PaymentRequestsGetResponse> {
+  const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
+    codiceContestoPagamento
+  );
+
+  const response = verifyPaymentNoticeResponse.paymentList
+    ? {
+        importoSingoloVersamento: exactConvertToCents(
+          verifyPaymentNoticeResponse.paymentList.paymentOptionDescription[0]
+            .amount
+        ),
+        codiceContestoPagamento: codiceContestoPagamentoApi,
+        ibanAccredito: undefined,
+        causaleVersamento:
+          verifyPaymentNoticeResponse.paymentList.paymentOptionDescription[0]
+            .paymentNote,
+        enteBeneficiario: verifyPaymentNoticeResponse
+          ? {
+              identificativoUnivocoBeneficiario:
+                verifyPaymentNoticeResponse.fiscalCodePA,
+              denominazioneBeneficiario:
+                verifyPaymentNoticeResponse.companyName,
+              codiceUnitOperBeneficiario:
+                verifyPaymentNoticeResponse.officeName,
+              denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName,
+              indirizzoBeneficiario: undefined,
+              civicoBeneficiario: undefined,
+              capBeneficiario: undefined,
+              localitaBeneficiario: undefined,
+              provinciaBeneficiario: undefined,
+              nazioneBeneficiario: undefined
+            }
+          : undefined
+      }
+    : undefined;
+
+  return PaymentRequestsGetResponse.decode(response);
+}
 /**
  * Convert PaymentActivationsPostRequest (BackendApp request) to nodoAttivaRPT_ppt (PagoPA request)
  * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response

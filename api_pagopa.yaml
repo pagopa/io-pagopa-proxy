@@ -292,6 +292,7 @@ definitions:
       - PAYMENT_UNAVAILABLE
       - PAYMENT_UNKNOWN
       - DOMAIN_UNKNOWN
+      - PPT_MULTI_BENEFICIARIO
 parameters:
   CodiceContestoPagamento:
     name: codice_contesto_pagamento
