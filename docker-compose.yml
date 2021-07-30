@@ -27,20 +27,32 @@ services:
 
   pagopa-nodo-mock:
     container_name: pagopa-nodo-mock
-    build:
-      context: ./io-pagopa-nodo-mock
-      dockerfile: ./Dockerfile
-      args:
-        - GITHUB_TOKEN
-        - IO_PAGOPA_NODO_MOCK_COMMIT_SHA
-    env_file:
-      - io-pagopa-nodo-mock/env.io-pagopa-nodo-mock
     ports:
       - 3002:3002
+    env_file:
+      - ../io-pagopa-proxy/.env
+    build:
+      context: ../io-pagopa-proxy
+      dockerfile: ./Dockerfile
     networks:
       - io-fn
-    depends_on:
-      - pagopaproxy    
+      
+  # pagopa-nodo-mock:
+  #   container_name: pagopa-nodo-mock
+  #   build:
+  #     context: ./io-pagopa-nodo-mock
+  #     dockerfile: ./Dockerfile
+  #     args:
+  #       - GITHUB_TOKEN
+  #       - IO_PAGOPA_NODO_MOCK_COMMIT_SHA
+  #   env_file:
+  #     - io-pagopa-nodo-mock/env.io-pagopa-nodo-mock
+  #   ports:
+  #     - 3002:3002
+  #   networks:
+  #     - io-fn
+  #   depends_on:
+  #     - pagopaproxy    
 
 networks:
   io-fn:
