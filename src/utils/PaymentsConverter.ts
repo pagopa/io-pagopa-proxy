@@ -5,7 +5,11 @@
 
 import { Either, isRight, left, right } from "fp-ts/lib/Either";
 import * as t from "io-ts";
-import { RptId, RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
+import {
+  PaymentNoticeNumber,
+  RptId,
+  RptIdFromString
+} from "italia-pagopa-commons/lib/pagopa";
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
@@ -62,8 +66,6 @@ export function getNodoVerifyPaymentNoticeInput(
   pagoPAConfig: PagoPAConfig,
   rptId: RptId
 ): Either<Error, verifyPaymentNoticeReq_nfpsp> {
-  // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
-
   return verifyPaymentNoticeReq_nfpsp
     .decode({
       idPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
@@ -72,10 +74,10 @@ export function getNodoVerifyPaymentNoticeInput(
       password: pagoPAConfig.IDENTIFIER.PASSWORD,
       qrCode: {
         fiscalCode: rptId.organizationFiscalCode,
-        noticeNumber: rptId.paymentNoticeNumber
+        noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
       }
     })
-    .bimap(e => Error(e.values.toString()), t.identity);
+    .bimap(() => Error("Decode Error NodoVerifyPaymentNotice"), t.identity);
 }
 
 /**
@@ -387,4 +389,30 @@ export function getCodiceContestoPagamentoForPagoPaApi(
   codiceContestoPagamento: CodiceContestoPagamento
 ): stText35_ppt {
   return stText35_ppt.decode(codiceContestoPagamento).value as stText35_ppt; // tslint:disable-line
+}
+/**
+ * Return a paymentNoticeNumber as string according to
+ * https://pagopa.atlassian.net/wiki/spaces/ISS/pages/296911713/Come+ricostruire+un+Numero+Avviso+NAV
+ * @param paymentNoticeNumber as PaymentNoticeNumber
+ * @returns paymentNoticeNumber as string
+ */
+function getPaymentNoticeNumberAsString(
+  paymentNoticeNumber: PaymentNoticeNumber
+): string {
+  switch (paymentNoticeNumber.auxDigit) {
+    case "0":
+      return `${paymentNoticeNumber.auxDigit}${
+        paymentNoticeNumber.applicationCode
+      }${paymentNoticeNumber.iuv13}${paymentNoticeNumber.checkDigit}`;
+    case "1":
+      return `${paymentNoticeNumber.auxDigit}${paymentNoticeNumber.iuv17}`;
+    case "2":
+      return `${paymentNoticeNumber.auxDigit}${paymentNoticeNumber.iuv15}${
+        paymentNoticeNumber.checkDigit
+      }`;
+    case "3":
+      return `${paymentNoticeNumber.auxDigit}${
+        paymentNoticeNumber.segregationCode
+      }${paymentNoticeNumber.iuv13}${paymentNoticeNumber.checkDigit}`;
+  }
 }
