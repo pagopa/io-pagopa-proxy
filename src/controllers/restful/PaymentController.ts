@@ -188,7 +188,6 @@ const getGetPaymentInfoController: (
 
       // Check PagoPA response content
       if (iverifyPaymentNoticeOutput.outcome !== "OK") {
-        // error
         const responseErrorVerifyPaymentNotice = getResponseErrorIfExists(
           iverifyPaymentNoticeOutput.fault
         );
@@ -199,38 +198,33 @@ const getGetPaymentInfoController: (
           )
         );
       } else {
-        // ok case
-        // redis + response
-
-        const isNm3Cached: boolean = await setNm3PaymentOption(
+        const isNm3RedisCached: boolean = await setNm3PaymentOption(
           codiceContestoPagamento,
           redisTimeoutSecs,
           redisClient
         );
 
-        if (isNm3Cached === true) {
-          {
-            logger.debug(
-              `GetPaymentInfo|·PPT_MULTI_BENEFICIARIO·isNm3Cached | ${isNm3Cached}`
-            );
-            // risposta
-            const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
-              iverifyPaymentNoticeOutput,
-              codiceContestoPagamento
-            );
+        if (isNm3RedisCached === true) {
+          logger.debug(
+            `GetPaymentInfo|·PPT_MULTI_BENEFICIARIO·isNm3Cached | ${isNm3RedisCached}`
+          );
+          // risposta
+          const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
+            iverifyPaymentNoticeOutput,
+            codiceContestoPagamento
+          );
 
-            if (isLeft(responseOrErrorNm3)) {
-              logger.error(
-                `GetPaymentInfo|Cannot construct valid response|${
-                  params.rptId
-                }|${PathReporter.report(responseOrErrorNm3)}`
-              );
-              return ResponseErrorFromValidationErrors(
-                PaymentRequestsGetResponse
-              )(responseOrErrorNm3.value);
-            }
-            return ResponseSuccessJson(responseOrErrorNm3.value);
+          if (isLeft(responseOrErrorNm3)) {
+            logger.error(
+              `GetPaymentInfo|Cannot construct valid response|${
+                params.rptId
+              }|${PathReporter.report(responseOrErrorNm3)}`
+            );
+            return ResponseErrorFromValidationErrors(
+              PaymentRequestsGetResponse
+            )(responseOrErrorNm3.value);
           }
+          return ResponseSuccessJson(responseOrErrorNm3.value);
         } else {
           return ResponseErrorInternal(PaymentFaultEnum.PAYMENT_UNAVAILABLE); // GENERIC_ERROR
         }
