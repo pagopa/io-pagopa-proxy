@@ -138,7 +138,10 @@ const getGetPaymentInfoController: (
         return ResponseErrorInternal(responseError);
       }
     } else {
-      // call NM3
+      logger.info(
+        `GetPaymentInfo|·PPT_MULTI_BENEFICIARIO·for·request|${params.rptId}`
+      );
+
       const errorOrIverifyPaymentNoticeutput = PaymentsConverter.getNodoVerifyPaymentNoticeInput(
         pagoPAConfig,
         rptId
@@ -159,6 +162,11 @@ const getGetPaymentInfoController: (
       const iverifyPaymentNoticeInput = errorOrIverifyPaymentNoticeutput.value;
 
       // Send the SOAP request to PagoPA (VerificaRPT message)
+      logger.info(
+        `GetPaymentInfo| sendNodoVerifyPaymentNotice for request|${
+          params.rptId
+        }`
+      );
       const errorOrIverifyPaymentNoticeOutput = await PaymentsService.sendNodoVerifyPaymentNoticeInput(
         iverifyPaymentNoticeInput,
         pagoPAClientNm3
@@ -193,12 +201,18 @@ const getGetPaymentInfoController: (
       } else {
         // ok case
         // redis + response
-        setNm3PaymentOption(
+
+        const isNm3Cached: boolean = await setNm3PaymentOption(
           codiceContestoPagamento,
           redisTimeoutSecs,
           redisClient
-        ).then(
-          _ => {
+        );
+
+        if (isNm3Cached === true) {
+          {
+            logger.debug(
+              `GetPaymentInfo|·PPT_MULTI_BENEFICIARIO·isNm3Cached | ${isNm3Cached}`
+            );
             // risposta
             const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
               iverifyPaymentNoticeOutput,
@@ -216,11 +230,10 @@ const getGetPaymentInfoController: (
               )(responseOrErrorNm3.value);
             }
             return ResponseSuccessJson(responseOrErrorNm3.value);
-          },
-          _ => {
-            return ResponseErrorInternal(PaymentFaultEnum.PAYMENT_UNAVAILABLE); // GENERIC_ERROR
           }
-        );
+        } else {
+          return ResponseErrorInternal(PaymentFaultEnum.PAYMENT_UNAVAILABLE); // GENERIC_ERROR
+        }
       }
     }
   }
