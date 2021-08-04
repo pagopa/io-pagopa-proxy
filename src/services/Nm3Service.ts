@@ -25,8 +25,14 @@ import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3Po
 
 import * as PaymentsConverter from "../utils/PaymentsConverter";
 
+import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
 import * as PaymentsService from "./PaymentsService";
 
+/**
+ * The goal of this function is to:
+ * 1. call verifyPaymentNotice service of pagoPA Node
+ * 2. save an entry on redis (<cpp,"">) in order to cache that the rptId related to cpp is nm3
+ */
 export async function nodoVerifyPaymentNoticeService(
   pagoPAConfig: PagoPAConfig,
   pagoPAClientNm3: PagamentiTelematiciPspNm3NodoAsyncClient,
@@ -100,6 +106,7 @@ export async function nodoVerifyPaymentNoticeService(
   } else {
     const isNm3RedisCached: boolean = await setNm3PaymentOption(
       codiceContestoPagamento,
+      "",
       redisTimeoutSecs,
       redisClient
     );
@@ -117,6 +124,120 @@ export async function nodoVerifyPaymentNoticeService(
       if (isLeft(responseOrErrorNm3)) {
         logger.error(
           `GetPaymentInfo|Cannot construct valid response|${rptIdAsString}|${PathReporter.report(
+            responseOrErrorNm3
+          )}`
+        );
+        return ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
+          responseOrErrorNm3.value
+        );
+      }
+      return ResponseSuccessJson(responseOrErrorNm3.value);
+    } else {
+      return ResponseErrorInternal(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
+    }
+  }
+}
+
+/**
+ * The goal of this function is to:
+ * 1. call ActivateIOPayment service of pagoPA Node
+ * 2. save an entry on redis (<cpp,idPayment>), where idPayment is returned from ActivateIOPayment service, according to nm3
+ */
+export async function nodoActivateIOPaymentService(
+  pagoPAConfig: PagoPAConfig,
+  pagoPAClientNm3: PagamentiTelematiciPspNm3NodoAsyncClient,
+  redisClient: redis.RedisClient,
+  redisTimeoutSecs: number,
+  codiceContestoPagamento: CodiceContestoPagamento,
+  rptId: RptId,
+  rptIdAsString: string,
+  amount: number
+): Promise<
+  | IResponseErrorValidation
+  | IResponseErrorInternal
+  | IResponseSuccessJson<PaymentActivationsPostResponse>
+> {
+  logger.info(`ActivateIOPayment| (nm3) for rptId|${rptIdAsString}`);
+
+  const errorOrActivateIOPaymentInput = PaymentsConverter.getNodoActivateIOPaymentInput(
+    pagoPAConfig,
+    rptId,
+    amount
+  );
+
+  if (isLeft(errorOrActivateIOPaymentInput)) {
+    const error = errorOrActivateIOPaymentInput.value;
+    logger.error(
+      `ActivateIOPayment| Cannot construct request|${rptIdAsString}|${
+        error.message
+      }`
+    );
+    return ResponseErrorValidation(
+      "Invalid PagoPA check ActivateIOPayment",
+      error.message
+    );
+  }
+
+  const activateIOPaymentInput = errorOrActivateIOPaymentInput.value;
+
+  // Send the SOAP request to PagoPA (sendNodoVerifyPaymentNotice message)
+  logger.info(
+    `ActivateIOPayment| sendNodoVerifyPaymentNoticeInput for request | ${rptIdAsString}`
+  );
+
+  const errorOrActivateIOPaymentOutput = await PaymentsService.sendNodoActivateIOPaymentInput(
+    activateIOPaymentInput,
+    pagoPAClientNm3
+  );
+
+  if (isLeft(errorOrActivateIOPaymentOutput)) {
+    const error = errorOrActivateIOPaymentOutput.value;
+    logger.error(
+      `ActivateIOPayment| Error while calling pagopa | ${rptIdAsString}|${
+        error.message
+      }`
+    );
+    return ResponseErrorInternal(
+      `PagoPA Server communication error: ${error.message}`
+    );
+  }
+
+  const activateIOPaymentOutput = errorOrActivateIOPaymentOutput.value;
+
+  // Check PagoPA response content
+  if (
+    activateIOPaymentOutput.outcome !== "OK" ||
+    !activateIOPaymentOutput.paymentToken
+  ) {
+    const responseErrorActivateIOPayment = getResponseErrorIfExists(
+      activateIOPaymentOutput.fault
+    );
+
+    return ResponseErrorInternal(
+      fromNullable(responseErrorActivateIOPayment).getOrElse(
+        PaymentFaultEnum.PAYMENT_UNAVAILABLE
+      )
+    );
+  } else {
+    const isNm3RedisCached: boolean = await setNm3PaymentOption(
+      codiceContestoPagamento,
+      activateIOPaymentOutput.paymentToken,
+      redisTimeoutSecs,
+      redisClient
+    );
+
+    if (isNm3RedisCached === true) {
+      logger.debug(
+        `ActivateIOPayment|·PPT_MULTI_BENEFICIARIO·isNm3Cached | ${isNm3RedisCached}`
+      );
+
+      const responseOrErrorNm3 = PaymentsConverter.getActivateIOPaymentResponse(
+        activateIOPaymentOutput
+      );
+
+      if (isLeft(responseOrErrorNm3)) {
+        logger.error(
+          `ActivateIOPayment|Cannot construct valid response|${rptIdAsString}|${PathReporter.report(
             responseOrErrorNm3
           )}`
         );

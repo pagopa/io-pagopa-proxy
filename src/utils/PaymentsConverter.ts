@@ -14,6 +14,8 @@ import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagam
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
+import { activateIOPaymentReq_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentReq_nfpsp";
+import { activateIOPaymentRes_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
 import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
 import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
@@ -80,6 +82,25 @@ export function getNodoVerifyPaymentNoticeInput(
     .bimap(() => Error("Decode Error NodoVerifyPaymentNotice"), t.identity);
 }
 
+export function getNodoActivateIOPaymentInput(
+  pagoPAConfig: PagoPAConfig,
+  rptId: RptId,
+  amount: number
+): Either<Error, activateIOPaymentReq_nfpsp> {
+  return activateIOPaymentReq_nfpsp
+    .decode({
+      idPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+      idBrokerPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      idChannel: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIER.PASSWORD,
+      amount,
+      qrCode: {
+        fiscalCode: rptId.organizationFiscalCode,
+        noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
+      }
+    })
+    .bimap(() => Error("Decode Error NodoVerifyPaymentNotice"), t.identity);
+}
 /**
  * Convert esitoNodoVerificaRPTRisposta_ppt (PagoPA response) to PaymentRequestsGetResponse (BackendApp response)
  * @param {esitoNodoVerificaRPTRisposta_ppt} esitoNodoVerificaRPTRisposta - Message to convert
@@ -263,6 +284,35 @@ export function getPaymentActivationsPostResponse(
                   datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
               }
             : undefined
+        }
+      : undefined;
+
+  return PaymentActivationsPostResponse.decode(response);
+}
+
+export function getActivateIOPaymentResponse(
+  activateIOPaymentRes: activateIOPaymentRes_nfpsp
+): t.Validation<PaymentActivationsPostResponse> {
+  const response =
+    activateIOPaymentRes !== undefined
+      ? {
+          importoSingoloVersamento: activateIOPaymentRes.totalAmount
+            ? exactConvertToCents(activateIOPaymentRes.totalAmount)
+            : undefined,
+          ibanAccredito: activateIOPaymentRes.creditorReferenceId
+            ? activateIOPaymentRes.creditorReferenceId
+            : undefined,
+          causaleVersamento: activateIOPaymentRes.paymentDescription
+            ? activateIOPaymentRes.paymentDescription
+            : undefined,
+          enteBeneficiario: {
+            identificativoUnivocoBeneficiario: activateIOPaymentRes.fiscalCodePA
+              ? activateIOPaymentRes.fiscalCodePA
+              : undefined,
+            denominazioneBeneficiario: activateIOPaymentRes.officeName
+              ? activateIOPaymentRes.officeName
+              : undefined
+          }
         }
       : undefined;
 

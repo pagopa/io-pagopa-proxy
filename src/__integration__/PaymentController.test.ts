@@ -182,7 +182,7 @@ describe("activatePaymentToPagoPa", async () => {
       client
     );
 
-    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+    const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({
         envelopeKey: "env"
       })
@@ -199,7 +199,9 @@ describe("activatePaymentToPagoPa", async () => {
     await activatePayment(
       aConfig,
       attivaRPTPagoPaClient,
-      verifyPaymentNoticePaClientNm3 // TOFIX
+      activeIoPaymentClientNm3,
+      aMockedRedisClient,
+      0
     )(activateRequest);
 
     expect(clientRequest).toHaveBeenCalledTimes(1);
@@ -219,7 +221,7 @@ describe("activatePaymentToPagoPa", async () => {
       })
     );
 
-    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+    const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({
         envelopeKey: "env"
       })
@@ -233,7 +235,9 @@ describe("activatePaymentToPagoPa", async () => {
     const errorOrPaymentActivationResponse = await activatePayment(
       aConfig,
       attivaRPTPagoPaClient,
-      verifyPaymentNoticePaClientNm3 // TOFIX
+      activeIoPaymentClientNm3,
+      aMockedRedisClient,
+      0
     )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe("IResponseSuccessJson");
@@ -287,7 +291,9 @@ describe("activatePaymentToPagoPa", async () => {
     const errorOrPaymentActivationResponse = await activatePayment(
       aConfig,
       attivaRPTPagoPaClient,
-      verifyPaymentNoticePaClientNm3
+      verifyPaymentNoticePaClientNm3,
+      aMockedRedisClient,
+      0
     )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe(
