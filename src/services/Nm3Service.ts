@@ -150,14 +150,15 @@ export async function nodoActivateIOPaymentService(
   redisTimeoutSecs: number,
   codiceContestoPagamento: CodiceContestoPagamento,
   rptId: RptId,
-  rptIdAsString: string,
   amount: number
 ): Promise<
   | IResponseErrorValidation
   | IResponseErrorInternal
   | IResponseSuccessJson<PaymentActivationsPostResponse>
 > {
-  logger.info(`ActivateIOPayment| (nm3) for rptId|${rptIdAsString}`);
+  logger.info(
+    `ActivateIOPayment| (nm3) for codiceContestoPagamento|${codiceContestoPagamento}`
+  );
 
   const errorOrActivateIOPaymentInput = PaymentsConverter.getNodoActivateIOPaymentInput(
     pagoPAConfig,
@@ -168,7 +169,7 @@ export async function nodoActivateIOPaymentService(
   if (isLeft(errorOrActivateIOPaymentInput)) {
     const error = errorOrActivateIOPaymentInput.value;
     logger.error(
-      `ActivateIOPayment| Cannot construct request|${rptIdAsString}|${
+      `ActivateIOPayment| Cannot construct request|${codiceContestoPagamento}|${
         error.message
       }`
     );
@@ -182,7 +183,7 @@ export async function nodoActivateIOPaymentService(
 
   // Send the SOAP request to PagoPA (sendNodoVerifyPaymentNotice message)
   logger.info(
-    `ActivateIOPayment| sendNodoVerifyPaymentNoticeInput for request | ${rptIdAsString}`
+    `ActivateIOPayment| sendNodoVerifyPaymentNoticeInput for request | ${codiceContestoPagamento}`
   );
 
   const errorOrActivateIOPaymentOutput = await PaymentsService.sendNodoActivateIOPaymentInput(
@@ -193,7 +194,7 @@ export async function nodoActivateIOPaymentService(
   if (isLeft(errorOrActivateIOPaymentOutput)) {
     const error = errorOrActivateIOPaymentOutput.value;
     logger.error(
-      `ActivateIOPayment| Error while calling pagopa | ${rptIdAsString}|${
+      `ActivateIOPayment| Error while calling pagopa | ${codiceContestoPagamento}|${
         error.message
       }`
     );
@@ -237,7 +238,7 @@ export async function nodoActivateIOPaymentService(
 
       if (isLeft(responseOrErrorNm3)) {
         logger.error(
-          `ActivateIOPayment|Cannot construct valid response|${rptIdAsString}|${PathReporter.report(
+          `ActivateIOPayment|Cannot construct valid response|${codiceContestoPagamento}|${PathReporter.report(
             responseOrErrorNm3
           )}`
         );
