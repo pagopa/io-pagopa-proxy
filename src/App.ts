@@ -232,7 +232,9 @@ function setRestfulRoutes(
     PaymentController.activatePayment(
       config.PAGOPA,
       pagoPAClient,
-      pagoPAClientIoNm3
+      pagoPAClientIoNm3,
+      redisClient,
+      config.PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS
     )
   );
   app.post(

@@ -33,7 +33,10 @@ import { cdInfoWisp_ppt } from "../../../generated/FespCdService/cdInfoWisp_ppt"
 import { cdInfoWispResponse_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_ppt";
 import { faultBean_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_ppt";
 import { PagoPAConfig } from "../../Configuration";
-import { nodoVerifyPaymentNoticeService } from "../../services/Nm3Service";
+import {
+  nodoActivateIOPaymentService,
+  nodoVerifyPaymentNoticeService
+} from "../../services/Nm3Service";
 import * as NodoNM3PortClient from "../../services/pagopa_api/NodoNM3PortClient";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import * as PaymentsService from "../../services/PaymentsService";
@@ -208,83 +211,125 @@ export function getPaymentInfo( // 1 - verifica
 const getActivatePaymentController: (
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
-  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
+  redisClient: redis.RedisClient,
+  redisTimeoutSecs: number
 ) => AsControllerFunction<ActivatePaymentT> = (
   pagoPAConfig,
-  pagoPAClient
+  pagoPAClient,
+  pagoPAClientNm3,
+  redisClient,
+  redisTimeoutSecs
 ) => async params => {
-  // Convert the input provided by BackendApp (RESTful request)
-  // to a PagoPA request (SOAP request), mapping useful information
-  // Some static information will be obtained by PagoPAConfig, to identify this client
-  // If something wrong into input will be detected during mapping, and error will be provided as response
-  const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
-    pagoPAConfig,
-    params.paymentActivationsPostRequest
-  );
-  if (isLeft(errorOrNodoAttivaRPTInput)) {
-    const error = errorOrNodoAttivaRPTInput.value;
-    logger.error(`ActivatePayment|Invalid request|${error}`);
-    return ResponseErrorValidation(
-      "Invalid PagoPA activation Request",
-      error.message
-    );
-  }
-  const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
-  const rptId = params.paymentActivationsPostRequest.rptId;
+  const ccp: CodiceContestoPagamento =
+    params.paymentActivationsPostRequest.codiceContestoPagamento;
+  const amount: number =
+    params.paymentActivationsPostRequest.importoSingoloVersamento;
+  const rptId: string = params.paymentActivationsPostRequest.rptId;
+  const rptIdObject: RptId = RptIdFromString.decode(rptId).getOrElseL(_ => {
+    throw Error("Cannot parse rptId");
+  });
 
-  // Send the SOAP request to PagoPA (AttivaRPT message)
-  const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
-    nodoAttivaRPTInput,
-    pagoPAClient
-  );
-  if (isLeft(errorOrInodoAttivaRPTOutput)) {
-    const error = errorOrInodoAttivaRPTOutput.value;
-    logger.error(
-      `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`
-    );
-    return ResponseErrorInternal(
-      `PagoPA Server communication error: ${error.message}`
-    );
-  }
-  const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
+  const maybeCcpOrError = await redisGet(redisClient, ccp);
 
-  // Check PagoPA response content.
-  if (iNodoAttivaRPTOutput.esito !== "OK") {
-    // If it contains a functional error, an HTTP error will be provided to BackendApp
-    const responseError = getResponseErrorIfExists(iNodoAttivaRPTOutput.fault);
-    logger.error(
-      `ActivatePayment|${rptId}|Error from pagopa|${responseError}|${JSON.stringify(
-        iNodoAttivaRPTOutput.fault
-      )}`
+  /**
+   * Check if a ccp is related to a nm3 payment,
+   * so if it present in redis as <cpp,"">
+   */
+  if (
+    maybeCcpOrError.isRight() &&
+    maybeCcpOrError.value.getOrElse("noNM3") === ""
+  ) {
+    logger.debug(`ActivatePayment|${ccp}| is a nm3`);
+    /**
+     * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
+     */
+    return await nodoActivateIOPaymentService(
+      pagoPAConfig,
+      pagoPAClientNm3,
+      redisClient,
+      redisTimeoutSecs,
+      ccp,
+      rptIdObject,
+      rptId,
+      amount
     );
-    if (responseError === undefined) {
-      return ResponseErrorInternal(
-        "Error during payment activate: esito === KO"
+  } else {
+    logger.debug(`ActivatePayment|${ccp}| isn't a nm3`);
+    // Convert the input provided by BackendApp (RESTful request)
+    // to a PagoPA request (SOAP request), mapping useful information
+    // Some static information will be obtained by PagoPAConfig, to identify this client
+    // If something wrong into input will be detected during mapping, and error will be provided as response
+    const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
+      pagoPAConfig,
+      params.paymentActivationsPostRequest
+    );
+    if (isLeft(errorOrNodoAttivaRPTInput)) {
+      const error = errorOrNodoAttivaRPTInput.value;
+      logger.error(`ActivatePayment|Invalid request|${error}`);
+      return ResponseErrorValidation(
+        "Invalid PagoPA activation Request",
+        error.message
       );
-    } else {
-      return ResponseErrorInternal(responseError);
     }
-  }
+    const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
 
-  // Convert the output provided by PagoPA (SOAP response)
-  // to a BackendApp response (RESTful response), mapping the result information.
-  // Send a response to BackendApp
-  const responseOrError = PaymentsConverter.getPaymentActivationsPostResponse(
-    iNodoAttivaRPTOutput
-  );
-
-  if (isLeft(responseOrError)) {
-    logger.error(
-      `ActivatePayment|${rptId}|Cannot construct valid response|${PathReporter.report(
-        responseOrError
-      )}`
+    // Send the SOAP request to PagoPA (AttivaRPT message)
+    const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
+      nodoAttivaRPTInput,
+      pagoPAClient
     );
-    return ResponseErrorFromValidationErrors(PaymentActivationsPostResponse)(
-      responseOrError.value
-    );
-  }
+    if (isLeft(errorOrInodoAttivaRPTOutput)) {
+      const error = errorOrInodoAttivaRPTOutput.value;
+      logger.error(
+        `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`
+      );
+      return ResponseErrorInternal(
+        `PagoPA Server communication error: ${error.message}`
+      );
+    }
+    const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
 
-  return ResponseSuccessJson(responseOrError.value);
+    // Check PagoPA response content.
+    if (iNodoAttivaRPTOutput.esito !== "OK") {
+      // If it contains a functional error, an HTTP error will be provided to BackendApp
+      const responseError = getResponseErrorIfExists(
+        iNodoAttivaRPTOutput.fault
+      );
+      logger.error(
+        `ActivatePayment|${rptId}|Error from pagopa|${responseError}|${JSON.stringify(
+          iNodoAttivaRPTOutput.fault
+        )}`
+      );
+      if (responseError === undefined) {
+        return ResponseErrorInternal(
+          "Error during payment activate: esito === KO"
+        );
+      } else {
+        return ResponseErrorInternal(responseError);
+      }
+    }
+
+    // Convert the output provided by PagoPA (SOAP response)
+    // to a BackendApp response (RESTful response), mapping the result information.
+    // Send a response to BackendApp
+    const responseOrError = PaymentsConverter.getPaymentActivationsPostResponse(
+      iNodoAttivaRPTOutput
+    );
+
+    if (isLeft(responseOrError)) {
+      logger.error(
+        `ActivatePayment|${rptId}|Cannot construct valid response|${PathReporter.report(
+          responseOrError
+        )}`
+      );
+      return ResponseErrorFromValidationErrors(PaymentActivationsPostResponse)(
+        responseOrError.value
+      );
+    }
+
+    return ResponseSuccessJson(responseOrError.value);
+  }
 };
 
 /**
@@ -300,14 +345,18 @@ const getActivatePaymentController: (
 export function activatePayment( // 2 - attiva
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
-  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
+  redisClient: redis.RedisClient,
+  redisTimeoutSecs: number
 ): (
   req: express.Request
 ) => Promise<AsControllerResponseType<TypeofApiResponse<ActivatePaymentT>>> {
   const controller = getActivatePaymentController(
     pagoPAConfig,
     pagoPAClient,
-    pagoPAClientNm3
+    pagoPAClientNm3,
+    redisClient,
+    redisTimeoutSecs
   );
   return async req => {
     // Validate input provided by BackendAp
@@ -358,13 +407,14 @@ export async function setActivationStatus(
 
 export async function setNm3PaymentOption(
   codiceContestoPagamento: CodiceContestoPagamento,
+  idPayment: string,
   redisTimeoutSecs: number,
   redisClient: redis.RedisClient
 ): Promise<boolean> {
   return (await redisSet(
     redisClient,
     codiceContestoPagamento,
-    "", // empty stroing for NM3 payments
+    idPayment,
     "EX", // Set the specified expire time, in seconds.
     redisTimeoutSecs
   )).fold<boolean>(_ => false, _ => true);

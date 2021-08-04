@@ -12,6 +12,8 @@ import { logger } from "../utils/Logger";
 import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
 import { PagamentiTelematiciPspNodoAsyncClient } from "./pagopa_api/PPTPortClient";
 
+import { activateIOPaymentReq_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentReq_nfpsp";
+import { activateIOPaymentRes_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
 import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
 import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
 
@@ -59,6 +61,24 @@ export async function sendNodoVerifyPaymentNoticeInput(
   }
 }
 
+export async function sendNodoActivateIOPaymentInput(
+  activateIOPaymentReq: activateIOPaymentReq_nfpsp,
+  pagoPASoapClient: PagamentiTelematiciPspNm3NodoAsyncClient
+): Promise<Either<Error, activateIOPaymentRes_nfpsp>> {
+  try {
+    const activateIOPaymentRes = await pagoPASoapClient.activateIOPayment(
+      activateIOPaymentReq
+    );
+    return right(activateIOPaymentRes);
+  } catch (exception) {
+    logger.error(
+      `Exception catched sending activateIOPaymentReq to PagoPA: ${
+        exception.message
+      }|${exception.response}|${exception.body}`
+    );
+    return left(Error(exception));
+  }
+}
 /**
  * Send a request to PagoPA to activate (lock) a payment (AttivaRPT)
  * @param {nodoAttivaRPT_ppt} nodoAttivaRPTInput - The request to send to PagoPA
