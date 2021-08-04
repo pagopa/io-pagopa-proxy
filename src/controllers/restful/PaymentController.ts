@@ -251,7 +251,6 @@ const getActivatePaymentController: (
       redisTimeoutSecs,
       ccp,
       rptIdObject,
-      rptId,
       amount
     );
   } else {

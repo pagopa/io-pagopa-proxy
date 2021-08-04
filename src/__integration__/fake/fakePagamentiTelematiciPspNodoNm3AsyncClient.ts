@@ -21,15 +21,15 @@ export async function createPagamentiTelematiciPspNm3NodoClient(
 const aVerifyPaymnentNoticeResOK = verifyPaymentNoticeRes_nfpsp
   .decode({
     outcome: "OK",
-    paymentList: [
-      {
-        paymentOptionDescription: {
+    paymentList: {
+      paymentOptionDescription: [
+        {
           amount: 30.0,
           options: "EQ",
           paymentNote: "paymentNoteTest"
         }
-      }
-    ],
+      ]
+    },
     paymentDescription: "payment",
     fiscalCodePA: "77777777777",
     companyName: "company EC",
