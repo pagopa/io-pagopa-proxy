@@ -5,7 +5,6 @@
 
 import * as express from "express";
 import { isLeft } from "fp-ts/lib/Either";
-import { fromNullable } from "fp-ts/lib/Option";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { RptId, RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
 import { TypeofApiResponse } from "italia-ts-commons/lib/requests";
@@ -34,6 +33,7 @@ import { cdInfoWisp_ppt } from "../../../generated/FespCdService/cdInfoWisp_ppt"
 import { cdInfoWispResponse_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_ppt";
 import { faultBean_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_ppt";
 import { PagoPAConfig } from "../../Configuration";
+import { nodoVerifyPaymentNoticeService } from "../../services/Nm3Service";
 import * as NodoNM3PortClient from "../../services/pagopa_api/NodoNM3PortClient";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import * as PaymentsService from "../../services/PaymentsService";
@@ -138,97 +138,18 @@ const getGetPaymentInfoController: (
         return ResponseErrorInternal(responseError);
       }
     } else {
-      logger.info(
-        `GetPaymentInfo|·PPT_MULTI_BENEFICIARIO·for·request|${params.rptId}`
-      );
-
-      const errorOrIverifyPaymentNoticeutput = PaymentsConverter.getNodoVerifyPaymentNoticeInput(
+      /**
+       * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
+       */
+      return await nodoVerifyPaymentNoticeService(
         pagoPAConfig,
-        rptId
+        pagoPAClientNm3,
+        redisClient,
+        redisTimeoutSecs,
+        params.rptId,
+        rptId,
+        codiceContestoPagamento
       );
-
-      if (isLeft(errorOrIverifyPaymentNoticeutput)) {
-        const error = errorOrIverifyPaymentNoticeutput.value;
-        logger.error(
-          `GetPaymentInfo|Cannot construct request|${params.rptId}|${
-            error.message
-          }`
-        );
-        return ResponseErrorValidation(
-          "Invalid PagoPA check Request",
-          error.message
-        );
-      }
-      const iverifyPaymentNoticeInput = errorOrIverifyPaymentNoticeutput.value;
-
-      // Send the SOAP request to PagoPA (VerificaRPT message)
-      logger.info(
-        `GetPaymentInfo| sendNodoVerifyPaymentNotice for request|${
-          params.rptId
-        }`
-      );
-      const errorOrIverifyPaymentNoticeOutput = await PaymentsService.sendNodoVerifyPaymentNoticeInput(
-        iverifyPaymentNoticeInput,
-        pagoPAClientNm3
-      );
-
-      if (isLeft(errorOrIverifyPaymentNoticeOutput)) {
-        const error = errorOrIverifyPaymentNoticeOutput.value;
-        logger.error(
-          `GetPaymentInfo|Error while calling pagopa|${params.rptId}|${
-            error.message
-          }`
-        );
-        return ResponseErrorInternal(
-          `PagoPA Server communication error: ${error.message}`
-        );
-      }
-      const iverifyPaymentNoticeOutput =
-        errorOrIverifyPaymentNoticeOutput.value;
-
-      // Check PagoPA response content
-      if (iverifyPaymentNoticeOutput.outcome !== "OK") {
-        const responseErrorVerifyPaymentNotice = getResponseErrorIfExists(
-          iverifyPaymentNoticeOutput.fault
-        );
-
-        return ResponseErrorInternal(
-          fromNullable(responseErrorVerifyPaymentNotice).getOrElse(
-            PaymentFaultEnum.PAYMENT_UNAVAILABLE // GENERIC_ERROR
-          )
-        );
-      } else {
-        const isNm3RedisCached: boolean = await setNm3PaymentOption(
-          codiceContestoPagamento,
-          redisTimeoutSecs,
-          redisClient
-        );
-
-        if (isNm3RedisCached === true) {
-          logger.debug(
-            `GetPaymentInfo|·PPT_MULTI_BENEFICIARIO·isNm3Cached | ${isNm3RedisCached}`
-          );
-          // risposta
-          const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
-            iverifyPaymentNoticeOutput,
-            codiceContestoPagamento
-          );
-
-          if (isLeft(responseOrErrorNm3)) {
-            logger.error(
-              `GetPaymentInfo|Cannot construct valid response|${
-                params.rptId
-              }|${PathReporter.report(responseOrErrorNm3)}`
-            );
-            return ResponseErrorFromValidationErrors(
-              PaymentRequestsGetResponse
-            )(responseOrErrorNm3.value);
-          }
-          return ResponseSuccessJson(responseOrErrorNm3.value);
-        } else {
-          return ResponseErrorInternal(PaymentFaultEnum.PAYMENT_UNAVAILABLE); // GENERIC_ERROR
-        }
-      }
     }
   }
 
