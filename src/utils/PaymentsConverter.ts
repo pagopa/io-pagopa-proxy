@@ -16,6 +16,7 @@ import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActiv
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
 import { activateIOPaymentReq_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentReq_nfpsp";
 import { activateIOPaymentRes_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
+import { ctPaymentOptionDescription_nfpsp } from "../../generated/nodeNm3psp/ctPaymentOptionDescription_nfpsp";
 import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
 import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
@@ -163,38 +164,34 @@ export function getPaymentRequestsGetResponseNm3(
     codiceContestoPagamento
   );
 
-  const response = verifyPaymentNoticeResponse.paymentList
-    ? {
-        importoSingoloVersamento: exactConvertToCents(
-          verifyPaymentNoticeResponse.paymentList.paymentOptionDescription[0]
-            .amount
-        ),
-        codiceContestoPagamento: codiceContestoPagamentoApi,
-        ibanAccredito: undefined,
-        causaleVersamento:
-          verifyPaymentNoticeResponse.paymentList.paymentOptionDescription[0]
-            .paymentNote,
-        enteBeneficiario: verifyPaymentNoticeResponse
-          ? {
-              identificativoUnivocoBeneficiario:
-                verifyPaymentNoticeResponse.fiscalCodePA,
-              denominazioneBeneficiario:
-                verifyPaymentNoticeResponse.companyName,
-              codiceUnitOperBeneficiario:
-                verifyPaymentNoticeResponse.officeName,
-              denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName,
-              indirizzoBeneficiario: undefined,
-              civicoBeneficiario: undefined,
-              capBeneficiario: undefined,
-              localitaBeneficiario: undefined,
-              provinciaBeneficiario: undefined,
-              nazioneBeneficiario: undefined
-            }
-          : undefined
-      }
-    : undefined;
+  const paymentOptionDescription: ctPaymentOptionDescription_nfpsp =
+    verifyPaymentNoticeResponse.paymentList &&
+    Array.isArray(
+      verifyPaymentNoticeResponse.paymentList.paymentOptionDescription
+    )
+      ? verifyPaymentNoticeResponse.paymentList.paymentOptionDescription[0]
+      : verifyPaymentNoticeResponse.paymentList
+        ? verifyPaymentNoticeResponse.paymentList.paymentOptionDescription
+        : undefined;
 
-  return PaymentRequestsGetResponse.decode(response);
+  return PaymentRequestsGetResponse.decode(
+    paymentOptionDescription
+      ? {
+          importoSingoloVersamento: exactConvertToCents(
+            paymentOptionDescription.amount
+          ),
+          codiceContestoPagamento: codiceContestoPagamentoApi,
+          causaleVersamento: paymentOptionDescription.paymentNote,
+          enteBeneficiario: {
+            identificativoUnivocoBeneficiario:
+              verifyPaymentNoticeResponse.fiscalCodePA,
+            denominazioneBeneficiario: verifyPaymentNoticeResponse.companyName,
+            codiceUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName,
+            denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName
+          }
+        }
+      : undefined
+  );
 }
 /**
  * Convert PaymentActivationsPostRequest (BackendApp request) to nodoAttivaRPT_ppt (PagoPA request)
