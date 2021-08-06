@@ -217,9 +217,7 @@ function setRestfulRoutes(
     PaymentController.getPaymentInfo(
       config.PAGOPA,
       pagoPAClient,
-      pagoPAClientPspNm3,
-      redisClient,
-      config.PAYMENT_ACTIVATION_STATUS_TIMEOUT_SECONDS
+      pagoPAClientPspNm3
     )
   );
   app.get(

@@ -51,15 +51,11 @@ import {
 const getGetPaymentInfoController: (
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
-  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
-  redisClient: redis.RedisClient,
-  redisTimeoutSecs: number
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
 ) => AsControllerFunction<GetPaymentInfoT> = (
   pagoPAConfig,
   pagoPAClient,
-  pagoPAClientNm3,
-  redisClient,
-  redisTimeoutSecs
+  pagoPAClientNm3
 ) => async params => {
   // Validate rptId (payment identifier) provided by BackendApp
   const errorOrRptId = RptIdFromString.decode(params.rptId);
@@ -147,8 +143,6 @@ const getGetPaymentInfoController: (
       return await nodoVerifyPaymentNoticeService(
         pagoPAConfig,
         pagoPAClientNm3,
-        redisClient,
-        redisTimeoutSecs,
         params.rptId,
         rptId,
         codiceContestoPagamento
@@ -189,18 +183,14 @@ const getGetPaymentInfoController: (
 export function getPaymentInfo( // 1 - verifica
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
-  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
-  redisClient: redis.RedisClient,
-  redisTimeoutSecs: number
+  pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
 ): (
   req: express.Request
 ) => Promise<AsControllerResponseType<TypeofApiResponse<GetPaymentInfoT>>> {
   const controller = getGetPaymentInfoController(
     pagoPAConfig,
     pagoPAClient,
-    pagoPAClientNm3,
-    redisClient,
-    redisTimeoutSecs
+    pagoPAClientNm3
   );
   return async req =>
     controller({
@@ -229,106 +219,93 @@ const getActivatePaymentController: (
   const rptIdObject: RptId = RptIdFromString.decode(rptId).getOrElseL(_ => {
     throw Error("Cannot parse rptId");
   });
-
-  const maybeCcpOrError = await redisGet(redisClient, ccp);
-
-  /**
-   * Check if a ccp is related to a nm3 payment,
-   * so if it present in redis as <cpp,"">
-   */
-  if (
-    maybeCcpOrError.isRight() &&
-    maybeCcpOrError.value.getOrElse("noNM3") === ""
-  ) {
-    logger.debug(`ActivatePayment|${ccp}| is a nm3`);
-    /**
-     * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
-     */
-    return await nodoActivateIOPaymentService(
-      pagoPAConfig,
-      pagoPAClientNm3,
-      redisClient,
-      redisTimeoutSecs,
-      ccp,
-      rptIdObject,
-      amount
+  // Convert the input provided by BackendApp (RESTful request)
+  // to a PagoPA request (SOAP request), mapping useful information
+  // Some static information will be obtained by PagoPAConfig, to identify this client
+  // If something wrong into input will be detected during mapping, and error will be provided as response
+  const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
+    pagoPAConfig,
+    params.paymentActivationsPostRequest
+  );
+  if (isLeft(errorOrNodoAttivaRPTInput)) {
+    const error = errorOrNodoAttivaRPTInput.value;
+    logger.error(`ActivatePayment|Invalid request|${error}`);
+    return ResponseErrorValidation(
+      "Invalid PagoPA activation Request",
+      error.message
     );
-  } else {
-    logger.debug(`ActivatePayment|${ccp}| isn't a nm3`);
-    // Convert the input provided by BackendApp (RESTful request)
-    // to a PagoPA request (SOAP request), mapping useful information
-    // Some static information will be obtained by PagoPAConfig, to identify this client
-    // If something wrong into input will be detected during mapping, and error will be provided as response
-    const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
-      pagoPAConfig,
-      params.paymentActivationsPostRequest
-    );
-    if (isLeft(errorOrNodoAttivaRPTInput)) {
-      const error = errorOrNodoAttivaRPTInput.value;
-      logger.error(`ActivatePayment|Invalid request|${error}`);
-      return ResponseErrorValidation(
-        "Invalid PagoPA activation Request",
-        error.message
-      );
-    }
-    const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
+  }
+  const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
 
-    // Send the SOAP request to PagoPA (AttivaRPT message)
-    const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
-      nodoAttivaRPTInput,
-      pagoPAClient
+  // Send the SOAP request to PagoPA (AttivaRPT message)
+  const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
+    nodoAttivaRPTInput,
+    pagoPAClient
+  );
+  if (isLeft(errorOrInodoAttivaRPTOutput)) {
+    const error = errorOrInodoAttivaRPTOutput.value;
+    logger.error(
+      `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`
     );
-    if (isLeft(errorOrInodoAttivaRPTOutput)) {
-      const error = errorOrInodoAttivaRPTOutput.value;
+    return ResponseErrorInternal(
+      `PagoPA Server communication error: ${error.message}`
+    );
+  }
+  const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
+
+  // Check PagoPA response content
+  if (iNodoAttivaRPTOutput.esito !== "OK") {
+    // If it contains a functional error, an HTTP error will be provided to BackendApp
+    const responseError = getResponseErrorIfExists(iNodoAttivaRPTOutput.fault);
+    if (
+      responseError &&
+      responseError.toString() !== "PPT_MULTI_BENEFICIARIO"
+    ) {
       logger.error(
-        `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`
-      );
-      return ResponseErrorInternal(
-        `PagoPA Server communication error: ${error.message}`
-      );
-    }
-    const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
-
-    // Check PagoPA response content.
-    if (iNodoAttivaRPTOutput.esito !== "OK") {
-      // If it contains a functional error, an HTTP error will be provided to BackendApp
-      const responseError = getResponseErrorIfExists(
-        iNodoAttivaRPTOutput.fault
-      );
-      logger.error(
-        `ActivatePayment|${rptId}|Error from pagopa|${responseError}|${JSON.stringify(
+        `ActivatePayment|Error from pagopa|${rptId}|${responseError}|${JSON.stringify(
           iNodoAttivaRPTOutput.fault
         )}`
       );
-      if (responseError === undefined) {
-        return ResponseErrorInternal(
-          "Error during payment activate: esito === KO"
-        );
-      } else {
-        return ResponseErrorInternal(responseError);
-      }
-    }
-
-    // Convert the output provided by PagoPA (SOAP response)
-    // to a BackendApp response (RESTful response), mapping the result information.
-    // Send a response to BackendApp
-    const responseOrError = PaymentsConverter.getPaymentActivationsPostResponse(
-      iNodoAttivaRPTOutput
-    );
-
-    if (isLeft(responseOrError)) {
-      logger.error(
-        `ActivatePayment|${rptId}|Cannot construct valid response|${PathReporter.report(
-          responseOrError
-        )}`
+      return ResponseErrorInternal(
+        responseError !== undefined
+          ? responseError
+          : "Error during payment check: esito === KO"
       );
-      return ResponseErrorFromValidationErrors(PaymentActivationsPostResponse)(
-        responseOrError.value
+    } else {
+      /**
+       * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
+       */
+      return await nodoActivateIOPaymentService(
+        pagoPAConfig,
+        pagoPAClientNm3,
+        redisClient,
+        redisTimeoutSecs,
+        ccp,
+        rptIdObject,
+        amount
       );
     }
-
-    return ResponseSuccessJson(responseOrError.value);
   }
+
+  // Convert the output provided by PagoPA (SOAP response)
+  // to a BackendApp response (RESTful response), mapping the result information.
+  // Send a response to BackendApp
+  const responseOrError = PaymentsConverter.getPaymentActivationsPostResponse(
+    iNodoAttivaRPTOutput
+  );
+
+  if (isLeft(responseOrError)) {
+    logger.error(
+      `ActivatePayment|${rptId}|Cannot construct valid response|${PathReporter.report(
+        responseOrError
+      )}`
+    );
+    return ResponseErrorFromValidationErrors(PaymentActivationsPostResponse)(
+      responseOrError.value
+    );
+  }
+
+  return ResponseSuccessJson(responseOrError.value);
 };
 
 /**
