@@ -96,9 +96,7 @@ describe("checkPaymentToPagoPa", async () => {
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
       verificaRPTPagoPaClient,
-      verifyPaymentNoticePaClientNm3,
-      aMockedRedisClient,
-      0.0
+      verifyPaymentNoticePaClientNm3
     )(req);
 
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseSuccessJson");
@@ -161,9 +159,7 @@ describe("checkPaymentToPagoPa", async () => {
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
       verificaRPTPagoPaClient,
-      verifyPaymentNoticePaClientNm3,
-      aMockedRedisClient,
-      0.0
+      verifyPaymentNoticePaClientNm3
     )(req);
 
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
