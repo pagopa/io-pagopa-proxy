@@ -48,6 +48,7 @@ import {
   AsControllerResponseType
 } from "../../utils/types";
 
+// 1 - verificaCtrl
 const getGetPaymentInfoController: (
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
@@ -198,6 +199,7 @@ export function getPaymentInfo( // 1 - verifica
     });
 }
 
+// 2 - attivaCtrl
 const getActivatePaymentController: (
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
@@ -396,6 +398,7 @@ export async function setNm3PaymentOption(
   )).fold<boolean>(_ => false, _ => true);
 }
 
+// 3 - getIdPagamentoCtrl
 const getGetActivationStatusController: (
   redisClient: redis.RedisClient
 ) => AsControllerFunction<

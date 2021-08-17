@@ -212,7 +212,7 @@ function setRestfulRoutes(
 ): void {
   const jsonParser = bodyParser.json();
 
-  // 1 - verifica
+  // fase 1 (verifica) : payment-requests > nodoVerificaRPT(NodoPerPsp) OR verifyPaymentNotice(nodeForPsp)
   const getPaymentInfoHandler = toExpressHandler(
     PaymentController.getPaymentInfo(
       config.PAGOPA,
@@ -225,7 +225,7 @@ function setRestfulRoutes(
     getPaymentInfoHandler
   );
 
-  // 2 - attiva
+  // fase 2 (attiva) : payment-activations > nodoAttivaRpt(NodoPerPsp) OR activateIOPayment(nodeForIO)
   const activatePaymentHandler = toExpressHandler(
     PaymentController.activatePayment(
       config.PAGOPA,
@@ -241,7 +241,7 @@ function setRestfulRoutes(
     activatePaymentHandler
   );
 
-  // 3 - getPayment ( polling )
+  // fase 3 - getPayment ( polling )
   const getActivationStatusHandler = toExpressHandler(
     PaymentController.getActivationStatus(redisClient)
   );
