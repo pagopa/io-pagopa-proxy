@@ -115,7 +115,7 @@ pagopaproxy_1       | {"message":"Creating a REDIS client...","level":"debug"}
 pagopaproxy_1       | {"message":"Server started at http://localhost:3000","level":"info"}
 ```
 
-Then to verify connection : 
+Then to verify connection typing : 
 
 ```sh
 curl --location --request GET 'http://localhost:3000/payment-requests/01234567891010001234567890123' \
@@ -131,6 +131,25 @@ and you'd see the following response :
     "ibanAccredito": "IT47L0300203280645139156879",
     "causaleVersamento": "Causale versamento mock"
 }
+```
+
+## Tests script
+
+In order to verify the flow of the three calls made by the [AppIO](https://github.com/pagopa/io-app) to obtain the payment ID necessary for the redirect to [WISP/PM](https://github.com/pagopa/pagopa-wisp2.0-pp-server),
+under `resources` folder typing :
+
+```sh
+bash calls_nm3_flow.sh
+```
+
+if all rights you'll see the following responses :
+
+```sh
+phase 1 - verify rsp => codiceContestoPagamento 7111a890ff3e11ebb41ccfc44eeecbc1 importo 200
+
+phase 2 - activation rsp => importoSingoloVersamento 3000
+
+phase 3 - Get idPagamento/paymentToken =  "c110729d258c4ab1b765fe902aae41d6"
 ```
 
 ## License

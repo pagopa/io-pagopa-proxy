@@ -207,7 +207,7 @@ export async function nodoActivateIOPaymentService(
 
     if (isIdPaymentSaved === true) {
       logger.debug(
-        `ActivateIOPayment | mn3 isIdPaymentSaved | ${isIdPaymentSaved}`
+        `ActivateIOPayment | nm3 isIdPaymentSaved | ${isIdPaymentSaved}`
       );
 
       const responseOrErrorNm3 = PaymentsConverter.getActivateIOPaymentResponse(
