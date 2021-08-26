@@ -13,7 +13,13 @@ parameters:
       - minor
       - patch
     default: minor
-
+  - name: ENV
+    displayName: Target Environment
+    type: string
+    default: test
+    values:
+      - test
+      - prod  
 
 # Only manual activations are intended
 trigger: none
@@ -151,6 +157,13 @@ stages:
   - stage: Deploy_production
     dependsOn:
       - Prepare_artifact
+    condition:
+      and(
+        succeeded(),
+        or(
+          eq(parameters['ENV'], 'prod')
+        )
+      )  
     jobs:
       - job: 'deploy'
         steps:
