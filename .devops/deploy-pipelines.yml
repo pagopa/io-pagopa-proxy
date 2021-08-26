@@ -176,7 +176,7 @@ stages:
               azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
               resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
               appType: 'webApp'
-              appName: '$(PRODUCTION_PROXYTEST_APP_NAME)'
+              appName: '$(PRODUCTION_PROXYPROD_APP_NAME)'
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
             displayName: Deploy to production slot
