@@ -160,7 +160,7 @@ stages:
     condition:
       and(
         succeeded(),
-        eq(parameters['ENV'], 'prod')
+        eq(parameters.ENV, 'prod')
       )  
     jobs:
       - job: 'deploy'
