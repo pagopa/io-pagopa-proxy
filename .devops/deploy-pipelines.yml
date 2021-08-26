@@ -19,7 +19,7 @@ parameters:
     default: test
     values:
       - test
-      - prod  
+      - prod
 
 # Only manual activations are intended
 trigger: none
