@@ -1,9 +1,5 @@
 # Azure DevOps pipeline to release a new version and deploy to production.
 
-variables:
-  NODE_VERSION: '8.9.4'
-  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
-
 parameters:
   - name: 'RELEASE_SEMVER'
     displayName: 'When packing a release, define the version bump to apply'
@@ -20,6 +16,11 @@ parameters:
     values:
       - test
       - prod
+
+variables:
+  NODE_VERSION: '8.9.4'
+  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+  ENV: ${{ parameters.ENV }}
 
 # Only manual activations are intended
 trigger: none
@@ -160,7 +161,7 @@ stages:
     condition:
       and(
         succeeded(),
-        eq(${{ parameters.ENV }}, 'prod')
+        eq(variables['ENV'], 'prod')
       )  
     jobs:
       - job: 'deploy'
