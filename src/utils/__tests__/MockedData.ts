@@ -77,23 +77,6 @@ export const aVerificaRPTOutputKOCompleted = esitoNodoVerificaRPTRisposta_ppt
     );
   });
 
-export const aVerificaRPTOutputKOIban = esitoNodoVerificaRPTRisposta_ppt
-  .decode({
-    esito: "KO",
-    fault: {
-      id: "NodoDeiPagamentiSPC",
-      faultCode: "PPT_IBAN_NON_CENSITO",
-      faultString: "IBAN PA non censito correttamente"
-    }
-  })
-  .getOrElseL(errors => {
-    throw Error(
-      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
-        errors
-      )}`
-    );
-  });
-
 export const aVerificaRPTOutputKOOnGoing = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "KO",

@@ -491,7 +491,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
  */
 export function getResponseErrorIfExists(
   faultBean: faultBean_ppt | undefined
-): PaymentFaultEnum | string | undefined {
+): PaymentFaultEnum | undefined {
   // Response is FAILED but no additional information are provided by PagoPa
   if (faultBean === undefined) {
     return undefined;
@@ -513,10 +513,7 @@ export function getResponseErrorIfExists(
 export function getErrorMessageCtrlFromPagoPaError(
   faultCode: string,
   faultDescription: string | undefined
-): PaymentFaultEnum | string {
-  logger.warn(
-    `Retrieved a PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
-  );
+): PaymentFaultEnum {
   switch (faultCode) {
     case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
       return PaymentFaultEnum.INVALID_AMOUNT;
@@ -533,6 +530,21 @@ export function getErrorMessageCtrlFromPagoPaError(
     case "PPT_MULTI_BENEFICIARIO":
       return PaymentFaultEnum.PPT_MULTI_BENEFICIARIO;
     default:
-      return faultCode;
+      // faultCode doesn't match anything
+      if (faultDescription !== undefined) {
+        // if there's a description, try to look for a fault code in the
+        // description
+        const extractedFaultCode = faultDescription.match(/(PAA|PPT)_\S+/);
+        if (extractedFaultCode !== null) {
+          return getErrorMessageCtrlFromPagoPaError(
+            extractedFaultCode[0],
+            undefined
+          );
+        }
+      }
+      logger.warn(
+        `Retrieved a generic PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
+      );
+      return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
   }
 }
