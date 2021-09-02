@@ -48,7 +48,7 @@ export const aVerificaRPTOutputKOGeneric = esitoNodoVerificaRPTRisposta_ppt
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
-      faultCode: "CANALE_RICHIEDENTE_ERRATO",
+      faultCode: "PPT_DOMINIO_SCONOSCIUTO",
       faultString: "Identificativo richiedente non valido."
     }
   })
@@ -64,9 +64,11 @@ export const aVerificaRPTOutputKOCompleted = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "KO",
     fault: {
-      id: "NodoDeiPagamentiSPC",
-      faultCode: "PAA_PAGAMENTO_DUPLICATO",
-      faultString: "Pagamento in attesa risulta concluso all’Ente Creditore."
+      id: "NodoDeiPagamentiSP",
+      faultCode: "PPT_EMESSO_DA_PAA",
+      faultString: "Errore emesso da Entre Creditore",
+      originalFaultCode: "PAA_PAGAMENTO_DUPLICATO",
+      originalFaultString: "Pagamento duplicato."
     }
   })
   .getOrElseL(errors => {
@@ -82,8 +84,11 @@ export const aVerificaRPTOutputKOOnGoing = esitoNodoVerificaRPTRisposta_ppt
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
-      faultCode: "PAA_PAGAMENTO_IN_CORSO",
-      faultString: "Pagamento in attesa risulta in corso all’Ente Creditore."
+      faultCode: "PPT_EMESSO_DA_PAA",
+      faultString: "Errore emesso da Ente Creditore",
+      originalFaultCode: "PAA_PAGAMENTO_IN_CORSO",
+      originalFaultString:
+        "Pagamento in attesa risulta in corso all'Ente Creditore"
     }
   })
   .getOrElseL(errors => {
@@ -99,8 +104,10 @@ export const aVerificaRPTOutputKOExpired = esitoNodoVerificaRPTRisposta_ppt
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
-      faultCode: "PAA_PAGAMENTO_SCADUTO",
-      faultString: "Pagamento in attesa risulta scaduto all’Ente Creditore."
+      faultCode: "PPT_EMESSO_DA_PAA",
+      faultString: "Errore emesso da Ente Creditore.",
+      originalFaultCode: "PAA_PAGAMENTO_SCADUTO",
+      originalFaultString: "Pagamento scaduto."
     }
   })
   .getOrElseL(errors => {
@@ -150,24 +157,12 @@ export const aAttivaRPTOutputKOAmount = esitoNodoAttivaRPTRisposta_ppt
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
-      faultCode: "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO",
-      faultString:
+      faultCode: "PPT_ERRORE_EMESSO_DA_PAA",
+      faultString: "Errore emesso dall'Ente Creditore",
+      originalFaultCode: "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO",
+      orginalfaultString:
         "L’importo del pagamento in attesa non è congruente con il dato indicato dal PSP"
     }
-  })
-  .getOrElseL(errors => {
-    throw Error(
-      `Invalid esitoNodoAttivaRPTRisposta_ppt to decode: ${reporters.readableReport(
-        errors
-      )}`
-    );
-  });
-
-export const aAttivaRPTOutputKOGeneric = esitoNodoAttivaRPTRisposta_ppt
-  .decode({
-    esito: "KO",
-    faultCode: "PAA_TIPOFIRMA_SCONOSCIUTO",
-    faultString: "Il campo tipoFirma non corrisponde ad alcun valore previsto."
   })
   .getOrElseL(errors => {
     throw Error(

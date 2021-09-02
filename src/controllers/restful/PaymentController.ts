@@ -496,10 +496,11 @@ export function getResponseErrorIfExists(
   if (faultBean === undefined) {
     return undefined;
   }
-  // Response is FAILED and additional information are provided by PagoPa
   return getErrorMessageCtrlFromPagoPaError(
+    faultBean.id,
     faultBean.faultCode,
-    faultBean.description
+    faultBean.description,
+    faultBean.originalFaultCode
   );
 }
 
@@ -507,14 +508,34 @@ export function getResponseErrorIfExists(
  * Convert PagoPa message error (faultCode) to Controller message error (ErrorMessagesCtrlEnum) to send to BackendApp
  * A complete list of faultCode provided by PagoPa is available at
  * https://www.agid.gov.it/sites/default/files/repository_files/specifiche_attuative_nodo_2_1_0.pdf
+ * @param {string} faultId - Error Id provided by PagoPa to
  * @param {string} faultCode - Error code provided by PagoPa
  * @return {PaymentFaultEnum} Error code to send to BackendApp
  */
 export function getErrorMessageCtrlFromPagoPaError(
+  faultId: string,
   faultCode: string,
-  faultDescription: string | undefined
+  faultDescription: string | undefined,
+  originalFaultCode: string | undefined
 ): PaymentFaultEnum {
   switch (faultCode) {
+    case "PPT_ERRORE_EMESSO_DA_PAA":
+      return getErrorMessageFromPA(originalFaultCode);
+    case "PPT_DOMINIO_SCONOSCIUTO":
+      return PaymentFaultEnum.DOMAIN_UNKNOWN;
+    default:
+      // faultCode doesn't match anything
+      logger.warn(
+        `Retrieved a generic PagoPA error from ${faultId} response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
+      );
+      return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
+  }
+}
+
+function getErrorMessageFromPA(
+  originalFaultCode: string | undefined
+): PaymentFaultEnum {
+  switch (originalFaultCode) {
     case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
       return PaymentFaultEnum.INVALID_AMOUNT;
     case "PAA_PAGAMENTO_DUPLICATO":
@@ -531,20 +552,7 @@ export function getErrorMessageCtrlFromPagoPaError(
       return PaymentFaultEnum.PPT_MULTI_BENEFICIARIO;
     default:
       // faultCode doesn't match anything
-      if (faultDescription !== undefined) {
-        // if there's a description, try to look for a fault code in the
-        // description
-        const extractedFaultCode = faultDescription.match(/(PAA|PPT)_\S+/);
-        if (extractedFaultCode !== null) {
-          return getErrorMessageCtrlFromPagoPaError(
-            extractedFaultCode[0],
-            undefined
-          );
-        }
-      }
-      logger.warn(
-        `Retrieved a generic PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
-      );
+      logger.warn(`Unexpected originalFaultCode : ${originalFaultCode} from PA`);
       return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
   }
 }

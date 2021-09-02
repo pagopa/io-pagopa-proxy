@@ -351,8 +351,10 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      fault.id,
       fault.faultCode,
-      undefined
+      undefined,
+      fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_DUPLICATED);
@@ -364,10 +366,10 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
-      "",
-      `FaultCode PA: ${
-        fault.faultCode
-      } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
+      fault.id,
+      fault.faultCode,
+      fault.faultString,
+      fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_DUPLICATED);
@@ -379,8 +381,10 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      fault.id,
       fault.faultCode,
-      undefined
+      undefined,
+      fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_EXPIRED);
@@ -392,10 +396,10 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
-      "",
-      `FaultCode PA: ${
-        fault.faultCode
-      } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
+      fault.id,
+      fault.faultCode,
+      fault.faultString,
+      fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_EXPIRED);
@@ -407,8 +411,10 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      fault.id,
       fault.faultCode,
-      undefined
+      undefined,
+      fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_ONGOING);
@@ -420,10 +426,10 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
-      "",
-      `FaultCode PA:  ${
-        fault.faultCode
-      } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
+      fault.id,
+      fault.faultCode,
+      fault.faultString,
+      fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_ONGOING);
@@ -435,8 +441,10 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      fault.id,
       fault.faultCode,
-      undefined
+      undefined,
+      fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
@@ -448,8 +456,10 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
     const errorMsg = PaymentController.getErrorMessageCtrlFromPagoPaError(
+      fault.id,
       fault.faultCode,
-      "Pagamento in attesa risulta in corso all’Ente Creditore. "
+      fault.faultString,
+      fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
