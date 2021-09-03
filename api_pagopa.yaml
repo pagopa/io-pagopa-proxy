@@ -123,6 +123,10 @@ definitions:
         exclusiveMaximum: true
       detail:
         $ref: "#/definitions/PaymentFault"
+      detail_v2:
+        type: string
+        description: |-
+          Error codes as defined and returned by the pagoPA Node
       instance:
         type: string
         format: uri
@@ -282,7 +286,7 @@ definitions:
       importoSpezzone:
         $ref: '#/definitions/ImportoEuroCents'
   PaymentFault:
-    description: Fault codes for the PagoPA Verifica and Attiva operations
+    description: Fault codes for the PagoPA Verifica and Attiva operations ( Deprecated )
     type: string
     x-extensible-enum:
       - PAYMENT_DUPLICATED

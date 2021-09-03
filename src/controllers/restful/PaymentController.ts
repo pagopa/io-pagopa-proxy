@@ -45,7 +45,8 @@ import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import { redisGet, redisSet } from "../../utils/Redis";
 import {
   AsControllerFunction,
-  AsControllerResponseType
+  AsControllerResponseType,
+  ResponsePaymentError
 } from "../../utils/types";
 
 // 1 - verificaCtrl
@@ -121,22 +122,26 @@ const getGetPaymentInfoController: (
     const responseError = getResponseErrorIfExists(
       iNodoVerificaRPTOutput.fault
     );
-    if (
-      responseError &&
-      responseError.toString() !== "PPT_MULTI_BENEFICIARIO"
-    ) {
+
+    if (responseError === undefined) {
+      return ResponseErrorInternal("Error during payment check: esito === KO");
+    }
+
+    if (responseError.toString() !== "PPT_MULTI_BENEFICIARIO") {
       logger.error(
         `GetPaymentInfo|Error from pagopa|${
           params.rptId
         }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
       );
-      if (responseError === undefined) {
-        return ResponseErrorInternal(
-          "Error during payment check: esito === KO"
-        );
-      } else {
-        return ResponseErrorInternal(responseError);
-      }
+
+      // tslint:disable-next-line:no-console
+      console.log(iNodoVerificaRPTOutput);
+      return ResponsePaymentError({
+        detail_v2: iNodoVerificaRPTOutput.fault
+          ? iNodoVerificaRPTOutput.fault.originalFaultCode
+          : undefined,
+        detail: responseError
+      });
     } else {
       /**
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
@@ -259,20 +264,25 @@ const getActivatePaymentController: (
   if (iNodoAttivaRPTOutput.esito !== "OK") {
     // If it contains a functional error, an HTTP error will be provided to BackendApp
     const responseError = getResponseErrorIfExists(iNodoAttivaRPTOutput.fault);
-    if (
-      responseError &&
-      responseError.toString() !== "PPT_MULTI_BENEFICIARIO"
-    ) {
+
+    if (responseError === undefined) {
+      return ResponseErrorInternal(
+        "Error during ActivatePayment check: esito === KO"
+      );
+    }
+
+    if (responseError.toString() !== "PPT_MULTI_BENEFICIARIO") {
       logger.error(
         `ActivatePayment|Error from pagopa|${rptId}|${responseError}|${JSON.stringify(
           iNodoAttivaRPTOutput.fault
         )}`
       );
-      return ResponseErrorInternal(
-        responseError !== undefined
-          ? responseError
-          : "Error during payment check: esito === KO"
-      );
+      return ResponsePaymentError({
+        detail_v2: iNodoAttivaRPTOutput.fault
+          ? iNodoAttivaRPTOutput.fault.originalFaultCode
+          : undefined,
+        detail: responseError
+      });
     } else {
       /**
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
