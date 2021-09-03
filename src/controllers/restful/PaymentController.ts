@@ -134,14 +134,8 @@ const getGetPaymentInfoController: (
         }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
       );
 
-      // tslint:disable-next-line:no-console
-      console.log(iNodoVerificaRPTOutput);
-      return ResponsePaymentError({
-        detail_v2: iNodoVerificaRPTOutput.fault
-          ? iNodoVerificaRPTOutput.fault.originalFaultCode
-          : undefined,
-        detail: responseError
-      });
+      const detailV2 = getDetailV2FromFaultCode(iNodoVerificaRPTOutput.fault);
+      return ResponsePaymentError(responseError, detailV2);
     } else {
       /**
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
@@ -277,12 +271,8 @@ const getActivatePaymentController: (
           iNodoAttivaRPTOutput.fault
         )}`
       );
-      return ResponsePaymentError({
-        detail_v2: iNodoAttivaRPTOutput.fault
-          ? iNodoAttivaRPTOutput.fault.originalFaultCode
-          : undefined,
-        detail: responseError
-      });
+      const detailV2 = getDetailV2FromFaultCode(iNodoAttivaRPTOutput.fault);
+      return ResponsePaymentError(responseError, detailV2);
     } else {
       /**
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
@@ -557,4 +547,17 @@ export function getErrorMessageCtrlFromPagoPaError(
       );
       return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
   }
+}
+
+/**
+ * Retrive detail_v2 from PagoPa message error (faultCode)
+ * @param {string} faultCode - Error code provided by PagoPa
+ * @return {detail_v2} detail_v2 to send to BackendApp
+ */
+function getDetailV2FromFaultCode(fault: faultBean_ppt | undefined): string {
+  return fault && fault.originalFaultCode
+    ? fault.originalFaultCode
+    : fault && fault.faultCode
+      ? fault.faultCode
+      : PaymentFaultEnum.PAYMENT_UNAVAILABLE.toString();
 }
