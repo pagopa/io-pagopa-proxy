@@ -4,6 +4,7 @@ import {
   TypeofApiResponse
 } from "italia-ts-commons/lib/requests";
 import {
+  HttpStatusCodeEnum,
   IResponse,
   IResponseErrorInternal,
   IResponseErrorNotFound,
@@ -11,6 +12,7 @@ import {
   IResponseSuccessJson,
   ProblemJson
 } from "italia-ts-commons/lib/responses";
+import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
@@ -22,36 +24,35 @@ export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
       : T extends IResponseType<500, ProblemJson>
         ? IResponseErrorInternal
         : T extends IResponseType<500, PaymentProblemJson>
-          ? IResponsePaymentError
+          ? IResponsePaymentInternalError
           : never;
 
 export type AsControllerFunction<T> = (
   params: TypeofApiParams<T>
 ) => Promise<AsControllerResponseType<TypeofApiResponse<T>>>;
 
-/**
- * Interface to model a 500 with json response.
- */
-export interface IResponsePaymentError
-  extends IResponse<"IResponseErrorInternal"> {
-  readonly body: PaymentProblemJson;
-}
+export interface IResponsePaymentInternalError
+  extends IResponse<"IResponseErrorInternal"> {}
 
 /**
  * Returns a 500 with json response.
- *
- * @param o The object to return to the client
  */
 export const ResponsePaymentError = (
-  o: PaymentProblemJson
-): IResponsePaymentError => {
-  const kindlessObject = Object.assign(Object.assign({}, o), {
-    kind: undefined
-  });
+  detail: PaymentFaultEnum,
+  detailV2: string
+): IResponsePaymentInternalError => {
+  const problem: PaymentProblemJson = {
+    status: HttpStatusCodeEnum.HTTP_STATUS_500,
+    title: "Internal server error",
+    detail,
+    detail_v2: detailV2
+  };
   return {
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    apply: res => res.status(500).json(kindlessObject),
-    kind: "IResponseErrorInternal",
-    body: o
+    apply: res =>
+      res
+        .status(HttpStatusCodeEnum.HTTP_STATUS_500)
+        .set("Content-Type", "application/problem+json")
+        .json(problem),
+    kind: "IResponseErrorInternal"
   };
 };
