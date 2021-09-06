@@ -499,7 +499,8 @@ export function getResponseErrorIfExists(
   // Response is FAILED and additional information are provided by PagoPa
   return getErrorMessageCtrlFromPagoPaError(
     faultBean.faultCode,
-    faultBean.description
+    faultBean.description,
+    faultBean.originalFaultCode
   );
 }
 
@@ -512,7 +513,8 @@ export function getResponseErrorIfExists(
  */
 export function getErrorMessageCtrlFromPagoPaError(
   faultCode: string,
-  faultDescription: string | undefined
+  faultDescription: string | undefined,
+  originalFaultCode?: string
 ): PaymentFaultEnum {
   switch (faultCode) {
     case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
@@ -530,7 +532,10 @@ export function getErrorMessageCtrlFromPagoPaError(
     case "PPT_MULTI_BENEFICIARIO":
       return PaymentFaultEnum.PPT_MULTI_BENEFICIARIO;
     default:
-      // faultCode doesn't match anything
+      // if originalFaultCode exists
+      if (originalFaultCode !== undefined) {
+        return getErrorMessageCtrlFromPagoPaError(originalFaultCode, undefined);
+      }
       if (faultDescription !== undefined) {
         // if there's a description, try to look for a fault code in the
         // description
