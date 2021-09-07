@@ -135,6 +135,9 @@ const getGetPaymentInfoController: (
       );
 
       const detailV2 = getDetailV2FromFaultCode(iNodoVerificaRPTOutput.fault);
+      logger.warn(
+        `GetPaymentInfo|ResponsePaymentError (detail: ${responseError} - detail_v2: ${detailV2})`
+      );
       return ResponsePaymentError(responseError, detailV2);
     } else {
       /**
