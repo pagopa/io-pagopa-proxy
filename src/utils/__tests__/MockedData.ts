@@ -49,7 +49,8 @@ export const aVerificaRPTOutputKOGeneric = esitoNodoVerificaRPTRisposta_ppt
     fault: {
       id: "NodoDeiPagamentiSPC",
       faultCode: "CANALE_RICHIEDENTE_ERRATO",
-      faultString: "Identificativo richiedente non valido."
+      faultString: "Identificativo richiedente non valido.",
+      originalFaultCode: "PAA_CANALE_RICHIEDENTE_ERRATO"
     }
   })
   .getOrElseL(errors => {
@@ -66,7 +67,8 @@ export const aVerificaRPTOutputKOCompleted = esitoNodoVerificaRPTRisposta_ppt
     fault: {
       id: "NodoDeiPagamentiSPC",
       faultCode: "PAA_PAGAMENTO_DUPLICATO",
-      faultString: "Pagamento in attesa risulta concluso all’Ente Creditore."
+      faultString: "Pagamento in attesa risulta concluso all’Ente Creditore.",
+      originalFaultCode: "PAA_PAGAMENTO_DUPLICATO"
     }
   })
   .getOrElseL(errors => {
@@ -83,7 +85,8 @@ export const aVerificaRPTOutputKOOnGoing = esitoNodoVerificaRPTRisposta_ppt
     fault: {
       id: "NodoDeiPagamentiSPC",
       faultCode: "PAA_PAGAMENTO_IN_CORSO",
-      faultString: "Pagamento in attesa risulta in corso all’Ente Creditore."
+      faultString: "Pagamento in attesa risulta in corso all’Ente Creditore.",
+      originalFaultCode: "PAA_PAGAMENTO_IN_CORSO"
     }
   })
   .getOrElseL(errors => {
@@ -100,7 +103,8 @@ export const aVerificaRPTOutputKOExpired = esitoNodoVerificaRPTRisposta_ppt
     fault: {
       id: "NodoDeiPagamentiSPC",
       faultCode: "PAA_PAGAMENTO_SCADUTO",
-      faultString: "Pagamento in attesa risulta scaduto all’Ente Creditore."
+      faultString: "Pagamento in attesa risulta scaduto all’Ente Creditore.",
+      originalFaultCode: "PAA_PAGAMENTO_SCADUTO"
     }
   })
   .getOrElseL(errors => {
@@ -152,7 +156,8 @@ export const aAttivaRPTOutputKOAmount = esitoNodoAttivaRPTRisposta_ppt
       id: "NodoDeiPagamentiSPC",
       faultCode: "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO",
       faultString:
-        "L’importo del pagamento in attesa non è congruente con il dato indicato dal PSP"
+        "L’importo del pagamento in attesa non è congruente con il dato indicato dal PSP",
+      originalFaultCode: "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO"
     }
   })
   .getOrElseL(errors => {
@@ -167,7 +172,8 @@ export const aAttivaRPTOutputKOGeneric = esitoNodoAttivaRPTRisposta_ppt
   .decode({
     esito: "KO",
     faultCode: "PAA_TIPOFIRMA_SCONOSCIUTO",
-    faultString: "Il campo tipoFirma non corrisponde ad alcun valore previsto."
+    faultString: "Il campo tipoFirma non corrisponde ad alcun valore previsto.",
+    originalFaultCode: "PAA_TIPOFIRMA_SCONOSCIUTO"
   })
   .getOrElseL(errors => {
     throw Error(
