@@ -1,5 +1,4 @@
 import { isLeft } from "fp-ts/lib/Either";
-import { fromNullable } from "fp-ts/lib/Option";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { RptId } from "italia-pagopa-commons/lib/pagopa";
 import {
@@ -17,6 +16,7 @@ import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
 import { PagoPAConfig } from "../Configuration";
 import {
+  getDetailV2FromFaultCode,
   getResponseErrorIfExists,
   setNm3PaymentOption
 } from "../controllers/restful/PaymentController";
@@ -26,6 +26,7 @@ import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3Po
 import * as PaymentsConverter from "../utils/PaymentsConverter";
 
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
+import { ResponsePaymentError } from "../utils/types";
 import * as PaymentsService from "./PaymentsService";
 
 /**
@@ -91,11 +92,17 @@ export async function nodoVerifyPaymentNoticeService(
       iverifyPaymentNoticeOutput.fault
     );
 
-    return ResponseErrorInternal(
-      fromNullable(responseErrorVerifyPaymentNotice).getOrElse(
-        PaymentFaultEnum.PAYMENT_UNAVAILABLE
-      )
+    if (responseErrorVerifyPaymentNotice === undefined) {
+      return ResponseErrorInternal(
+        "Error during GetNodoVerifyPaymentNotice check: esito === KO"
+      );
+    }
+
+    const detailV2 = getDetailV2FromFaultCode(iverifyPaymentNoticeOutput.fault);
+    logger.warn(
+      `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorVerifyPaymentNotice} - detail_v2: ${detailV2})`
     );
+    return ResponsePaymentError(responseErrorVerifyPaymentNotice, detailV2);
   } else {
     const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
       iverifyPaymentNoticeOutput,
@@ -192,11 +199,17 @@ export async function nodoActivateIOPaymentService(
       activateIOPaymentOutput.fault
     );
 
-    return ResponseErrorInternal(
-      fromNullable(responseErrorActivateIOPayment).getOrElse(
-        PaymentFaultEnum.PAYMENT_UNAVAILABLE
-      )
+    if (responseErrorActivateIOPayment === undefined) {
+      return ResponseErrorInternal(
+        "Error during ActivateIOPayment check: esito === KO"
+      );
+    }
+
+    const detailV2 = getDetailV2FromFaultCode(activateIOPaymentOutput.fault);
+    logger.warn(
+      `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorActivateIOPayment} - detail_v2: ${detailV2})`
     );
+    return ResponsePaymentError(responseErrorActivateIOPayment, detailV2);
   } else {
     const isIdPaymentSaved: boolean = await setNm3PaymentOption(
       codiceContestoPagamento,

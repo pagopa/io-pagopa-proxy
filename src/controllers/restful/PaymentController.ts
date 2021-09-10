@@ -562,7 +562,9 @@ export function getErrorMessageCtrlFromPagoPaError(
  * @param {string} faultCode - Error code provided by PagoPa
  * @return {detail_v2} detail_v2 to send to BackendApp
  */
-function getDetailV2FromFaultCode(fault: faultBean_ppt | undefined): string {
+export function getDetailV2FromFaultCode(
+  fault: faultBean_ppt | undefined
+): string {
   return fault && fault.originalFaultCode
     ? fault.originalFaultCode
     : fault && fault.faultCode
