@@ -356,6 +356,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_DUPLICATED);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_DUPLICATO");
   });
   it("should convert a KO Completed Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOCompleted.fault;
@@ -371,6 +372,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_DUPLICATED);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_DUPLICATO");
   });
   it("should convert a KO Expired Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOExpired.fault;
@@ -384,6 +386,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_EXPIRED);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_SCADUTO");
   });
   it("should convert a KO Expired Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOExpired.fault;
@@ -399,6 +402,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_EXPIRED);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_SCADUTO");
   });
   it("should convert a KO OnGoing Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
@@ -412,6 +416,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_ONGOING);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_IN_CORSO");
   });
   it("should convert a KO OnGoing Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
@@ -427,6 +432,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_ONGOING);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_IN_CORSO");
   });
   it("should convert a KO Generic Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOGeneric.fault;
@@ -440,6 +446,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
+    expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
   });
   it("should convert a KO Generic Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOGeneric.fault;
@@ -453,5 +460,6 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     );
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
+    expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
   });
 });
