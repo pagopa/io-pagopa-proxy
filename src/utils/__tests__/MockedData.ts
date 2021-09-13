@@ -61,14 +61,15 @@ export const aVerificaRPTOutputKOGeneric = esitoNodoVerificaRPTRisposta_ppt
     );
   });
 
-  export const aVerificaRPTOutputKOShort = esitoNodoVerificaRPTRisposta_ppt
+export const aVerificaRPTOutputKOShort = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
       faultCode: "PPT_ERRORE_EMESSO_DA_PAA",
-      description : "Pagamento PAA_PAGAMENTO_DUPLICATO in attesa risulta concluso all’Ente Creditore.",
-      faultString: "Errore restituito dall’ente creditore",
+      description:
+        "Pagamento PAA_PAGAMENTO_DUPLICATO in attesa risulta concluso all’Ente Creditore.",
+      faultString: "Errore restituito dall’ente creditore"
     }
   })
   .getOrElseL(errors => {
@@ -79,14 +80,13 @@ export const aVerificaRPTOutputKOGeneric = esitoNodoVerificaRPTRisposta_ppt
     );
   });
 
-
 export const aVerificaRPTOutputKOCompleted = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
       faultCode: "PPT_ERRORE_EMESSO_DA_PAA",
-      description : "Pagamento in attesa risulta concluso all’Ente Creditore.",
+      description: "Pagamento in attesa risulta concluso all’Ente Creditore.",
       faultString: "Errore restituito dall’ente creditore",
       originalFaultCode: "PAA_PAGAMENTO_DUPLICATO"
     }
