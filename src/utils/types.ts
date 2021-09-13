@@ -13,6 +13,7 @@ import {
   ProblemJson
 } from "italia-ts-commons/lib/responses";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
+import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
@@ -39,7 +40,7 @@ export interface IResponsePaymentInternalError
  */
 export const ResponsePaymentError = (
   detail: PaymentFaultEnum,
-  detailV2: string
+  detailV2: PaymentFaultV2Enum | undefined
 ): IResponsePaymentInternalError => {
   const problem: PaymentProblemJson = {
     status: HttpStatusCodeEnum.HTTP_STATUS_500,
