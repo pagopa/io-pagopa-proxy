@@ -1,5 +1,6 @@
 import { isRight } from "fp-ts/lib/Either";
 import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
+import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
 import * as PaymentController from "../../controllers/restful/PaymentController";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
@@ -221,6 +222,84 @@ describe("getPaymentsCheckResponse", () => {
         denomUnitOperBeneficiario: enteBeneficiario.denomUnitOperBeneficiario,
         indirizzoBeneficiario: enteBeneficiario.indirizzoBeneficiario,
         civicoBeneficiario: enteBeneficiario.civicoBeneficiario,
+        capBeneficiario: enteBeneficiario.capBeneficiario,
+        localitaBeneficiario: enteBeneficiario.localitaBeneficiario,
+        provinciaBeneficiario: enteBeneficiario.provinciaBeneficiario,
+        nazioneBeneficiario: enteBeneficiario.nazioneBeneficiario
+      }
+    });
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "causaleVersamento",
+      datiPagamentoPA.causaleVersamento
+    );
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "importoSingoloVersamento",
+      15098
+    );
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "codiceContestoPagamento",
+      MockedData.aCodiceContestoPagamento
+    );
+    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+      "ibanAccredito",
+      datiPagamentoPA.ibanAccredito
+    );
+  });
+
+  it("should convert NodoVerificaRPTOutput NotFullFilled civicoBeneficiario to PaymentsCheckResponse", () => {
+    const errorOrPaymentCheckResponse = PaymentsConverter.getPaymentRequestsGetResponse(
+      ({
+        esito: "OK",
+        datiPagamentoPA: {
+          importoSingoloVersamento: 150.98,
+          ibanAccredito: "IT17X0605502100000001234567",
+          bicAccredito: "BPPIITRR",
+          enteBeneficiario: {
+            identificativoUnivocoBeneficiario: {
+              tipoIdentificativoUnivoco: "G",
+              codiceIdentificativoUnivoco: "001"
+            },
+            denominazioneBeneficiario: "BANCA01",
+            codiceUnitOperBeneficiario: "01",
+            denomUnitOperBeneficiario: "DENOM01",
+            indirizzoBeneficiario: "VIAROMA",
+            civicoBeneficiario: null,
+            capBeneficiario: "00000",
+            localitaBeneficiario: "ROMA",
+            provinciaBeneficiario: "ROMA",
+            nazioneBeneficiario: "IT"
+          },
+          credenzialiPagatore: "NOMECOGNOME",
+          causaleVersamento: "CAUSALE01"
+        }
+      } as unknown) as esitoNodoVerificaRPTRisposta_ppt,
+      MockedData.aCodiceContestoPagamento
+    );
+
+    // Check correct field mapping
+    expect(isRight(errorOrPaymentCheckResponse)).toBeTruthy();
+
+    const datiPagamentoPA = MockedData.aVerificaRPTOutput.datiPagamentoPA;
+    expect(datiPagamentoPA).toBeDefined();
+    if (datiPagamentoPA === undefined) {
+      return;
+    }
+
+    const enteBeneficiario = datiPagamentoPA.enteBeneficiario;
+    expect(enteBeneficiario).toBeDefined();
+    if (enteBeneficiario === undefined) {
+      return;
+    }
+
+    expect(errorOrPaymentCheckResponse.value).toMatchObject({
+      enteBeneficiario: {
+        identificativoUnivocoBeneficiario:
+          enteBeneficiario.identificativoUnivocoBeneficiario
+            .codiceIdentificativoUnivoco,
+        denominazioneBeneficiario: enteBeneficiario.denominazioneBeneficiario,
+        codiceUnitOperBeneficiario: enteBeneficiario.codiceUnitOperBeneficiario,
+        denomUnitOperBeneficiario: enteBeneficiario.denomUnitOperBeneficiario,
+        indirizzoBeneficiario: enteBeneficiario.indirizzoBeneficiario,
         capBeneficiario: enteBeneficiario.capBeneficiario,
         localitaBeneficiario: enteBeneficiario.localitaBeneficiario,
         provinciaBeneficiario: enteBeneficiario.provinciaBeneficiario,
