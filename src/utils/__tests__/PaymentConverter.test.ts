@@ -344,7 +344,6 @@ describe("getResponseErrorIfExists", () => {
 });
 
 describe("getErrorMessageCtrlFromPagoPaError", () => {
-
   it("should convert a KO Short Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOShort.fault;
     expect(fault).toBeDefined();
@@ -424,7 +423,6 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_EXPIRED);
     expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_SCADUTO");
   });
-
 
   it("should convert a KO OnGoing Error", () => {
     const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
