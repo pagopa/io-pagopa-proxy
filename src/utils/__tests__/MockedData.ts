@@ -61,13 +61,33 @@ export const aVerificaRPTOutputKOGeneric = esitoNodoVerificaRPTRisposta_ppt
     );
   });
 
+  export const aVerificaRPTOutputKOShort = esitoNodoVerificaRPTRisposta_ppt
+  .decode({
+    esito: "KO",
+    fault: {
+      id: "NodoDeiPagamentiSPC",
+      faultCode: "PPT_ERRORE_EMESSO_DA_PAA",
+      description : "Pagamento PAA_PAGAMENTO_DUPLICATO in attesa risulta concluso all’Ente Creditore.",
+      faultString: "Errore restituito dall’ente creditore",
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+
 export const aVerificaRPTOutputKOCompleted = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
-      faultCode: "PAA_PAGAMENTO_DUPLICATO",
-      faultString: "Pagamento in attesa risulta concluso all’Ente Creditore.",
+      faultCode: "PPT_ERRORE_EMESSO_DA_PAA",
+      description : "Pagamento in attesa risulta concluso all’Ente Creditore.",
+      faultString: "Errore restituito dall’ente creditore",
       originalFaultCode: "PAA_PAGAMENTO_DUPLICATO"
     }
   })
@@ -84,7 +104,7 @@ export const aVerificaRPTOutputKOOnGoing = esitoNodoVerificaRPTRisposta_ppt
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
-      faultCode: "PAA_PAGAMENTO_IN_CORSO",
+      faultCode: "PPT_ERRORE_EMESSO_DA_PAA",
       faultString: "Pagamento in attesa risulta in corso all’Ente Creditore.",
       originalFaultCode: "PAA_PAGAMENTO_IN_CORSO"
     }
@@ -102,7 +122,7 @@ export const aVerificaRPTOutputKOExpired = esitoNodoVerificaRPTRisposta_ppt
     esito: "KO",
     fault: {
       id: "NodoDeiPagamentiSPC",
-      faultCode: "PAA_PAGAMENTO_SCADUTO",
+      faultCode: "PPT_ERRORE_EMESSO_DA_PAA",
       faultString: "Pagamento in attesa risulta scaduto all’Ente Creditore.",
       originalFaultCode: "PAA_PAGAMENTO_SCADUTO"
     }
