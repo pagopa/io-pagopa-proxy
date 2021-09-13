@@ -11,3 +11,4 @@ dump.rdb
 generated
 .env
 .DS_Store
+k6example/libs
