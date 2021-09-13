@@ -92,7 +92,10 @@ export async function nodoVerifyPaymentNoticeService(
       iverifyPaymentNoticeOutput.fault
     );
 
-    if (responseErrorVerifyPaymentNotice === undefined) {
+    if (
+      responseErrorVerifyPaymentNotice === undefined ||
+      iverifyPaymentNoticeOutput.fault === undefined
+    ) {
       return ResponseErrorInternal(
         "Error during GetNodoVerifyPaymentNotice check: esito === KO"
       );
@@ -199,7 +202,10 @@ export async function nodoActivateIOPaymentService(
       activateIOPaymentOutput.fault
     );
 
-    if (responseErrorActivateIOPayment === undefined) {
+    if (
+      responseErrorActivateIOPayment === undefined ||
+      activateIOPaymentOutput.fault === undefined
+    ) {
       return ResponseErrorInternal(
         "Error during ActivateIOPayment check: esito === KO"
       );

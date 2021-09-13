@@ -23,6 +23,10 @@ import { PaymentActivationsGetResponse } from "../../../generated/api/PaymentAct
 import { PaymentActivationsPostRequest } from "../../../generated/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../../generated/api/PaymentActivationsPostResponse";
 import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
+import {
+  PaymentFaultV2,
+  PaymentFaultV2Enum
+} from "../../../generated/api/PaymentFaultV2";
 import { PaymentRequestsGetResponse } from "../../../generated/api/PaymentRequestsGetResponse";
 import {
   ActivatePaymentT,
@@ -123,11 +127,14 @@ const getGetPaymentInfoController: (
       iNodoVerificaRPTOutput.fault
     );
 
-    if (responseError === undefined) {
+    if (
+      responseError === undefined ||
+      iNodoVerificaRPTOutput.fault === undefined
+    ) {
       return ResponseErrorInternal("Error during payment check: esito === KO");
     }
 
-    if (responseError.toString() !== "PPT_MULTI_BENEFICIARIO") {
+    if (responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO) {
       logger.error(
         `GetPaymentInfo|Error from pagopa|${
           params.rptId
@@ -262,13 +269,16 @@ const getActivatePaymentController: (
     // If it contains a functional error, an HTTP error will be provided to BackendApp
     const responseError = getResponseErrorIfExists(iNodoAttivaRPTOutput.fault);
 
-    if (responseError === undefined) {
+    if (
+      responseError === undefined ||
+      iNodoAttivaRPTOutput.fault === undefined
+    ) {
       return ResponseErrorInternal(
         "Error during ActivatePayment check: esito === KO"
       );
     }
 
-    if (responseError.toString() !== "PPT_MULTI_BENEFICIARIO") {
+    if (responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO) {
       logger.error(
         `ActivatePayment|Error from pagopa|${rptId}|${responseError}|${JSON.stringify(
           iNodoAttivaRPTOutput.fault
@@ -563,11 +573,17 @@ export function getErrorMessageCtrlFromPagoPaError(
  * @return {detail_v2} detail_v2 to send to BackendApp
  */
 export function getDetailV2FromFaultCode(
-  fault: faultBean_ppt | undefined
-): string {
-  return fault && fault.originalFaultCode
-    ? fault.originalFaultCode
-    : fault && fault.faultCode
-      ? fault.faultCode
-      : PaymentFaultEnum.PAYMENT_UNAVAILABLE.toString();
+  fault: faultBean_ppt
+): PaymentFaultV2Enum | undefined {
+  const maybeOriginalFaultCode = PaymentFaultV2.decode(fault.originalFaultCode);
+  const extractedValues = fault.faultString.match(/(PAA|PPT)_\S+/);
+  const maybeExtractedFaultCode =
+    extractedValues != null
+      ? PaymentFaultV2.decode(extractedValues[0])
+      : undefined;
+  return maybeOriginalFaultCode.isRight()
+    ? maybeOriginalFaultCode.value
+    : maybeExtractedFaultCode && maybeExtractedFaultCode.isRight()
+      ? maybeExtractedFaultCode.value
+      : undefined;
 }
