@@ -19,6 +19,7 @@ import { activateIOPaymentRes_nfpsp } from "../../generated/nodeNm3io/activateIO
 import { ctPaymentOptionDescription_nfpsp } from "../../generated/nodeNm3psp/ctPaymentOptionDescription_nfpsp";
 import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
 import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
+import { ctEnteBeneficiario_pay_i_unqual } from "../../generated/PagamentiTelematiciPspNodoservice/ctEnteBeneficiario_pay_i_unqual";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
 import { nodoAttivaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
@@ -125,35 +126,52 @@ export function getPaymentRequestsGetResponse(
         codiceContestoPagamento: codiceContestoPagamentoApi,
         ibanAccredito: datiPagamentoPA.ibanAccredito,
         causaleVersamento: getCausaleVersamentoForController(datiPagamentoPA),
-        enteBeneficiario: datiPagamentoPA.enteBeneficiario
-          ? {
-              identificativoUnivocoBeneficiario:
-                datiPagamentoPA.enteBeneficiario
-                  .identificativoUnivocoBeneficiario
-                  .codiceIdentificativoUnivoco,
-              denominazioneBeneficiario:
-                datiPagamentoPA.enteBeneficiario.denominazioneBeneficiario,
-              codiceUnitOperBeneficiario:
-                datiPagamentoPA.enteBeneficiario.codiceUnitOperBeneficiario,
-              denomUnitOperBeneficiario:
-                datiPagamentoPA.enteBeneficiario.denomUnitOperBeneficiario,
-              indirizzoBeneficiario:
-                datiPagamentoPA.enteBeneficiario.indirizzoBeneficiario,
-              civicoBeneficiario:
-                datiPagamentoPA.enteBeneficiario.civicoBeneficiario,
-              capBeneficiario: datiPagamentoPA.enteBeneficiario.capBeneficiario,
-              localitaBeneficiario:
-                datiPagamentoPA.enteBeneficiario.localitaBeneficiario,
-              provinciaBeneficiario:
-                datiPagamentoPA.enteBeneficiario.provinciaBeneficiario,
-              nazioneBeneficiario:
-                datiPagamentoPA.enteBeneficiario.nazioneBeneficiario
-            }
-          : undefined
+        enteBeneficiario: getEnteBeneficiario(datiPagamentoPA.enteBeneficiario)
       }
     : undefined;
 
   return PaymentRequestsGetResponse.decode(response);
+}
+
+/* tslint:disable */
+export function getEnteBeneficiario(
+  enteBeneficiarioIn: ctEnteBeneficiario_pay_i_unqual | undefined
+): ctEnteBeneficiario_pay_i_unqual | undefined {
+  const enteBeneficiarioOut = enteBeneficiarioIn
+    ? {
+        identificativoUnivocoBeneficiario:
+          enteBeneficiarioIn.identificativoUnivocoBeneficiario
+            .codiceIdentificativoUnivoco,
+        denominazioneBeneficiario: enteBeneficiarioIn.denominazioneBeneficiario
+          ? enteBeneficiarioIn.denominazioneBeneficiario
+          : undefined,
+        codiceUnitOperBeneficiario: enteBeneficiarioIn.codiceUnitOperBeneficiario
+          ? enteBeneficiarioIn.codiceUnitOperBeneficiario
+          : undefined,
+        denomUnitOperBeneficiario: enteBeneficiarioIn.denomUnitOperBeneficiario
+          ? enteBeneficiarioIn.denomUnitOperBeneficiario
+          : undefined,
+        indirizzoBeneficiario: enteBeneficiarioIn.indirizzoBeneficiario
+          ? enteBeneficiarioIn.indirizzoBeneficiario
+          : undefined,
+        civicoBeneficiario: enteBeneficiarioIn.civicoBeneficiario
+          ? enteBeneficiarioIn.civicoBeneficiario
+          : undefined,
+        capBeneficiario: enteBeneficiarioIn.capBeneficiario
+          ? enteBeneficiarioIn.capBeneficiario
+          : undefined,
+        localitaBeneficiario: enteBeneficiarioIn.localitaBeneficiario
+          ? enteBeneficiarioIn.localitaBeneficiario
+          : undefined,
+        provinciaBeneficiario: enteBeneficiarioIn.provinciaBeneficiario
+          ? enteBeneficiarioIn.provinciaBeneficiario
+          : undefined,
+        nazioneBeneficiario: enteBeneficiarioIn.nazioneBeneficiario
+          ? enteBeneficiarioIn.nazioneBeneficiario
+          : undefined
+      }
+    : undefined;
+  return (enteBeneficiarioOut as unknown) as ctEnteBeneficiario_pay_i_unqual;
 }
 
 export function getPaymentRequestsGetResponseNm3(
