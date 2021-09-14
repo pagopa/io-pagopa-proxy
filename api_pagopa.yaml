@@ -133,6 +133,7 @@ definitions:
           It may or may not yield further information if dereferenced.
     required:
       - detail
+      - detail_v2
   CodiceContestoPagamento:
     description: Transaction Id used to identify the communication flow
     type: string
@@ -295,6 +296,7 @@ definitions:
       - PAYMENT_UNKNOWN
       - DOMAIN_UNKNOWN
       - PPT_MULTI_BENEFICIARIO
+      - GENERIC_ERROR
   PaymentFaultV2:
     description: Fault codes for the PagoPA/Controparte Verifica and Attiva operations
     type: string
@@ -407,6 +409,7 @@ definitions:
       - PPT_PAGAMENTO_DUPLICATO
       - PPT_MULTI_BENEFICIARIO
       - PPT_ERRORE
+      - GENERIC_ERROR
 parameters:
   CodiceContestoPagamento:
     name: codice_contesto_pagamento

@@ -40,7 +40,7 @@ export interface IResponsePaymentInternalError
  */
 export const ResponsePaymentError = (
   detail: PaymentFaultEnum,
-  detailV2: PaymentFaultV2Enum | undefined
+  detailV2: PaymentFaultV2Enum
 ): IResponsePaymentInternalError => {
   const problem: PaymentProblemJson = {
     status: HttpStatusCodeEnum.HTTP_STATUS_500,

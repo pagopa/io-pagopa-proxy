@@ -114,8 +114,9 @@ const getGetPaymentInfoController: (
         error.message
       }`
     );
-    return ResponseErrorInternal(
-      `PagoPA Server communication error: ${error.message}`
+    return ResponsePaymentError(
+      PaymentFaultEnum.GENERIC_ERROR,
+      PaymentFaultV2Enum.GENERIC_ERROR
     );
   }
   const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.value;
@@ -131,7 +132,15 @@ const getGetPaymentInfoController: (
       responseError === undefined ||
       iNodoVerificaRPTOutput.fault === undefined
     ) {
-      return ResponseErrorInternal("Error during payment check: esito === KO");
+      logger.error(
+        `GetPaymentInfo|Error during payment check: esito === KO${
+          params.rptId
+        }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
+      );
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
+      );
     }
 
     if (responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO) {
@@ -142,9 +151,11 @@ const getGetPaymentInfoController: (
       );
 
       const detailV2 = getDetailV2FromFaultCode(iNodoVerificaRPTOutput.fault);
+
       logger.warn(
-        `GetPaymentInfo|ResponsePaymentError (detail: ${responseError} - detail_v2: ${detailV2})`
+        `GetPaymentInfo|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`
       );
+
       return ResponsePaymentError(responseError, detailV2);
     } else {
       /**
@@ -258,8 +269,9 @@ const getActivatePaymentController: (
     logger.error(
       `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`
     );
-    return ResponseErrorInternal(
-      `PagoPA Server communication error: ${error.message}`
+    return ResponsePaymentError(
+      PaymentFaultEnum.GENERIC_ERROR,
+      PaymentFaultV2Enum.GENERIC_ERROR
     );
   }
   const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
@@ -273,8 +285,14 @@ const getActivatePaymentController: (
       responseError === undefined ||
       iNodoAttivaRPTOutput.fault === undefined
     ) {
-      return ResponseErrorInternal(
-        "Error during ActivatePayment check: esito === KO"
+      logger.error(
+        `GetPaymentInfo|Error during payment check: esito === KO${rptId}|${responseError}|${JSON.stringify(
+          iNodoAttivaRPTOutput.fault
+        )}`
+      );
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
       );
     }
 
@@ -284,7 +302,13 @@ const getActivatePaymentController: (
           iNodoAttivaRPTOutput.fault
         )}`
       );
+
       const detailV2 = getDetailV2FromFaultCode(iNodoAttivaRPTOutput.fault);
+
+      logger.warn(
+        `ActivatePayment|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`
+      );
+
       return ResponsePaymentError(responseError, detailV2);
     } else {
       /**
@@ -500,7 +524,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
  * If error is found, it is mapped into a controller response for BackendApp
  * @param {string} esito - The esito (OK or KO) provided by PagoPa
  * @param {string} faultBean - Optional information provided by PagoPa in case of error
- * @return {IResponseErrorGeneric | IResponseErrorInternal} A controller response or undefined if no errors exist
+ * @return {IResponseErrorGeneric | IResponsePaymentError} A controller response or undefined if no errors exist
  */
 export function getResponseErrorIfExists(
   faultBean: faultBean_ppt | undefined
@@ -574,7 +598,7 @@ export function getErrorMessageCtrlFromPagoPaError(
  */
 export function getDetailV2FromFaultCode(
   fault: faultBean_ppt
-): PaymentFaultV2Enum | undefined {
+): PaymentFaultV2Enum {
   const maybeOriginalFaultCode = PaymentFaultV2.decode(fault.originalFaultCode);
   const extractedValues = fault.faultString.match(/(PAA|PPT)_\S+/);
   const maybeExtractedFaultCode =
@@ -585,5 +609,5 @@ export function getDetailV2FromFaultCode(
     ? maybeOriginalFaultCode.value
     : maybeExtractedFaultCode && maybeExtractedFaultCode.isRight()
       ? maybeExtractedFaultCode.value
-      : undefined;
+      : PaymentFaultV2Enum.GENERIC_ERROR;
 }
