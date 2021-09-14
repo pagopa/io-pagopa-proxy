@@ -6,7 +6,6 @@ import {
   IResponseErrorValidation,
   IResponseSuccessJson,
   ResponseErrorFromValidationErrors,
-  ResponseErrorInternal,
   ResponseErrorValidation,
   ResponseSuccessJson
 } from "italia-ts-commons/lib/responses";
@@ -26,6 +25,7 @@ import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3Po
 import * as PaymentsConverter from "../utils/PaymentsConverter";
 
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
+import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { ResponsePaymentError } from "../utils/types";
 import * as PaymentsService from "./PaymentsService";
 
@@ -79,8 +79,9 @@ export async function nodoVerifyPaymentNoticeService(
         error.message
       }`
     );
-    return ResponseErrorInternal(
-      `PagoPA Server communication error: ${error.message}`
+    return ResponsePaymentError(
+      PaymentFaultEnum.GENERIC_ERROR,
+      PaymentFaultV2Enum.GENERIC_ERROR
     );
   }
 
@@ -96,15 +97,21 @@ export async function nodoVerifyPaymentNoticeService(
       responseErrorVerifyPaymentNotice === undefined ||
       iverifyPaymentNoticeOutput.fault === undefined
     ) {
-      return ResponseErrorInternal(
+      logger.error(
         "Error during GetNodoVerifyPaymentNotice check: esito === KO"
+      );
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
       );
     }
 
     const detailV2 = getDetailV2FromFaultCode(iverifyPaymentNoticeOutput.fault);
+
     logger.warn(
       `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorVerifyPaymentNotice} - detail_v2: ${detailV2})`
     );
+
     return ResponsePaymentError(responseErrorVerifyPaymentNotice, detailV2);
   } else {
     const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
@@ -186,8 +193,9 @@ export async function nodoActivateIOPaymentService(
         error.message
       }`
     );
-    return ResponseErrorInternal(
-      `PagoPA Server communication error: ${error.message}`
+    return ResponsePaymentError(
+      PaymentFaultEnum.GENERIC_ERROR,
+      PaymentFaultV2Enum.GENERIC_ERROR
     );
   }
 
@@ -206,15 +214,19 @@ export async function nodoActivateIOPaymentService(
       responseErrorActivateIOPayment === undefined ||
       activateIOPaymentOutput.fault === undefined
     ) {
-      return ResponseErrorInternal(
-        "Error during ActivateIOPayment check: esito === KO"
+      logger.error("Error during ActivateIOPayment check: esito === KO");
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
       );
     }
 
     const detailV2 = getDetailV2FromFaultCode(activateIOPaymentOutput.fault);
+
     logger.warn(
       `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorActivateIOPayment} - detail_v2: ${detailV2})`
     );
+
     return ResponsePaymentError(responseErrorActivateIOPayment, detailV2);
   } else {
     const isIdPaymentSaved: boolean = await setNm3PaymentOption(
@@ -245,7 +257,11 @@ export async function nodoActivateIOPaymentService(
       }
       return ResponseSuccessJson(responseOrErrorNm3.value);
     } else {
-      return ResponseErrorInternal(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
+      logger.error("ActivateIOPayment| isIdPaymentSaved fails");
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
+      );
     }
   }
 }
