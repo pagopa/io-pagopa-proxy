@@ -72,12 +72,12 @@ const getGetPaymentInfoController: (
     const errorDetail = `GetPaymentInfo|Cannot decode rptid|${
       params.rptId
     }|${PathReporter.report(errorOrRptId)}`;
-
     logger.error(errorDetail);
 
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
+        rptId: params.rptId,
         result: EventResultEnum.INVALID_INPUT,
         detail: errorDetail
       }
@@ -106,12 +106,13 @@ const getGetPaymentInfoController: (
     const errorDetail = `GetPaymentInfo|Cannot construct request|${
       params.rptId
     }|${error.message}`;
-
     logger.error(errorDetail);
 
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
+        rptId: params.rptId,
+        codiceContestoPagamento,
         result: EventResultEnum.INVALID_INPUT,
         detail: errorDetail
       }
@@ -134,12 +135,13 @@ const getGetPaymentInfoController: (
     const errorDetail = `GetPaymentInfo|Error while calling pagopa|${
       params.rptId
     }|${error.message}`;
-
     logger.error(errorDetail);
 
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
+        rptId: params.rptId,
+        codiceContestoPagamento,
         result: EventResultEnum.CONNECTION_NODE,
         detail: errorDetail
       }
@@ -165,12 +167,13 @@ const getGetPaymentInfoController: (
       const errorDetail = `GetPaymentInfo|Error during payment check: esito === KO${
         params.rptId
       }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`;
-
       logger.error(errorDetail);
 
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
+          rptId: params.rptId,
+          codiceContestoPagamento,
           result: EventResultEnum.CONNECTION_NODE,
           detail: errorDetail
         }
@@ -191,12 +194,13 @@ const getGetPaymentInfoController: (
       const detailV2 = getDetailV2FromFaultCode(iNodoVerificaRPTOutput.fault);
 
       const errorDetail = `GetPaymentInfo|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
-
       logger.warn(errorDetail);
 
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
+          rptId: params.rptId,
+          codiceContestoPagamento,
           result: EventResultEnum.ERROR_NODE,
           detail: errorDetail,
           detail_v2: detailV2
@@ -236,6 +240,8 @@ const getGetPaymentInfoController: (
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
+        rptId: params.rptId,
+        codiceContestoPagamento,
         result: EventResultEnum.ERROR_NODE,
         detail: errorDetail
       }
@@ -248,6 +254,8 @@ const getGetPaymentInfoController: (
   appInsights.defaultClient.trackEvent({
     name: EventNameEnum.PAYMENT_VERIFY,
     properties: {
+      rptId: params.rptId,
+      codiceContestoPagamento,
       result: EventResultEnum.OK
     }
   });
@@ -320,6 +328,8 @@ const getActivatePaymentController: (
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
+        rptId,
+        codiceContestoPagamento: ccp,
         result: EventResultEnum.INVALID_INPUT,
         detail: errorDetail
       }
@@ -347,6 +357,8 @@ const getActivatePaymentController: (
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
+        rptId,
+        codiceContestoPagamento: ccp,
         result: EventResultEnum.ERROR_NODE,
         detail: errorDetail
       }
@@ -376,6 +388,8 @@ const getActivatePaymentController: (
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
+          rptId,
+          codiceContestoPagamento: ccp,
           result: EventResultEnum.ERROR_NODE,
           detail: errorDetail
         }
@@ -396,12 +410,13 @@ const getActivatePaymentController: (
       const detailV2 = getDetailV2FromFaultCode(iNodoAttivaRPTOutput.fault);
 
       const errorDetail = `ActivatePayment|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
-
       logger.error(errorDetail);
 
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
+          rptId,
+          codiceContestoPagamento: ccp,
           result: EventResultEnum.ERROR_NODE,
           detail: errorDetail,
           detail_v2: detailV2
@@ -419,7 +434,8 @@ const getActivatePaymentController: (
         redisTimeoutSecs,
         ccp,
         rptIdObject,
-        amount
+        amount,
+        rptId
       );
     }
   }
