@@ -13,9 +13,9 @@ const localhost = "http://localhost";
 export const CONFIG = {
   APPINSIGHTS_INSTRUMENTATIONKEY:
     process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "key",
-  APPINSIGHTS_DISABLE: process.env.APPINSIGHTS_DISABLE || "true",
+  APPINSIGHTS_DISABLE: process.env.APPINSIGHTS_DISABLE || "false",
   APPINSIGHTS_SAMPLING_PERCENTAGE:
-    process.env.APPINSIGHTS_SAMPLING_PERCENTAGE || "20",
+    process.env.APPINSIGHTS_SAMPLING_PERCENTAGE || "100",
   // The log level used for Winston logger (error, info, debug)
   WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL || "debug",
 
