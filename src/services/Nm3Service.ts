@@ -1,3 +1,5 @@
+import * as appInsights from "applicationinsights";
+
 import { isLeft } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { RptId } from "italia-pagopa-commons/lib/pagopa";
@@ -26,6 +28,7 @@ import * as PaymentsConverter from "../utils/PaymentsConverter";
 
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
+import { EventNameEnum, EventResultEnum } from "../utils/AIEvents";
 import { ResponsePaymentError } from "../utils/types";
 import * as PaymentsService from "./PaymentsService";
 
@@ -52,11 +55,19 @@ export async function nodoVerifyPaymentNoticeService(
 
   if (isLeft(errorOrIverifyPaymentNoticeutput)) {
     const error = errorOrIverifyPaymentNoticeutput.value;
-    logger.error(
-      `GetNodoVerifyPaymentNotice| Cannot construct request|${rptIdAsString}|${
-        error.message
-      }`
-    );
+
+    const errorDetail = `GetNodoVerifyPaymentNotice| Cannot construct request|${rptIdAsString}|${
+      error.message
+    }`;
+    logger.error(errorDetail);
+
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_VERIFY,
+      properties: {
+        result: EventResultEnum.INVALID_INPUT,
+        detail: errorDetail
+      }
+    });
     return ResponseErrorValidation("Invalid PagoPA check", error.message);
   }
 
@@ -74,11 +85,19 @@ export async function nodoVerifyPaymentNoticeService(
 
   if (isLeft(errorOrIverifyPaymentNoticeOutput)) {
     const error = errorOrIverifyPaymentNoticeOutput.value;
-    logger.error(
-      `GetNodoVerifyPaymentNotice| Error while calling pagopa | ${rptIdAsString}|${
-        error.message
-      }`
-    );
+    const errorDetail = `GetNodoVerifyPaymentNotice| Error while calling pagopa | ${rptIdAsString}|${
+      error.message
+    }`;
+
+    logger.error(errorDetail);
+
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_VERIFY,
+      properties: {
+        result: EventResultEnum.CONNECTION_NODE,
+        detail: errorDetail
+      }
+    });
     return ResponsePaymentError(
       PaymentFaultEnum.GENERIC_ERROR,
       PaymentFaultV2Enum.GENERIC_ERROR
@@ -97,9 +116,19 @@ export async function nodoVerifyPaymentNoticeService(
       responseErrorVerifyPaymentNotice === undefined ||
       iverifyPaymentNoticeOutput.fault === undefined
     ) {
-      logger.error(
-        "Error during GetNodoVerifyPaymentNotice check: esito === KO"
-      );
+      const errorDetail =
+        "Error during GetNodoVerifyPaymentNotice check: esito === KO";
+
+      logger.error(errorDetail);
+
+      appInsights.defaultClient.trackEvent({
+        name: EventNameEnum.PAYMENT_VERIFY,
+        properties: {
+          result: EventResultEnum.ERROR_NODE,
+          detail: errorDetail
+        }
+      });
+
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
         PaymentFaultV2Enum.GENERIC_ERROR
@@ -108,9 +137,18 @@ export async function nodoVerifyPaymentNoticeService(
 
     const detailV2 = getDetailV2FromFaultCode(iverifyPaymentNoticeOutput.fault);
 
-    logger.warn(
-      `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorVerifyPaymentNotice} - detail_v2: ${detailV2})`
-    );
+    const detailError = `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorVerifyPaymentNotice} - detail_v2: ${detailV2})`;
+
+    logger.warn(detailError);
+
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_VERIFY,
+      properties: {
+        result: EventResultEnum.ERROR_NODE,
+        detail: detailError,
+        detail_v2: detailV2
+      }
+    });
 
     return ResponsePaymentError(responseErrorVerifyPaymentNotice, detailV2);
   } else {
@@ -120,15 +158,28 @@ export async function nodoVerifyPaymentNoticeService(
     );
 
     if (isLeft(responseOrErrorNm3)) {
-      logger.error(
-        `GetNodoVerifyPaymentNotice| Cannot construct valid response|${rptIdAsString}|${PathReporter.report(
-          responseOrErrorNm3
-        )}`
-      );
+      const detailError = `GetNodoVerifyPaymentNotice| Cannot construct valid response|${rptIdAsString}|${PathReporter.report(
+        responseOrErrorNm3
+      )}`;
+      logger.error(detailError);
+
+      appInsights.defaultClient.trackEvent({
+        name: EventNameEnum.PAYMENT_VERIFY,
+        properties: {
+          result: EventResultEnum.ERROR_NODE,
+          detail: detailError
+        }
+      });
       return ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
         responseOrErrorNm3.value
       );
     }
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_VERIFY,
+      properties: {
+        result: EventResultEnum.OK
+      }
+    });
     return ResponseSuccessJson(responseOrErrorNm3.value);
   }
 }
