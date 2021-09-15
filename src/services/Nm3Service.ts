@@ -64,6 +64,8 @@ export async function nodoVerifyPaymentNoticeService(
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
+        rptId: rptIdAsString,
+        codiceContestoPagamento,
         result: EventResultEnum.INVALID_INPUT,
         detail: errorDetail
       }
@@ -94,6 +96,8 @@ export async function nodoVerifyPaymentNoticeService(
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
+        rptId: rptIdAsString,
+        codiceContestoPagamento,
         result: EventResultEnum.CONNECTION_NODE,
         detail: errorDetail
       }
@@ -124,6 +128,8 @@ export async function nodoVerifyPaymentNoticeService(
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
+          rptId: rptIdAsString,
+          codiceContestoPagamento,
           result: EventResultEnum.ERROR_NODE,
           detail: errorDetail
         }
@@ -144,6 +150,8 @@ export async function nodoVerifyPaymentNoticeService(
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
+        rptId: rptIdAsString,
+        codiceContestoPagamento,
         result: EventResultEnum.ERROR_NODE,
         detail: detailError,
         detail_v2: detailV2
@@ -166,6 +174,8 @@ export async function nodoVerifyPaymentNoticeService(
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
+          rptId: rptIdAsString,
+          codiceContestoPagamento,
           result: EventResultEnum.ERROR_NODE,
           detail: detailError
         }
@@ -177,6 +187,8 @@ export async function nodoVerifyPaymentNoticeService(
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
+        rptId: rptIdAsString,
+        codiceContestoPagamento,
         result: EventResultEnum.OK
       }
     });
@@ -196,7 +208,8 @@ export async function nodoActivateIOPaymentService(
   redisTimeoutSecs: number,
   codiceContestoPagamento: CodiceContestoPagamento,
   rptId: RptId,
-  amount: number
+  amount: number,
+  rptIdAsString: string
 ): Promise<
   | IResponseErrorValidation
   | IResponseErrorInternal
@@ -224,6 +237,8 @@ export async function nodoActivateIOPaymentService(
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
+        rptId: rptIdAsString,
+        codiceContestoPagamento,
         result: EventResultEnum.ERROR_NODE,
         detail: errorDetail
       }
@@ -258,6 +273,8 @@ export async function nodoActivateIOPaymentService(
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
+        rptId: rptIdAsString,
+        codiceContestoPagamento,
         result: EventResultEnum.ERROR_NODE,
         detail: errorDetail
       }
@@ -290,6 +307,8 @@ export async function nodoActivateIOPaymentService(
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
+          rptId: rptIdAsString,
+          codiceContestoPagamento,
           result: EventResultEnum.ERROR_NODE,
           detail: detailError
         }
@@ -309,6 +328,8 @@ export async function nodoActivateIOPaymentService(
     appInsights.defaultClient.trackEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
+        rptId: rptIdAsString,
+        codiceContestoPagamento,
         result: EventResultEnum.ERROR_NODE,
         detail: errorDetail,
         detail_v2: detailV2
@@ -342,6 +363,8 @@ export async function nodoActivateIOPaymentService(
         appInsights.defaultClient.trackEvent({
           name: EventNameEnum.PAYMENT_ACTIVATION,
           properties: {
+            rptId: rptIdAsString,
+            codiceContestoPagamento,
             result: EventResultEnum.ERROR_NODE,
             detail: errorDetail
           }
@@ -354,6 +377,8 @@ export async function nodoActivateIOPaymentService(
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
+          rptId: rptIdAsString,
+          codiceContestoPagamento,
           result: EventResultEnum.OK
         }
       });
@@ -366,6 +391,8 @@ export async function nodoActivateIOPaymentService(
       appInsights.defaultClient.trackEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
+          rptId: rptIdAsString,
+          codiceContestoPagamento,
           result: EventResultEnum.ERROR_NODE,
           detail: errorDetail
         }
