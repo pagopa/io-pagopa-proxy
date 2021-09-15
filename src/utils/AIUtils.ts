@@ -1,4 +1,3 @@
-import * as ai from "applicationinsights";
 import * as t from "io-ts";
 import { initAppInsights } from "italia-ts-commons/lib/appinsights";
 import { IntegerFromString } from "italia-ts-commons/lib/numbers";

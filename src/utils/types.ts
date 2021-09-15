@@ -1,3 +1,5 @@
+import * as t from "io-ts";
+import { RptId } from "italia-pagopa-commons/lib/pagopa";
 import {
   IResponseType,
   TypeofApiParams,
@@ -57,3 +59,10 @@ export const ResponsePaymentError = (
     kind: "IResponseErrorInternal"
   };
 };
+
+const GeneralRptId = t.interface({
+  asString: t.string,
+  asObject: RptId
+});
+
+export type GeneralRptId = t.TypeOf<typeof GeneralRptId>;
