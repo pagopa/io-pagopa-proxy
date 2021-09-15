@@ -2,7 +2,6 @@
  * PaymentControllers
  * RESTful Controllers for Payments Endpoints
  */
-import * as appInsights from "applicationinsights";
 import * as express from "express";
 import { isLeft } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
@@ -44,7 +43,11 @@ import {
 import * as NodoNM3PortClient from "../../services/pagopa_api/NodoNM3PortClient";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import * as PaymentsService from "../../services/PaymentsService";
-import { EventNameEnum, EventResultEnum } from "../../utils/AIEvents";
+import {
+  EventNameEnum,
+  EventResultEnum,
+  trackPaymentEvent
+} from "../../utils/AIUtils";
 import { logger } from "../../utils/Logger";
 import * as PaymentsConverter from "../../utils/PaymentsConverter";
 import { redisGet, redisSet } from "../../utils/Redis";
@@ -74,7 +77,7 @@ const getGetPaymentInfoController: (
     }|${PathReporter.report(errorOrRptId)}`;
     logger.error(errorDetail);
 
-    appInsights.defaultClient.trackEvent({
+    trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
         rptId: params.rptId,
@@ -108,7 +111,7 @@ const getGetPaymentInfoController: (
     }|${error.message}`;
     logger.error(errorDetail);
 
-    appInsights.defaultClient.trackEvent({
+    trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
         rptId: params.rptId,
@@ -137,7 +140,7 @@ const getGetPaymentInfoController: (
     }|${error.message}`;
     logger.error(errorDetail);
 
-    appInsights.defaultClient.trackEvent({
+    trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
         rptId: params.rptId,
@@ -169,7 +172,7 @@ const getGetPaymentInfoController: (
       }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`;
       logger.error(errorDetail);
 
-      appInsights.defaultClient.trackEvent({
+      trackPaymentEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
           rptId: params.rptId,
@@ -196,7 +199,7 @@ const getGetPaymentInfoController: (
       const errorDetail = `GetPaymentInfo|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
       logger.warn(errorDetail);
 
-      appInsights.defaultClient.trackEvent({
+      trackPaymentEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
           rptId: params.rptId,
@@ -237,7 +240,7 @@ const getGetPaymentInfoController: (
 
     logger.error(errorDetail);
 
-    appInsights.defaultClient.trackEvent({
+    trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
         rptId: params.rptId,
@@ -251,7 +254,7 @@ const getGetPaymentInfoController: (
     );
   }
 
-  appInsights.defaultClient.trackEvent({
+  trackPaymentEvent({
     name: EventNameEnum.PAYMENT_VERIFY,
     properties: {
       rptId: params.rptId,
@@ -325,7 +328,7 @@ const getActivatePaymentController: (
 
     logger.error(errorDetail);
 
-    appInsights.defaultClient.trackEvent({
+    trackPaymentEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
         rptId,
@@ -354,7 +357,7 @@ const getActivatePaymentController: (
 
     logger.error(errorDetail);
 
-    appInsights.defaultClient.trackEvent({
+    trackPaymentEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
         rptId,
@@ -385,7 +388,7 @@ const getActivatePaymentController: (
 
       logger.error(errorDetail);
 
-      appInsights.defaultClient.trackEvent({
+      trackPaymentEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
           rptId,
@@ -412,7 +415,7 @@ const getActivatePaymentController: (
       const errorDetail = `ActivatePayment|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
       logger.error(errorDetail);
 
-      appInsights.defaultClient.trackEvent({
+      trackPaymentEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
           rptId,
