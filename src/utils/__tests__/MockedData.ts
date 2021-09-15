@@ -287,7 +287,10 @@ export const aConfig = PagoPAConfig.decode({
     IDENTIFICATIVO_CANALE: "97735020584_02",
     IDENTIFICATIVO_CANALE_PAGAMENTO: "97735020584_xx",
     PASSWORD: process.env.PAGOPA_PASSWORD || "nopassword"
-  }
+  },
+  APPINSIGHTS_DISABLE: "true",
+  APPINSIGHTS_SAMPLING_PERCENTAGE: "100",
+  APPINSIGHTS_INSTRUMENTATIONKEY: "key"
 }).getOrElseL(errors => {
   throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
 });
