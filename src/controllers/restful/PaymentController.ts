@@ -54,6 +54,7 @@ import { redisGet, redisSet } from "../../utils/Redis";
 import {
   AsControllerFunction,
   AsControllerResponseType,
+  GeneralRptId,
   ResponsePaymentError
 } from "../../utils/types";
 
@@ -215,11 +216,14 @@ const getGetPaymentInfoController: (
       /**
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
        */
+      const geralRptId: GeneralRptId = {
+        asString: params.rptId,
+        asObject: rptId
+      };
       return await nodoVerifyPaymentNoticeService(
         pagoPAConfig,
         pagoPAClientNm3,
-        params.rptId,
-        rptId,
+        geralRptId,
         codiceContestoPagamento
       );
     }
@@ -430,15 +434,20 @@ const getActivatePaymentController: (
       /**
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
        */
+
+      const geralRptId: GeneralRptId = {
+        asString: rptId,
+        asObject: rptIdObject
+      };
+
       return await nodoActivateIOPaymentService(
         pagoPAConfig,
         pagoPAClientNm3,
         redisClient,
         redisTimeoutSecs,
         ccp,
-        rptIdObject,
-        amount,
-        rptId
+        geralRptId,
+        amount
       );
     }
   }
