@@ -37,19 +37,20 @@ const DEFAULT_SAMPLING_PERCENTAGE = 20;
 // Avoid to initialize Application Insights more than once
 export const initTelemetryClient = (
   intrumentationKey: string,
-  env = process.env
+  aiDisable: string,
+  aiSampling: string
 ) =>
-  ai.defaultClient
-    ? ai.defaultClient
-    : initAppInsights(intrumentationKey, {
-        disableAppInsights: env.APPINSIGHTS_DISABLE === "true",
-        samplingPercentage: IntegerFromString.decode(
-          env.APPINSIGHTS_SAMPLING_PERCENTAGE
-        ).getOrElse(DEFAULT_SAMPLING_PERCENTAGE)
-      });
+  initAppInsights(intrumentationKey, {
+    disableAppInsights: aiDisable === "true",
+    samplingPercentage: IntegerFromString.decode(aiSampling).getOrElse(
+      DEFAULT_SAMPLING_PERCENTAGE
+    )
+  });
 
 const telemetryClient = initTelemetryClient(
-  CONFIG.APPINSIGHTS_INSTRUMENTATIONKEY
+  CONFIG.APPINSIGHTS_INSTRUMENTATIONKEY,
+  CONFIG.APPINSIGHTS_DISABLE,
+  CONFIG.APPINSIGHTS_SAMPLING_PERCENTAGE
 );
 
 export const trackPaymentEvent = (event: PaymentEvent): void =>
