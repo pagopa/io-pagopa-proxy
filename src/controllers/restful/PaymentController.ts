@@ -312,7 +312,19 @@ const getActivatePaymentController: (
   );
   if (isLeft(errorOrNodoAttivaRPTInput)) {
     const error = errorOrNodoAttivaRPTInput.value;
-    logger.error(`ActivatePayment|Invalid request|${error}`);
+
+    const errorDetail = `ActivatePayment|Invalid request|${error}`;
+
+    logger.error(errorDetail);
+
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_ACTIVATION,
+      properties: {
+        result: EventResultEnum.INVALID_INPUT,
+        detail: errorDetail
+      }
+    });
+
     return ResponseErrorValidation(
       "Invalid PagoPA activation Request",
       error.message
@@ -327,9 +339,18 @@ const getActivatePaymentController: (
   );
   if (isLeft(errorOrInodoAttivaRPTOutput)) {
     const error = errorOrInodoAttivaRPTOutput.value;
-    logger.error(
-      `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`
-    );
+
+    const errorDetail = `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`;
+
+    logger.error(errorDetail);
+
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_ACTIVATION,
+      properties: {
+        result: EventResultEnum.ERROR_NODE,
+        detail: errorDetail
+      }
+    });
     return ResponsePaymentError(
       PaymentFaultEnum.GENERIC_ERROR,
       PaymentFaultV2Enum.GENERIC_ERROR
@@ -346,11 +367,19 @@ const getActivatePaymentController: (
       responseError === undefined ||
       iNodoAttivaRPTOutput.fault === undefined
     ) {
-      logger.error(
-        `GetPaymentInfo|Error during payment check: esito === KO${rptId}|${responseError}|${JSON.stringify(
-          iNodoAttivaRPTOutput.fault
-        )}`
-      );
+      const errorDetail = `GetPaymentInfo|Error during payment check: esito === KO${rptId}|${responseError}|${JSON.stringify(
+        iNodoAttivaRPTOutput.fault
+      )}`;
+
+      logger.error(errorDetail);
+
+      appInsights.defaultClient.trackEvent({
+        name: EventNameEnum.PAYMENT_ACTIVATION,
+        properties: {
+          result: EventResultEnum.ERROR_NODE,
+          detail: errorDetail
+        }
+      });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
         PaymentFaultV2Enum.GENERIC_ERROR
@@ -366,10 +395,18 @@ const getActivatePaymentController: (
 
       const detailV2 = getDetailV2FromFaultCode(iNodoAttivaRPTOutput.fault);
 
-      logger.warn(
-        `ActivatePayment|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`
-      );
+      const errorDetail = `ActivatePayment|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
 
+      logger.error(errorDetail);
+
+      appInsights.defaultClient.trackEvent({
+        name: EventNameEnum.PAYMENT_ACTIVATION,
+        properties: {
+          result: EventResultEnum.ERROR_NODE,
+          detail: errorDetail,
+          detail_v2: detailV2
+        }
+      });
       return ResponsePaymentError(responseError, detailV2);
     } else {
       /**
