@@ -214,11 +214,20 @@ export async function nodoActivateIOPaymentService(
 
   if (isLeft(errorOrActivateIOPaymentInput)) {
     const error = errorOrActivateIOPaymentInput.value;
-    logger.error(
-      `ActivateIOPayment|Cannot construct request|${codiceContestoPagamento}|${
-        error.message
-      }`
-    );
+
+    const errorDetail = `ActivateIOPayment|Cannot construct request|${codiceContestoPagamento}|${
+      error.message
+    }`;
+
+    logger.error(errorDetail);
+
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_ACTIVATION,
+      properties: {
+        result: EventResultEnum.ERROR_NODE,
+        detail: errorDetail
+      }
+    });
     return ResponseErrorValidation(
       "ActivateIOPayment|Invalid PagoPA check ActivateIOPayment",
       error.message
@@ -239,11 +248,20 @@ export async function nodoActivateIOPaymentService(
 
   if (isLeft(errorOrActivateIOPaymentOutput)) {
     const error = errorOrActivateIOPaymentOutput.value;
-    logger.error(
-      `ActivateIOPayment|Error while calling pagopa | ${codiceContestoPagamento}|${
-        error.message
-      }`
-    );
+
+    const errorDetail = `ActivateIOPayment|Error while calling pagopa | ${codiceContestoPagamento}|${
+      error.message
+    }`;
+
+    logger.error(errorDetail);
+
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_ACTIVATION,
+      properties: {
+        result: EventResultEnum.ERROR_NODE,
+        detail: errorDetail
+      }
+    });
     return ResponsePaymentError(
       PaymentFaultEnum.GENERIC_ERROR,
       PaymentFaultV2Enum.GENERIC_ERROR
@@ -265,7 +283,17 @@ export async function nodoActivateIOPaymentService(
       responseErrorActivateIOPayment === undefined ||
       activateIOPaymentOutput.fault === undefined
     ) {
-      logger.error("Error during ActivateIOPayment check: esito === KO");
+      const detailError = "Error during ActivateIOPayment check: esito === KO";
+
+      logger.error(detailError);
+
+      appInsights.defaultClient.trackEvent({
+        name: EventNameEnum.PAYMENT_ACTIVATION,
+        properties: {
+          result: EventResultEnum.ERROR_NODE,
+          detail: detailError
+        }
+      });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
         PaymentFaultV2Enum.GENERIC_ERROR
@@ -274,10 +302,18 @@ export async function nodoActivateIOPaymentService(
 
     const detailV2 = getDetailV2FromFaultCode(activateIOPaymentOutput.fault);
 
-    logger.warn(
-      `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorActivateIOPayment} - detail_v2: ${detailV2})`
-    );
+    const errorDetail = `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorActivateIOPayment} - detail_v2: ${detailV2})`;
 
+    logger.warn(errorDetail);
+
+    appInsights.defaultClient.trackEvent({
+      name: EventNameEnum.PAYMENT_ACTIVATION,
+      properties: {
+        result: EventResultEnum.ERROR_NODE,
+        detail: errorDetail,
+        detail_v2: detailV2
+      }
+    });
     return ResponsePaymentError(responseErrorActivateIOPayment, detailV2);
   } else {
     const isIdPaymentSaved: boolean = await setNm3PaymentOption(
@@ -297,18 +333,43 @@ export async function nodoActivateIOPaymentService(
       );
 
       if (isLeft(responseOrErrorNm3)) {
-        logger.error(
-          `ActivateIOPayment|Cannot construct valid response|${codiceContestoPagamento}|${PathReporter.report(
-            responseOrErrorNm3
-          )}`
-        );
+        const errorDetail = `ActivateIOPayment|Cannot construct valid response|${codiceContestoPagamento}|${PathReporter.report(
+          responseOrErrorNm3
+        )}`;
+
+        logger.error(errorDetail);
+
+        appInsights.defaultClient.trackEvent({
+          name: EventNameEnum.PAYMENT_ACTIVATION,
+          properties: {
+            result: EventResultEnum.ERROR_NODE,
+            detail: errorDetail
+          }
+        });
         return ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
           responseOrErrorNm3.value
         );
       }
+
+      appInsights.defaultClient.trackEvent({
+        name: EventNameEnum.PAYMENT_ACTIVATION,
+        properties: {
+          result: EventResultEnum.OK
+        }
+      });
       return ResponseSuccessJson(responseOrErrorNm3.value);
     } else {
-      logger.error("ActivateIOPayment| isIdPaymentSaved fails");
+      const errorDetail = "ActivateIOPayment| isIdPaymentSaved fails";
+
+      logger.error(errorDetail);
+
+      appInsights.defaultClient.trackEvent({
+        name: EventNameEnum.PAYMENT_ACTIVATION,
+        properties: {
+          result: EventResultEnum.ERROR_NODE,
+          detail: errorDetail
+        }
+      });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
         PaymentFaultV2Enum.GENERIC_ERROR
