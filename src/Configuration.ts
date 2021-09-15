@@ -11,6 +11,8 @@ import { stPassword_ppt } from "../generated/PagamentiTelematiciPspNodoservice/s
 const localhost = "http://localhost";
 
 export const CONFIG = {
+  APPINSIGHTS_INSTRUMENTATIONKEY:
+    process.env.APPINSIGHTS_INSTRUMENTATIONKEY || "",
   // The log level used for Winston logger (error, info, debug)
   WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL || "debug",
 
