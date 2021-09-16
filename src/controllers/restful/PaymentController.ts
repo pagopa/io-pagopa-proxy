@@ -726,6 +726,7 @@ export function getDetailV2FromFaultCode(
   fault: faultBean_ppt
 ): PaymentFaultV2Enum {
   const maybeOriginalFaultCode = PaymentFaultV2.decode(fault.originalFaultCode);
+  const maybeFaultCode = PaymentFaultV2.decode(fault.faultCode);
   const extractedValues = fault.faultString.match(/(PAA|PPT)_\S+/);
   const maybeExtractedFaultCode =
     extractedValues != null
@@ -735,5 +736,7 @@ export function getDetailV2FromFaultCode(
     ? maybeOriginalFaultCode.value
     : maybeExtractedFaultCode && maybeExtractedFaultCode.isRight()
       ? maybeExtractedFaultCode.value
-      : PaymentFaultV2Enum.GENERIC_ERROR;
+      : maybeFaultCode.isRight()
+        ? maybeFaultCode.value
+        : PaymentFaultV2Enum.GENERIC_ERROR;
 }
