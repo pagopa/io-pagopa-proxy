@@ -252,9 +252,9 @@ export async function nodoActivateIOPaymentService(
 
   const activateIOPaymentInput = errorOrActivateIOPaymentInput.value;
 
-  // Send the SOAP request to PagoPA (sendNodoVerifyPaymentNotice message)
+  // Send the SOAP request to PagoPA (sendNodoAcitvatePaymentNotice message)
   logger.info(
-    `ActivateIOPayment|sendNodoVerifyPaymentNoticeInput for request | ${codiceContestoPagamento}`
+    `ActivateIOPayment|sendNodoAcitvatePaymentNoticeInput for request | ${codiceContestoPagamento}`
   );
 
   const errorOrActivateIOPaymentOutput = await PaymentsService.sendNodoActivateIOPaymentInput(
@@ -322,7 +322,7 @@ export async function nodoActivateIOPaymentService(
 
     const detailV2 = getDetailV2FromFaultCode(activateIOPaymentOutput.fault);
 
-    const errorDetail = `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorActivateIOPayment} - detail_v2: ${detailV2})`;
+    const errorDetail = `GetNodoAcitvatePaymentNotice|ResponsePaymentError (detail: ${responseErrorActivateIOPayment} - detail_v2: ${detailV2})`;
 
     logger.warn(errorDetail);
 
