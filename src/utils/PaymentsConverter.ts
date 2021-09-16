@@ -99,7 +99,7 @@ export function getNodoActivateIOPaymentInput(
         fiscalCode: rptId.organizationFiscalCode,
         noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
       },
-      amount: amount / 100
+      amount: (amount / 100).toFixed(2)
     })
     .bimap(() => Error("Decode Error NodoActivatePaymentNotice"), t.identity);
 }
