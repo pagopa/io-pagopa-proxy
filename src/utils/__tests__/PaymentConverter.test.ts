@@ -565,4 +565,15 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
     expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
   });
+
+  it("should convert a KO detailV2", () => {
+    const fault = MockedData.aActivateKO.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual("PPT_SINTASSI_EXTRAXSD");
+  });
 });
