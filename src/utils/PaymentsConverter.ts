@@ -16,6 +16,7 @@ import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActiv
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
 import { activateIOPaymentReq_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentReq_nfpsp";
 import { activateIOPaymentRes_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
+import { stAmount_nfpsp } from "../../generated/nodeNm3io/stAmount_nfpsp";
 import { ctPaymentOptionDescription_nfpsp } from "../../generated/nodeNm3psp/ctPaymentOptionDescription_nfpsp";
 import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
 import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
@@ -87,7 +88,7 @@ export function getNodoVerifyPaymentNoticeInput(
 export function getNodoActivateIOPaymentInput(
   pagoPAConfig: PagoPAConfig,
   rptId: RptId,
-  amount: number
+  amount: stAmount_nfpsp
 ): Either<Error, activateIOPaymentReq_nfpsp> {
   return activateIOPaymentReq_nfpsp
     .decode({
@@ -99,10 +100,11 @@ export function getNodoActivateIOPaymentInput(
         fiscalCode: rptId.organizationFiscalCode,
         noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
       },
-      amount: (amount / 100).toFixed(2)
+      amount: amount / 100
     })
     .bimap(() => Error("Decode Error NodoActivatePaymentNotice"), t.identity);
 }
+
 /**
  * Convert esitoNodoVerificaRPTRisposta_ppt (PagoPA response) to PaymentRequestsGetResponse (BackendApp response)
  * @param {esitoNodoVerificaRPTRisposta_ppt} esitoNodoVerificaRPTRisposta - Message to convert

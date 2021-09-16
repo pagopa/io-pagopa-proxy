@@ -1,5 +1,6 @@
 import { isRight } from "fp-ts/lib/Either";
 import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
+import { stAmount_nfpsp } from "../../../generated/nodeNm3io/stAmount_nfpsp";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
 import * as PaymentController from "../../controllers/restful/PaymentController";
 import * as PaymentsConverter from "../PaymentsConverter";
@@ -572,6 +573,20 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     if (fault === undefined) {
       return;
     }
+
+    const errorOrActivateIOPaymentInput = PaymentsConverter.getNodoActivateIOPaymentInput(
+      MockedData.aConfig,
+      MockedData.aRptId1,
+      12000 as stAmount_nfpsp
+    );
+
+    expect(isRight(errorOrActivateIOPaymentInput)).toBeTruthy();
+    if (!isRight(errorOrActivateIOPaymentInput)) {
+      return;
+    }
+
+    expect(errorOrActivateIOPaymentInput.value.amount).toBe(120.01);
+
     const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual("PPT_SINTASSI_EXTRAXSD");

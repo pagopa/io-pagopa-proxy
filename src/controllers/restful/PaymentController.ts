@@ -57,6 +57,7 @@ import {
   GeneralRptId,
   ResponsePaymentError
 } from "../../utils/types";
+import { stAmount_nfpsp } from "../../../generated/nodeNm3io/stAmount_nfpsp";
 
 // 1 - verificaCtrl
 const getGetPaymentInfoController: (
@@ -311,7 +312,7 @@ const getActivatePaymentController: (
 ) => async params => {
   const ccp: CodiceContestoPagamento =
     params.paymentActivationsPostRequest.codiceContestoPagamento;
-  const amount: number =
+  const amount : stAmount_nfpsp =
     params.paymentActivationsPostRequest.importoSingoloVersamento;
   const rptId: string = params.paymentActivationsPostRequest.rptId;
   const rptIdObject: RptId = RptIdFromString.decode(rptId).getOrElseL(_ => {
