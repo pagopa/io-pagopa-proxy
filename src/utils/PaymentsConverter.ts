@@ -95,7 +95,7 @@ export function getNodoActivateIOPaymentInput(
       idBrokerPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       idChannel: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
       password: pagoPAConfig.IDENTIFIER.PASSWORD,
-      amount : amount / 100,
+      amount: amount / 100,
       qrCode: {
         fiscalCode: rptId.organizationFiscalCode,
         noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
