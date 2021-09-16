@@ -1,6 +1,6 @@
 import { isRight } from "fp-ts/lib/Either";
+import { ImportoEuroCents } from "../../../generated/api/ImportoEuroCents";
 import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
-import { stAmount_nfpsp } from "../../../generated/nodeNm3io/stAmount_nfpsp";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
 import * as PaymentController from "../../controllers/restful/PaymentController";
 import * as PaymentsConverter from "../PaymentsConverter";
@@ -577,7 +577,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     const errorOrActivateIOPaymentInput = PaymentsConverter.getNodoActivateIOPaymentInput(
       MockedData.aConfig,
       MockedData.aRptId1,
-      12000 as stAmount_nfpsp
+      12000 as ImportoEuroCents
     );
 
     expect(isRight(errorOrActivateIOPaymentInput)).toBeTruthy();
@@ -585,7 +585,8 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
 
-    expect(errorOrActivateIOPaymentInput.value.amount).toBe(120.01);
+    // tslint:disable-next-line:prettier
+    expect(errorOrActivateIOPaymentInput.value.amount).toBe(120.00);
 
     const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
     expect(errorMsg).toBeDefined();
