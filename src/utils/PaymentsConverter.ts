@@ -95,11 +95,11 @@ export function getNodoActivateIOPaymentInput(
       idBrokerPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       idChannel: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
       password: pagoPAConfig.IDENTIFIER.PASSWORD,
-      amount: amount / 100,
       qrCode: {
         fiscalCode: rptId.organizationFiscalCode,
         noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
-      }
+      },
+      amount: amount / 100
     })
     .bimap(() => Error("Decode Error NodoActivatePaymentNotice"), t.identity);
 }
