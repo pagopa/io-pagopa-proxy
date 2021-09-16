@@ -23,6 +23,7 @@ import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3Po
 
 import * as PaymentsConverter from "../utils/PaymentsConverter";
 
+import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import {
@@ -32,7 +33,6 @@ import {
 } from "../utils/AIUtils";
 import { GeneralRptId, ResponsePaymentError } from "../utils/types";
 import * as PaymentsService from "./PaymentsService";
-import { stAmount_nfpsp } from "../../generated/nodeNm3io/stAmount_nfpsp";
 
 /**
  * The goal of this function is to call verifyPaymentNotice service of pagoPA Node
@@ -211,7 +211,7 @@ export async function nodoActivateIOPaymentService(
   redisTimeoutSecs: number,
   codiceContestoPagamento: CodiceContestoPagamento,
   rptId: GeneralRptId,
-  amount: stAmount_nfpsp
+  amount: ImportoEuroCents
 ): Promise<
   | IResponseErrorValidation
   | IResponseErrorInternal

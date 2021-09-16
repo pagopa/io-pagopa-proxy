@@ -11,12 +11,12 @@ import {
   RptIdFromString
 } from "italia-pagopa-commons/lib/pagopa";
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
+import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
 import { activateIOPaymentReq_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentReq_nfpsp";
 import { activateIOPaymentRes_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
-import { stAmount_nfpsp } from "../../generated/nodeNm3io/stAmount_nfpsp";
 import { ctPaymentOptionDescription_nfpsp } from "../../generated/nodeNm3psp/ctPaymentOptionDescription_nfpsp";
 import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
 import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
@@ -88,7 +88,7 @@ export function getNodoVerifyPaymentNoticeInput(
 export function getNodoActivateIOPaymentInput(
   pagoPAConfig: PagoPAConfig,
   rptId: RptId,
-  amount: stAmount_nfpsp
+  amount: ImportoEuroCents
 ): Either<Error, activateIOPaymentReq_nfpsp> {
   return activateIOPaymentReq_nfpsp
     .decode({
@@ -315,9 +315,6 @@ export function getActivateIOPaymentResponse(
       ? {
           importoSingoloVersamento: activateIOPaymentRes.totalAmount
             ? exactConvertToCents(activateIOPaymentRes.totalAmount)
-            : undefined,
-          ibanAccredito: activateIOPaymentRes.creditorReferenceId
-            ? activateIOPaymentRes.creditorReferenceId
             : undefined,
           causaleVersamento: activateIOPaymentRes.paymentDescription
             ? activateIOPaymentRes.paymentDescription
