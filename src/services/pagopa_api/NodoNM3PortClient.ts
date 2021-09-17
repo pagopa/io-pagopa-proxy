@@ -7,7 +7,7 @@ import * as soap from "soap";
 
 import {
   createClient,
-  fixImportoSingoloVersamentoDigits,
+  fixAmountDigits,
   promisifySoapMethod
 } from "../../utils/SoapUtils";
 import { INm3PortSoap } from "./IPPTPortSoap";
@@ -66,7 +66,7 @@ export class PagamentiTelematiciPspNm3NodoAsyncClient {
   );
   public readonly activateIOPayment = flip(
     curry(promisifySoapMethod(this.client.activateIOPayment))
-  )({ postProcess: fixImportoSingoloVersamentoDigits }); // TODO PS-SI verify
+  )({ postProcess: fixAmountDigits });
 
   constructor(private readonly client: INm3PortSoap) {}
 }
