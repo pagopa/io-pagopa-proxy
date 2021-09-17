@@ -185,16 +185,10 @@ The duration of the payment token can be set in 2 ways :
 Amount of payment in euro
       </xsd:documentation>
     </xsd:annotation>
-    <!-- <xsd:restriction base="xsd:decimal">
+    <xsd:restriction base="xsd:decimal">
       <xsd:pattern value="\d+\.\d{2}" />
       <xsd:maxInclusive value="999999999.99" />
-    </xsd:restriction> -->
-    <xsd:restriction base="xsd:decimal">
-      <xsd:minInclusive value="0.00" />
-      <xsd:maxInclusive value="999999.99" />
-      <xsd:fractionDigits value="2" />
-      <xsd:totalDigits value="10" />
-    </xsd:restriction>       
+    </xsd:restriction>
   </xsd:simpleType>
 
   <!-- <xsd:simpleType name="stUUID">

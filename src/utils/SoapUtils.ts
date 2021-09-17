@@ -87,3 +87,13 @@ export const fixImportoSingoloVersamentoDigits = (xml: string): string =>
       return `${p1}${padded}${p3}`;
     }
   );
+
+/**
+ * Makes sure that amount is formatted with 2 decimals
+ */
+export const fixAmountDigits = (xml: string): string =>
+  xml.replace(/(\d+)(\.\d+)?([\n\s]*<\/amount)/, (_, pp1, pp2, pp3) => {
+    const decimals = pp2 !== undefined ? String(pp2).slice(0, 3) : ".";
+    const padded = decimals.padEnd(3, "0");
+    return `${pp1}${padded}${pp3}`;
+  });
