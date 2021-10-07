@@ -22,6 +22,11 @@ import { requireClientCertificateFingerprint } from "./middlewares/requireClient
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
 import * as NodoNM3PortClient from "./services/pagopa_api/NodoNM3PortClient";
 import * as PPTPortClient from "./services/pagopa_api/PPTPortClient";
+import {
+  EventNameEnum,
+  EventResultEnum,
+  trackPaymentEvent
+} from "./utils/AIUtils";
 
 import { logger } from "./utils/Logger";
 
@@ -291,15 +296,39 @@ function getRedisClient(config: Configuration): redis.RedisClient {
 
   redisClient.on("error", err => {
     logger.error(`REDIS Connection error: ${err}`);
+    trackPaymentEvent({
+      name: EventNameEnum.REDIS_ERROR,
+      properties: {
+        result: EventResultEnum.REDIS_CONNECTION_ERR
+      }
+    });
   });
   redisClient.on("reconnecting", () => {
     logger.info(`REDIS is trying to reconnect...`);
+    trackPaymentEvent({
+      name: EventNameEnum.REDIS_ERROR,
+      properties: {
+        result: EventResultEnum.REDIS_TRY_RECONNECT
+      }
+    });
   });
   redisClient.on("warning", err => {
     logger.warn(`REDIS Connection warning: ${err}`);
+    trackPaymentEvent({
+      name: EventNameEnum.REDIS_ERROR,
+      properties: {
+        result: EventResultEnum.REDIS_CONNECTION_WRN
+      }
+    });
   });
   redisClient.on("end", () => {
     logger.error(`REDIS Connection lost`);
+    trackPaymentEvent({
+      name: EventNameEnum.REDIS_ERROR,
+      properties: {
+        result: EventResultEnum.REDIS_CONNECTION_LOST
+      }
+    });
   });
 
   return redisClient;

@@ -133,23 +133,32 @@ and you'd see the following response :
 }
 ```
 
-## Tests script
+## Tests 🧪
 
 In order to verify the flow of the three calls made by the [AppIO](https://github.com/pagopa/io-app) to obtain the payment ID necessary for the redirect to [WISP/PM](https://github.com/pagopa/pagopa-wisp2.0-pp-server),
-under `resources` folder typing :
+under `k6example` folder typing :
 
 ```sh
-bash calls_nm3_flow.sh
+bash ws.sh postman
 ```
 
 if all rights you'll see the following responses :
 
 ```sh
-phase 1 - verify rsp => codiceContestoPagamento 7111a890ff3e11ebb41ccfc44eeecbc1 importo 200
+→ 01-verifyNM3
+  GET http://localhost:3000/payment-requests/77777777777300053456789077781 [200 OK, 630B, 62ms]
+  ✓  Verify status code is 200
+  ✓  Verify importoSingoloVersamento is 100
 
-phase 2 - activation rsp => importoSingoloVersamento 3000
+→ 02-activateNM3
+  POST http://localhost:3000/payment-activations [200 OK, 367B, 23ms]
+  ✓  Activate status code is 200
+  ✓  Activate importoSingoloVersamento is 1
 
-phase 3 - Get idPagamento/paymentToken =  "c110729d258c4ab1b765fe902aae41d6"
+→ 03-getPaymentNM3
+  GET http://localhost:3000/payment-activations/6a5a9d20279011ecab332548974f42d8 [200 OK, 273B, 9ms]
+  ✓  payment-activations status code is 200
+  ✓  payment-activations idPagamento is not null
 ```
 
 ## License
