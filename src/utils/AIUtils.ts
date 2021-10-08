@@ -31,7 +31,7 @@ export enum EventResultEnum {
   "REDIS_CONNECTION_WRN" = "REDIS_CONNECTION_WRN",
   "REDIS_CONNECTION_LOST" = "REDIS_CONNECTION_LOST",
   "REDIS_TRY_RECONNECT" = "REDIS_TRY_RECONNECT",
-  ERROR_NODE = "ERROR_NODE"
+  "ERROR_NODE" = "ERROR_NODE"
 }
 
 // the internal function runtime has MaxTelemetryItem per second set to 20 by default
