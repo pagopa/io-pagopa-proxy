@@ -436,7 +436,7 @@ const getActivatePaymentController: (
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
        */
 
-      const geralRptId: GeneralRptId = {
+      const generalRptId: GeneralRptId = {
         asString: rptId,
         asObject: rptIdObject
       };
@@ -447,7 +447,7 @@ const getActivatePaymentController: (
         redisClient,
         redisTimeoutSecs,
         ccp,
-        geralRptId,
+        generalRptId,
         amount
       );
     }
@@ -461,16 +461,35 @@ const getActivatePaymentController: (
   );
 
   if (isLeft(responseOrError)) {
-    logger.error(
-      `ActivatePayment|${rptId}|Cannot construct valid response|${PathReporter.report(
-        responseOrError
-      )}`
-    );
+    const errorDetail = `ActivatePayment|${rptId}|Cannot construct valid response|${PathReporter.report(
+      responseOrError
+    )}`;
+
+    logger.error(errorDetail);
+
+    trackPaymentEvent({
+      name: EventNameEnum.PAYMENT_ACTIVATION,
+      properties: {
+        rptId,
+        codiceContestoPagamento: ccp,
+        result: EventResultEnum.ERROR_NODE,
+        detail: errorDetail
+      }
+    });
+
     return ResponseErrorFromValidationErrors(PaymentActivationsPostResponse)(
       responseOrError.value
     );
   }
 
+  trackPaymentEvent({
+    name: EventNameEnum.PAYMENT_ACTIVATION,
+    properties: {
+      rptId,
+      codiceContestoPagamento: ccp,
+      result: EventResultEnum.OK
+    }
+  });
   return ResponseSuccessJson(responseOrError.value);
 };
 
