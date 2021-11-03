@@ -65,7 +65,10 @@ export const CONFIG = {
       PAGAMENTI:
         process.env.PAGOPA_WS_URI ||
         "/webservices/pof/PagamentiTelematiciPspNodoservice"
-    }
+    },
+    NM3_ENABLED: fromNullable(process.env.NM3_ENABLED)
+      .map(_ => _.toLocaleLowerCase() === "true")
+      .getOrElse(false)
   },
 
   // Redis DB Server Configuration
@@ -124,7 +127,8 @@ export const PagoPAConfig = t.intersection([
     }),
     WS_SERVICES: t.interface({
       PAGAMENTI: NonEmptyString
-    })
+    }),
+    NM3_ENABLED: t.boolean
   }),
   t.partial({
     CERT: NonEmptyString,

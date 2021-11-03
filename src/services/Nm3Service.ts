@@ -146,22 +146,34 @@ export async function nodoVerifyPaymentNoticeService(
 
     const detailV2 = getDetailV2FromFaultCode(iverifyPaymentNoticeOutput.fault);
 
-    const detailError = `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorVerifyPaymentNotice} - detail_v2: ${detailV2})`;
-
-    logger.warn(detailError);
-
-    trackPaymentEvent({
-      name: EventNameEnum.PAYMENT_VERIFY,
-      properties: {
-        rptId: rptId.asString,
+    if (pagoPAConfig.NM3_ENABLED === true) {
+      return getPaymentErrorResponse(
+        EventNameEnum.PAYMENT_VERIFY,
+        rptId.asString,
+        EventResultEnum.ERROR_NODE,
         codiceContestoPagamento,
-        result: EventResultEnum.ERROR_NODE,
-        detail: detailError,
-        detail_v2: detailV2
-      }
-    });
+        detailV2,
+        responseErrorVerifyPaymentNotice,
+        true
+      );
+    } else {
+      const detailV2Nm3Disabled =
+        detailV2.toString() === "PTT_PAGAMENTO_IN_CORSO"
+          ? PaymentFaultV2Enum.PAA_PAGAMENTO_IN_CORSO
+          : detailV2.toString() === "PTT_PAGAMENTO_DUPLICATO"
+            ? PaymentFaultV2Enum.PAA_PAGAMENTO_DUPLICATO
+            : detailV2;
 
-    return ResponsePaymentError(responseErrorVerifyPaymentNotice, detailV2);
+      return getPaymentErrorResponse(
+        EventNameEnum.PAYMENT_VERIFY,
+        rptId.asString,
+        EventResultEnum.ERROR_NODE,
+        codiceContestoPagamento,
+        detailV2Nm3Disabled,
+        responseErrorVerifyPaymentNotice,
+        false
+      );
+    }
   } else {
     const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
       iverifyPaymentNoticeOutput,
@@ -405,4 +417,32 @@ export async function nodoActivateIOPaymentService(
       );
     }
   }
+}
+
+function getPaymentErrorResponse(
+  eventName: EventNameEnum,
+  rptId: string,
+  result: EventResultEnum,
+  codiceContestoPagamento: string,
+  detailV2: PaymentFaultV2Enum,
+  paymentFault: PaymentFaultEnum,
+  detailV2Nm3Enabled: boolean = false
+): IResponseErrorInternal {
+
+  const detail = `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${paymentFault} - detail_v2: ${detailV2})`;
+  logger.warn(detail);
+
+  trackPaymentEvent({
+    name: eventName,
+    properties: {
+      rptId,
+      codiceContestoPagamento,
+      result,
+      detail,
+      detail_v2: detailV2,
+      detail_v2_nm3_enabled: detailV2Nm3Enabled
+    }
+  });
+
+  return ResponsePaymentError(paymentFault, detailV2);
 }
