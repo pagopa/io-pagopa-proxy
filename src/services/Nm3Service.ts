@@ -199,6 +199,11 @@ export async function nodoVerifyPaymentNoticeService(
       }
     });
     // feature flag NM3 - PPR-162
+    logger.info(
+      `GetNodoVerifyPaymentNotice| valid rptId NM3 with feature flag NM3_ENABLED: ${
+        pagoPAConfig.NM3_ENABLED
+      }`
+    );
     return pagoPAConfig.NM3_ENABLED === true
       ? ResponseSuccessJson(responseOrErrorNm3.value)
       : ResponsePaymentError(
