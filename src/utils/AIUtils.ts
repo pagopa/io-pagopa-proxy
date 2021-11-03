@@ -10,8 +10,7 @@ const PaymentEvent = t.interface({
     codiceContestoPagamento: t.string,
     result: t.string,
     detail: t.string,
-    detail_v2: t.string,
-    detail_v2_nm3_enabled: t.boolean
+    detail_v2: t.string
   })
 });
 
