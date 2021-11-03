@@ -743,7 +743,8 @@ export function getErrorMessageCtrlFromPagoPaError(
  * @return {detail_v2} detail_v2 to send to BackendApp
  */
 export function getDetailV2FromFaultCode(
-  fault: faultBean_ppt
+  fault: faultBean_ppt,
+  isNM3Enabled: boolean = true
 ): PaymentFaultV2Enum {
   const maybeOriginalFaultCode = PaymentFaultV2.decode(fault.originalFaultCode);
   const maybeFaultCode = PaymentFaultV2.decode(fault.faultCode);
@@ -752,11 +753,21 @@ export function getDetailV2FromFaultCode(
     extractedValues != null
       ? PaymentFaultV2.decode(extractedValues[0])
       : undefined;
-  return maybeOriginalFaultCode.isRight()
+  const detailV2 = maybeOriginalFaultCode.isRight()
     ? maybeOriginalFaultCode.value
     : maybeExtractedFaultCode && maybeExtractedFaultCode.isRight()
       ? maybeExtractedFaultCode.value
       : maybeFaultCode.isRight()
         ? maybeFaultCode.value
         : PaymentFaultV2Enum.GENERIC_ERROR;
+
+  // feature flag NM3 - PPR-162
+  const detailV2Nm3Disabled =
+    detailV2.toString() === "PTT_PAGAMENTO_IN_CORSO"
+      ? PaymentFaultV2Enum.PAA_PAGAMENTO_IN_CORSO
+      : detailV2.toString() === "PTT_PAGAMENTO_DUPLICATO"
+        ? PaymentFaultV2Enum.PAA_PAGAMENTO_DUPLICATO
+        : detailV2;
+
+  return isNM3Enabled ? detailV2 : detailV2Nm3Disabled;
 }
