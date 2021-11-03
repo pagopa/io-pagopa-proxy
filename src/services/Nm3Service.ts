@@ -198,6 +198,7 @@ export async function nodoVerifyPaymentNoticeService(
         result: EventResultEnum.OK
       }
     });
+    // feature flag NM3 - PPR-162
     return pagoPAConfig.NM3_ENABLED === true
       ? ResponseSuccessJson(responseOrErrorNm3.value)
       : ResponsePaymentError(
