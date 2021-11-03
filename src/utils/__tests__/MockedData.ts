@@ -307,7 +307,8 @@ export const aConfig = PagoPAConfig.decode({
   },
   APPINSIGHTS_DISABLE: "true",
   APPINSIGHTS_SAMPLING_PERCENTAGE: "100",
-  APPINSIGHTS_INSTRUMENTATIONKEY: "key"
+  APPINSIGHTS_INSTRUMENTATIONKEY: "key",
+  NM3_ENABLED: true
 }).getOrElseL(errors => {
   throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
 });
