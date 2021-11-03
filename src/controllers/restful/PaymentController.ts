@@ -763,9 +763,9 @@ export function getDetailV2FromFaultCode(
 
   // feature flag NM3 - PPR-162
   const detailV2Nm3Disabled =
-    detailV2.toString() === "PTT_PAGAMENTO_IN_CORSO"
+    detailV2.toString() === "PPT_PAGAMENTO_IN_CORSO"
       ? PaymentFaultV2Enum.PAA_PAGAMENTO_IN_CORSO
-      : detailV2.toString() === "PTT_PAGAMENTO_DUPLICATO"
+      : detailV2.toString() === "PPT_PAGAMENTO_DUPLICATO"
         ? PaymentFaultV2Enum.PAA_PAGAMENTO_DUPLICATO
         : detailV2;
 
