@@ -237,7 +237,25 @@ export const aAttivaRPTOutputKOGeneric = esitoNodoAttivaRPTRisposta_ppt
       )}`
     );
   });
-  
+
+  export const aVerificaRPTOutputKOPAUnknownError = esitoNodoVerificaRPTRisposta_ppt
+  .decode({
+    esito: "KO",
+    fault: {
+      id: "NodoDeiPagamentiSPC",
+      faultCode: "PPT_ERRORE_EMESSO_DA_PAA",
+      faultString: "Errore generico lato PA.",
+      originalFaultCode: "PAA_UNK_ERROR"
+    }
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+   
 export const aCodiceContestoPagamento: CodiceContestoPagamento = "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento;
 
 export const iuv13 = "1234567890123";
