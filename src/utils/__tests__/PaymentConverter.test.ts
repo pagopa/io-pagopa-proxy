@@ -592,4 +592,17 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual("PPT_SINTASSI_EXTRAXSD");
   });
+
+  it("should convert a KO PA System Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOPASystemError.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+
+    const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual("PAA_SYSTEM_ERROR");
+  
+  });
 });
