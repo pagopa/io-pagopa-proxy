@@ -605,4 +605,18 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     expect(errorMsg).toEqual("PAA_SYSTEM_ERROR");
   
   });
+
+  it("should convert a KO PA unknown Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOPAUnknownError.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+
+    const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual("PPT_ERRORE_EMESSO_DA_PAA");
+  
+  });
+
 });
