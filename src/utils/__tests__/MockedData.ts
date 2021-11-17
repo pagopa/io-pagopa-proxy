@@ -220,7 +220,7 @@ export const aAttivaRPTOutputKOGeneric = esitoNodoAttivaRPTRisposta_ppt
     );
   });
 
-  export const aVerificaRPTOutputKOPASystemError = esitoNodoVerificaRPTRisposta_ppt
+export const aVerificaRPTOutputKOPASystemError = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "KO",
     fault: {
@@ -238,7 +238,7 @@ export const aAttivaRPTOutputKOGeneric = esitoNodoAttivaRPTRisposta_ppt
     );
   });
 
-  export const aVerificaRPTOutputKOPAUnknownError = esitoNodoVerificaRPTRisposta_ppt
+export const aVerificaRPTOutputKOPAUnknownError = esitoNodoVerificaRPTRisposta_ppt
   .decode({
     esito: "KO",
     fault: {
@@ -255,7 +255,7 @@ export const aAttivaRPTOutputKOGeneric = esitoNodoAttivaRPTRisposta_ppt
       )}`
     );
   });
-   
+
 export const aCodiceContestoPagamento: CodiceContestoPagamento = "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento;
 
 export const iuv13 = "1234567890123";

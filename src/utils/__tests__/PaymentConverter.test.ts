@@ -586,7 +586,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     }
 
     // tslint:disable-next-line:prettier
-    expect(errorOrActivateIOPaymentInput.value.amount).toBe(120.00);
+    expect(errorOrActivateIOPaymentInput.value.amount).toBe(120.0);
 
     const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
     expect(errorMsg).toBeDefined();
@@ -603,7 +603,6 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual("PAA_SYSTEM_ERROR");
-  
   });
 
   it("should convert a KO PA unknown Error", () => {
@@ -616,7 +615,5 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toEqual("PPT_ERRORE_EMESSO_DA_PAA");
-  
   });
-
 });
