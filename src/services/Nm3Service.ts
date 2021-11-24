@@ -166,6 +166,18 @@ export async function nodoVerifyPaymentNoticeService(
 
     return ResponsePaymentError(responseErrorVerifyPaymentNotice, detailV2);
   } else {
+    // feature flag NM3 - PPR-162
+    logger.info(
+      `GetNodoVerifyPaymentNotice| valid rptId NM3 with feature flag NM3_ENABLED: ${
+        pagoPAConfig.NM3_ENABLED
+      }`
+    );
+    if (pagoPAConfig.NM3_ENABLED !== true)
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.PPT_AUTORIZZAZIONE 
+      );
+        
     const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
       iverifyPaymentNoticeOutput,
       codiceContestoPagamento
@@ -198,19 +210,8 @@ export async function nodoVerifyPaymentNoticeService(
         result: EventResultEnum.OK
       }
     });
-    // feature flag NM3 - PPR-162
-    logger.info(
-      `GetNodoVerifyPaymentNotice| valid rptId NM3 with feature flag NM3_ENABLED: ${
-        pagoPAConfig.NM3_ENABLED
-      }`
-    );
-    return pagoPAConfig.NM3_ENABLED === true
-      ? ResponseSuccessJson(responseOrErrorNm3.value)
-      : ResponsePaymentError(
-          PaymentFaultEnum.GENERIC_ERROR,
-          PaymentFaultV2Enum.PPT_AUTORIZZAZIONE
-        );
-  }
+    return ResponseSuccessJson(responseOrErrorNm3.value)
+  }  
 }
 
 /**
