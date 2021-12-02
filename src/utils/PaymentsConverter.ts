@@ -323,8 +323,8 @@ export function getActivateIOPaymentResponse(
             identificativoUnivocoBeneficiario: activateIOPaymentRes.fiscalCodePA
               ? activateIOPaymentRes.fiscalCodePA
               : undefined,
-            denominazioneBeneficiario: activateIOPaymentRes.officeName
-              ? activateIOPaymentRes.officeName
+            denominazioneBeneficiario: activateIOPaymentRes.companyName
+              ? activateIOPaymentRes.companyName
               : undefined
           }
         }
