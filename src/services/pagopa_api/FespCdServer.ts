@@ -19,6 +19,7 @@ const FESP_CD_WSDL_PATH = `${__dirname}/../../wsdl/CdPerNodo.wsdl` as NonEmptySt
  * @param {IFespCdPortTypeSoap} fespCdHandlers - The service controller
  * @return {Promise<soap.Server>} The soap server defined and started
  */
+// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export async function attachFespCdServer(
   server: core.Express,
   path: NonEmptyString,

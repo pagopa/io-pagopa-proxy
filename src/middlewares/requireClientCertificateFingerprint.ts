@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 /**
  * Extract base64 client certificate from the header and verify
  * if the fingerprint is valid.

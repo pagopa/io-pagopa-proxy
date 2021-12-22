@@ -1,9 +1,12 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /**
  * PaymentControllers
  * RESTful Controllers for Payments Endpoints
  */
 import * as express from "express";
-import { isLeft } from "fp-ts/lib/Either";
+import * as E from "fp-ts/lib/Either";
+import * as O from "fp-ts/lib/Option";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { RptId, RptIdFromString } from "@pagopa/io-pagopa-commons/lib/pagopa";
 import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
@@ -17,6 +20,7 @@ import {
 import * as redis from "redis";
 import * as uuid from "uuid";
 
+import { pipe } from "fp-ts/lib/function";
 import { CodiceContestoPagamento } from "../../../generated/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../../../generated/api/ImportoEuroCents";
 import { PaymentActivationsGetResponse } from "../../../generated/api/PaymentActivationsGetResponse";
@@ -33,9 +37,9 @@ import {
   GetActivationStatusT,
   GetPaymentInfoT
 } from "../../../generated/api/requestTypes";
-import { cdInfoWisp_ppt } from "../../../generated/FespCdService/cdInfoWisp_ppt";
-import { cdInfoWispResponse_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_ppt";
-import { faultBean_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_ppt";
+import { cdInfoWisp_element_ppt } from "../../../generated/FespCdService/cdInfoWisp_element_ppt";
+import { cdInfoWispResponse_element_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_element_ppt";
+import { faultBean_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_type_ppt";
 import { PagoPAConfig } from "../../Configuration";
 import {
   nodoActivateIOPaymentService,
@@ -59,37 +63,39 @@ import {
   ResponsePaymentError
 } from "../../utils/types";
 
-// 1 - verificaCtrl
+// 1. verificaCtrl
 const getGetPaymentInfoController: (
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
   pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
-) => AsControllerFunction<GetPaymentInfoT> = (
+) => // eslint-disable-next-line max-lines-per-function
+AsControllerFunction<GetPaymentInfoT> = (
   pagoPAConfig,
   pagoPAClient,
   pagoPAClientNm3
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 ) => async params => {
   // Validate rptId (payment identifier) provided by BackendApp
-  const errorOrRptId = RptIdFromString.decode(params.rptId);
-  if (isLeft(errorOrRptId)) {
-    const error = errorOrRptId.value;
+  const errorOrRptId = RptIdFromString.decode(params.rpt_id_from_string);
+  if (E.isLeft(errorOrRptId)) {
+    const error = errorOrRptId.left;
 
     const errorDetail = `GetPaymentInfo|Cannot decode rptid|${
-      params.rptId
+      params.rpt_id_from_string
     }|${PathReporter.report(errorOrRptId)}`;
     logger.error(errorDetail);
 
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
-        rptId: params.rptId,
+        detail: errorDetail,
         result: EventResultEnum.INVALID_INPUT,
-        detail: errorDetail
+        rptId: params.rpt_id_from_string
       }
     });
     return ResponseErrorFromValidationErrors(RptId)(error);
   }
-  const rptId = errorOrRptId.value;
+  const rptId = errorOrRptId.right;
 
   // Generate a Transaction ID called CodiceContestoPagamento
   // to follow a stream of requests with PagoPA.
@@ -105,19 +111,19 @@ const getGetPaymentInfoController: (
     rptId,
     codiceContestoPagamento
   );
-  if (isLeft(errorOrInodoVerificaRPTInput)) {
-    const error = errorOrInodoVerificaRPTInput.value;
+  if (E.isLeft(errorOrInodoVerificaRPTInput)) {
+    const error = errorOrInodoVerificaRPTInput.left;
 
-    const errorDetail = `GetPaymentInfo|Cannot construct request|${params.rptId}|${error.message}`;
+    const errorDetail = `GetPaymentInfo|Cannot construct request|${params.rpt_id_from_string}|${error.message}`;
     logger.error(errorDetail);
 
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
-        rptId: params.rptId,
         codiceContestoPagamento,
+        detail: errorDetail,
         result: EventResultEnum.INVALID_INPUT,
-        detail: errorDetail
+        rptId: params.rpt_id_from_string
       }
     });
     return ResponseErrorValidation(
@@ -125,26 +131,26 @@ const getGetPaymentInfoController: (
       error.message
     );
   }
-  const iNodoVerificaRPTInput = errorOrInodoVerificaRPTInput.value;
+  const iNodoVerificaRPTInput = errorOrInodoVerificaRPTInput.right;
 
   // Send the SOAP request to PagoPA (VerificaRPT message)
   const errorOrInodoVerificaRPTOutput = await PaymentsService.sendNodoVerificaRPTInput(
     iNodoVerificaRPTInput,
     pagoPAClient
   );
-  if (isLeft(errorOrInodoVerificaRPTOutput)) {
-    const error = errorOrInodoVerificaRPTOutput.value;
+  if (E.isLeft(errorOrInodoVerificaRPTOutput)) {
+    const error = errorOrInodoVerificaRPTOutput.left;
 
-    const errorDetail = `GetPaymentInfo|Error while calling pagopa|${params.rptId}|${error.message}`;
+    const errorDetail = `GetPaymentInfo|Error while calling pagopa|${params.rpt_id_from_string}|${error.message}`;
     logger.error(errorDetail);
 
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
-        rptId: params.rptId,
         codiceContestoPagamento,
+        detail: errorDetail,
         result: EventResultEnum.CONNECTION_NODE,
-        detail: errorDetail
+        rptId: params.rpt_id_from_string
       }
     });
     return ResponsePaymentError(
@@ -152,7 +158,7 @@ const getGetPaymentInfoController: (
       PaymentFaultV2Enum.GENERIC_ERROR
     );
   }
-  const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.value;
+  const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.right;
 
   // Check PagoPA response content
   if (iNodoVerificaRPTOutput.esito !== "OK") {
@@ -166,17 +172,17 @@ const getGetPaymentInfoController: (
       iNodoVerificaRPTOutput.fault === undefined
     ) {
       const errorDetail = `GetPaymentInfo|Error during payment check: esito === KO${
-        params.rptId
+        params.rpt_id_from_string
       }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`;
       logger.error(errorDetail);
 
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
-          rptId: params.rptId,
           codiceContestoPagamento,
+          detail: errorDetail,
           result: EventResultEnum.CONNECTION_NODE,
-          detail: errorDetail
+          rptId: params.rpt_id_from_string
         }
       });
       return ResponsePaymentError(
@@ -188,7 +194,7 @@ const getGetPaymentInfoController: (
     if (responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO) {
       logger.error(
         `GetPaymentInfo|Error from pagopa|${
-          params.rptId
+          params.rpt_id_from_string
         }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
       );
 
@@ -200,11 +206,11 @@ const getGetPaymentInfoController: (
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
-          rptId: params.rptId,
           codiceContestoPagamento,
-          result: EventResultEnum.ERROR_NODE,
           detail: errorDetail,
-          detail_v2: detailV2
+          detail_v2: detailV2,
+          result: EventResultEnum.ERROR_NODE,
+          rptId: params.rpt_id_from_string
         }
       });
 
@@ -214,8 +220,8 @@ const getGetPaymentInfoController: (
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
        */
       const geralRptId: GeneralRptId = {
-        asString: params.rptId,
-        asObject: rptId
+        asObject: rptId,
+        asString: params.rpt_id_from_string
       };
       return await nodoVerifyPaymentNoticeService(
         pagoPAConfig,
@@ -234,9 +240,9 @@ const getGetPaymentInfoController: (
     codiceContestoPagamento
   );
 
-  if (isLeft(responseOrError)) {
+  if (E.isLeft(responseOrError)) {
     const errorDetail = `GetPaymentInfo|Cannot construct valid response|${
-      params.rptId
+      params.rpt_id_from_string
     }|${PathReporter.report(responseOrError)}`;
 
     logger.error(errorDetail);
@@ -244,26 +250,26 @@ const getGetPaymentInfoController: (
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
-        rptId: params.rptId,
         codiceContestoPagamento,
+        detail: errorDetail,
         result: EventResultEnum.ERROR_NODE,
-        detail: errorDetail
+        rptId: params.rpt_id_from_string
       }
     });
     return ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
-      responseOrError.value
+      responseOrError.left
     );
   }
 
   trackPaymentEvent({
     name: EventNameEnum.PAYMENT_VERIFY,
     properties: {
-      rptId: params.rptId,
       codiceContestoPagamento,
-      result: EventResultEnum.OK
+      result: EventResultEnum.OK,
+      rptId: params.rpt_id_from_string
     }
   });
-  return ResponseSuccessJson(responseOrError.value);
+  return ResponseSuccessJson(responseOrError.right);
 };
 
 /**
@@ -275,7 +281,7 @@ const getGetPaymentInfoController: (
  * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentsActivationResponse>>} The response content to send to applicant
  */
-export function getPaymentInfo( // 1 - verifica
+export function getPaymentInfo(
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
   pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient
@@ -287,13 +293,14 @@ export function getPaymentInfo( // 1 - verifica
     pagoPAClient,
     pagoPAClientNm3
   );
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   return async req =>
     controller({
-      rptId: req.params.rptId
+      rpt_id_from_string: req.params.rpt_id_from_string
     });
 }
 
-// 2 - attivaCtrl
+// 2. attivaCtrl
 const getActivatePaymentController: (
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
@@ -306,25 +313,27 @@ const getActivatePaymentController: (
   pagoPAClientNm3,
   redisClient,
   redisTimeoutSecs
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 ) => async params => {
-  const ccp: CodiceContestoPagamento =
-    params.paymentActivationsPostRequest.codiceContestoPagamento;
-  const amount: ImportoEuroCents =
-    params.paymentActivationsPostRequest.importoSingoloVersamento;
-  const rptId: string = params.paymentActivationsPostRequest.rptId;
-  const rptIdObject: RptId = RptIdFromString.decode(rptId).getOrElseL(_ => {
-    throw Error("Cannot parse rptId");
-  });
+  const ccp: CodiceContestoPagamento = params.body.codiceContestoPagamento;
+  const amount: ImportoEuroCents = params.body.importoSingoloVersamento;
+  const rptId: string = params.body.rptId;
+  const rptIdObject: RptId = pipe(
+    RptIdFromString.decode(rptId),
+    E.getOrElseW(_ => {
+      throw Error("Cannot parse rptId");
+    })
+  );
   // Convert the input provided by BackendApp (RESTful request)
   // to a PagoPA request (SOAP request), mapping useful information
   // Some static information will be obtained by PagoPAConfig, to identify this client
   // If something wrong into input will be detected during mapping, and error will be provided as response
   const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
     pagoPAConfig,
-    params.paymentActivationsPostRequest
+    params.body
   );
-  if (isLeft(errorOrNodoAttivaRPTInput)) {
-    const error = errorOrNodoAttivaRPTInput.value;
+  if (E.isLeft(errorOrNodoAttivaRPTInput)) {
+    const error = errorOrNodoAttivaRPTInput.left;
 
     const errorDetail = `ActivatePayment|Invalid request|${error}`;
 
@@ -333,10 +342,10 @@ const getActivatePaymentController: (
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
-        rptId,
         codiceContestoPagamento: ccp,
+        detail: errorDetail,
         result: EventResultEnum.INVALID_INPUT,
-        detail: errorDetail
+        rptId
       }
     });
 
@@ -345,15 +354,15 @@ const getActivatePaymentController: (
       error.message
     );
   }
-  const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.value;
+  const nodoAttivaRPTInput = errorOrNodoAttivaRPTInput.right;
 
   // Send the SOAP request to PagoPA (AttivaRPT message)
   const errorOrInodoAttivaRPTOutput = await PaymentsService.sendNodoAttivaRPTInputToPagoPa(
     nodoAttivaRPTInput,
     pagoPAClient
   );
-  if (isLeft(errorOrInodoAttivaRPTOutput)) {
-    const error = errorOrInodoAttivaRPTOutput.value;
+  if (E.isLeft(errorOrInodoAttivaRPTOutput)) {
+    const error = errorOrInodoAttivaRPTOutput.left;
 
     const errorDetail = `ActivatePayment|${rptId}|Cannot decode response from pagopa|${error}`;
 
@@ -362,10 +371,10 @@ const getActivatePaymentController: (
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
-        rptId,
         codiceContestoPagamento: ccp,
+        detail: errorDetail,
         result: EventResultEnum.ERROR_NODE,
-        detail: errorDetail
+        rptId
       }
     });
     return ResponsePaymentError(
@@ -373,7 +382,7 @@ const getActivatePaymentController: (
       PaymentFaultV2Enum.GENERIC_ERROR
     );
   }
-  const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.value;
+  const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.right;
 
   // Check PagoPA response content
   if (iNodoAttivaRPTOutput.esito !== "OK") {
@@ -393,10 +402,10 @@ const getActivatePaymentController: (
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
-          rptId,
           codiceContestoPagamento: ccp,
+          detail: errorDetail,
           result: EventResultEnum.ERROR_NODE,
-          detail: errorDetail
+          rptId
         }
       });
       return ResponsePaymentError(
@@ -420,11 +429,11 @@ const getActivatePaymentController: (
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
-          rptId,
           codiceContestoPagamento: ccp,
-          result: EventResultEnum.ERROR_NODE,
           detail: errorDetail,
-          detail_v2: detailV2
+          detail_v2: detailV2,
+          result: EventResultEnum.ERROR_NODE,
+          rptId
         }
       });
       return ResponsePaymentError(responseError, detailV2);
@@ -434,8 +443,8 @@ const getActivatePaymentController: (
        */
 
       const generalRptId: GeneralRptId = {
-        asString: rptId,
-        asObject: rptIdObject
+        asObject: rptIdObject,
+        asString: rptId
       };
 
       return await nodoActivateIOPaymentService(
@@ -457,7 +466,7 @@ const getActivatePaymentController: (
     iNodoAttivaRPTOutput
   );
 
-  if (isLeft(responseOrError)) {
+  if (E.isLeft(responseOrError)) {
     const errorDetail = `ActivatePayment|${rptId}|Cannot construct valid response|${PathReporter.report(
       responseOrError
     )}`;
@@ -467,27 +476,27 @@ const getActivatePaymentController: (
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
-        rptId,
         codiceContestoPagamento: ccp,
+        detail: errorDetail,
         result: EventResultEnum.ERROR_NODE,
-        detail: errorDetail
+        rptId
       }
     });
 
     return ResponseErrorFromValidationErrors(PaymentActivationsPostResponse)(
-      responseOrError.value
+      responseOrError.left
     );
   }
 
   trackPaymentEvent({
     name: EventNameEnum.PAYMENT_ACTIVATION,
     properties: {
-      rptId,
       codiceContestoPagamento: ccp,
-      result: EventResultEnum.OK
+      result: EventResultEnum.OK,
+      rptId
     }
   });
-  return ResponseSuccessJson(responseOrError.value);
+  return ResponseSuccessJson(responseOrError.right);
 };
 
 /**
@@ -501,7 +510,7 @@ const getActivatePaymentController: (
  * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentActivationsPostRequest>>} The response content to send to applicant
  */
-export function activatePayment( // 2 - attiva
+export function activatePayment(
   pagoPAConfig: PagoPAConfig,
   pagoPAClient: PPTPortClient.PagamentiTelematiciPspNodoAsyncClient,
   pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
@@ -517,20 +526,21 @@ export function activatePayment( // 2 - attiva
     redisClient,
     redisTimeoutSecs
   );
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   return async req => {
     // Validate input provided by BackendAp
     const errorOrPaymentActivationsPostRequest = PaymentActivationsPostRequest.decode(
       req.body
     );
-    if (isLeft(errorOrPaymentActivationsPostRequest)) {
-      const error = errorOrPaymentActivationsPostRequest.value;
+    if (E.isLeft(errorOrPaymentActivationsPostRequest)) {
+      const error = errorOrPaymentActivationsPostRequest.left;
       return ResponseErrorFromValidationErrors(PaymentActivationsPostRequest)(
         error
       );
     }
     const paymentActivationsPostRequest =
-      errorOrPaymentActivationsPostRequest.value;
-    return controller({ paymentActivationsPostRequest });
+      errorOrPaymentActivationsPostRequest.right;
+    return controller({ body: paymentActivationsPostRequest });
   };
 }
 
@@ -539,31 +549,34 @@ export function activatePayment( // 2 - attiva
  * related to a previous async request (attivaRPT)
  * It just store this information into redis db. This information will be retrieved by App using polling
  *
- * @param {cdInfoWisp_ppt} cdInfoWisp_ppt - The request from PagoPA
+ * @param {cdInfoWisp_element_ppt} cdInfoWisp_element_ppt - The request from PagoPA
  * @param {number} redisTimeoutSecs - The expiration timeout for the information to store
  * @param {RedisClient} redisClient - The redis client used to store the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
 export async function setActivationStatus(
-  cdInfoWispInput: cdInfoWisp_ppt,
+  cdInfoWispInput: cdInfoWisp_element_ppt,
   redisTimeoutSecs: number,
   redisClient: redis.RedisClient
-): Promise<cdInfoWispResponse_ppt> {
+): Promise<cdInfoWispResponse_element_ppt> {
   return (
-    await redisSet(
-      redisClient,
-      cdInfoWispInput.codiceContestoPagamento,
-      cdInfoWispInput.idPagamento,
-      "EX", // Set the specified expire time, in seconds.
-      redisTimeoutSecs
+    pipe(
+      await redisSet(
+        redisClient,
+        cdInfoWispInput.codiceContestoPagamento,
+        cdInfoWispInput.idPagamento,
+        "EX", // Set the specified expire time, in seconds.
+        redisTimeoutSecs
+      )
+    ),
+    E.fold(
+      _ => ({
+        esito: "KO"
+      }),
+      _ => ({
+        esito: "OK"
+      })
     )
-  ).fold<cdInfoWispResponse_ppt>(
-    _ => ({
-      esito: "KO"
-    }),
-    _ => ({
-      esito: "OK"
-    })
   );
 }
 
@@ -573,43 +586,45 @@ export async function setNm3PaymentOption(
   redisTimeoutSecs: number,
   redisClient: redis.RedisClient
 ): Promise<boolean> {
-  return (
+  return pipe(
     await redisSet(
       redisClient,
       codiceContestoPagamento,
       idPayment,
       "EX", // Set the specified expire time, in seconds.
       redisTimeoutSecs
+    ),
+    E.fold(
+      _ => false,
+      _ => true
     )
-  ).fold<boolean>(
-    _ => false,
-    _ => true
   );
 }
 
-// 3 - getIdPagamentoCtrl
+// 3. getIdPagamentoCtrl
 const getGetActivationStatusController: (
   redisClient: redis.RedisClient
 ) => AsControllerFunction<
   GetActivationStatusT
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 > = redisClient => async params => {
   // Retrieve idPayment related to a codiceContestoPagamento from DB
   // It's just a key-value mapping
 
   const maybeIdPaymentOrError = await redisGet(
     redisClient,
-    params.codiceContestoPagamento
+    params.codice_contesto_pagamento
   );
 
-  if (maybeIdPaymentOrError.isLeft()) {
+  if (E.isLeft(maybeIdPaymentOrError)) {
     return ResponseErrorInternal(
-      `getActivationStatus: ${maybeIdPaymentOrError.value}`
+      `getActivationStatus: ${maybeIdPaymentOrError.left}`
     );
   }
 
-  const maybeIdPayment = maybeIdPaymentOrError.value;
+  const maybeIdPayment = maybeIdPaymentOrError.right;
 
-  if (maybeIdPayment.isNone()) {
+  if (O.isNone(maybeIdPayment)) {
     return ResponseErrorNotFound("Not found", "getActivationStatus");
   }
 
@@ -619,13 +634,13 @@ const getGetActivationStatusController: (
     idPagamento: idPayment
   });
 
-  if (responseOrError.isLeft()) {
+  if (E.isLeft(responseOrError)) {
     return ResponseErrorFromValidationErrors(PaymentActivationsGetResponse)(
-      responseOrError.value
+      responseOrError.left
     );
   }
 
-  return ResponseSuccessJson(responseOrError.value);
+  return ResponseSuccessJson(responseOrError.right);
 };
 
 /**
@@ -636,7 +651,7 @@ const getGetActivationStatusController: (
  * @param {redis.RedisClient} redisClient - The redis client used to retrieve the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
-export function getActivationStatus( // 3 - getIdPagamento
+export function getActivationStatus(
   redisClient: redis.RedisClient
 ): (
   req: express.Request
@@ -644,18 +659,19 @@ export function getActivationStatus( // 3 - getIdPagamento
   AsControllerResponseType<TypeofApiResponse<GetActivationStatusT>>
 > {
   const controller = getGetActivationStatusController(redisClient);
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   return async req => {
     // Validate codiceContestoPagamento (transaction id) data provided by BackendApp
     const errorOrCodiceContestoPagamento = CodiceContestoPagamento.decode(
       req.params.codiceContestoPagamento
     );
-    if (isLeft(errorOrCodiceContestoPagamento)) {
-      const error = errorOrCodiceContestoPagamento.value;
+    if (E.isLeft(errorOrCodiceContestoPagamento)) {
+      const error = errorOrCodiceContestoPagamento.left;
       return ResponseErrorFromValidationErrors(CodiceContestoPagamento)(error);
     }
-    const codiceContestoPagamento = errorOrCodiceContestoPagamento.value;
+    const codiceContestoPagamento = errorOrCodiceContestoPagamento.right;
     return controller({
-      codiceContestoPagamento
+      codice_contesto_pagamento: codiceContestoPagamento
     });
   };
 }
@@ -682,7 +698,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
  * @return {IResponseErrorGeneric | IResponsePaymentError} A controller response or undefined if no errors exist
  */
 export function getResponseErrorIfExists(
-  faultBean: faultBean_ppt | undefined
+  faultBean: faultBean_type_ppt | undefined
 ): PaymentFaultEnum | undefined {
   // Response is FAILED but no additional information are provided by PagoPa
   if (faultBean === undefined) {
@@ -754,7 +770,7 @@ export function getErrorMessageCtrlFromPagoPaError(
  * @return {detail_v2} detail_v2 to send to BackendApp
  */
 export function getDetailV2FromFaultCode(
-  fault: faultBean_ppt,
+  fault: faultBean_type_ppt,
   isNM3Enabled: boolean = true
 ): PaymentFaultV2Enum {
   const maybeOriginalFaultCode = PaymentFaultV2.decode(fault.originalFaultCode);
@@ -764,12 +780,12 @@ export function getDetailV2FromFaultCode(
     extractedValues != null
       ? PaymentFaultV2.decode(extractedValues[0])
       : undefined;
-  const detailV2 = maybeOriginalFaultCode.isRight()
-    ? maybeOriginalFaultCode.value
-    : maybeExtractedFaultCode && maybeExtractedFaultCode.isRight()
-    ? maybeExtractedFaultCode.value
-    : maybeFaultCode.isRight()
-    ? maybeFaultCode.value
+  const detailV2 = E.isRight(maybeOriginalFaultCode)
+    ? maybeOriginalFaultCode.right
+    : maybeExtractedFaultCode && E.isRight(maybeExtractedFaultCode)
+    ? maybeExtractedFaultCode.right
+    : E.isRight(maybeFaultCode)
+    ? maybeFaultCode.right
     : PaymentFaultV2Enum.GENERIC_ERROR;
 
   // feature flag NM3 - PPR-162

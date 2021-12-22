@@ -2,39 +2,37 @@
  * Handler interface for PPTPortType SOAP Endpoint
  */
 
-// tslint:disable:no-any
+import { nodoAttivaRPT_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_element_ppt";
+import { nodoAttivaRPTRisposta_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPTRisposta_element_ppt";
+import { nodoVerificaRPT_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_element_ppt";
+import { nodoVerificaRPTRisposta_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPTRisposta_element_ppt";
 
-import { nodoAttivaRPT_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
-import { nodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPTRisposta_ppt";
-import { nodoVerificaRPT_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
-import { nodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPTRisposta_ppt";
+import { activateIOPaymentReq_element_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentReq_element_nfpsp";
+import { activateIOPaymentRes_element_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentRes_element_nfpsp";
 
-import { activateIOPaymentReq_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentReq_nfpsp";
-import { activateIOPaymentRes_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
-
-import { verifyPaymentNoticeReq_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
-import { verifyPaymentNoticeRes_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
+import { verifyPaymentNoticeReq_element_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeReq_element_nfpsp";
+import { verifyPaymentNoticeRes_element_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeRes_element_nfpsp";
 
 import { SoapMethodCB } from "../../utils/SoapUtils";
 
 export interface IPPTPortSoap {
   readonly nodoVerificaRPT: SoapMethodCB<
-    nodoVerificaRPT_ppt,
-    nodoVerificaRPTRisposta_ppt
+    nodoVerificaRPT_element_ppt,
+    nodoVerificaRPTRisposta_element_ppt
   >;
   readonly nodoAttivaRPT: SoapMethodCB<
-    nodoAttivaRPT_ppt,
-    nodoAttivaRPTRisposta_ppt
+    nodoAttivaRPT_element_ppt,
+    nodoAttivaRPTRisposta_element_ppt
   >;
 }
 
 export interface INm3PortSoap {
   readonly verifyPaymentNotice: SoapMethodCB<
-    verifyPaymentNoticeReq_nfpsp,
-    verifyPaymentNoticeRes_nfpsp
+    verifyPaymentNoticeReq_element_nfpsp,
+    verifyPaymentNoticeRes_element_nfpsp
   >;
   readonly activateIOPayment: SoapMethodCB<
-    activateIOPaymentReq_nfpsp,
-    activateIOPaymentRes_nfpsp
+    activateIOPaymentReq_element_nfpsp,
+    activateIOPaymentRes_element_nfpsp
   >;
 }
