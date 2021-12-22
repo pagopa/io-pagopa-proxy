@@ -5,15 +5,15 @@
 import * as express from "express";
 import { isLeft } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
-import { RptId, RptIdFromString } from "italia-pagopa-commons/lib/pagopa";
-import { TypeofApiResponse } from "italia-ts-commons/lib/requests";
+import { RptId, RptIdFromString } from "@pagopa/io-pagopa-commons/lib/pagopa";
+import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
 import {
   ResponseErrorFromValidationErrors,
   ResponseErrorInternal,
   ResponseErrorNotFound,
   ResponseErrorValidation,
   ResponseSuccessJson
-} from "italia-ts-commons/lib/responses";
+} from "@pagopa/ts-commons/lib/responses";
 import * as redis from "redis";
 import * as uuid from "uuid";
 

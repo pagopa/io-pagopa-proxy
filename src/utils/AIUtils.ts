@@ -1,7 +1,9 @@
 import * as t from "io-ts";
-import { initAppInsights } from "italia-ts-commons/lib/appinsights";
-import { IntegerFromString } from "italia-ts-commons/lib/numbers";
+import { initAppInsights } from "@pagopa/ts-commons/lib/appinsights";
+import { IntegerFromString } from "@pagopa/ts-commons/lib/numbers";
 import { CONFIG } from "../Configuration";
+import { pipe } from "fp-ts/lib/function";
+import * as E from "fp-ts/lib/Either";
 
 const PaymentEvent = t.interface({
   name: t.string,
@@ -46,8 +48,9 @@ export const initTelemetryClient = (
 ) =>
   initAppInsights(intrumentationKey, {
     disableAppInsights: aiDisable === "true",
-    samplingPercentage: IntegerFromString.decode(aiSampling).getOrElse(
-      DEFAULT_SAMPLING_PERCENTAGE
+    samplingPercentage: pipe(
+      IntegerFromString.decode(aiSampling),
+      E.getOrElse(_ => DEFAULT_SAMPLING_PERCENTAGE)
     )
   });
 
