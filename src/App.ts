@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 /**
  * App
  * Define a Restful and a SOAP Webservice and routes incoming requests to controllers
@@ -14,9 +15,8 @@ import * as redis from "redis";
 import RedisClustr = require("redis-clustr");
 import * as soap from "soap";
 
-import { specs as publicApiV1Specs } from "../generated/api/public_api_pagopa";
+// import { specs as publicApiV1Specs } from "../generated/api/public_api_pagopa";
 import { Configuration } from "./Configuration";
-import { GetOpenapi } from "./controllers/openapi";
 import * as PaymentController from "./controllers/restful/PaymentController";
 import { requireClientCertificateFingerprint } from "./middlewares/requireClientCertificateFingerprint";
 import * as FespCdServer from "./services/pagopa_api/FespCdServer";
@@ -42,17 +42,17 @@ const getFespCdServiceHandler = (
   redisClient: redis.RedisClient,
   redisTimeoutSecs: number
 ): soap.IServicePort => ({
-  cdInfoWisp: (input, cb) => {
+  cdInfoWisp: (input, cb): Promise<void> => {
     logger.info(
       `idpayment=${input.idPagamento}|contesto=${input.codiceContestoPagamento}|dominio=${input.identificativoDominio}|versamento=${input.identificativoUnivocoVersamento}`
     );
     const aiEventProps = {
-      idpayment: input.idPagamento,
       ccp: input.codiceContestoPagamento,
       iddominio: input.identificativoDominio,
+      idpayment: input.idPagamento,
       iuv: input.identificativoUnivocoVersamento
     };
-    PaymentController.setActivationStatus(
+    return PaymentController.setActivationStatus(
       input,
       redisTimeoutSecs,
       redisClient
@@ -65,7 +65,7 @@ const getFespCdServiceHandler = (
         if (cb) {
           // we need to cast the callback to any as the type definition doesn't
           // include all the actual parameters
-          // tslint:disable-next-line: no-any no-useless-cast
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (cb as any)(undefined, iCdInfoWispOutput);
         }
       },
@@ -78,7 +78,7 @@ const getFespCdServiceHandler = (
         if (cb) {
           // we need to cast the callback to any as the type definition doesn't
           // include all the actual parameters
-          // tslint:disable-next-line: no-any no-useless-cast
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (cb as any)(undefined, { esito: "KO" });
         }
       }
@@ -142,6 +142,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
 
   // Define a redis client necessary to handle persistent data
   // for async payment activation process
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const redisClient = getRedisClient(config);
 
   // Define RESTful endpoints
@@ -158,6 +159,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
     app.use(requireClientCertificateFingerprint(clientCertificateFingerprint));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   setRestfulRoutes(
     app,
     config,
@@ -200,6 +202,7 @@ export function stopServer(server: http.Server): void {
  * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPA
  * @param {PagamentiTelematiciPspNodoAsyncClient} pagoPAClient - PagoPa SOAP client to call verificaRPT and attivaRPT services
  */
+// eslint-disable-next-line max-params
 function setRestfulRoutes(
   app: core.Express,
   config: Configuration,
@@ -249,7 +252,8 @@ function setRestfulRoutes(
   );
 
   // Endpoint for OpenAPI handler
-  app.get("/api/v1/swagger.json", GetOpenapi(publicApiV1Specs));
+  // eslint-disable-next-line extra-rules/no-commented-out-code
+  // app.get("/api/v1/swagger.json", GetOpenapi(publicApiV1Specs));
 
   // Liveness probe for Kubernetes.
   // @see
@@ -266,7 +270,7 @@ function setRestfulRoutes(
  * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
  */
 function getRedisClient(config: Configuration): redis.RedisClient {
-  const redisClient = (() => {
+  const redisClient = ((): redis.RedisClient => {
     if (config.REDIS_DB.USE_CLUSTER) {
       logger.debug("Creating a REDIS client using cluster...");
       return new RedisClustr({
