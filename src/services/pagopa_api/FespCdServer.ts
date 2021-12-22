@@ -13,6 +13,7 @@ const FESP_CD_WSDL_PATH = `${__dirname}/../../wsdl/CdPerNodo.wsdl` as NonEmptySt
 
 /**
  * Attach FespCd SOAP service to a server instance
+ *
  * @param {core.Express} server - The server instance to use to expose services
  * @param {NonEmptyString} path - The endpoint path
  * @param {IFespCdPortTypeSoap} fespCdHandlers - The service controller

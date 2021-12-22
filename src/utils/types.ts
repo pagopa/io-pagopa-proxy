@@ -21,21 +21,20 @@ import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
   : T extends IResponseType<400, ProblemJson>
-    ? IResponseErrorValidation
-    : T extends IResponseType<404, ProblemJson>
-      ? IResponseErrorNotFound
-      : T extends IResponseType<500, ProblemJson>
-        ? IResponseErrorInternal
-        : T extends IResponseType<500, PaymentProblemJson>
-          ? IResponsePaymentInternalError
-          : never;
+  ? IResponseErrorValidation
+  : T extends IResponseType<404, ProblemJson>
+  ? IResponseErrorNotFound
+  : T extends IResponseType<500, ProblemJson>
+  ? IResponseErrorInternal
+  : T extends IResponseType<500, PaymentProblemJson>
+  ? IResponsePaymentInternalError
+  : never;
 
 export type AsControllerFunction<T> = (
   params: TypeofApiParams<T>
 ) => Promise<AsControllerResponseType<TypeofApiResponse<T>>>;
 
-export interface IResponsePaymentInternalError
-  extends IResponse<"IResponseErrorInternal"> {}
+export type IResponsePaymentInternalError = IResponse<"IResponseErrorInternal">;
 
 /**
  * Returns a 500 with json response.

@@ -36,6 +36,7 @@ import { exactConvertToCents } from "./money";
 
 /**
  * Define NodoVerificaRPTInput (PagoPA request) using information provided by BackendApp
+ *
  * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
  * @param {RptId} rptId - Unique identifier for payment (fiscalCode + numeroAvviso)
  * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
@@ -107,6 +108,7 @@ export function getNodoActivateIOPaymentInput(
 
 /**
  * Convert esitoNodoVerificaRPTRisposta_ppt (PagoPA response) to PaymentRequestsGetResponse (BackendApp response)
+ *
  * @param {esitoNodoVerificaRPTRisposta_ppt} esitoNodoVerificaRPTRisposta - Message to convert
  * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
  * @return {Validation<PaymentRequestsGetResponse>} Converted object
@@ -191,8 +193,8 @@ export function getPaymentRequestsGetResponseNm3(
     )
       ? verifyPaymentNoticeResponse.paymentList.paymentOptionDescription[0]
       : verifyPaymentNoticeResponse.paymentList
-        ? verifyPaymentNoticeResponse.paymentList.paymentOptionDescription
-        : undefined;
+      ? verifyPaymentNoticeResponse.paymentList.paymentOptionDescription
+      : undefined;
 
   return PaymentRequestsGetResponse.decode(
     paymentOptionDescription
@@ -215,6 +217,7 @@ export function getPaymentRequestsGetResponseNm3(
 }
 /**
  * Convert PaymentActivationsPostRequest (BackendApp request) to nodoAttivaRPT_ppt (PagoPA request)
+ *
  * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
  * @param {PaymentActivationsPostRequest} paymentActivationsPostRequest - Message to convert
  * @return {Either<Error, nodoAttivaRPT_ppt>} Converted object
@@ -259,6 +262,7 @@ export function getNodoAttivaRPTInput(
 
 /**
  * Convert esitoNodoAttivaRPTRisposta_ppt (PagoPA response) to PaymentActivationsPostResponse (BackendApp response)
+ *
  * @param {esitoNodoAttivaRPTRisposta_ppt} esitoNodoAttivaRPTRisposta - Message to convert
  * @return {Validation<PaymentActivationsPostResponse>} Converted object
  */
@@ -336,6 +340,7 @@ export function getActivateIOPaymentResponse(
 /**
  * Define a nodoTipoCodiceIdRPT_ppt object to send to PagoPA Services, containing payment information
  * Ask the pagopa service administrator or read documentation from RptId definition
+ *
  * @param {RptId} rptId - Payment information provided by BackendApp
  * @return {nodoTipoCodiceIdRPT_ppt} The result generated for PagoPa
  */
@@ -389,6 +394,7 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
 
 /**
  * Extract causaleVersamento from esitoNodoVerificaRPTRisposta_ppt
+ *
  * @param {esitoNodoVerificaRPTRisposta_ppt} datiPagamentoPA - Payment information provided by BackendApp
  * @return {stText140_ppt | undefined} The causaleVersamento value
  */
@@ -457,6 +463,7 @@ export function getCodiceContestoPagamentoForPagoPaApi(
 /**
  * Return a paymentNoticeNumber as string according to
  * https://pagopa.atlassian.net/wiki/spaces/ISS/pages/296911713/Come+ricostruire+un+Numero+Avviso+NAV
+ *
  * @param paymentNoticeNumber as PaymentNoticeNumber
  * @returns paymentNoticeNumber as string
  */
@@ -465,18 +472,12 @@ function getPaymentNoticeNumberAsString(
 ): string {
   switch (paymentNoticeNumber.auxDigit) {
     case "0":
-      return `${paymentNoticeNumber.auxDigit}${
-        paymentNoticeNumber.applicationCode
-      }${paymentNoticeNumber.iuv13}${paymentNoticeNumber.checkDigit}`;
+      return `${paymentNoticeNumber.auxDigit}${paymentNoticeNumber.applicationCode}${paymentNoticeNumber.iuv13}${paymentNoticeNumber.checkDigit}`;
     case "1":
       return `${paymentNoticeNumber.auxDigit}${paymentNoticeNumber.iuv17}`;
     case "2":
-      return `${paymentNoticeNumber.auxDigit}${paymentNoticeNumber.iuv15}${
-        paymentNoticeNumber.checkDigit
-      }`;
+      return `${paymentNoticeNumber.auxDigit}${paymentNoticeNumber.iuv15}${paymentNoticeNumber.checkDigit}`;
     case "3":
-      return `${paymentNoticeNumber.auxDigit}${
-        paymentNoticeNumber.segregationCode
-      }${paymentNoticeNumber.iuv13}${paymentNoticeNumber.checkDigit}`;
+      return `${paymentNoticeNumber.auxDigit}${paymentNoticeNumber.segregationCode}${paymentNoticeNumber.iuv13}${paymentNoticeNumber.checkDigit}`;
   }
 }
