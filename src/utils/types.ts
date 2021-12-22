@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { RptId } from "italia-pagopa-commons/lib/pagopa";
+import { RptId } from "@pagopa/io-pagopa-commons/lib/pagopa";
 import {
   IResponseType,
   TypeofApiParams,
   TypeofApiResponse
-} from "italia-ts-commons/lib/requests";
+} from "@pagopa/ts-commons/lib/requests";
 import {
   HttpStatusCodeEnum,
   IResponse,
@@ -13,7 +13,7 @@ import {
   IResponseErrorValidation,
   IResponseSuccessJson,
   ProblemJson
-} from "italia-ts-commons/lib/responses";
+} from "@pagopa/ts-commons/lib/responses";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";

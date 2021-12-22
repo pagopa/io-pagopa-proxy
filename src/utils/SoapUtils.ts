@@ -6,7 +6,7 @@
 // tslint:disable:no-any
 
 import * as fs from "fs";
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as soap from "soap";
 
 export function createClient<T>(
@@ -67,7 +67,7 @@ export const promisifySoapMethod = <I, O>(f: SoapMethodCB<I, O>) => (
  */
 export async function readWsdl(path: NonEmptyString): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    fs.readFile(path, { encoding: "UTF-8" }, (err, wsdl) => {
+    fs.readFile(path, { encoding: "utf-8" }, (err, wsdl) => {
       if (err) {
         return reject(err);
       }

@@ -9,7 +9,7 @@ import * as appInsights from "applicationinsights";
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as core from "express-serve-static-core";
-import { toExpressHandler } from "italia-ts-commons/lib/express";
+import { toExpressHandler } from "@pagopa/ts-commons/lib/express";
 import * as morgan from "morgan";
 import * as redis from "redis";
 import RedisClustr = require("redis-clustr");
