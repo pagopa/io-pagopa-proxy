@@ -9,7 +9,7 @@ import {
   PaymentNoticeNumber,
   RptId,
   RptIdFromString
-} from "italia-pagopa-commons/lib/pagopa";
+} from "@pagopa/io-pagopa-commons/lib/pagopa";
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
