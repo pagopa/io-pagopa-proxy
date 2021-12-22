@@ -17,6 +17,9 @@ import {
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
+import { WithinRangeInteger } from "@pagopa/ts-commons/lib/numbers";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
@@ -44,7 +47,10 @@ export const ResponsePaymentError = (
   detailV2: PaymentFaultV2Enum
 ): IResponsePaymentInternalError => {
   const problem: PaymentProblemJson = {
-    status: HttpStatusCodeEnum.HTTP_STATUS_500,
+    status: pipe(
+      WithinRangeInteger(100, 599).decode(HttpStatusCodeEnum.HTTP_STATUS_500),
+      E.getOrElseW(e => { throw new Error("should never happen: invalid HTTP status code") })
+    ), // FIXME: Why doesn't direct usage of `HttpStatusCodeEnum.HTTP_STATUS_500` typecheck correctly?
     title: "Internal server error",
     detail,
     detail_v2: detailV2

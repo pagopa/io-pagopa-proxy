@@ -1,4 +1,4 @@
-import { reporters } from "italia-ts-commons";
+import { reporters } from "@pagopa/ts-commons";
 import * as soap from "soap";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
@@ -9,6 +9,8 @@ import { nodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelemat
 import { IPPTPortSoap } from "../../services/pagopa_api/IPPTPortSoap";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import { createClient } from "../../utils/SoapUtils";
+import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/lib/function";
 
 const invalidInput = "Invalid input";
 export async function createPagamentiTelematiciPspNodoClient(
@@ -20,8 +22,8 @@ export async function createPagamentiTelematiciPspNodoClient(
   );
 }
 
-const aNodoVerificaRPTRispostaOK = esitoNodoVerificaRPTRisposta_ppt
-  .decode({
+const aNodoVerificaRPTRispostaOK = pipe(
+  esitoNodoVerificaRPTRisposta_ppt.decode({
     esito: "OK",
     datiPagamentoPA: {
       importoSingoloVersamento: 99.05,
@@ -45,17 +47,18 @@ const aNodoVerificaRPTRispostaOK = esitoNodoVerificaRPTRisposta_ppt
       credenzialiPagatore: "NOMECOGNOME",
       causaleVersamento: "CAUSALE01"
     }
-  })
-  .getOrElseL(errors => {
+  }),
+  E.getOrElseW(errors => {
     throw Error(
       `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
         errors
       )}`
     );
-  });
+  })
+);
 
-const aNodoAttivaRPTRispostaOK = esitoNodoAttivaRPTRisposta_ppt
-  .decode({
+const aNodoAttivaRPTRispostaOK = pipe(
+  esitoNodoAttivaRPTRisposta_ppt.decode({
     esito: "OK",
     datiPagamentoPA: {
       importoSingoloVersamento: 99.05,
@@ -79,14 +82,15 @@ const aNodoAttivaRPTRispostaOK = esitoNodoAttivaRPTRisposta_ppt
       credenzialiPagatore: "NOMECOGNOME",
       causaleVersamento: "CAUSALE01"
     }
-  })
-  .getOrElseL(errors => {
+  }),
+  E.getOrElseW(errors => {
     throw Error(
       `Invalid esitoNodoAttivaRPTRisposta_ppt to decode: ${reporters.readableReport(
         errors
       )}`
     );
-  });
+  })
+);
 
 export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.PagamentiTelematiciPspNodoAsyncClient {
   constructor(client: IPPTPortSoap) {
