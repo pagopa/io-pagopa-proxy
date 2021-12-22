@@ -1,18 +1,18 @@
 import * as t from "io-ts";
 import { initAppInsights } from "@pagopa/ts-commons/lib/appinsights";
 import { IntegerFromString } from "@pagopa/ts-commons/lib/numbers";
-import { CONFIG } from "../Configuration";
 import { pipe } from "fp-ts/lib/function";
 import * as E from "fp-ts/lib/Either";
+import { CONFIG } from "../Configuration";
 
 const PaymentEvent = t.interface({
   name: t.string,
   properties: t.partial({
-    rptId: t.string,
     codiceContestoPagamento: t.string,
-    result: t.string,
     detail: t.string,
-    detail_v2: t.string
+    detail_v2: t.string,
+    result: t.string,
+    rptId: t.string
   })
 });
 
@@ -41,6 +41,7 @@ export enum EventResultEnum {
 const DEFAULT_SAMPLING_PERCENTAGE = 20;
 
 // Avoid to initialize Application Insights more than once
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const initTelemetryClient = (
   intrumentationKey: string,
   aiDisable: string,

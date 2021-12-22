@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function exactConvertToCents(amount: number): number {
   const parts = String(amount).split(".");
   if (parts.length === 1) {

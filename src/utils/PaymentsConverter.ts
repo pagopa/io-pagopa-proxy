@@ -1,38 +1,41 @@
+/* eslint-disable sort-keys */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 /**
  * Payments Converter
  * Data Converter for Payments Request\Responses between PagoPA and BackendAPP types
  */
 
-import { Either, isRight, left, right } from "fp-ts/lib/Either";
+import * as E from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import {
   PaymentNoticeNumber,
   RptId,
   RptIdFromString
 } from "@pagopa/io-pagopa-commons/lib/pagopa";
+import { pipe } from "fp-ts/lib/function";
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
-import { activateIOPaymentReq_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentReq_nfpsp";
-import { activateIOPaymentRes_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
-import { ctPaymentOptionDescription_nfpsp } from "../../generated/nodeNm3psp/ctPaymentOptionDescription_nfpsp";
-import { verifyPaymentNoticeReq_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
-import { verifyPaymentNoticeRes_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
-import { ctEnteBeneficiario_pay_i_unqual } from "../../generated/PagamentiTelematiciPspNodoservice/ctEnteBeneficiario_pay_i_unqual";
-import { esitoNodoAttivaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
-import { esitoNodoVerificaRPTRisposta_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
-import { nodoAttivaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
-import { nodoTipoCodiceIdRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoCodiceIdRPT_ppt";
-import { nodoTipoDatiPagamentoPA_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoDatiPagamentoPA_ppt";
-import { nodoVerificaRPT_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
+import { activateIOPaymentReq_element_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentReq_element_nfpsp";
+import { activateIOPaymentRes_element_nfpsp } from "../../generated/nodeNm3io/activateIOPaymentRes_element_nfpsp";
+import { ctPaymentOptionDescription_type_nfpsp } from "../../generated/nodeNm3psp/ctPaymentOptionDescription_type_nfpsp";
+import { verifyPaymentNoticeReq_element_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeReq_element_nfpsp";
+import { verifyPaymentNoticeRes_element_nfpsp } from "../../generated/nodeNm3psp/verifyPaymentNoticeRes_element_nfpsp";
+import { ctEnteBeneficiario_type_pay_i_unqual } from "../../generated/PagamentiTelematiciPspNodoservice/ctEnteBeneficiario_type_pay_i_unqual";
+import { esitoNodoAttivaRPTRisposta_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_type_ppt";
+import { esitoNodoVerificaRPTRisposta_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_type_ppt";
+import { nodoAttivaRPT_element_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_element_ppt";
+import { nodoTipoCodiceIdRPT_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoCodiceIdRPT_type_ppt";
+import { nodoTipoDatiPagamentoPA_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoTipoDatiPagamentoPA_type_ppt";
+import { nodoVerificaRPT_element_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_element_ppt";
 
-import { stText140_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText140_ppt";
-import { stText35_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText35_ppt";
+import { stText140_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText140_type_ppt";
+import { stText35_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText35_type_ppt";
 import { PagoPAConfig } from "../Configuration";
 import { exactConvertToCents } from "./money";
-// tslint:disable:no-duplicate-string
 
 /**
  * Define NodoVerificaRPTInput (PagoPA request) using information provided by BackendApp
@@ -46,14 +49,14 @@ export function getNodoVerificaRPTInput(
   pagoPAConfig: PagoPAConfig,
   rptId: RptId,
   codiceContestoPagamento: CodiceContestoPagamento
-): Either<Error, nodoVerificaRPT_ppt> {
+): E.Either<Error, nodoVerificaRPT_element_ppt> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
   try {
     const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
       codiceContestoPagamento
     );
     const codiceIdRPT = getCodiceIdRpt(rptId);
-    return right({
+    return E.right({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
@@ -64,16 +67,16 @@ export function getNodoVerificaRPTInput(
       codiceIdRPT
     });
   } catch (exception) {
-    return left(Error(exception));
+    return E.left(Error(exception));
   }
 }
 
 export function getNodoVerifyPaymentNoticeInput(
   pagoPAConfig: PagoPAConfig,
   rptId: RptId
-): Either<Error, verifyPaymentNoticeReq_nfpsp> {
-  return verifyPaymentNoticeReq_nfpsp
-    .decode({
+): E.Either<Error, verifyPaymentNoticeReq_element_nfpsp> {
+  return pipe(
+    verifyPaymentNoticeReq_element_nfpsp.decode({
       idPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       idBrokerPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       idChannel: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
@@ -82,17 +85,18 @@ export function getNodoVerifyPaymentNoticeInput(
         fiscalCode: rptId.organizationFiscalCode,
         noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
       }
-    })
-    .bimap(() => Error("Decode Error NodoVerifyPaymentNotice"), t.identity);
+    }),
+    E.bimap(() => Error("Decode Error NodoVerifyPaymentNotice"), t.identity)
+  );
 }
 
 export function getNodoActivateIOPaymentInput(
   pagoPAConfig: PagoPAConfig,
   rptId: RptId,
   amount: ImportoEuroCents
-): Either<Error, activateIOPaymentReq_nfpsp> {
-  return activateIOPaymentReq_nfpsp
-    .decode({
+): E.Either<Error, activateIOPaymentReq_element_nfpsp> {
+  return pipe(
+    activateIOPaymentReq_element_nfpsp.decode({
       idPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       idBrokerPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
       idChannel: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
@@ -102,19 +106,20 @@ export function getNodoActivateIOPaymentInput(
         noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
       },
       amount: amount / 100
-    })
-    .bimap(() => Error("Decode Error NodoActivatePaymentNotice"), t.identity);
+    }),
+    E.bimap(() => Error("Decode Error NodoActivatePaymentNotice"), t.identity)
+  );
 }
 
 /**
- * Convert esitoNodoVerificaRPTRisposta_ppt (PagoPA response) to PaymentRequestsGetResponse (BackendApp response)
+ * Convert esitoNodoVerificaRPTRisposta_type_ppt (PagoPA response) to PaymentRequestsGetResponse (BackendApp response)
  *
- * @param {esitoNodoVerificaRPTRisposta_ppt} esitoNodoVerificaRPTRisposta - Message to convert
+ * @param {esitoNodoVerificaRPTRisposta_type_ppt} esitoNodoVerificaRPTRisposta - Message to convert
  * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
  * @return {Validation<PaymentRequestsGetResponse>} Converted object
  */
 export function getPaymentRequestsGetResponse(
-  esitoNodoVerificaRPTRisposta: esitoNodoVerificaRPTRisposta_ppt,
+  esitoNodoVerificaRPTRisposta: esitoNodoVerificaRPTRisposta_type_ppt,
   codiceContestoPagamento: CodiceContestoPagamento
 ): t.Validation<PaymentRequestsGetResponse> {
   const datiPagamentoPA = esitoNodoVerificaRPTRisposta.datiPagamentoPA;
@@ -137,10 +142,9 @@ export function getPaymentRequestsGetResponse(
   return PaymentRequestsGetResponse.decode(response);
 }
 
-/* tslint:disable */
 export function getEnteBeneficiario(
-  enteBeneficiarioIn: ctEnteBeneficiario_pay_i_unqual | undefined
-): ctEnteBeneficiario_pay_i_unqual | undefined {
+  enteBeneficiarioIn: ctEnteBeneficiario_type_pay_i_unqual | undefined
+): ctEnteBeneficiario_type_pay_i_unqual | undefined {
   const enteBeneficiarioOut = enteBeneficiarioIn
     ? {
         identificativoUnivocoBeneficiario:
@@ -175,18 +179,18 @@ export function getEnteBeneficiario(
           : undefined
       }
     : undefined;
-  return (enteBeneficiarioOut as unknown) as ctEnteBeneficiario_pay_i_unqual;
+  return (enteBeneficiarioOut as unknown) as ctEnteBeneficiario_type_pay_i_unqual;
 }
 
 export function getPaymentRequestsGetResponseNm3(
-  verifyPaymentNoticeResponse: verifyPaymentNoticeRes_nfpsp,
+  verifyPaymentNoticeResponse: verifyPaymentNoticeRes_element_nfpsp,
   codiceContestoPagamento: CodiceContestoPagamento
 ): t.Validation<PaymentRequestsGetResponse> {
   const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
     codiceContestoPagamento
   );
 
-  const paymentOptionDescription: ctPaymentOptionDescription_nfpsp =
+  const paymentOptionDescription: ctPaymentOptionDescription_type_nfpsp =
     verifyPaymentNoticeResponse.paymentList &&
     Array.isArray(
       verifyPaymentNoticeResponse.paymentList.paymentOptionDescription
@@ -216,28 +220,30 @@ export function getPaymentRequestsGetResponseNm3(
   );
 }
 /**
- * Convert PaymentActivationsPostRequest (BackendApp request) to nodoAttivaRPT_ppt (PagoPA request)
+ * Convert PaymentActivationsPostRequest (BackendApp request) to nodoAttivaRPT_element_ppt (PagoPA request)
  *
  * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
  * @param {PaymentActivationsPostRequest} paymentActivationsPostRequest - Message to convert
- * @return {Either<Error, nodoAttivaRPT_ppt>} Converted object
+ * @return {Either<Error, nodoAttivaRPT_element_ppt>} Converted object
  */
 export function getNodoAttivaRPTInput(
   pagoPAConfig: PagoPAConfig,
   paymentActivationsPostRequest: PaymentActivationsPostRequest
-): Either<Error, nodoAttivaRPT_ppt> {
+): E.Either<Error, nodoAttivaRPT_element_ppt> {
   // TODO: [#158209998] Remove try\catch and replace it with decode when io-ts types will be ready
-  try {
-    const rptId = RptIdFromString.decode(
-      paymentActivationsPostRequest.rptId
-    ).getOrElseL(_ => {
+  const rptId = pipe(
+    RptIdFromString.decode(paymentActivationsPostRequest.rptId),
+    E.getOrElseW(_ => {
       throw Error("Cannot parse rptId");
-    });
-    const codiceIdRPT = getCodiceIdRpt(rptId);
-    const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
-      paymentActivationsPostRequest.codiceContestoPagamento
-    );
-    return right({
+    })
+  );
+  const codiceIdRPT = getCodiceIdRpt(rptId);
+  const codiceContestoPagamentoApi = getCodiceContestoPagamentoForPagoPaApi(
+    paymentActivationsPostRequest.codiceContestoPagamento
+  );
+
+  return pipe(
+    nodoAttivaRPT_element_ppt.decode({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
@@ -254,20 +260,19 @@ export function getNodoAttivaRPTInput(
         importoSingoloVersamento:
           paymentActivationsPostRequest.importoSingoloVersamento / 100
       }
-    });
-  } catch (exception) {
-    return left(Error(exception));
-  }
+    }),
+    E.bimap(_ => Error("Cannot parse nodoAttivaRPT_element_ppt"), t.identity)
+  );
 }
 
 /**
- * Convert esitoNodoAttivaRPTRisposta_ppt (PagoPA response) to PaymentActivationsPostResponse (BackendApp response)
+ * Convert esitoNodoAttivaRPTRisposta_type_ppt (PagoPA response) to PaymentActivationsPostResponse (BackendApp response)
  *
- * @param {esitoNodoAttivaRPTRisposta_ppt} esitoNodoAttivaRPTRisposta - Message to convert
+ * @param {esitoNodoAttivaRPTRisposta_type_ppt} esitoNodoAttivaRPTRisposta - Message to convert
  * @return {Validation<PaymentActivationsPostResponse>} Converted object
  */
 export function getPaymentActivationsPostResponse(
-  esitoNodoAttivaRPTRisposta: esitoNodoAttivaRPTRisposta_ppt
+  esitoNodoAttivaRPTRisposta: esitoNodoAttivaRPTRisposta_type_ppt
 ): t.Validation<PaymentActivationsPostResponse> {
   const datiPagamentoPA = esitoNodoAttivaRPTRisposta.datiPagamentoPA;
 
@@ -312,7 +317,7 @@ export function getPaymentActivationsPostResponse(
 }
 
 export function getActivateIOPaymentResponse(
-  activateIOPaymentRes: activateIOPaymentRes_nfpsp
+  activateIOPaymentRes: activateIOPaymentRes_element_nfpsp
 ): t.Validation<PaymentActivationsPostResponse> {
   const response =
     activateIOPaymentRes !== undefined
@@ -338,13 +343,14 @@ export function getActivateIOPaymentResponse(
 }
 
 /**
- * Define a nodoTipoCodiceIdRPT_ppt object to send to PagoPA Services, containing payment information
+ * Define a nodoTipoCodiceIdRPT_type_ppt object to send to PagoPA Services, containing payment information
  * Ask the pagopa service administrator or read documentation from RptId definition
  *
  * @param {RptId} rptId - Payment information provided by BackendApp
- * @return {nodoTipoCodiceIdRPT_ppt} The result generated for PagoPa
+ * @return {nodoTipoCodiceIdRPT_type_ppt} The result generated for PagoPa
  */
-function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
+function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_type_ppt {
+  // eslint-disable-next-line default-case
   switch (rptId.paymentNoticeNumber.auxDigit) {
     case "0":
       return {
@@ -393,14 +399,14 @@ function getCodiceIdRpt(rptId: RptId): nodoTipoCodiceIdRPT_ppt {
 }
 
 /**
- * Extract causaleVersamento from esitoNodoVerificaRPTRisposta_ppt
+ * Extract causaleVersamento from esitoNodoVerificaRPTRisposta_type_ppt
  *
- * @param {esitoNodoVerificaRPTRisposta_ppt} datiPagamentoPA - Payment information provided by BackendApp
- * @return {stText140_ppt | undefined} The causaleVersamento value
+ * @param {esitoNodoVerificaRPTRisposta_type_ppt} datiPagamentoPA - Payment information provided by BackendApp
+ * @return {stText140_type_ppt | undefined} The causaleVersamento value
  */
 function getCausaleVersamentoForController(
-  datiPagamentoPA: nodoTipoDatiPagamentoPA_ppt
-): stText140_ppt | undefined {
+  datiPagamentoPA: nodoTipoDatiPagamentoPA_type_ppt
+): stText140_type_ppt | undefined {
   if (datiPagamentoPA.causaleVersamento !== undefined) {
     return datiPagamentoPA.causaleVersamento;
   }
@@ -414,18 +420,18 @@ function getCausaleVersamentoForController(
   ) {
     const spezzoneCausaleVersamento =
       datiPagamentoPA.spezzoniCausaleVersamento.spezzoneCausaleVersamento;
-    const spezzoneCausaleVersamentoOrError = stText140_ppt.decode(
+    const spezzoneCausaleVersamentoOrError = stText140_type_ppt.decode(
       spezzoneCausaleVersamento
     );
-    if (isRight(spezzoneCausaleVersamentoOrError)) {
-      return spezzoneCausaleVersamentoOrError.value;
+    if (E.isRight(spezzoneCausaleVersamentoOrError)) {
+      return spezzoneCausaleVersamentoOrError.right;
     }
     if (spezzoneCausaleVersamento instanceof Array) {
-      const firstSpezzoneCausaleVersamentoOrError = stText140_ppt.decode(
+      const firstSpezzoneCausaleVersamentoOrError = stText140_type_ppt.decode(
         spezzoneCausaleVersamento[0]
       );
-      if (isRight(firstSpezzoneCausaleVersamentoOrError)) {
-        return firstSpezzoneCausaleVersamentoOrError.value;
+      if (E.isRight(firstSpezzoneCausaleVersamentoOrError)) {
+        return firstSpezzoneCausaleVersamentoOrError.right;
       }
     }
   }
@@ -444,8 +450,12 @@ function getCausaleVersamentoForController(
         : datiPagamentoPA.spezzoniCausaleVersamento
             .spezzoneStrutturatoCausaleVersamento;
     if (spezzoneStrutturato.causaleSpezzone !== undefined) {
-      return stText140_ppt.decode(spezzoneStrutturato.causaleSpezzone)
-        .value as stText140_ppt; // tslint:disable-line
+      return pipe(
+        stText140_type_ppt.decode(spezzoneStrutturato.causaleSpezzone),
+        E.getOrElseW(_ => {
+          throw Error("Cannot parse causaleSpezzone as stText140_type_ppt");
+        })
+      );
     }
   }
   return undefined;
@@ -457,8 +467,13 @@ function getCausaleVersamentoForController(
  */
 export function getCodiceContestoPagamentoForPagoPaApi(
   codiceContestoPagamento: CodiceContestoPagamento
-): stText35_ppt {
-  return stText35_ppt.decode(codiceContestoPagamento).value as stText35_ppt; // tslint:disable-line
+): stText35_type_ppt {
+  return pipe(
+    stText35_type_ppt.decode(codiceContestoPagamento),
+    E.getOrElseW(_ => {
+      throw Error("Cannot parse causaleSpezzone as stText140_type_ppt");
+    })
+  );
 }
 /**
  * Return a paymentNoticeNumber as string according to
@@ -470,6 +485,7 @@ export function getCodiceContestoPagamentoForPagoPaApi(
 function getPaymentNoticeNumberAsString(
   paymentNoticeNumber: PaymentNoticeNumber
 ): string {
+  // eslint-disable-next-line default-case
   switch (paymentNoticeNumber.auxDigit) {
     case "0":
       return `${paymentNoticeNumber.auxDigit}${paymentNoticeNumber.applicationCode}${paymentNoticeNumber.iuv13}${paymentNoticeNumber.checkDigit}`;

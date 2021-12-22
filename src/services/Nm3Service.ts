@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { isLeft } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import {
@@ -55,7 +56,7 @@ export async function nodoVerifyPaymentNoticeService(
   );
 
   if (isLeft(errorOrIverifyPaymentNoticeutput)) {
-    const error = errorOrIverifyPaymentNoticeutput.value;
+    const error = errorOrIverifyPaymentNoticeutput.left;
 
     const errorDetail = `GetNodoVerifyPaymentNotice| Cannot construct request|${rptId.asString}|${error.message}`;
     logger.error(errorDetail);
@@ -63,16 +64,16 @@ export async function nodoVerifyPaymentNoticeService(
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
-        rptId: rptId.asString,
         codiceContestoPagamento,
+        detail: errorDetail,
         result: EventResultEnum.INVALID_INPUT,
-        detail: errorDetail
+        rptId: rptId.asString
       }
     });
     return ResponseErrorValidation("Invalid PagoPA check", error.message);
   }
 
-  const iverifyPaymentNoticeInput = errorOrIverifyPaymentNoticeutput.value;
+  const iverifyPaymentNoticeInput = errorOrIverifyPaymentNoticeutput.right;
 
   // Send the SOAP request to PagoPA (sendNodoVerifyPaymentNotice message)
   logger.info(
@@ -85,7 +86,7 @@ export async function nodoVerifyPaymentNoticeService(
   );
 
   if (isLeft(errorOrIverifyPaymentNoticeOutput)) {
-    const error = errorOrIverifyPaymentNoticeOutput.value;
+    const error = errorOrIverifyPaymentNoticeOutput.left;
     const errorDetail = `GetNodoVerifyPaymentNotice| Error while calling pagopa | ${rptId.asString}|${error.message}`;
 
     logger.error(errorDetail);
@@ -93,10 +94,10 @@ export async function nodoVerifyPaymentNoticeService(
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
-        rptId: rptId.asString,
         codiceContestoPagamento,
+        detail: errorDetail,
         result: EventResultEnum.CONNECTION_NODE,
-        detail: errorDetail
+        rptId: rptId.asString
       }
     });
     return ResponsePaymentError(
@@ -105,7 +106,7 @@ export async function nodoVerifyPaymentNoticeService(
     );
   }
 
-  const iverifyPaymentNoticeOutput = errorOrIverifyPaymentNoticeOutput.value;
+  const iverifyPaymentNoticeOutput = errorOrIverifyPaymentNoticeOutput.right;
 
   // Check PagoPA response content
   if (iverifyPaymentNoticeOutput.outcome !== "OK") {
@@ -125,10 +126,10 @@ export async function nodoVerifyPaymentNoticeService(
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
-          rptId: rptId.asString,
           codiceContestoPagamento,
+          detail: errorDetail,
           result: EventResultEnum.ERROR_NODE,
-          detail: errorDetail
+          rptId: rptId.asString
         }
       });
 
@@ -150,11 +151,10 @@ export async function nodoVerifyPaymentNoticeService(
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
-        rptId: rptId.asString,
         codiceContestoPagamento,
-        result: EventResultEnum.ERROR_NODE,
         detail: detailError,
-        detail_v2: detailV2
+        detail_v2: detailV2,
+        rptId: rptId.asString
       }
     });
 
@@ -174,22 +174,22 @@ export async function nodoVerifyPaymentNoticeService(
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_VERIFY,
         properties: {
-          rptId: rptId.asString,
           codiceContestoPagamento,
+          detail: detailError,
           result: EventResultEnum.ERROR_NODE,
-          detail: detailError
+          rptId: rptId.asString
         }
       });
       return ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
-        responseOrErrorNm3.value
+        responseOrErrorNm3.left
       );
     }
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_VERIFY,
       properties: {
-        rptId: rptId.asString,
         codiceContestoPagamento,
-        result: EventResultEnum.OK
+        result: EventResultEnum.OK,
+        rptId: rptId.asString
       }
     });
     // feature flag NM3 - PPR-162
@@ -197,7 +197,7 @@ export async function nodoVerifyPaymentNoticeService(
       `GetNodoVerifyPaymentNotice| valid rptId NM3 with feature flag NM3_ENABLED: ${pagoPAConfig.NM3_ENABLED}`
     );
     return pagoPAConfig.NM3_ENABLED === true
-      ? ResponseSuccessJson(responseOrErrorNm3.value)
+      ? ResponseSuccessJson(responseOrErrorNm3.right)
       : ResponsePaymentError(
           PaymentFaultEnum.GENERIC_ERROR,
           PaymentFaultV2Enum.PPT_AUTORIZZAZIONE
@@ -210,6 +210,7 @@ export async function nodoVerifyPaymentNoticeService(
  * 1. call ActivateIOPayment service of pagoPA Node
  * 2. save an entry on redis (<cpp,idPayment>), where idPayment is returned from ActivateIOPayment service, according to nm3
  */
+// eslint-disable-next-line max-params,  max-lines-per-function
 export async function nodoActivateIOPaymentService(
   pagoPAConfig: PagoPAConfig,
   pagoPAClientNm3: PagamentiTelematiciPspNm3NodoAsyncClient,
@@ -234,7 +235,7 @@ export async function nodoActivateIOPaymentService(
   );
 
   if (isLeft(errorOrActivateIOPaymentInput)) {
-    const error = errorOrActivateIOPaymentInput.value;
+    const error = errorOrActivateIOPaymentInput.left;
 
     const errorDetail = `ActivateIOPayment|Cannot construct request|${codiceContestoPagamento}|${error.message}`;
 
@@ -243,10 +244,10 @@ export async function nodoActivateIOPaymentService(
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
-        rptId: rptId.asString,
         codiceContestoPagamento,
+        detail: errorDetail,
         result: EventResultEnum.ERROR_NODE,
-        detail: errorDetail
+        rptId: rptId.asString
       }
     });
     return ResponseErrorValidation(
@@ -255,7 +256,7 @@ export async function nodoActivateIOPaymentService(
     );
   }
 
-  const activateIOPaymentInput = errorOrActivateIOPaymentInput.value;
+  const activateIOPaymentInput = errorOrActivateIOPaymentInput.right;
 
   // Send the SOAP request to PagoPA (sendNodoAcitvatePaymentNotice message)
   logger.info(
@@ -268,7 +269,7 @@ export async function nodoActivateIOPaymentService(
   );
 
   if (isLeft(errorOrActivateIOPaymentOutput)) {
-    const error = errorOrActivateIOPaymentOutput.value;
+    const error = errorOrActivateIOPaymentOutput.left;
 
     const errorDetail = `ActivateIOPayment|Error while calling pagopa | ${codiceContestoPagamento}|${error.message}`;
 
@@ -277,10 +278,10 @@ export async function nodoActivateIOPaymentService(
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
-        rptId: rptId.asString,
         codiceContestoPagamento,
+        detail: errorDetail,
         result: EventResultEnum.ERROR_NODE,
-        detail: errorDetail
+        rptId: rptId.asString
       }
     });
     return ResponsePaymentError(
@@ -289,7 +290,7 @@ export async function nodoActivateIOPaymentService(
     );
   }
 
-  const activateIOPaymentOutput = errorOrActivateIOPaymentOutput.value;
+  const activateIOPaymentOutput = errorOrActivateIOPaymentOutput.right;
 
   // Check PagoPA response content
   if (
@@ -311,10 +312,10 @@ export async function nodoActivateIOPaymentService(
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
-          rptId: rptId.asString,
           codiceContestoPagamento,
+          detail: detailError,
           result: EventResultEnum.ERROR_NODE,
-          detail: detailError
+          rptId: rptId.asString
         }
       });
       return ResponsePaymentError(
@@ -335,11 +336,11 @@ export async function nodoActivateIOPaymentService(
     trackPaymentEvent({
       name: EventNameEnum.PAYMENT_ACTIVATION,
       properties: {
-        rptId: rptId.asString,
         codiceContestoPagamento,
-        result: EventResultEnum.ERROR_NODE,
         detail: errorDetail,
-        detail_v2: detailV2
+        detail_v2: detailV2,
+        result: EventResultEnum.ERROR_NODE,
+        rptId: rptId.asString
       }
     });
     return ResponsePaymentError(responseErrorActivateIOPayment, detailV2);
@@ -370,26 +371,26 @@ export async function nodoActivateIOPaymentService(
         trackPaymentEvent({
           name: EventNameEnum.PAYMENT_ACTIVATION,
           properties: {
-            rptId: rptId.asString,
             codiceContestoPagamento,
+            detail: errorDetail,
             result: EventResultEnum.ERROR_NODE,
-            detail: errorDetail
+            rptId: rptId.asString
           }
         });
         return ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
-          responseOrErrorNm3.value
+          responseOrErrorNm3.left
         );
       }
 
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
-          rptId: rptId.asString,
           codiceContestoPagamento,
-          result: EventResultEnum.OK
+          result: EventResultEnum.OK,
+          rptId: rptId.asString
         }
       });
-      return ResponseSuccessJson(responseOrErrorNm3.value);
+      return ResponseSuccessJson(responseOrErrorNm3.right);
     } else {
       const errorDetail = "ActivateIOPayment| isIdPaymentSaved fails";
 
@@ -398,10 +399,10 @@ export async function nodoActivateIOPaymentService(
       trackPaymentEvent({
         name: EventNameEnum.PAYMENT_ACTIVATION,
         properties: {
-          rptId: rptId.asString,
           codiceContestoPagamento,
+          detail: errorDetail,
           result: EventResultEnum.ERROR_NODE,
-          detail: errorDetail
+          rptId: rptId.asString
         }
       });
       return ResponsePaymentError(

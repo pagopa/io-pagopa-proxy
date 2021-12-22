@@ -8,10 +8,10 @@ import * as O from "fp-ts/lib/Option";
 import * as E from "fp-ts/lib/Either";
 
 import { reporters } from "@pagopa/ts-commons";
+import { Errors } from "io-ts";
 import * as App from "./App";
 import { CONFIG, Configuration } from "./Configuration";
 import { logger } from "./utils/Logger";
-import { Errors } from "io-ts";
 
 // Retrieve server configuration
 // TODO: Check why `getOrElseW` variant is necessary
@@ -20,7 +20,7 @@ const config = pipe(
   E.getOrElseW((errors: Errors) => {
     throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
   })
-)
+);
 
 // Initialize AppInsights if InstrumentationKey is provided
 pipe(
@@ -31,20 +31,20 @@ pipe(
     logger.verbose(
       `Starting application insights agent - cloudRole[${aiCloudRole}]`
     );
-  
+
     appInsights
       .setup(k)
       // do not buffer request data on disk
       .setUseDiskRetryCaching(false);
-  
-    // tslint:disable-next-line: no-object-mutation
+
+    // eslint-disable-next-line functional/immutable-data
     appInsights.defaultClient.context.tags[
       appInsights.defaultClient.context.keys.cloudRole
     ] = aiCloudRole;
-  
+
     appInsights.start();
   })
-)
+);
 
 // Define and start server
 App.startApp(config).catch(error => {

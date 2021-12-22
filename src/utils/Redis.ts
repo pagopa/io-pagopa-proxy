@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { Either, left, right } from "fp-ts/lib/Either";
 import { fromNullable, Option } from "fp-ts/lib/Option";
 import { RedisClient } from "redis";
