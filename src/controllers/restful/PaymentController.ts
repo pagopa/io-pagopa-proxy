@@ -108,9 +108,7 @@ const getGetPaymentInfoController: (
   if (isLeft(errorOrInodoVerificaRPTInput)) {
     const error = errorOrInodoVerificaRPTInput.value;
 
-    const errorDetail = `GetPaymentInfo|Cannot construct request|${
-      params.rptId
-    }|${error.message}`;
+    const errorDetail = `GetPaymentInfo|Cannot construct request|${params.rptId}|${error.message}`;
     logger.error(errorDetail);
 
     trackPaymentEvent({
@@ -137,9 +135,7 @@ const getGetPaymentInfoController: (
   if (isLeft(errorOrInodoVerificaRPTOutput)) {
     const error = errorOrInodoVerificaRPTOutput.value;
 
-    const errorDetail = `GetPaymentInfo|Error while calling pagopa|${
-      params.rptId
-    }|${error.message}`;
+    const errorDetail = `GetPaymentInfo|Error while calling pagopa|${params.rptId}|${error.message}`;
     logger.error(errorDetail);
 
     trackPaymentEvent({
@@ -274,6 +270,7 @@ const getGetPaymentInfoController: (
  * This controller is invoked by BackendApp
  * to retrieve information about a payment.
  * It asks PagoPA for payment information using VerificaRPT service.
+ *
  * @param {express.Request} req - The RESTful request
  * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentsActivationResponse>>} The response content to send to applicant
@@ -499,6 +496,7 @@ const getActivatePaymentController: (
  * It will require the payment lock to PagoPA (AttivaRPT service) to avoid concurrency problems.
  * This request result will confirm the taking charge about the payment lock request.
  * If success, it will be necessary to wait an async response from PagoPA.
+ *
  * @param {express.Request} req - The RESTful request
  * @param {PagoPAConfig} pagoPAConfig - Configuration about PagoPA WS to contact
  * @return {Promise<PaymentCtrlResponse<PaymentActivationsPostRequest>>} The response content to send to applicant
@@ -540,6 +538,7 @@ export function activatePayment( // 2 - attiva
  * This controller is invoked by PagoPA that provides a paymentId
  * related to a previous async request (attivaRPT)
  * It just store this information into redis db. This information will be retrieved by App using polling
+ *
  * @param {cdInfoWisp_ppt} cdInfoWisp_ppt - The request from PagoPA
  * @param {number} redisTimeoutSecs - The expiration timeout for the information to store
  * @param {RedisClient} redisClient - The redis client used to store the paymentId
@@ -550,13 +549,15 @@ export async function setActivationStatus(
   redisTimeoutSecs: number,
   redisClient: redis.RedisClient
 ): Promise<cdInfoWispResponse_ppt> {
-  return (await redisSet(
-    redisClient,
-    cdInfoWispInput.codiceContestoPagamento,
-    cdInfoWispInput.idPagamento,
-    "EX", // Set the specified expire time, in seconds.
-    redisTimeoutSecs
-  )).fold<cdInfoWispResponse_ppt>(
+  return (
+    await redisSet(
+      redisClient,
+      cdInfoWispInput.codiceContestoPagamento,
+      cdInfoWispInput.idPagamento,
+      "EX", // Set the specified expire time, in seconds.
+      redisTimeoutSecs
+    )
+  ).fold<cdInfoWispResponse_ppt>(
     _ => ({
       esito: "KO"
     }),
@@ -572,13 +573,18 @@ export async function setNm3PaymentOption(
   redisTimeoutSecs: number,
   redisClient: redis.RedisClient
 ): Promise<boolean> {
-  return (await redisSet(
-    redisClient,
-    codiceContestoPagamento,
-    idPayment,
-    "EX", // Set the specified expire time, in seconds.
-    redisTimeoutSecs
-  )).fold<boolean>(_ => false, _ => true);
+  return (
+    await redisSet(
+      redisClient,
+      codiceContestoPagamento,
+      idPayment,
+      "EX", // Set the specified expire time, in seconds.
+      redisTimeoutSecs
+    )
+  ).fold<boolean>(
+    _ => false,
+    _ => true
+  );
 }
 
 // 3 - getIdPagamentoCtrl
@@ -626,6 +632,7 @@ const getGetActivationStatusController: (
  * This controller is invoked by BackendApp to check the status of a previous activation request (async process)
  * If PagoPA sent an activation result (via cdInfoWisp), a paymentId will be retrieved into redis
  * The paymentId is necessary for App to proceed with the payment process
+ *
  * @param {redis.RedisClient} redisClient - The redis client used to retrieve the paymentId
  * @return {Promise<IResponse*>} The response content to send to applicant
  */
@@ -659,6 +666,7 @@ export function getActivationStatus( // 3 - getIdPagamento
  * It will be generated here after the first interaction
  * started by BackendApp (checkPayment)
  * For the next messages, BackendApp will provide the same codiceContestoPagamento
+ *
  * @return {Either<Error,CodiceContestoPagamento>} The generated id or an internal error
  */
 function generateCodiceContestoPagamento(): CodiceContestoPagamento {
@@ -668,6 +676,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
 /**
  * Parse a PagoPa response to check if it contains functional errors.
  * If error is found, it is mapped into a controller response for BackendApp
+ *
  * @param {string} esito - The esito (OK or KO) provided by PagoPa
  * @param {string} faultBean - Optional information provided by PagoPa in case of error
  * @return {IResponseErrorGeneric | IResponsePaymentError} A controller response or undefined if no errors exist
@@ -691,6 +700,7 @@ export function getResponseErrorIfExists(
  * Convert PagoPa message error (faultCode) to Controller message error (ErrorMessagesCtrlEnum) to send to BackendApp
  * A complete list of faultCode provided by PagoPa is available at
  * https://www.agid.gov.it/sites/default/files/repository_files/specifiche_attuative_nodo_2_1_0.pdf
+ *
  * @param {string} faultCode - Error code provided by PagoPa
  * @return {PaymentFaultEnum} Error code to send to BackendApp
  */
@@ -739,6 +749,7 @@ export function getErrorMessageCtrlFromPagoPaError(
 
 /**
  * Retrive detail_v2 from PagoPa message error (faultCode)
+ *
  * @param {string} faultCode - Error code provided by PagoPa
  * @return {detail_v2} detail_v2 to send to BackendApp
  */
@@ -756,18 +767,18 @@ export function getDetailV2FromFaultCode(
   const detailV2 = maybeOriginalFaultCode.isRight()
     ? maybeOriginalFaultCode.value
     : maybeExtractedFaultCode && maybeExtractedFaultCode.isRight()
-      ? maybeExtractedFaultCode.value
-      : maybeFaultCode.isRight()
-        ? maybeFaultCode.value
-        : PaymentFaultV2Enum.GENERIC_ERROR;
+    ? maybeExtractedFaultCode.value
+    : maybeFaultCode.isRight()
+    ? maybeFaultCode.value
+    : PaymentFaultV2Enum.GENERIC_ERROR;
 
   // feature flag NM3 - PPR-162
   const detailV2Nm3Disabled =
     detailV2.toString() === "PPT_PAGAMENTO_IN_CORSO"
       ? PaymentFaultV2Enum.PAA_PAGAMENTO_IN_CORSO
       : detailV2.toString() === "PPT_PAGAMENTO_DUPLICATO"
-        ? PaymentFaultV2Enum.PAA_PAGAMENTO_DUPLICATO
-        : detailV2;
+      ? PaymentFaultV2Enum.PAA_PAGAMENTO_DUPLICATO
+      : detailV2;
 
   return isNM3Enabled ? detailV2 : detailV2Nm3Disabled;
 }

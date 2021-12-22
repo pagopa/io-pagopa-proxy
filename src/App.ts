@@ -3,11 +3,11 @@
  * Define a Restful and a SOAP Webservice and routes incoming requests to controllers
  */
 
+import * as http from "http";
 import * as appInsights from "applicationinsights";
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as core from "express-serve-static-core";
-import * as http from "http";
 import { toExpressHandler } from "italia-ts-commons/lib/express";
 import * as morgan from "morgan";
 import * as redis from "redis";
@@ -33,6 +33,7 @@ import { logger } from "./utils/Logger";
 /**
  * Define a Service Handler for FespCdService SOAP service
  * It's an endpoint for PagoPA to confirm a payment activation result
+ *
  * @param {redis.RedisClient} redisClient - Redis Client to store persistente paymentId into DB
  * @param {number} redisTimeoutSecs - Timeout set for information stored into DB
  * @return {IFespCdPortTypeSoap} An object containing the service handler
@@ -43,11 +44,7 @@ const getFespCdServiceHandler = (
 ): soap.IServicePort => ({
   cdInfoWisp: (input, cb) => {
     logger.info(
-      `idpayment=${input.idPagamento}|contesto=${
-        input.codiceContestoPagamento
-      }|dominio=${input.identificativoDominio}|versamento=${
-        input.identificativoUnivocoVersamento
-      }`
+      `idpayment=${input.idPagamento}|contesto=${input.codiceContestoPagamento}|dominio=${input.identificativoDominio}|versamento=${input.identificativoUnivocoVersamento}`
     );
     const aiEventProps = {
       idpayment: input.idPagamento,
@@ -92,6 +89,7 @@ const getFespCdServiceHandler = (
 /**
  * Define and start an express Server
  * to expose RESTful and SOAP endpoints for BackendApp and Proxy requests.
+ *
  * @param {Configuration} config - The server configuration to use
  * @return {Promise<http.Server>} The express server defined and started
  */
@@ -103,9 +101,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const pagoPAClient = new PPTPortClient.PagamentiTelematiciPspNodoAsyncClient(
     await PPTPortClient.createPagamentiTelematiciPspNodoClient(
       {
-        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-          config.PAGOPA.WS_SERVICES.PAGAMENTI
-        }`,
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI}`,
         wsdl_options: {
           timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
         }
@@ -119,9 +115,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const pagoPANm3PspClient = new NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient(
     await NodoNM3PortClient.createNm3NodoPspClient(
       {
-        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-          config.PAGOPA.WS_SERVICES.PAGAMENTI
-        }`,
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI}`,
         wsdl_options: {
           timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
         }
@@ -135,9 +129,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const pagoPANm3IoClient = new NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient(
     await NodoNM3PortClient.createNm3NodoIoClient(
       {
-        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${
-          config.PAGOPA.WS_SERVICES.PAGAMENTI
-        }`,
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI}`,
         wsdl_options: {
           timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
         }
@@ -202,6 +194,7 @@ export function stopServer(server: http.Server): void {
 
 /**
  * Set RESTful WS endpoints
+ *
  * @param {core.Express} app - Express server to set
  * @param {Configuration} config - PagoPa proxy configuration
  * @param {redis.RedisClient} redisClient - The redis client used to store information sent by PagoPA
@@ -268,6 +261,7 @@ function setRestfulRoutes(
 
 /**
  * Define a redis client necessary to handle persistent data
+ *
  * @param {Configuration} config - Server Configuration
  * @return {(app: core.Express) => soap.Server} A method to execute for start server listening
  */

@@ -19,7 +19,6 @@ import {
   setNm3PaymentOption
 } from "../controllers/restful/PaymentController";
 import { logger } from "../utils/Logger";
-import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
 
 import * as PaymentsConverter from "../utils/PaymentsConverter";
 
@@ -32,6 +31,7 @@ import {
   trackPaymentEvent
 } from "../utils/AIUtils";
 import { GeneralRptId, ResponsePaymentError } from "../utils/types";
+import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
 import * as PaymentsService from "./PaymentsService";
 
 /**
@@ -57,9 +57,7 @@ export async function nodoVerifyPaymentNoticeService(
   if (isLeft(errorOrIverifyPaymentNoticeutput)) {
     const error = errorOrIverifyPaymentNoticeutput.value;
 
-    const errorDetail = `GetNodoVerifyPaymentNotice| Cannot construct request|${
-      rptId.asString
-    }|${error.message}`;
+    const errorDetail = `GetNodoVerifyPaymentNotice| Cannot construct request|${rptId.asString}|${error.message}`;
     logger.error(errorDetail);
 
     trackPaymentEvent({
@@ -78,9 +76,7 @@ export async function nodoVerifyPaymentNoticeService(
 
   // Send the SOAP request to PagoPA (sendNodoVerifyPaymentNotice message)
   logger.info(
-    `GetNodoVerifyPaymentNotice| sendNodoVerifyPaymentNotice for request | ${
-      rptId.asString
-    }`
+    `GetNodoVerifyPaymentNotice| sendNodoVerifyPaymentNotice for request | ${rptId.asString}`
   );
 
   const errorOrIverifyPaymentNoticeOutput = await PaymentsService.sendNodoVerifyPaymentNoticeInput(
@@ -90,9 +86,7 @@ export async function nodoVerifyPaymentNoticeService(
 
   if (isLeft(errorOrIverifyPaymentNoticeOutput)) {
     const error = errorOrIverifyPaymentNoticeOutput.value;
-    const errorDetail = `GetNodoVerifyPaymentNotice| Error while calling pagopa | ${
-      rptId.asString
-    }|${error.message}`;
+    const errorDetail = `GetNodoVerifyPaymentNotice| Error while calling pagopa | ${rptId.asString}|${error.message}`;
 
     logger.error(errorDetail);
 
@@ -200,9 +194,7 @@ export async function nodoVerifyPaymentNoticeService(
     });
     // feature flag NM3 - PPR-162
     logger.info(
-      `GetNodoVerifyPaymentNotice| valid rptId NM3 with feature flag NM3_ENABLED: ${
-        pagoPAConfig.NM3_ENABLED
-      }`
+      `GetNodoVerifyPaymentNotice| valid rptId NM3 with feature flag NM3_ENABLED: ${pagoPAConfig.NM3_ENABLED}`
     );
     return pagoPAConfig.NM3_ENABLED === true
       ? ResponseSuccessJson(responseOrErrorNm3.value)
@@ -244,9 +236,7 @@ export async function nodoActivateIOPaymentService(
   if (isLeft(errorOrActivateIOPaymentInput)) {
     const error = errorOrActivateIOPaymentInput.value;
 
-    const errorDetail = `ActivateIOPayment|Cannot construct request|${codiceContestoPagamento}|${
-      error.message
-    }`;
+    const errorDetail = `ActivateIOPayment|Cannot construct request|${codiceContestoPagamento}|${error.message}`;
 
     logger.error(errorDetail);
 
@@ -280,9 +270,7 @@ export async function nodoActivateIOPaymentService(
   if (isLeft(errorOrActivateIOPaymentOutput)) {
     const error = errorOrActivateIOPaymentOutput.value;
 
-    const errorDetail = `ActivateIOPayment|Error while calling pagopa | ${codiceContestoPagamento}|${
-      error.message
-    }`;
+    const errorDetail = `ActivateIOPayment|Error while calling pagopa | ${codiceContestoPagamento}|${error.message}`;
 
     logger.error(errorDetail);
 

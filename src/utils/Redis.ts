@@ -15,15 +15,10 @@ export function redisSet(
         left<Error, "OK" | undefined>(new Error("Redis client not connected"))
       );
     }
-    redisClient.set(
-      key,
-      value,
-      mode,
-      duration,
-      (err, ret) =>
-        err
-          ? resolve(left<Error, "OK" | undefined>(err))
-          : resolve(right<Error, "OK" | undefined>(ret))
+    redisClient.set(key, value, mode, duration, (err, ret) =>
+      err
+        ? resolve(left<Error, "OK" | undefined>(err))
+        : resolve(right<Error, "OK" | undefined>(ret))
     );
   });
 }
@@ -38,12 +33,10 @@ export function redisGet(
         left<Error, Option<string>>(new Error("Redis client not connected"))
       );
     }
-    redisClient.get(
-      key,
-      (err, ret) =>
-        err
-          ? resolve(left<Error, Option<string>>(err))
-          : resolve(right<Error, Option<string>>(fromNullable(ret)))
+    redisClient.get(key, (err, ret) =>
+      err
+        ? resolve(left<Error, Option<string>>(err))
+        : resolve(right<Error, Option<string>>(fromNullable(ret)))
     );
   });
 }

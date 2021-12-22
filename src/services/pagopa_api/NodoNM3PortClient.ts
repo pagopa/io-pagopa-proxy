@@ -18,6 +18,7 @@ export const PAGAMENTI_TELEMATICI_IO_WSDL_PATH = `${__dirname}/../../wsdl/nodeFo
 
 /**
  * Create a client for PagamentiTelematiciPspNodo SOAP service
+ *
  * @param {soap.IOptions} options - Soap options
  * @return {Promise<soap.Client & INm3PortSoap>} Soap client created
  */
@@ -38,6 +39,7 @@ export function createNm3NodoPspClient(
 
 /**
  * Create a client for PagamentiTelematiciPspNodo SOAP service
+ *
  * @param {soap.IOptions} options - Soap options
  * @return {Promise<soap.Client & INm3PortSoap>} Soap client created
  */

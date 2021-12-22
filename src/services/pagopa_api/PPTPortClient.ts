@@ -17,6 +17,7 @@ export const PAGAMENTI_TELEMATICI_PSP_WSDL_PATH = `${__dirname}/../../wsdl/NodoP
 
 /**
  * Create a client for PagamentiTelematiciPspNodo SOAP service
+ *
  * @param {soap.IOptions} options - Soap options
  * @return {Promise<soap.Client & IPPTPortSoap>} Soap client created
  */

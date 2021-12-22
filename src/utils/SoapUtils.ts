@@ -61,6 +61,7 @@ export const promisifySoapMethod = <I, O>(f: SoapMethodCB<I, O>) => (
 
 /**
  * Retrieve wsdl file content
+ *
  * @param {NonEmptyString} path - WSDL file path
  * @return {Promise<string>} WSDL file content
  */
