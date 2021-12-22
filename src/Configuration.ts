@@ -1,12 +1,14 @@
+/* eslint-disable sort-keys */
 /**
  * Common configurations for Proxy PagoPA and external resources
  */
 
-import { fromNullable } from "fp-ts/lib/Option";
 import * as t from "io-ts";
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
-import { stText35_ppt } from "../generated/PagamentiTelematiciPspNodoservice//stText35_ppt";
-import { stPassword_ppt } from "../generated/PagamentiTelematiciPspNodoservice/stPassword_ppt";
+import * as O from "fp-ts/lib/Option";
+import { pipe } from "fp-ts/lib/function";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { stText35_type_ppt } from "../generated/PagamentiTelematiciPspNodoservice/stText35_type_ppt";
+import { stPassword_type_ppt } from "../generated/PagamentiTelematiciPspNodoservice/stPassword_type_ppt";
 
 const localhost = "http://localhost";
 
@@ -66,9 +68,11 @@ export const CONFIG = {
         process.env.PAGOPA_WS_URI ||
         "/webservices/pof/PagamentiTelematiciPspNodoservice"
     },
-    NM3_ENABLED: fromNullable(process.env.NM3_ENABLED)
-      .map(_ => _.toLocaleLowerCase() === "true")
-      .getOrElse(false)
+    NM3_ENABLED: pipe(
+      O.fromNullable(process.env.NM3_ENABLED),
+      O.map(_ => _.toLowerCase() === "true"),
+      O.getOrElse(() => false)
+    )
   },
 
   // Redis DB Server Configuration
@@ -76,9 +80,11 @@ export const CONFIG = {
     HOST: process.env.REDIS_DB_URL || "redis://localhost",
     PASSWORD: process.env.REDIS_DB_PASSWORD || "ND",
     PORT: process.env.REDIS_DB_PORT || 6379,
-    USE_CLUSTER: fromNullable(process.env.REDIS_USE_CLUSTER)
-      .map(_ => _.toLocaleLowerCase() === "true")
-      .getOrElse(false)
+    USE_CLUSTER: pipe(
+      O.fromNullable(process.env.REDIS_USE_CLUSTER),
+      O.map(_ => _.toLowerCase() === "true"),
+      O.getOrElse(() => false)
+    )
   },
 
   // Timeout used to store PaymentId into redis db (AttivaRPT process)
@@ -119,11 +125,11 @@ export const PagoPAConfig = t.intersection([
   t.interface({
     CLIENT_TIMEOUT_MSEC: t.number,
     IDENTIFIER: t.interface({
-      IDENTIFICATIVO_CANALE: stText35_ppt,
-      IDENTIFICATIVO_CANALE_PAGAMENTO: stText35_ppt,
-      IDENTIFICATIVO_INTERMEDIARIO_PSP: stText35_ppt,
-      IDENTIFICATIVO_PSP: stText35_ppt,
-      PASSWORD: stPassword_ppt
+      IDENTIFICATIVO_CANALE: stText35_type_ppt,
+      IDENTIFICATIVO_CANALE_PAGAMENTO: stText35_type_ppt,
+      IDENTIFICATIVO_INTERMEDIARIO_PSP: stText35_type_ppt,
+      IDENTIFICATIVO_PSP: stText35_type_ppt,
+      PASSWORD: stPassword_type_ppt
     }),
     WS_SERVICES: t.interface({
       PAGAMENTI: NonEmptyString
