@@ -2,8 +2,8 @@
  * Define FespCd SOAP Servers to expose to PagoPa
  */
 
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as core from "express-serve-static-core";
-import { NonEmptyString } from "italia-ts-commons/lib/strings";
 import * as soap from "soap";
 
 import { readWsdl } from "../../utils/SoapUtils";

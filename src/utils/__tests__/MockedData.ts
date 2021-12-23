@@ -1,4 +1,3 @@
-import { RptId } from "@pagopa/io-pagopa-commons/lib/pagopa";
 import { reporters } from "@pagopa/ts-commons";
 import { pipe } from "fp-ts/lib/function";
 import { CodiceContestoPagamento } from "../../../generated/api/CodiceContestoPagamento";
@@ -8,6 +7,7 @@ import { esitoNodoAttivaRPTRisposta_type_ppt } from "../../../generated/Pagament
 import { esitoNodoVerificaRPTRisposta_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_type_ppt";
 import { PagoPAConfig } from "../../Configuration";
 import * as E from "fp-ts/Either";
+import { RptId } from "../pagopa";
 
 // tslint:disable:no-identical-functions
 

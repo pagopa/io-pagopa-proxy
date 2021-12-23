@@ -8,7 +8,6 @@ import * as express from "express";
 import * as E from "fp-ts/lib/Either";
 import * as O from "fp-ts/lib/Option";
 import { PathReporter } from "io-ts/lib/PathReporter";
-import { RptId, RptIdFromString } from "@pagopa/io-pagopa-commons/lib/pagopa";
 import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
 import {
   ResponseErrorFromValidationErrors,
@@ -62,6 +61,7 @@ import {
   GeneralRptId,
   ResponsePaymentError
 } from "../../utils/types";
+import { RptIdFromString, RptId } from "../../utils/pagopa";
 
 // 1. verificaCtrl
 const getGetPaymentInfoController: (

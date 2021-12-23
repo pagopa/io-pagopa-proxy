@@ -1,13 +1,6 @@
+import { OrganizationFiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { isRight } from "fp-ts/lib/Either";
-import {
-  ApplicationCode,
-  AuxDigit,
-  CheckDigit,
-  IUV13,
-  PaymentNoticeNumber,
-  RptIdFromString
-} from "@pagopa/io-pagopa-commons/lib/pagopa";
-import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
+
 import "jest-xml-matcher";
 import * as redis from "redis";
 
@@ -24,6 +17,7 @@ import {
 } from "../controllers/restful/PaymentController";
 import { PagamentiTelematiciPspNodoAsyncClient } from "../services/pagopa_api/PPTPortClient";
 import { logger } from "../utils/Logger";
+import { RptIdFromString, ApplicationCode, AuxDigit, CheckDigit, IUV13, PaymentNoticeNumber } from "../utils/pagopa";
 import {
   createPagamentiTelematiciPspNodoClient,
   FakePagamentiTelematiciPspNodoAsyncClient

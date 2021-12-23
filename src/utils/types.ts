@@ -16,10 +16,10 @@ import {
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/lib/function";
 import { WithinRangeInteger } from "@pagopa/ts-commons/lib/numbers";
-import { RptId } from "@pagopa/io-pagopa-commons/lib/pagopa";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";
+import { RptId } from "./pagopa";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
