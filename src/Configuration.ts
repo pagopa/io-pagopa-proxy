@@ -36,7 +36,7 @@ export const CONFIG = {
         PAYMENT_ACTIVATIONS_GET:
           "/payment-activations/:codiceContestoPagamento",
         PAYMENT_ACTIVATIONS_POST: "/payment-activations",
-        PAYMENT_REQUESTS_GET: "/payment-requests/:rptId"
+        PAYMENT_REQUESTS_GET: "/payment-requests/:rpt_id_from_string"
       },
       SOAP: {
         PAYMENT_ACTIVATIONS_STATUS_UPDATE: "/FespCdService"
