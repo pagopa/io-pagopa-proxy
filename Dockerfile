@@ -1,6 +1,6 @@
-FROM circleci/node:8.9.4 as builder
+FROM circleci/node:14.16.0 as builder
 
-RUN sudo apt-get -y install --no-install-recommends libunwind8=1.1-3.2
+RUN sudo apt-get -y install --no-install-recommends libunwind8=1.1-4.1
 
 WORKDIR /usr/src/app
 
@@ -10,12 +10,13 @@ COPY /package.json /usr/src/app/package.json
 COPY /tsconfig.json /usr/src/app/tsconfig.json
 COPY /yarn.lock /usr/src/app/yarn.lock
 COPY /api_pagopa.yaml /usr/src/app/api_pagopa.yaml
+COPY /.eslintrc.js /usr/src/.eslintrc.js
 
 RUN sudo chmod -R 777 /usr/src/app \
   && yarn install \
   && yarn build
 
-FROM node:8.9.4-alpine
+FROM node:14.16.0-alpine
 LABEL maintainer="https://teamdigitale.governo.it"
 
 # Install major CA certificates to cover
