@@ -1,12 +1,11 @@
-import { isRight } from "fp-ts/lib/Either";
+import { getOrElseW, isRight } from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
 import { ImportoEuroCents } from "../../../generated/api/ImportoEuroCents";
 import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
-import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
+import { esitoNodoVerificaRPTRisposta_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_type_ppt";
 import * as PaymentController from "../../controllers/restful/PaymentController";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
-
-// tslint:disable:max-line-length no-duplicate-string
 
 describe("getNodoVerificaRPTInput", () => {
   it("should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
@@ -24,23 +23,23 @@ describe("getNodoVerificaRPTInput", () => {
 
     // Check input heading
     expect(
-      errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
+      errorOrNodoVerificaRPTInput.right.identificativoIntermediarioPSP
     ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
-    expect(errorOrNodoVerificaRPTInput.value.identificativoCanale).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.identificativoCanale).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
     );
-    expect(errorOrNodoVerificaRPTInput.value.identificativoPSP).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.identificativoPSP).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
-    expect(errorOrNodoVerificaRPTInput.value.password).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.password).toBe(
       MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
-    expect(errorOrNodoVerificaRPTInput.value.codificaInfrastrutturaPSP).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.codificaInfrastrutturaPSP).toBe(
       "QR-CODE"
     );
-    expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
+    expect(errorOrNodoVerificaRPTInput.right.codiceIdRPT).toMatchObject({
       "qrc:QrCode": {
         "qrc:CF": MockedData.aRptId0.organizationFiscalCode,
         "qrc:CodStazPA": MockedData.applicationCode,
@@ -50,7 +49,7 @@ describe("getNodoVerificaRPTInput", () => {
         )
       }
     });
-    expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
+    expect(errorOrNodoVerificaRPTInput.right.codiceContestoPagamento).toMatch(
       MockedData.aCodiceContestoPagamento
     );
   });
@@ -70,30 +69,30 @@ describe("getNodoVerificaRPTInput", () => {
 
     // Check input heading
     expect(
-      errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
+      errorOrNodoVerificaRPTInput.right.identificativoIntermediarioPSP
     ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
-    expect(errorOrNodoVerificaRPTInput.value.identificativoCanale).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.identificativoCanale).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
     );
-    expect(errorOrNodoVerificaRPTInput.value.identificativoPSP).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.identificativoPSP).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
-    expect(errorOrNodoVerificaRPTInput.value.password).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.password).toBe(
       MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
-    expect(errorOrNodoVerificaRPTInput.value.codificaInfrastrutturaPSP).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.codificaInfrastrutturaPSP).toBe(
       "QR-CODE"
     );
-    expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
+    expect(errorOrNodoVerificaRPTInput.right.codiceIdRPT).toMatchObject({
       "qrc:QrCode": {
         "qrc:CF": MockedData.aRptId1.organizationFiscalCode,
         "qrc:AuxDigit": MockedData.aRptId1.paymentNoticeNumber.auxDigit,
         "qrc:CodIUV": MockedData.iuv17
       }
     });
-    expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
+    expect(errorOrNodoVerificaRPTInput.right.codiceContestoPagamento).toMatch(
       MockedData.aCodiceContestoPagamento
     );
   });
@@ -113,23 +112,23 @@ describe("getNodoVerificaRPTInput", () => {
 
     // Check input heading
     expect(
-      errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
+      errorOrNodoVerificaRPTInput.right.identificativoIntermediarioPSP
     ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
-    expect(errorOrNodoVerificaRPTInput.value.identificativoCanale).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.identificativoCanale).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
     );
-    expect(errorOrNodoVerificaRPTInput.value.identificativoPSP).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.identificativoPSP).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
-    expect(errorOrNodoVerificaRPTInput.value.password).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.password).toBe(
       MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
-    expect(errorOrNodoVerificaRPTInput.value.codificaInfrastrutturaPSP).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.codificaInfrastrutturaPSP).toBe(
       "QR-CODE"
     );
-    expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
+    expect(errorOrNodoVerificaRPTInput.right.codiceIdRPT).toMatchObject({
       "qrc:QrCode": {
         "qrc:CF": MockedData.aRptId2.organizationFiscalCode,
         "qrc:AuxDigit": MockedData.aRptId2.paymentNoticeNumber.auxDigit,
@@ -138,7 +137,7 @@ describe("getNodoVerificaRPTInput", () => {
         )
       }
     });
-    expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
+    expect(errorOrNodoVerificaRPTInput.right.codiceContestoPagamento).toMatch(
       MockedData.aCodiceContestoPagamento
     );
   });
@@ -158,23 +157,23 @@ describe("getNodoVerificaRPTInput", () => {
 
     // Check input heading
     expect(
-      errorOrNodoVerificaRPTInput.value.identificativoIntermediarioPSP
+      errorOrNodoVerificaRPTInput.right.identificativoIntermediarioPSP
     ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
-    expect(errorOrNodoVerificaRPTInput.value.identificativoCanale).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.identificativoCanale).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
     );
-    expect(errorOrNodoVerificaRPTInput.value.identificativoPSP).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.identificativoPSP).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
-    expect(errorOrNodoVerificaRPTInput.value.password).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.password).toBe(
       MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
-    expect(errorOrNodoVerificaRPTInput.value.codificaInfrastrutturaPSP).toBe(
+    expect(errorOrNodoVerificaRPTInput.right.codificaInfrastrutturaPSP).toBe(
       "QR-CODE"
     );
-    expect(errorOrNodoVerificaRPTInput.value.codiceIdRPT).toMatchObject({
+    expect(errorOrNodoVerificaRPTInput.right.codiceIdRPT).toMatchObject({
       "qrc:QrCode": {
         "qrc:CF": MockedData.aRptId3.organizationFiscalCode,
         "qrc:AuxDigit": MockedData.aRptId3.paymentNoticeNumber.auxDigit,
@@ -185,7 +184,7 @@ describe("getNodoVerificaRPTInput", () => {
         ].join("")
       }
     });
-    expect(errorOrNodoVerificaRPTInput.value.codiceContestoPagamento).toMatch(
+    expect(errorOrNodoVerificaRPTInput.right.codiceContestoPagamento).toMatch(
       MockedData.aCodiceContestoPagamento
     );
   });
@@ -213,7 +212,13 @@ describe("getPaymentsCheckResponse", () => {
       return;
     }
 
-    expect(errorOrPaymentCheckResponse.value).toMatchObject({
+    const paymentCheckResponse = pipe(
+      errorOrPaymentCheckResponse, 
+      getOrElseW(_=> { throw new Error("Cannot decode errorOrPaymentCheckResponse"); 
+      })
+    );
+
+    expect(paymentCheckResponse).toMatchObject({
       enteBeneficiario: {
         identificativoUnivocoBeneficiario:
           enteBeneficiario.identificativoUnivocoBeneficiario
@@ -229,19 +234,19 @@ describe("getPaymentsCheckResponse", () => {
         nazioneBeneficiario: enteBeneficiario.nazioneBeneficiario
       }
     });
-    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+    expect(paymentCheckResponse).toHaveProperty(
       "causaleVersamento",
       datiPagamentoPA.causaleVersamento
     );
-    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+    expect(paymentCheckResponse).toHaveProperty(
       "importoSingoloVersamento",
       15098
     );
-    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+    expect(paymentCheckResponse).toHaveProperty(
       "codiceContestoPagamento",
       MockedData.aCodiceContestoPagamento
     );
-    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+    expect(paymentCheckResponse).toHaveProperty(
       "ibanAccredito",
       datiPagamentoPA.ibanAccredito
     );
@@ -273,7 +278,7 @@ describe("getPaymentsCheckResponse", () => {
           credenzialiPagatore: "NOMECOGNOME",
           causaleVersamento: "CAUSALE01"
         }
-      } as unknown) as esitoNodoVerificaRPTRisposta_ppt,
+      } as unknown) as esitoNodoVerificaRPTRisposta_type_ppt,
       MockedData.aCodiceContestoPagamento
     );
 
@@ -291,8 +296,13 @@ describe("getPaymentsCheckResponse", () => {
     if (enteBeneficiario === undefined) {
       return;
     }
+    const paymentCheckResponse = pipe(
+      errorOrPaymentCheckResponse, 
+      getOrElseW(_=> { throw new Error("Cannot decode errorOrPaymentCheckResponse"); 
+      })
+    );
 
-    expect(errorOrPaymentCheckResponse.value).toMatchObject({
+    expect(paymentCheckResponse).toMatchObject({
       enteBeneficiario: {
         identificativoUnivocoBeneficiario:
           enteBeneficiario.identificativoUnivocoBeneficiario
@@ -307,19 +317,19 @@ describe("getPaymentsCheckResponse", () => {
         nazioneBeneficiario: enteBeneficiario.nazioneBeneficiario
       }
     });
-    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+    expect(paymentCheckResponse).toHaveProperty(
       "causaleVersamento",
       datiPagamentoPA.causaleVersamento
     );
-    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+    expect(paymentCheckResponse).toHaveProperty(
       "importoSingoloVersamento",
       15098
     );
-    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+    expect(paymentCheckResponse).toHaveProperty(
       "codiceContestoPagamento",
       MockedData.aCodiceContestoPagamento
     );
-    expect(errorOrPaymentCheckResponse.value).toHaveProperty(
+    expect(paymentCheckResponse).toHaveProperty(
       "ibanAccredito",
       datiPagamentoPA.ibanAccredito
     );
@@ -340,27 +350,27 @@ describe("getNodoAttivaRPTInput", () => {
     }
 
     // Check input heading
-    expect(errorOrNodoAttivaRPTInput.value.identificativoIntermediarioPSP).toBe(
+    expect(errorOrNodoAttivaRPTInput.right.identificativoIntermediarioPSP).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
     );
     expect(
-      errorOrNodoAttivaRPTInput.value.identificativoIntermediarioPSPPagamento
+      errorOrNodoAttivaRPTInput.right.identificativoIntermediarioPSPPagamento
     ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
-    expect(errorOrNodoAttivaRPTInput.value.identificativoCanale).toBe(
+    expect(errorOrNodoAttivaRPTInput.right.identificativoCanale).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
     );
-    expect(errorOrNodoAttivaRPTInput.value.identificativoCanalePagamento).toBe(
+    expect(errorOrNodoAttivaRPTInput.right.identificativoCanalePagamento).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE_PAGAMENTO
     );
-    expect(errorOrNodoAttivaRPTInput.value.identificativoPSP).toBe(
+    expect(errorOrNodoAttivaRPTInput.right.identificativoPSP).toBe(
       MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
     );
-    expect(errorOrNodoAttivaRPTInput.value.password).toBe(
+    expect(errorOrNodoAttivaRPTInput.right.password).toBe(
       MockedData.aConfig.IDENTIFIER.PASSWORD
     );
 
     // Check input content
-    expect(errorOrNodoAttivaRPTInput.value).toMatchObject({
+    expect(errorOrNodoAttivaRPTInput.right).toMatchObject({
       codiceIdRPT: {
         "qrc:QrCode": {
           "qrc:CF": "12345678901",
@@ -370,16 +380,16 @@ describe("getNodoAttivaRPTInput", () => {
         }
       }
     });
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+    expect(errorOrNodoAttivaRPTInput.right).toHaveProperty(
       "codiceContestoPagamento",
       MockedData.aCodiceContestoPagamento
     );
-    expect(errorOrNodoAttivaRPTInput.value).toHaveProperty(
+    expect(errorOrNodoAttivaRPTInput.right).toHaveProperty(
       "codificaInfrastrutturaPSP",
       "QR-CODE"
     );
     expect(
-      errorOrNodoAttivaRPTInput.value.datiPagamentoPSP.importoSingoloVersamento
+      errorOrNodoAttivaRPTInput.right.datiPagamentoPSP.importoSingoloVersamento
     ).toEqual(99.05);
   });
 });
@@ -394,7 +404,7 @@ describe("getPaymentsActivationResponse", () => {
       return;
     }
     expect(
-      errorOrPaymentActivationsPostResponse.value.importoSingoloVersamento
+      errorOrPaymentActivationsPostResponse.right.importoSingoloVersamento
     ).toBe(9905);
   });
 });
@@ -585,8 +595,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       return;
     }
 
-    // tslint:disable-next-line:prettier
-    expect(errorOrActivateIOPaymentInput.value.amount).toBe(120.0);
+    expect(errorOrActivateIOPaymentInput.right.amount).toBe(120.0);
 
     const errorMsg = PaymentController.getDetailV2FromFaultCode(fault);
     expect(errorMsg).toBeDefined();
