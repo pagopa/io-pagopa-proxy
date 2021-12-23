@@ -1,11 +1,11 @@
 import { reporters } from "@pagopa/ts-commons";
 import * as soap from "soap";
-import { esitoNodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
-import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
-import { nodoAttivaRPT_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_ppt";
-import { nodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPTRisposta_ppt";
-import { nodoVerificaRPT_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_ppt";
-import { nodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPTRisposta_ppt";
+import { esitoNodoAttivaRPTRisposta_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_type_ppt";
+import { esitoNodoVerificaRPTRisposta_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_type_ppt";
+import { nodoAttivaRPT_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPT_element_ppt";
+import { nodoAttivaRPTRisposta_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoAttivaRPTRisposta_element_ppt";
+import { nodoVerificaRPT_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_element_ppt";
+import { nodoVerificaRPTRisposta_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPTRisposta_element_ppt";
 import { IPPTPortSoap } from "../../services/pagopa_api/IPPTPortSoap";
 import * as PPTPortClient from "../../services/pagopa_api/PPTPortClient";
 import { createClient } from "../../utils/SoapUtils";
@@ -23,7 +23,7 @@ export async function createPagamentiTelematiciPspNodoClient(
 }
 
 const aNodoVerificaRPTRispostaOK = pipe(
-  esitoNodoVerificaRPTRisposta_ppt.decode({
+  esitoNodoVerificaRPTRisposta_type_ppt.decode({
     esito: "OK",
     datiPagamentoPA: {
       importoSingoloVersamento: 99.05,
@@ -50,7 +50,7 @@ const aNodoVerificaRPTRispostaOK = pipe(
   }),
   E.getOrElseW(errors => {
     throw Error(
-      `Invalid esitoNodoVerificaRPTRisposta_ppt to decode: ${reporters.readableReport(
+      `Invalid esitoNodoVerificaRPTRisposta_type_ppt to decode: ${reporters.readableReport(
         errors
       )}`
     );
@@ -58,7 +58,7 @@ const aNodoVerificaRPTRispostaOK = pipe(
 );
 
 const aNodoAttivaRPTRispostaOK = pipe(
-  esitoNodoAttivaRPTRisposta_ppt.decode({
+  esitoNodoAttivaRPTRisposta_type_ppt.decode({
     esito: "OK",
     datiPagamentoPA: {
       importoSingoloVersamento: 99.05,
@@ -85,7 +85,7 @@ const aNodoAttivaRPTRispostaOK = pipe(
   }),
   E.getOrElseW(errors => {
     throw Error(
-      `Invalid esitoNodoAttivaRPTRisposta_ppt to decode: ${reporters.readableReport(
+      `Invalid esitoNodoAttivaRPTRisposta_type_ppt to decode: ${reporters.readableReport(
         errors
       )}`
     );
@@ -96,8 +96,8 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.Pag
   constructor(client: IPPTPortSoap) {
     super(client);
   }
-  public readonly nodoVerificaRPT = (input: nodoVerificaRPT_ppt) => {
-    return new Promise<nodoVerificaRPTRisposta_ppt>((resolve, reject) => {
+  public readonly nodoVerificaRPT = (input: nodoVerificaRPT_element_ppt) => {
+    return new Promise<nodoVerificaRPTRisposta_element_ppt>((resolve, reject) => {
       if (input !== undefined) {
         resolve({
           nodoVerificaRPTRisposta: aNodoVerificaRPTRispostaOK
@@ -108,8 +108,8 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.Pag
     });
   };
 
-  public readonly nodoAttivaRPT = (input: nodoAttivaRPT_ppt) => {
-    return new Promise<nodoAttivaRPTRisposta_ppt>((resolve, reject) => {
+  public readonly nodoAttivaRPT = (input: nodoAttivaRPT_element_ppt) => {
+    return new Promise<nodoAttivaRPTRisposta_element_ppt>((resolve, reject) => {
       if (input !== undefined) {
         resolve({
           nodoAttivaRPTRisposta: aNodoAttivaRPTRispostaOK
