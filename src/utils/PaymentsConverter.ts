@@ -8,11 +8,6 @@
 
 import * as E from "fp-ts/lib/Either";
 import * as t from "io-ts";
-import {
-  PaymentNoticeNumber,
-  RptId,
-  RptIdFromString
-} from "@pagopa/io-pagopa-commons/lib/pagopa";
 import { pipe } from "fp-ts/lib/function";
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
@@ -36,6 +31,7 @@ import { stText140_type_ppt } from "../../generated/PagamentiTelematiciPspNodose
 import { stText35_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText35_type_ppt";
 import { PagoPAConfig } from "../Configuration";
 import { exactConvertToCents } from "./money";
+import { PaymentNoticeNumber, RptId, RptIdFromString } from "./pagopa";
 
 /**
  * Define NodoVerificaRPTInput (PagoPA request) using information provided by BackendApp

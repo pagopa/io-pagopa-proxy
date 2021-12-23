@@ -1,6 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { isLeft } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
+
+import * as redis from "redis";
 import {
   IResponseErrorInternal,
   IResponseErrorValidation,
@@ -8,8 +10,7 @@ import {
   ResponseErrorFromValidationErrors,
   ResponseErrorValidation,
   ResponseSuccessJson
-} from "italia-ts-commons/lib/responses";
-import * as redis from "redis";
+} from "@pagopa/ts-commons/lib/responses";
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
