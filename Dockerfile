@@ -10,7 +10,7 @@ COPY /package.json /usr/src/app/package.json
 COPY /tsconfig.json /usr/src/app/tsconfig.json
 COPY /yarn.lock /usr/src/app/yarn.lock
 COPY /api_pagopa.yaml /usr/src/app/api_pagopa.yaml
-COPY /.eslintrc.js /usr/src/.eslintrc.js
+COPY /.eslintrc.js /usr/src/app/.eslintrc.js
 
 RUN sudo chmod -R 777 /usr/src/app \
   && yarn install \
