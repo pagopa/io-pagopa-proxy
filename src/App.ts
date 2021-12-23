@@ -42,7 +42,8 @@ const getFespCdServiceHandler = (
   redisClient: redis.RedisClient,
   redisTimeoutSecs: number
 ): soap.IServicePort => ({
-  cdInfoWisp: (input, cb): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  cdInfoWisp: (input, cb) => {
     logger.info(
       `idpayment=${input.idPagamento}|contesto=${input.codiceContestoPagamento}|dominio=${input.identificativoDominio}|versamento=${input.identificativoUnivocoVersamento}`
     );
@@ -52,7 +53,7 @@ const getFespCdServiceHandler = (
       idpayment: input.idPagamento,
       iuv: input.identificativoUnivocoVersamento
     };
-    return PaymentController.setActivationStatus(
+    PaymentController.setActivationStatus(
       input,
       redisTimeoutSecs,
       redisClient

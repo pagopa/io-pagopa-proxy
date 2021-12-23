@@ -69,7 +69,7 @@ const aPaymentActivationRequest = {
   codiceContestoPagamento: aCodiceContestoPagamento
 };
 
-describe("checkPaymentToPagoPa", async () => {
+describe("checkPaymentToPagoPa", () => {
   it("should return the right response", async () => {
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
@@ -84,7 +84,7 @@ describe("checkPaymentToPagoPa", async () => {
     );
 
     const req = mockReq();
-    req.params = { rptId: aRptIdString };
+    req.params = { rpt_id_from_string: aRptIdString };
 
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
@@ -159,7 +159,7 @@ describe("checkPaymentToPagoPa", async () => {
   });
 });
 
-describe("activatePaymentToPagoPa", async () => {
+describe("activatePaymentToPagoPa", () => {
   it("should correctly format amounts", async () => {
     const clientRequest = jest.fn((_, __, cb) => cb());
     const client = await createPagamentiTelematiciPspNodoClient({
@@ -179,7 +179,6 @@ describe("activatePaymentToPagoPa", async () => {
 
     const activateRequest = mockReq();
 
-    // tslint:disable-next-line:no-object-mutation
     activateRequest.body = {
       ...aPaymentActivationRequest,
       importoSingoloVersamento: 9900 as ImportoEuroCents
@@ -218,7 +217,6 @@ describe("activatePaymentToPagoPa", async () => {
 
     const req = mockReq();
 
-    // tslint:disable-next-line:no-object-mutation
     req.body = aPaymentActivationRequest;
 
     const errorOrPaymentActivationResponse = await activatePayment(

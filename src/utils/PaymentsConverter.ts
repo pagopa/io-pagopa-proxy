@@ -239,7 +239,7 @@ export function getNodoAttivaRPTInput(
   );
 
   return pipe(
-    nodoAttivaRPT_element_ppt.decode({
+    E.right({
       identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
         pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
@@ -256,7 +256,7 @@ export function getNodoAttivaRPTInput(
         importoSingoloVersamento:
           paymentActivationsPostRequest.importoSingoloVersamento / 100
       }
-    }),
+    } as nodoAttivaRPT_element_ppt),
     E.bimap(_ => Error("Cannot parse nodoAttivaRPT_element_ppt"), t.identity)
   );
 }
