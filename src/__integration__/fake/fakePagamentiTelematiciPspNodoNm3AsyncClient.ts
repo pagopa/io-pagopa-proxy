@@ -4,8 +4,8 @@ import { INm3PortSoap } from "../../services/pagopa_api/IPPTPortSoap";
 import * as NodoNM3PortClient from "../../services/pagopa_api/NodoNM3PortClient";
 import { createClient } from "../../utils/SoapUtils";
 
-import { verifyPaymentNoticeReq_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeReq_nfpsp";
-import { verifyPaymentNoticeRes_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeRes_nfpsp";
+import { verifyPaymentNoticeReq_element_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeReq_element_nfpsp";
+import { verifyPaymentNoticeRes_element_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeRes_element_nfpsp";
 import { pipe } from "fp-ts/lib/function";
 import * as E from "fp-ts/Either";
 
@@ -21,7 +21,7 @@ export async function createPagamentiTelematiciPspNm3NodoClient(
 }
 
 const aVerifyPaymnentNoticeResOK = pipe(
-  verifyPaymentNoticeRes_nfpsp.decode({
+  verifyPaymentNoticeRes_element_nfpsp.decode({
     outcome: "OK",
     paymentList: {
       paymentOptionDescription: [
@@ -51,9 +51,9 @@ export class FakePagamentiTelematiciPspNodoNm3PspAsyncClient extends NodoNM3Port
     super(client);
   }
   public readonly verifyPaymentNotice = (
-    input: verifyPaymentNoticeReq_nfpsp
+    input: verifyPaymentNoticeReq_element_nfpsp
   ) => {
-    return new Promise<verifyPaymentNoticeRes_nfpsp>((resolve, reject) => {
+    return new Promise<verifyPaymentNoticeRes_element_nfpsp>((resolve, reject) => {
       if (input !== undefined) {
         resolve(aVerifyPaymnentNoticeResOK);
       } else {
