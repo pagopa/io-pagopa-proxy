@@ -1,4 +1,3 @@
-import * as express from "express";
 import { isRight } from "fp-ts/lib/Either";
 import {
   ApplicationCode,
@@ -7,15 +6,15 @@ import {
   IUV13,
   PaymentNoticeNumber,
   RptIdFromString
-} from "italia-pagopa-commons/lib/pagopa";
+} from "@pagopa/io-pagopa-commons/lib/pagopa";
 import { OrganizationFiscalCode } from "italia-ts-commons/lib/strings";
 import "jest-xml-matcher";
 import * as redis from "redis";
 
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
-import { cdInfoWisp_ppt } from "../../generated/FespCdService/cdInfoWisp_ppt";
-import { stText35_ppt } from "../../generated/FespCdService/stText35_ppt";
+import { cdInfoWisp_element_ppt } from "../../generated/FespCdService/cdInfoWisp_element_ppt";
+import { stText35_type_ppt } from "../../generated/FespCdService/stText35_type_ppt";
 import { PagoPAConfig } from "../Configuration";
 import {
   activatePayment,
@@ -53,14 +52,14 @@ const aRptIdString = "12345678901012123456789012399";
 
 const aMockedRedisClient = redis.createClient(6379, "localhost");
 
-const aCodiceContestoPagamento = "05245c90746811e8b9bf91897339427e" as stText35_ppt;
+const aCodiceContestoPagamento = "05245c90746811e8b9bf91897339427e" as stText35_type_ppt;
 
 const aCdInfoWispPpt = {
   identificativoDominio: "idDom",
   identificativoUnivocoVersamento: "idUniv",
   codiceContestoPagamento: aCodiceContestoPagamento,
   idPagamento: "id1234"
-} as cdInfoWisp_ppt;
+} as cdInfoWisp_element_ppt;
 
 const aPaymentActivationRequest = {
   rptId: RptIdFromString.encode({
@@ -90,9 +89,9 @@ describe("checkPaymentToPagoPa", async () => {
       })
     );
 
-    const req = {
-      params: { rptId: aRptIdString }
-    } as express.Request;
+    const req = mockReq();
+    req.params = { rptId: aRptIdString };
+
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
       verificaRPTPagoPaClient,
