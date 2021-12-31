@@ -18,7 +18,7 @@ parameters:
       - prod
 
 variables:
-  NODE_VERSION: '8.9.4'
+  NODE_VERSION: '14.16.0'
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
   ENV: ${{ parameters.ENV }}
 
@@ -154,7 +154,40 @@ stages:
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
             displayName: Deploy to production slot
-  
+
+  - stage: Api_test
+    dependsOn:
+      - Deploy_test
+    jobs:
+      - job: 'TestAPI'
+        steps:
+          - checkout: none
+
+          - download: current
+            artifact: Bundle
+    
+      - job: waitStartup
+        steps:
+          - task: Delay@1
+            inputs:
+              delayForMinutes: '5'
+
+      - job: integrationTests
+        dependsOn: waitStartup
+        steps:
+          - script: |
+              yarn global add newman
+            displayName: 'newman installation'
+
+          - task: Bash@3
+            inputs:
+              targetType: filePath
+              filePath: k6example/ws.sh
+              arguments: postman
+              workingDirectory: k6example
+              failOnStdErr: true
+            displayName: Run API tests
+
   - stage: Deploy_production
     dependsOn:
       - Prepare_artifact
