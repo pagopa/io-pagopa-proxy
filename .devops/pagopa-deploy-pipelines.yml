@@ -159,7 +159,6 @@ stages:
             artifact: Bundle
 
       - job: integrationTests
-        dependsOn: waitStartup
         steps:
           - script: |
               yarn global add newman
@@ -168,7 +167,7 @@ stages:
           - task: Bash@3
             inputs:
               targetType: filePath
-              filePath: k6example/ws.sh
+              filePath: api-tests/ws.sh
               arguments: postman
               workingDirectory: k6example
               failOnStdErr: true
