@@ -9,18 +9,10 @@ parameters:
       - minor
       - patch
     default: minor
-  - name: ENV
-    displayName: Target Environment
-    type: string
-    default: test
-    values:
-      - test
-      - prod
 
 variables:
   NODE_VERSION: '14.16.0'
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
-  ENV: ${{ parameters.ENV }}
 
 # Only manual activations are intended
 trigger: none
@@ -134,7 +126,7 @@ stages:
           - publish: $(System.DefaultWorkingDirectory)/bundle
             artifact: Bundle
             
-  - stage: Deploy_test
+  - stage: Deploy_DEV_pagoPA
     dependsOn:
       - Prepare_artifact
     jobs:
@@ -147,17 +139,17 @@ stages:
 
           - task: AzureWebApp@1  
             inputs:
-              azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
-              resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
+              azureSubscription: '$(DEV_AZURE_SUBSCRIPTION)'
+              resourceGroupName: '$(pagopa-d-pagopa-proxy-rg)'
               appType: 'webApp'
-              appName: '$(PRODUCTION_PROXYTEST_APP_NAME)'
+              appName: 'pagopa-d-app-pagopa-proxy'
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
             displayName: Deploy to production slot
 
-  - stage: Api_test
+  - stage: API_Tests_DEV_pagoPA
     dependsOn:
-      - Deploy_test
+      - Deploy_DEV_pagoPA
     jobs:
       - job: 'TestAPI'
         steps:
@@ -165,12 +157,6 @@ stages:
 
           - download: current
             artifact: Bundle
-    
-      - job: waitStartup
-        steps:
-          - task: Delay@1
-            inputs:
-              delayForMinutes: '5'
 
       - job: integrationTests
         dependsOn: waitStartup
@@ -187,29 +173,3 @@ stages:
               workingDirectory: k6example
               failOnStdErr: true
             displayName: Run API tests
-
-  - stage: Deploy_production
-    dependsOn:
-      - Prepare_artifact
-    condition:
-      and(
-        succeeded(),
-        eq(variables['ENV'], 'prod')
-      )  
-    jobs:
-      - job: 'deploy'
-        steps:
-          - checkout: none
-
-          - download: current
-            artifact: Bundle
-
-          - task: AzureWebApp@1  
-            inputs:
-              azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
-              resourceGroupName: '$(PRODUCTION_RESOURCE_GROUP_NAME)'
-              appType: 'webApp'
-              appName: '$(PRODUCTION_PROXYPROD_APP_NAME)'
-              package: '$(Pipeline.Workspace)/Bundle'
-              deploymentMethod: 'auto'
-            displayName: Deploy to production slot
