@@ -140,7 +140,7 @@ stages:
           - task: AzureWebApp@1  
             inputs:
               azureSubscription: '$(DEV_AZURE_SUBSCRIPTION)'
-              resourceGroupName: '$(pagopa-d-pagopa-proxy-rg)'
+              resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
               appType: 'webApp'
               appName: 'pagopa-d-app-pagopa-proxy'
               package: '$(Pipeline.Workspace)/Bundle'
