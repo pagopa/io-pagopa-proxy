@@ -169,6 +169,6 @@ stages:
               targetType: filePath
               filePath: api-tests/ws.sh
               arguments: postman
-              workingDirectory: k6example
+              workingDirectory: api-tests
               failOnStdErr: true
             displayName: Run API tests
