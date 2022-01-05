@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "35f2759a-2cde-4351-9fda-2fe3305404e2",
+		"_postman_id": "c27c3288-555a-4f2b-a939-3acec35ff744",
 		"name": "NM3",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -15,9 +15,9 @@
 							"pm.test(\"Verify status code is 200\", () => {",
 							"  pm.response.to.have.status(200);",
 							"});",
-							"pm.test(\"Verify importoSingoloVersamento is 100\", () => {",
+							"pm.test(`Verify importoSingoloVersamento is ${pm.environment.get('importo_versamento')}`, () => {",
 							"  const responseJson = pm.response.json();",
-							"  pm.expect(responseJson.importoSingoloVersamento).to.eql(100);",
+							"  pm.expect(responseJson.importoSingoloVersamento).to.eql(pm.environment.get('importo_versamento'));",
 							"",
 							"  let codiceContestoPagamento = responseJson.codiceContestoPagamento;",
 							"  pm.environment.set(\"codiceContestoPagamento\", codiceContestoPagamento );",
@@ -57,9 +57,9 @@
 							"pm.test(\"Activate status code is 200\", () => {",
 							"  pm.response.to.have.status(200);",
 							"});",
-							"pm.test(\"Activate importoSingoloVersamento is 1\", () => {",
+							"pm.test(`Activate importoSingoloVersamento is ${pm.environment.get('importo_versamento')}`, () => {",
 							"  const responseJson = pm.response.json();",
-							"  pm.expect(responseJson.importoSingoloVersamento).to.eql(1);",
+							"  pm.expect(responseJson.importoSingoloVersamento).to.eql(pm.environment.get('importo_versamento'));",
 							"});",
 							"setTimeout(function(){}, 1000);",
 							""
