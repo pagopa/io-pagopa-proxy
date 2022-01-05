@@ -290,7 +290,14 @@ function getRedisClient(config: Configuration): redis.RedisClient {
       }) as redis.RedisClient;
     }
     logger.debug("Creating a REDIS client...");
-    return redis.createClient(config.REDIS_DB.HOST);
+    return redis.createClient({
+      password: config.REDIS_DB.PASSWORD,
+      port: config.REDIS_DB.PORT,
+      tls: {
+        servername: config.REDIS_DB.HOST
+      },
+      url: config.REDIS_DB.HOST
+    });
   })();
 
   redisClient.on("error", err => {
