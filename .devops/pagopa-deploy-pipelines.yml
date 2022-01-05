@@ -168,7 +168,7 @@ stages:
             inputs:
               targetType: filePath
               filePath: api-tests/ws.sh
-              arguments: postman
+              arguments: postman ./ENV_DEPLOY.postman_environment.json
               workingDirectory: api-tests
               failOnStdErr: true
             displayName: Run API tests
