@@ -78,7 +78,7 @@ export const CONFIG = {
   // Redis DB Server Configuration
   REDIS_DB: {
     HOST: process.env.REDIS_DB_URL || "redis://localhost",
-    PASSWORD: process.env.REDIS_DB_PASSWORD || "ND",
+    PASSWORD: process.env.REDIS_DB_PASSWORD,
     PORT: process.env.REDIS_DB_PORT || 6379,
     USE_CLUSTER: pipe(
       O.fromNullable(process.env.REDIS_USE_CLUSTER),
@@ -154,8 +154,10 @@ export type WinstonLogLevel = t.TypeOf<typeof WinstonLogLevel>;
 export const RedisConfig = t.intersection([
   ServerConfiguration,
   t.interface({
-    PASSWORD: t.string,
     USE_CLUSTER: t.boolean
+  }),
+  t.partial({
+    PASSWORD: t.string
   })
 ]);
 export type RedisConfig = t.TypeOf<typeof RedisConfig>;

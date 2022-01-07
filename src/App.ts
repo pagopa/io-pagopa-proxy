@@ -276,7 +276,7 @@ function getRedisClient(config: Configuration): redis.RedisClient {
       logger.debug("Creating a REDIS client using cluster...");
       return new RedisClustr({
         redisOptions: {
-          auth_pass: config.REDIS_DB.PASSWORD,
+          password: config.REDIS_DB.PASSWORD,
           tls: {
             servername: config.REDIS_DB.HOST
           }
@@ -290,13 +290,24 @@ function getRedisClient(config: Configuration): redis.RedisClient {
       }) as redis.RedisClient;
     }
     logger.debug("Creating a REDIS client...");
+
+    // eslint-disable-next-line functional/no-let
+    let tlsConfig = {};
+    if (config.REDIS_DB.PASSWORD !== undefined) {
+      tlsConfig = {
+        tls: {
+          servername: config.REDIS_DB.HOST
+        }
+      };
+    } else {
+      logger.debug("REDIS_DB.PASSWORD not set, TLS is disabled.");
+    }
+
     return redis.createClient({
       password: config.REDIS_DB.PASSWORD,
       port: config.REDIS_DB.PORT,
-      tls: {
-        servername: config.REDIS_DB.HOST
-      },
-      url: config.REDIS_DB.HOST
+      url: config.REDIS_DB.HOST,
+      ...tlsConfig
     });
   })();
 

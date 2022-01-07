@@ -9,7 +9,7 @@ declare module "redis-clustr" {
   }
 
   interface IRedisOptions {
-    readonly auth_pass: string;
+    readonly password?: string;
     readonly tls: {
       readonly servername: string;
     };
