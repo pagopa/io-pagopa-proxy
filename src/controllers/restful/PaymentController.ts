@@ -559,15 +559,13 @@ export async function setActivationStatus(
   redisTimeoutSecs: number,
   redisClient: redis.RedisClient
 ): Promise<cdInfoWispResponse_element_ppt> {
-  return (
-    pipe(
-      await redisSet(
-        redisClient,
-        cdInfoWispInput.codiceContestoPagamento,
-        cdInfoWispInput.idPagamento,
-        "EX", // Set the specified expire time, in seconds.
-        redisTimeoutSecs
-      )
+  return pipe(
+    await redisSet(
+      redisClient,
+      cdInfoWispInput.codiceContestoPagamento,
+      cdInfoWispInput.idPagamento,
+      "EX", // Set the specified expire time, in seconds.
+      redisTimeoutSecs
     ),
     E.fold(
       _ => ({
