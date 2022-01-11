@@ -32,7 +32,11 @@ const aConfig = {
   HOST: "http://localhost",
   PORT: 3002,
   WS_SERVICES: {
-    PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
+    PAGAMENTI: {
+      NODO_PER_PSP: "/api/nodo-per-psp/v1",
+      NODE_FOR_PSP: "/api/node-for-psp/v1",
+      NODE_FOR_IO: "/api/node-for-io/v1"
+    }
   },
   // These information will identify our system when it will access to PagoPA
   IDENTIFIER: {

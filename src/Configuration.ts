@@ -64,9 +64,14 @@ export const CONFIG = {
     },
     PORT: process.env.PAGOPA_PORT || 3001,
     WS_SERVICES: {
-      PAGAMENTI:
-        process.env.PAGOPA_WS_URI ||
-        "/webservices/pof/PagamentiTelematiciPspNodoservice"
+      PAGAMENTI: {
+        NODO_PER_PSP:
+          process.env.PAGOPA_WS_NODO_PER_PSP_URI || "/api/nodo-per-psp/v1",
+        NODE_FOR_PSP:
+          process.env.PAGOPA_WS_NODE_FOR_PSP_URI || "/api/node-for-psp/v1",
+        NODE_FOR_IO:
+          process.env.PAGOPA_WS_NODE_FOR_IO_URI || "/api/node-for-io/v1"
+      }
     },
     NM3_ENABLED: pipe(
       O.fromNullable(process.env.NM3_ENABLED),
@@ -132,7 +137,11 @@ export const PagoPAConfig = t.intersection([
       PASSWORD: stPassword_type_ppt
     }),
     WS_SERVICES: t.interface({
-      PAGAMENTI: NonEmptyString
+      PAGAMENTI: t.interface({
+        NODO_PER_PSP: NonEmptyString,
+        NODE_FOR_PSP: NonEmptyString,
+        NODE_FOR_IO: NonEmptyString
+      })
     }),
     NM3_ENABLED: t.boolean
   }),
