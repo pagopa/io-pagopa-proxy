@@ -349,7 +349,11 @@ export const aConfig = pipe(
     KEY: process.env.PAGOPA_KEY || "fakekey",
     CLIENT_TIMEOUT_MSEC: process.env.PAGOPA_TIMEOUT_MSEC || 60000,
     WS_SERVICES: {
-      PAGAMENTI: "/PagamentiTelematiciPspNodoservice/"
+      PAGAMENTI: {
+        NODO_PER_PSP: "/api/nodo-per-psp/v1",
+        NODE_FOR_PSP: "/api/node-for-psp/v1",
+        NODE_FOR_IO: "/api/node-for-io/v1"
+      }
     },
     IDENTIFIER: {
       IDENTIFICATIVO_PSP: "AGID_01",
