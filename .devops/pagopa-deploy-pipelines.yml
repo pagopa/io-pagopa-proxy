@@ -145,7 +145,7 @@ stages:
               appName: 'pagopa-d-app-pagopa-proxy'
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
-            displayName: Deploy to production slot
+            displayName: Deploy to DEV-pagoPA
 
   - stage: API_Tests_DEV_pagoPA
     dependsOn:
