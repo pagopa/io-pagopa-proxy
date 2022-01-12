@@ -172,3 +172,38 @@ stages:
               workingDirectory: api-tests
               failOnStdErr: true
             displayName: Run API tests
+
+  - stage: DEV_to_UAT_promotion
+    dependsOn:
+      - Deploy_DEV_pagoPA
+    jobs:
+      - job: Deploy_UAT_WaitForApproval
+        displayName: Wait for UAT approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+        - task: ManualValidation@0
+          timeoutInMinutes: 4320 # 3 days
+          inputs:
+            onTimeout: 'skip'
+
+  - stage: Deploy_UAT_pagoPA
+    dependsOn:
+      - Prepare_artifact
+    jobs:
+      - job: 'deploy'
+        steps:
+          - checkout: none
+
+          - download: current
+            artifact: Bundle
+
+          - task: AzureWebApp@1  
+            inputs:
+              azureSubscription: '$(UAT_AZURE_SUBSCRIPTION)'
+              resourceGroupName: 'pagopa-u-pagopa-proxy-rg'
+              appType: 'webApp'
+              appName: 'pagopa-u-app-pagopa-proxy'
+              package: '$(Pipeline.Workspace)/Bundle'
+              deploymentMethod: 'auto'
+            displayName: Deploy to UAT-pagoPA
