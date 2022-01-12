@@ -189,7 +189,7 @@ stages:
 
   - stage: Deploy_UAT_pagoPA
     dependsOn:
-      - Prepare_artifact
+      - DEV_to_UAT_promotion
     jobs:
       - job: 'deploy'
         steps:
