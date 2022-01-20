@@ -41,17 +41,17 @@ stages:
   # - is on branch master 
   # - is a tag in the form v{version}-RELEASE
   - stage: Release
-    # condition:
-    #   and(
-    #     succeeded(),
-    #     or(
-    #       eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-    #       and(
-    #         startsWith(variables['Build.SourceBranch'], 'refs/tags'),
-    #         endsWith(variables['Build.SourceBranch'], '-RELEASE')
-    #       )
-    #     )
-    #   )
+    condition:
+      # and(
+      #   succeeded(),
+      #   or(
+      #     eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+      #     and(
+      #       startsWith(variables['Build.SourceBranch'], 'refs/tags'),
+      #       endsWith(variables['Build.SourceBranch'], '-RELEASE')
+      #     )
+      #   )
+      # )
     pool:
       vmImage: 'ubuntu-latest'
     jobs:
@@ -72,8 +72,6 @@ stages:
           - script: |
               echo "We assume this reference to be a valid release: $(Build.SourceBranch). Therefore, there is no need to bundle a new release."
             displayName: 'Skip release bundle'
-
-
   # Prepare Artifact
   - stage: Prepare_artifact
     dependsOn:
@@ -93,7 +91,6 @@ stages:
           - script: |
               yarn build
             displayName: 'Build'
-
           - task: CopyFiles@2
             inputs:
               SourceFolder: '$(System.DefaultWorkingDirectory)'
@@ -120,19 +117,11 @@ stages:
                 !preview.hbs
                 !.auto-changelog.json
                 !api_pagopa.yaml
-                !io-pagopa-node-mock
+                !io-pagopa-node-mock/**/*
                 !__*/**/*
             displayName: 'Copy bundle files'
-
-          - task: ArchiveFiles@2
-            inputs:
-              rootFolderOrFile: $(System.DefaultWorkingDirectory)/bundle
-              includeRootFolder: false 
-              archiveType: 'zip'
-              archiveFile: $(System.DefaultWorkingDirectory)/$(Build.BuildId).zip
-              replaceExistingArchive: true 
-
-          - publish: $(System.DefaultWorkingDirectory)/$(Build.BuildId).zip
+          
+          - publish: $(System.DefaultWorkingDirectory)/bundle
             artifact: Bundle
             
   - stage: Deploy_DEV_pagoPA
@@ -150,9 +139,9 @@ stages:
             inputs:
               azureSubscription: '$(DEV_AZURE_SUBSCRIPTION)'
               resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
-              appType: 'webAppLinux'
+              appType: 'webApp'
               appName: 'pagopa-d-app-pagopa-proxy'
-              package: '$(Pipeline.Workspace)/**/*.zip'
+              package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
             displayName: Deploy to DEV-pagoPA
 
@@ -172,7 +161,6 @@ stages:
           - script: |
               yarn global add newman
             displayName: 'newman installation'
-
           - task: Bash@3
             inputs:
               targetType: filePath
@@ -213,41 +201,6 @@ stages:
               resourceGroupName: 'pagopa-u-pagopa-proxy-rg'
               appType: 'webApp'
               appName: 'pagopa-u-app-pagopa-proxy'
-              package: '$(Pipeline.Workspace)/*.zip'
-              deploymentMethod: 'auto'
-            displayName: Deploy to UAT-pagoPA
-
-  - stage: UAT_to_PROD_pagoPA_promotion
-    dependsOn:
-      - Deploy_UAT_pagoPA
-    jobs:
-      - job: Deploy_PROD_WaitForApproval
-        displayName: Wait for PROD approval
-        pool: server
-        timeoutInMinutes: 4320 # 3 days
-        steps:
-        - task: ManualValidation@0
-          timeoutInMinutes: 4320 # 3 days
-          inputs:
-            onTimeout: 'skip'
-
-  - stage: Deploy_to_PROD_pagoPA
-    dependsOn:
-      - UAT_to_PROD_pagopa_promotion
-    jobs:
-      - job: 'deploy'
-        steps:
-          - checkout: none
-
-          - download: current
-            artifact: Bundle
-            
-          - task: AzureWebApp@1  
-            inputs:
-              azureSubscription: '$(PROD_AZURE_SUBSCRIPTION)'
-              resourceGroupName: 'pagopa-p-pagopa-proxy-rg'
-              appType: 'webApp'
-              appName: 'pagopa-p-app-pagopa-proxy'
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
-            displayName: Deploy to PROD-pagoPA
+            displayName: Deploy to UAT-pagoPA
