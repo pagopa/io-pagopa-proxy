@@ -49,12 +49,11 @@
 					"urlencoded": []
 				},
 				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payments/v1/payment-requests/{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}?recaptchaResponse=token",
+					"raw": "{{CHECKOUT_HOST}}/checkout/payments/v1/payment-requests/{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}?recaptchaResponse=token",
 					"host": [
 						"{{CHECKOUT_HOST}}"
 					],
 					"path": [
-						"api",
 						"checkout",
 						"payments",
 						"v1",
@@ -112,12 +111,11 @@
 					}
 				},
 				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payments/v1/payment-activations",
+					"raw": "{{CHECKOUT_HOST}}/checkout/payments/v1/payment-activations",
 					"host": [
 						"{{CHECKOUT_HOST}}"
 					],
 					"path": [
-						"api",
 						"checkout",
 						"payments",
 						"v1",
@@ -164,12 +162,11 @@
 					"urlencoded": []
 				},
 				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payments/v1/payment-activations/{{CODICE_CONTESTO_PAGAMENTO}}",
+					"raw": "{{CHECKOUT_HOST}}/checkout/payments/v1/payment-activations/{{CODICE_CONTESTO_PAGAMENTO}}",
 					"host": [
 						"{{CHECKOUT_HOST}}"
 					],
 					"path": [
-						"api",
 						"checkout",
 						"payments",
 						"v1",
@@ -207,12 +204,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payments/v1/payment-requests/{{UNKNOWN_STAZIONE_FISCAL_CODE_PA}}{{UNKNOWN_STAZIONE_NOTICE_CODE}}?recaptchaResponse=token",
+					"raw": "{{CHECKOUT_HOST}}/checkout/payments/v1/payment-requests/{{UNKNOWN_STAZIONE_FISCAL_CODE_PA}}{{UNKNOWN_STAZIONE_NOTICE_CODE}}?recaptchaResponse=token",
 					"host": [
 						"{{CHECKOUT_HOST}}"
 					],
 					"path": [
-						"api",
 						"checkout",
 						"payments",
 						"v1",
@@ -256,12 +252,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payments/v1/payment-requests/{{UNKNOWN_FISCAL_CODE_PA}}{{UNKNOWN_NOTICE_CODE}}?recaptchaResponse=token",
+					"raw": "{{CHECKOUT_HOST}}/checkout/payments/v1/payment-requests/{{UNKNOWN_FISCAL_CODE_PA}}{{UNKNOWN_NOTICE_CODE}}?recaptchaResponse=token",
 					"host": [
 						"{{CHECKOUT_HOST}}"
 					],
 					"path": [
-						"api",
 						"checkout",
 						"payments",
 						"v1",
@@ -273,280 +268,6 @@
 							"key": "recaptchaResponse",
 							"value": "token"
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Payment Support - browser info",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Payment Support - Status code is 200 with browsers detail\", function(){",
-							"    ",
-							"    const responseJson = pm.response.json();",
-							"",
-							"    pm.expect(responseJson.ip).not.equal(null);",
-							"    pm.expect(responseJson.accept).not.equal(null);",
-							"    pm.expect(responseJson.useragent).not.equal(null);",
-							"",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disabledSystemHeaders": {}
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payments/v1/browsers/current/info",
-					"host": [
-						"{{CHECKOUT_HOST}}"
-					],
-					"path": [
-						"api",
-						"checkout",
-						"payments",
-						"v1",
-						"browsers",
-						"current",
-						"info"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Payment transaction - xpay",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Payment transaction xpay - Status code is 302 with params\", function(){",
-							"    ",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disabledSystemHeaders": {}
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payment-transactions/v1/transactions/xpay/NzA5MDEwMjg3NQ==?esito=OK&idOperazione=00054014&timeStamp=1638023340310&mac=000000b500ba947c2614b547250c49e59477e6ef&xpayNonce=58a83f26-1421-3350-8dd6-aa152de80000",
-					"host": [
-						"{{CHECKOUT_HOST}}"
-					],
-					"path": [
-						"api",
-						"checkout",
-						"payment-transactions",
-						"v1",
-						"transactions",
-						"xpay",
-						"NzA5MDEwMjg3NQ=="
-					],
-					"query": [
-						{
-							"key": "esito",
-							"value": "OK"
-						},
-						{
-							"key": "idOperazione",
-							"value": "00054014"
-						},
-						{
-							"key": "timeStamp",
-							"value": "1638023340310"
-						},
-						{
-							"key": "mac",
-							"value": "000000b500ba947c2614b547250c49e59477e6ef"
-						},
-						{
-							"key": "xpayNonce",
-							"value": "58a83f26-1421-3350-8dd6-aa152de80000"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Payment transaction- xpay verify",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Payment transaction xpay verify Status code is 200 with params\", function(){",
-							"    ",
-							"    pm.expect(pm.response.text()).to.include(\"Checkout - pagoPA<\");",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disabledSystemHeaders": {}
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payment-transactions/v1/transactions/xpay/verification/NzA5MDEwMjg3NQ==?esito=OK&idOperazione=00054014&timeStamp=1638023340310&mac=000000b500ba947c2614b547250c49e59477e6ef&xpayNonce=58a83f26-1421-3350-8dd6-aa152de80000",
-					"host": [
-						"{{CHECKOUT_HOST}}"
-					],
-					"path": [
-						"api",
-						"checkout",
-						"payment-transactions",
-						"v1",
-						"transactions",
-						"xpay",
-						"verification",
-						"NzA5MDEwMjg3NQ=="
-					],
-					"query": [
-						{
-							"key": "esito",
-							"value": "OK"
-						},
-						{
-							"key": "idOperazione",
-							"value": "00054014"
-						},
-						{
-							"key": "timeStamp",
-							"value": "1638023340310"
-						},
-						{
-							"key": "mac",
-							"value": "000000b500ba947c2614b547250c49e59477e6ef"
-						},
-						{
-							"key": "xpayNonce",
-							"value": "58a83f26-1421-3350-8dd6-aa152de80000"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Payment transaction - vpos challenge",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Payment transaction vpos challenge - Status code is 200 with params\", function(){",
-							"    pm.expect(pm.response.text()).to.include(\"Checkout - pagoPA<\");",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disabledSystemHeaders": {}
-			},
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payment-transactions/v1/transactions/NzA5MDEwMjg3NQ==/challenge?esito=OK&idOperazione=00054014&timeStamp=1638023340310&mac=000000b500ba947c2614b547250c49e59477e6ef&xpayNonce=58a83f26-1421-3350-8dd6-aa152de80000",
-					"host": [
-						"{{CHECKOUT_HOST}}"
-					],
-					"path": [
-						"api",
-						"checkout",
-						"payment-transactions",
-						"v1",
-						"transactions",
-						"NzA5MDEwMjg3NQ==",
-						"challenge"
-					],
-					"query": [
-						{
-							"key": "esito",
-							"value": "OK"
-						},
-						{
-							"key": "idOperazione",
-							"value": "00054014"
-						},
-						{
-							"key": "timeStamp",
-							"value": "1638023340310"
-						},
-						{
-							"key": "mac",
-							"value": "000000b500ba947c2614b547250c49e59477e6ef"
-						},
-						{
-							"key": "xpayNonce",
-							"value": "58a83f26-1421-3350-8dd6-aa152de80000"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Payment transaction - vpos method",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Payment transaction vpos method - Status code is 200 with 3DS.Notification.Received\", function(){",
-							"    pm.expect(pm.response.text()).to.include(\"3DS.Notification.Received\");",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disabledSystemHeaders": {}
-			},
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{CHECKOUT_HOST}}/api/checkout/payment-transactions/v1/transactions/NzA5MDEwMjg3NQ==/method",
-					"host": [
-						"{{CHECKOUT_HOST}}"
-					],
-					"path": [
-						"api",
-						"checkout",
-						"payment-transactions",
-						"v1",
-						"transactions",
-						"NzA5MDEwMjg3NQ==",
-						"method"
 					]
 				}
 			},
