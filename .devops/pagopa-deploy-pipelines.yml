@@ -207,3 +207,38 @@ stages:
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
             displayName: Deploy to UAT-pagoPA
+
+  - stage: UAT_to_PROD_pagoPA_promotion
+    dependsOn:
+      - Deploy_UAT_pagoPA
+    jobs:
+      - job: Deploy_PROD_WaitForApproval
+        displayName: Wait for PROD approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+        - task: ManualValidation@0
+          timeoutInMinutes: 4320 # 3 days
+          inputs:
+            onTimeout: 'skip'
+
+  - stage: Deploy_to_PROD_pagoPA
+    dependsOn:
+      - UAT_to_PROD_pagopa_promotion
+    jobs:
+      - job: 'deploy'
+        steps:
+          - checkout: none
+
+          - download: current
+            artifact: Bundle
+            
+          - task: AzureWebApp@1  
+            inputs:
+              azureSubscription: '$(PROD_AZURE_SUBSCRIPTION)'
+              resourceGroupName: 'pagopa-p-pagopa-proxy-rg'
+              appType: 'webApp'
+              appName: 'pagopa-p-app-pagopa-proxy'
+              package: '$(Pipeline.Workspace)/Bundle'
+              deploymentMethod: 'auto'
+            displayName: Deploy to PROD-pagoPA
