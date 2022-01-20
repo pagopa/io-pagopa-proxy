@@ -123,12 +123,16 @@ stages:
                 !io-pagopa-node-mock
                 !__*/**/*
             displayName: 'Copy bundle files'
-          
-          - script: |
-              zip -r $(System.DefaultWorkingDirectory)/bundle.zip $(System.DefaultWorkingDirectory)
-            displayName: 'Build'
 
-          - publish: $(System.DefaultWorkingDirectory)/bundle.zip
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: $(System.DefaultWorkingDirectory)/bundle
+              includeRootFolder: false 
+              archiveType: 'zip'
+              archiveFile: $(System.DefaultWorkingDirectory)/$(Build.BuildId).zip
+              replaceExistingArchive: true 
+
+          - publish: $(System.DefaultWorkingDirectory)/$(Build.BuildId).zip
             artifact: Bundle
             
   - stage: Deploy_DEV_pagoPA
@@ -148,7 +152,7 @@ stages:
               resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
               appType: 'webAppLinux'
               appName: 'pagopa-d-app-pagopa-proxy'
-              package: '$(Pipeline.Workspace)/Bundle'
+              package: '$(Pipeline.Workspace)/*.zip'
               deploymentMethod: 'auto'
             displayName: Deploy to DEV-pagoPA
 
