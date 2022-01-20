@@ -10,5 +10,12 @@ module.exports = {
   },
   "testMatch": [
     "**/__integration__/*.ts"
-  ]
+  ],
+  "reporters": [
+    "default",
+    [ "jest-junit", {
+      "outputDirectory": "./test_reports",
+      "outputName": "pagopa-proxy-IT.xml"
+    } ]
+  ],
 }

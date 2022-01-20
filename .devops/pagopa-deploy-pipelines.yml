@@ -149,26 +149,22 @@ stages:
     dependsOn:
       - Deploy_DEV_pagoPA
     jobs:
-      - job: 'TestAPI'
-        steps:
-          - checkout: none
-
-          - download: current
-            artifact: Bundle
-
-      - job: integrationTests
+      - job: TestAPI
         steps:
           - script: |
               yarn global add newman
             displayName: 'newman installation'
-          - task: Bash@3
+
+          - script: |
+              newman run api-tests/checkout-payments.tests.json --environment=api-tests/dev.envs.json --reporters cli,junit --reporter-junit-export Results/checkout-api-TEST.xml
+            displayName: 'Run api test'
+            continueOnError: true 
+
+          - task: PublishTestResults@2
             inputs:
-              targetType: filePath
-              filePath: api-tests/ws.sh
-              arguments: postman ./ENV_DEPLOY.postman_environment.json
-              workingDirectory: api-tests
-              failOnStdErr: true
-            displayName: Run API tests
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/*-TEST.xml' 
+              searchFolder: '$(System.DefaultWorkingDirectory)'
 
   - stage: DEV_to_UAT_promotion
     dependsOn:
@@ -201,6 +197,62 @@ stages:
               resourceGroupName: 'pagopa-u-pagopa-proxy-rg'
               appType: 'webApp'
               appName: 'pagopa-u-app-pagopa-proxy'
+              package: '$(Pipeline.Workspace)/Bundle'
+              deploymentMethod: 'auto'
+            displayName: Deploy to UAT-pagoPA
+
+  - stage: API_Tests_UAT_pagoPA
+    dependsOn:
+      - Deploy_UAT_pagoPA
+    jobs:
+      - job: TestAPI
+        steps:
+          - script: |
+              yarn global add newman
+            displayName: 'newman installation'
+
+          - script: |
+              newman run api-tests/checkout-payments.tests.json --environment=api-tests/uat.envs.json --reporters cli,junit --reporter-junit-export Results/checkout-api-TEST.xml
+            displayName: 'Run api test'
+            continueOnError: true 
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/*-TEST.xml' 
+              searchFolder: '$(System.DefaultWorkingDirectory)'          
+
+  - stage: UAT_to_PROD_promotion
+    dependsOn:
+      - Deploy_UAT_pagoPA
+    jobs:
+      - job: Deploy_Prod_WaitForApproval
+        displayName: Wait for PROD approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+        - task: ManualValidation@0
+          timeoutInMinutes: 4320 # 3 days
+          inputs:
+            onTimeout: 'skip'
+
+  - stage: Deploy_PROD_pagoPA
+    dependsOn:
+      - UAT_to_PROD_promotion
+    jobs:
+      - job: 'deploy'
+        steps:
+          - checkout: none
+
+          - download: current
+            artifact: Bundle
+
+          - task: AzureWebApp@1  
+            inputs:
+              azureSubscription: '$(PROD_AZURE_SUBSCRIPTION)'
+              resourceGroupName: 'pagopa-p-pagopa-proxy-rg'
+              appType: 'webApp'
+              appName: 'pagopa-p-app-pagopa-proxy'
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
             displayName: Deploy to UAT-pagoPA
