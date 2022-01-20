@@ -152,7 +152,7 @@ stages:
               resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
               appType: 'webAppLinux'
               appName: 'pagopa-d-app-pagopa-proxy'
-              package: '$(Pipeline.Workspace)/*.zip'
+              package: '$(Pipeline.Workspace)/**/*.zip'
               deploymentMethod: 'auto'
             displayName: Deploy to DEV-pagoPA
 
