@@ -120,10 +120,15 @@ stages:
                 !preview.hbs
                 !.auto-changelog.json
                 !api_pagopa.yaml
+                !io-pagopa-node-mock
                 !__*/**/*
             displayName: 'Copy bundle files'
           
-          - publish: $(System.DefaultWorkingDirectory)/bundle
+          - script: |
+              zip -r $(System.DefaultWorkingDirectory)/bundle.zip $(System.DefaultWorkingDirectory)
+            displayName: 'Build'
+
+          - publish: $(System.DefaultWorkingDirectory)/bundle.zip
             artifact: Bundle
             
   - stage: Deploy_DEV_pagoPA
@@ -204,7 +209,7 @@ stages:
               resourceGroupName: 'pagopa-u-pagopa-proxy-rg'
               appType: 'webApp'
               appName: 'pagopa-u-app-pagopa-proxy'
-              package: '$(Pipeline.Workspace)/Bundle'
+              package: '$(Pipeline.Workspace)/*.zip'
               deploymentMethod: 'auto'
             displayName: Deploy to UAT-pagoPA
 
