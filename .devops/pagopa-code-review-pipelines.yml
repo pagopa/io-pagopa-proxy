@@ -72,17 +72,9 @@ stages:
               yarn test:coverage
             displayName: 'Unit tests'
 
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '**/*-TEST.xml' 
-              searchFolder: '$(System.DefaultWorkingDirectory)'
-
-          - task: PublishCodeCoverageResults@1
-            inputs:
-              codeCoverageTool: 'Cobertura'
-              summaryFileLocation: 'coverage/cobertura-coverage.xml'
-            displayName: 'Publish Code Coverage'
+          - bash: |
+              bash <(curl -s https://codecov.io/bash)
+            displayName: 'Code coverage'
 
   - stage: Integration_Tests
     pool:
@@ -104,16 +96,5 @@ stages:
           - script: |
               yarn test:integration
             displayName: 'Unit tests integration'
-          
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '**/*-TEST.xml' 
-              searchFolder: '$(System.DefaultWorkingDirectory)'
 
-          - task: PublishCodeCoverageResults@1
-            inputs:
-              codeCoverageTool: 'Cobertura'
-              summaryFileLocation: 'coverage/cobertura-coverage.xml'
-            displayName: 'Publish Code Coverage'
 
