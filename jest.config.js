@@ -10,7 +10,4 @@ module.exports = {
     } ]
   ],
   coverageReporters: ["cobertura"],
-  testMatch: [
-    "**/__tests__/*.ts"
-  ]
 };
