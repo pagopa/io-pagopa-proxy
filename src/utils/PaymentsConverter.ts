@@ -319,14 +319,10 @@ export function getActivateIOPaymentResponse(
           causaleVersamento: activateIOPaymentRes.paymentDescription
             ? activateIOPaymentRes.paymentDescription
             : undefined,
-          enteBeneficiario: {
-            identificativoUnivocoBeneficiario: activateIOPaymentRes.fiscalCodePA
-              ? activateIOPaymentRes.fiscalCodePA
-              : undefined,
+          enteBeneficiario: activateIOPaymentRes.fiscalCodePA && activateIOPaymentRes.companyName ? {
+            identificativoUnivocoBeneficiario: activateIOPaymentRes.fiscalCodePA,
             denominazioneBeneficiario: activateIOPaymentRes.companyName
-              ? activateIOPaymentRes.companyName
-              : undefined
-          }
+          } : undefined
         }
       : undefined;
 
