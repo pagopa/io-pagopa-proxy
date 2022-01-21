@@ -2,6 +2,7 @@ import { RptId } from "italia-pagopa-commons/lib/pagopa";
 import { reporters } from "italia-ts-commons";
 import { CodiceContestoPagamento } from "../../../generated/api/CodiceContestoPagamento";
 import { PaymentActivationsPostRequest } from "../../../generated/api/PaymentActivationsPostRequest";
+import { activateIOPaymentRes_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentRes_nfpsp";
 import { ctSpezzoniCausaleVersamento_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/ctSpezzoniCausaleVersamento_ppt";
 import { esitoNodoAttivaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoAttivaRPTRisposta_ppt";
 import { esitoNodoVerificaRPTRisposta_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_ppt";
@@ -186,6 +187,50 @@ export const anAttivaRPTOutput = esitoNodoAttivaRPTRisposta_ppt
     );
   });
 
+export const activateIOPaymentResOutputWhitoutEnte = activateIOPaymentRes_nfpsp
+  .decode({
+    outcome: "OK",
+    totalAmount: 100,
+    paymentDescription: "Test causale senza ente"
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid activateIOPaymentRes_nfpsp to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+export const activateIOPaymentResOutputWhithInvalidEnte = activateIOPaymentRes_nfpsp
+  .decode({
+    outcome: "OK",
+    totalAmount: 100,
+    paymentDescription: "Test causale",
+    fiscalCodePA: "77777777777"
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid activateIOPaymentRes_nfpsp to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
+
+export const activateIOPaymentResOutputWhithEnte = activateIOPaymentRes_nfpsp
+  .decode({
+    outcome: "OK",
+    totalAmount: 100,
+    paymentDescription: "Test causale",
+    fiscalCodePA: "77777777777",
+    companyName: "denominazione"
+  })
+  .getOrElseL(errors => {
+    throw Error(
+      `Invalid activateIOPaymentRes_nfpsp to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  });
 export const aAttivaRPTOutputKOAmount = esitoNodoAttivaRPTRisposta_ppt
   .decode({
     esito: "KO",

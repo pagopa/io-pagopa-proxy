@@ -617,3 +617,80 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     expect(errorMsg).toEqual("PPT_ERRORE_EMESSO_DA_PAA");
   });
 });
+
+describe("getActivateIOPaymentResponse", () => {
+  it("should convert activateIOPaymentRes_nfpsp with valid Ente in PaymentActivationsPostResponse", () => {
+    const errorOrPaymentActivationsPostResponse = PaymentsConverter.getActivateIOPaymentResponse(
+      MockedData.activateIOPaymentResOutputWhithEnte
+    );
+    expect(isRight(errorOrPaymentActivationsPostResponse)).toBeTruthy();
+    if (!isRight(errorOrPaymentActivationsPostResponse)) {
+      return;
+    }
+    expect(
+      errorOrPaymentActivationsPostResponse.value.importoSingoloVersamento
+    ).toBe(10000);
+    expect(
+      errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+        ? errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+            .denominazioneBeneficiario
+        : undefined
+    ).toBe("denominazione");
+    expect(
+      errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+        ? errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+            .identificativoUnivocoBeneficiario
+        : undefined
+    ).toBe("77777777777");
+  });
+
+  it("should convert activateIOPaymentRes_nfpsp with invalid Ente in PaymentActivationsPostResponse", () => {
+    const errorOrPaymentActivationsPostResponse = PaymentsConverter.getActivateIOPaymentResponse(
+      MockedData.activateIOPaymentResOutputWhithInvalidEnte
+    );
+    expect(isRight(errorOrPaymentActivationsPostResponse)).toBeTruthy();
+    if (!isRight(errorOrPaymentActivationsPostResponse)) {
+      return;
+    }
+    expect(
+      errorOrPaymentActivationsPostResponse.value.importoSingoloVersamento
+    ).toBe(10000);
+    expect(
+      errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+        ? errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+            .denominazioneBeneficiario
+        : undefined
+    ).toBeUndefined();
+    expect(
+      errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+        ? errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+            .identificativoUnivocoBeneficiario
+        : undefined
+    ).toBeUndefined();
+  });
+
+  it("should convert activateIOPaymentRes_nfpsp without Ente in getActivateIOPaymentResponse", () => {
+    const errorOrPaymentActivationsPostResponse = PaymentsConverter.getActivateIOPaymentResponse(
+      MockedData.activateIOPaymentResOutputWhitoutEnte
+    );
+    expect(isRight(errorOrPaymentActivationsPostResponse)).toBeTruthy();
+    if (!isRight(errorOrPaymentActivationsPostResponse)) {
+      return;
+    }
+    expect(
+      errorOrPaymentActivationsPostResponse.value.importoSingoloVersamento
+    ).toBe(10000);
+    expect(
+      errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+        ? errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+            .denominazioneBeneficiario
+        : undefined
+    ).toBeUndefined();
+    expect(
+      errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+        ? errorOrPaymentActivationsPostResponse.value.enteBeneficiario
+            .identificativoUnivocoBeneficiario
+        : undefined
+    ).toBeUndefined();
+  });
+});
