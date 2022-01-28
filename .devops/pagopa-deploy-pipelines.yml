@@ -182,7 +182,7 @@ stages:
               webAppName: 'pagopa-d-app-pagopa-proxy'
               sourceSlot: staging
               swapWithProduction: true
-              displayName: Swap with production slot
+            displayName: Swap with production slot
 
   - stage: DEV_to_UAT_promotion
     dependsOn:
