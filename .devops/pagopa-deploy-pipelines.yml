@@ -172,7 +172,7 @@ stages:
     dependsOn:
       - API_tests_in_staging_dev
     jobs:
-      - job: 'deply'       
+      - job: 'deploy'       
         steps:  
           - checkout: none
           - task: AzureAppServiceManage@0
@@ -180,7 +180,7 @@ stages:
               azureSubscription: '$(DEV_AZURE_SUBSCRIPTION)'
               resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
               webAppName: 'pagopa-d-app-pagopa-proxy'
-              sourceSlot: staging
+              sourceSlot: 'staging'
               swapWithProduction: true
             displayName: Swap with production slot
 
