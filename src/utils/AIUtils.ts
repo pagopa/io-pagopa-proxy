@@ -13,7 +13,7 @@ const PaymentEvent = t.interface({
     detail: t.string,
     detail_v2: t.string,
     result: t.string,
-    rptId: t.string,
+    rptId: t.string
   })
 });
 
