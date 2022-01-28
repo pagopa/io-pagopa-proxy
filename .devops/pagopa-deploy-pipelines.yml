@@ -124,7 +124,7 @@ stages:
           - publish: $(System.DefaultWorkingDirectory)/bundle
             artifact: Bundle
             
-  - stage: Deploy_DEV_pagoPA
+  - stage: Deploy_to_staging_slot_DEV
     dependsOn:
       - Prepare_artifact
     jobs:
@@ -147,9 +147,9 @@ stages:
               slotName: 'staging'
             displayName: Deploy pagopa-proxy to staging slot - DEV-pagoPA
 
-  - stage: API_tests_DEV
+  - stage: API_tests_in_staging_dev
     dependsOn:
-      - Deploy_DEV_pagoPA
+      - Deploy_to_staging_slot_DEV
     jobs:
       - job: TestAPI
         steps:
@@ -168,9 +168,25 @@ stages:
               testResultsFiles: '**/*-TEST.xml' 
               searchFolder: '$(System.DefaultWorkingDirectory)'
 
+  - stage: Swap_to_production_slot_DEV
+    dependsOn:
+      - API_tests_in_staging_dev
+    jobs:
+      - job: 'deply'       
+        steps:  
+          - checkout: none
+          - task: AzureAppServiceManage@0
+            inputs:
+              azureSubscription: '$(DEV_AZURE_SUBSCRIPTION)'
+              resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
+              webAppName: 'pagopa-d-app-pagopa-proxy'
+              sourceSlot: 'staging'
+              swapWithProduction: true
+            displayName: Swap with production slot
+
   - stage: DEV_to_UAT_promotion
     dependsOn:
-      - Deploy_DEV_pagoPA
+      - Swap_to_production_slot_DEV
     jobs:
       - job: Deploy_UAT_WaitForApproval
         displayName: Wait for UAT approval
@@ -238,7 +254,7 @@ stages:
           inputs:
             onTimeout: 'skip'
 
-  - stage: Deploy_to_staging_slot_PROD
+  - stage: Deploy_PROD_pagoPA
     dependsOn:
       - UAT_to_PROD_promotion
     jobs:
@@ -257,43 +273,4 @@ stages:
               appName: 'pagopa-p-app-pagopa-proxy'
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
-              deployToSlotOrASE: true
-              slotName: 'staging'
-            displayName: Deploy pagopa-proxy to staging slot - PROD-pagoPA
-
-  - stage: API_tests_in_staging
-    dependsOn:
-      - Deploy_to_staging_slot_PROD
-    jobs:
-      - job: TestAPI
-        steps:
-          - script: |
-              yarn global add newman
-            displayName: 'newman installation'
-
-          - script: |
-              newman run api-tests/checkout-payments.tests.json --environment=api-tests/dev.envs.json --reporters cli,junit --reporter-junit-export Results/checkout-api-TEST.xml
-            displayName: 'Run api test'
-            continueOnError: true 
-
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '**/*-TEST.xml' 
-              searchFolder: '$(System.DefaultWorkingDirectory)'
-
-  - stage: Swap_to_production_slot_PROD
-    dependsOn:
-      - API_tests_in_staging
-    jobs:
-      - job: 'deploy'       
-        steps:  
-          - checkout: none
-          - task: AzureAppServiceManage@0
-            inputs:
-              azureSubscription: '$(PROD_AZURE_SUBSCRIPTION)'
-              resourceGroupName: 'pagopa-p-pagopa-proxy-rg'
-              webAppName: 'pagopa-p-app-pagopa-proxy'
-              sourceSlot: 'staging'
-              swapWithProduction: true
-            displayName: Swap with production slot
+            displayName: Deploy to UAT-pagoPA
