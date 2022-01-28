@@ -29,6 +29,7 @@ WORKDIR /usr/src/app
 COPY /package.json /usr/src/app/package.json
 COPY --from=builder /usr/src/app/dist /usr/src/app/dist
 COPY --from=builder /usr/src/app/node_modules /usr/src/app/node_modules
+COPY /.node_config.json /usr/src/app/.node_config.json
 
 EXPOSE 80
 

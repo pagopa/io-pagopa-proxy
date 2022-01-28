@@ -15,6 +15,7 @@ paths:
       description: Retrieve information about a payment
       parameters:
         - $ref: '#/parameters/RptId'
+        - $ref: '#/parameters/ClientId'
       responses:
         '200':
           description: Payment information retrieved
@@ -49,6 +50,7 @@ paths:
               rptId: '12345678901012123456789012345'
               importoSingoloVersamento: 200
               codiceContestoPagamento: 'ABC123'
+        - $ref: '#/parameters/ClientId'
       responses:
         '200':
           description: Payment activation process started
@@ -73,6 +75,7 @@ paths:
       description: Get the activation status and the paymentId
       parameters:
         - $ref: '#/parameters/CodiceContestoPagamento'
+        - $ref: '#/parameters/ClientId'
       responses:
         '200':
           description: Activation information
@@ -430,6 +433,14 @@ parameters:
     required: true
     in: path
     x-example: A0123BC123124
+  ClientId:
+    name: X-Client-Id
+    description: Client identifier to handle connection parameters for Nodo
+    type: string
+    minLength: 1
+    required: true
+    in: header
+    x-example: TEST_1
 consumes:
   - application/json
 produces:

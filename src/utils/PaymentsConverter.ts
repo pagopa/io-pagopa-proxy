@@ -36,12 +36,14 @@ import { PaymentNoticeNumber, RptId, RptIdFromString } from "./pagopa";
 /**
  * Define NodoVerificaRPTInput (PagoPA request) using information provided by BackendApp
  *
- * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
+ * @param {NonEmptyString} clientId - Client identifier used to fetch Node connection parameters
+ * @param {PagoPAConfig} pagoPAConfig - PagoPA config, containing static information to put into response
  * @param {RptId} rptId - Unique identifier for payment (fiscalCode + numeroAvviso)
  * @param {CodiceContestoPagamento} codiceContestoPagamento - Transaction Identifier to put into response
- * @return {Either<Error, NodoVerificaRPTInput>} Converted object
+ * @return {E.Either<Error, nodoVerificaRPT_element_ppt>} Converted object
  */
 export function getNodoVerificaRPTInput(
+  clientId: string,
   pagoPAConfig: PagoPAConfig,
   rptId: RptId,
   codiceContestoPagamento: CodiceContestoPagamento
@@ -53,11 +55,12 @@ export function getNodoVerificaRPTInput(
     );
     const codiceIdRPT = getCodiceIdRpt(rptId);
     return E.right({
-      identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+      identificativoPSP: pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPAConfig.IDENTIFIER.PASSWORD,
+        pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      identificativoCanale:
+        pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIERS[clientId].PASSWORD,
       codiceContestoPagamento: codiceContestoPagamentoApi,
       codificaInfrastrutturaPSP: "QR-CODE",
       codiceIdRPT
@@ -68,15 +71,17 @@ export function getNodoVerificaRPTInput(
 }
 
 export function getNodoVerifyPaymentNoticeInput(
+  clientId: string,
   pagoPAConfig: PagoPAConfig,
   rptId: RptId
 ): E.Either<Error, verifyPaymentNoticeReq_element_nfpsp> {
   return pipe(
     verifyPaymentNoticeReq_element_nfpsp.decode({
-      idPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
-      idBrokerPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      idChannel: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPAConfig.IDENTIFIER.PASSWORD,
+      idPSP: pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_PSP,
+      idBrokerPSP:
+        pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      idChannel: pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIERS[clientId].PASSWORD,
       qrCode: {
         fiscalCode: rptId.organizationFiscalCode,
         noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
@@ -87,16 +92,18 @@ export function getNodoVerifyPaymentNoticeInput(
 }
 
 export function getNodoActivateIOPaymentInput(
+  clientId: string,
   pagoPAConfig: PagoPAConfig,
   rptId: RptId,
   amount: ImportoEuroCents
 ): E.Either<Error, activateIOPaymentReq_element_nfpsp> {
   return pipe(
     activateIOPaymentReq_element_nfpsp.decode({
-      idPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
-      idBrokerPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      idChannel: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPAConfig.IDENTIFIER.PASSWORD,
+      idPSP: pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_PSP,
+      idBrokerPSP:
+        pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      idChannel: pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIERS[clientId].PASSWORD,
       qrCode: {
         fiscalCode: rptId.organizationFiscalCode,
         noticeNumber: getPaymentNoticeNumberAsString(rptId.paymentNoticeNumber)
@@ -218,11 +225,13 @@ export function getPaymentRequestsGetResponseNm3(
 /**
  * Convert PaymentActivationsPostRequest (BackendApp request) to nodoAttivaRPT_element_ppt (PagoPA request)
  *
- * @param {PagoPAConfig} PagoPAConfig - PagoPA config, containing static information to put into response
+ * @param {string} clientId - Client identifier used to fetch Node connection parameters
+ * @param {PagoPAConfig} pagoPAConfig - PagoPA config, containing static information to put into response
  * @param {PaymentActivationsPostRequest} paymentActivationsPostRequest - Message to convert
  * @return {Either<Error, nodoAttivaRPT_element_ppt>} Converted object
  */
 export function getNodoAttivaRPTInput(
+  clientId: string,
   pagoPAConfig: PagoPAConfig,
   paymentActivationsPostRequest: PaymentActivationsPostRequest
 ): E.Either<Error, nodoAttivaRPT_element_ppt> {
@@ -241,16 +250,17 @@ export function getNodoAttivaRPTInput(
   // Because of that we force typing via a cast.
   return pipe(
     E.right({
-      identificativoPSP: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_PSP,
+      identificativoPSP: pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_PSP,
       identificativoIntermediarioPSP:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
-      identificativoCanale: pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE,
-      password: pagoPAConfig.IDENTIFIER.PASSWORD,
+        pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_INTERMEDIARIO_PSP,
+      identificativoCanale:
+        pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_CANALE,
+      password: pagoPAConfig.IDENTIFIERS[clientId].PASSWORD,
       codiceContestoPagamento: codiceContestoPagamentoApi,
       identificativoIntermediarioPSPPagamento:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP,
+        pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_INTERMEDIARIO_PSP,
       identificativoCanalePagamento:
-        pagoPAConfig.IDENTIFIER.IDENTIFICATIVO_CANALE_PAGAMENTO,
+        pagoPAConfig.IDENTIFIERS[clientId].IDENTIFICATIVO_CANALE_PAGAMENTO,
       codificaInfrastrutturaPSP: "QR-CODE",
       codiceIdRPT,
       datiPagamentoPSP: {

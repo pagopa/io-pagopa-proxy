@@ -1,0 +1,16 @@
+{
+  "CLIENT_CHECKOUT": {
+    "ID_PSP": 6666,
+    "ID_CANALE": 7777,
+    "ID_CANALE_PAGAMENTO": 8888,
+    "ID_INT_PSP": 9999,
+    "PASSWORD": "password"
+  },
+  "CLIENT_IO": {
+    "ID_PSP": 6665,
+    "ID_CANALE": 7776,
+    "ID_CANALE_PAGAMENTO": 8887,
+    "ID_INT_PSP": 9998,
+    "PASSWORD": "password"
+  }
+}

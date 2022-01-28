@@ -10,6 +10,7 @@ package-lock.json
 dump.rdb
 generated
 .env
+.node_config.json
 .DS_Store
 k6example/libs
 .eslintcache

@@ -1,4 +1,4 @@
-import { OrganizationFiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { NonEmptyString, OrganizationFiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { isRight } from "fp-ts/lib/Either";
 
 import "jest-xml-matcher";
@@ -28,6 +28,8 @@ import {
 } from "./fake/fakePagamentiTelematiciPspNodoNm3AsyncClient";
 import mockReq from "./fake/request";
 
+const TEST_CLIENT_ID = "TEST_1" as NonEmptyString;
+
 const aConfig = {
   HOST: "http://localhost",
   PORT: 3002,
@@ -39,11 +41,13 @@ const aConfig = {
     }
   },
   // These information will identify our system when it will access to PagoPA
-  IDENTIFIER: {
-    IDENTIFICATIVO_PSP: "AGID_01",
-    IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
-    IDENTIFICATIVO_CANALE: "97735020584_02",
-    PASSWORD: "nopassword"
+  IDENTIFIERS: {
+    [TEST_CLIENT_ID]: {
+      IDENTIFICATIVO_PSP: "AGID_01",
+      IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
+      IDENTIFICATIVO_CANALE: "97735020584_02",
+      PASSWORD: "nopassword",
+    }
   }
 } as PagoPAConfig;
 const aRptIdString = "12345678901012123456789012399";
@@ -89,6 +93,7 @@ describe("checkPaymentToPagoPa", () => {
 
     const req = mockReq();
     req.params = { rpt_id_from_string: aRptIdString };
+    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
 
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
@@ -152,6 +157,7 @@ describe("checkPaymentToPagoPa", () => {
 
     // tslint:disable-next-line:no-object-mutation
     req.params = aRptId;
+    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
 
     const errorOrPaymentCheckResponse = await getPaymentInfo(
       aConfig,
@@ -182,6 +188,7 @@ describe("activatePaymentToPagoPa", () => {
     );
 
     const activateRequest = mockReq();
+    activateRequest.headers = { "X-Client-Id": TEST_CLIENT_ID };
 
     activateRequest.body = {
       ...aPaymentActivationRequest,
@@ -220,8 +227,8 @@ describe("activatePaymentToPagoPa", () => {
     );
 
     const req = mockReq();
-
     req.body = aPaymentActivationRequest;
+    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
 
     const errorOrPaymentActivationResponse = await activatePayment(
       aConfig,
@@ -299,6 +306,7 @@ describe("setActivationStatus and getActivationStatus", () => {
 
     // tslint:disable-next-line:no-object-mutation
     req.params = aPaymentActivationRequest;
+    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
 
     await setActivationStatus(aCdInfoWispPpt, 5000, aMockedRedisClient);
 

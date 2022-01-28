@@ -6,14 +6,11 @@ import { esitoNodoVerificaRPTRisposta_type_ppt } from "../../../generated/Pagame
 import * as PaymentController from "../../controllers/restful/PaymentController";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
+import { MOCK_CLIENT_ID } from "./MockedData";
 
 describe("getNodoVerificaRPTInput", () => {
   it("should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
-    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
-      MockedData.aConfig,
-      MockedData.aRptId0,
-      MockedData.aCodiceContestoPagamento
-    );
+    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MOCK_CLIENT_ID, MockedData.aConfig, MockedData.aRptId0, MockedData.aCodiceContestoPagamento);
 
     // Check if object is valid
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
@@ -24,15 +21,15 @@ describe("getNodoVerificaRPTInput", () => {
     // Check input heading
     expect(
       errorOrNodoVerificaRPTInput.right.identificativoIntermediarioPSP
-    ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
+    ).toBe(MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_INTERMEDIARIO_PSP);
     expect(errorOrNodoVerificaRPTInput.right.identificativoCanale).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_CANALE
     );
     expect(errorOrNodoVerificaRPTInput.right.identificativoPSP).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoVerificaRPTInput.right.password).toBe(
-      MockedData.aConfig.IDENTIFIER.PASSWORD
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].PASSWORD
     );
 
     // Check input content
@@ -55,11 +52,7 @@ describe("getNodoVerificaRPTInput", () => {
   });
 
   it("should return a correct NodoVerificaRPTInput with auxDigit=1", () => {
-    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
-      MockedData.aConfig,
-      MockedData.aRptId1,
-      MockedData.aCodiceContestoPagamento
-    );
+    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MOCK_CLIENT_ID, MockedData.aConfig, MockedData.aRptId1, MockedData.aCodiceContestoPagamento);
 
     // Check if object is valid
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
@@ -70,15 +63,15 @@ describe("getNodoVerificaRPTInput", () => {
     // Check input heading
     expect(
       errorOrNodoVerificaRPTInput.right.identificativoIntermediarioPSP
-    ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
+    ).toBe(MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_INTERMEDIARIO_PSP);
     expect(errorOrNodoVerificaRPTInput.right.identificativoCanale).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_CANALE
     );
     expect(errorOrNodoVerificaRPTInput.right.identificativoPSP).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoVerificaRPTInput.right.password).toBe(
-      MockedData.aConfig.IDENTIFIER.PASSWORD
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].PASSWORD
     );
 
     // Check input content
@@ -98,11 +91,7 @@ describe("getNodoVerificaRPTInput", () => {
   });
 
   it("should return a correct NodoVerificaRPTInput with auxDigit=2", () => {
-    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
-      MockedData.aConfig,
-      MockedData.aRptId2,
-      MockedData.aCodiceContestoPagamento
-    );
+    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MOCK_CLIENT_ID, MockedData.aConfig, MockedData.aRptId2, MockedData.aCodiceContestoPagamento);
 
     // Check if object is valid
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
@@ -113,15 +102,15 @@ describe("getNodoVerificaRPTInput", () => {
     // Check input heading
     expect(
       errorOrNodoVerificaRPTInput.right.identificativoIntermediarioPSP
-    ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
+    ).toBe(MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_INTERMEDIARIO_PSP);
     expect(errorOrNodoVerificaRPTInput.right.identificativoCanale).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_CANALE
     );
     expect(errorOrNodoVerificaRPTInput.right.identificativoPSP).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoVerificaRPTInput.right.password).toBe(
-      MockedData.aConfig.IDENTIFIER.PASSWORD
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].PASSWORD
     );
 
     // Check input content
@@ -143,11 +132,7 @@ describe("getNodoVerificaRPTInput", () => {
   });
 
   it("should return a correct NodoVerificaRPTInput with auxDigit=3", () => {
-    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
-      MockedData.aConfig,
-      MockedData.aRptId3,
-      MockedData.aCodiceContestoPagamento
-    );
+    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MOCK_CLIENT_ID, MockedData.aConfig, MockedData.aRptId3, MockedData.aCodiceContestoPagamento);
 
     // Check if object is valid
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
@@ -158,15 +143,15 @@ describe("getNodoVerificaRPTInput", () => {
     // Check input heading
     expect(
       errorOrNodoVerificaRPTInput.right.identificativoIntermediarioPSP
-    ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
+    ).toBe(MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_INTERMEDIARIO_PSP);
     expect(errorOrNodoVerificaRPTInput.right.identificativoCanale).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_CANALE
     );
     expect(errorOrNodoVerificaRPTInput.right.identificativoPSP).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoVerificaRPTInput.right.password).toBe(
-      MockedData.aConfig.IDENTIFIER.PASSWORD
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].PASSWORD
     );
 
     // Check input content
@@ -339,6 +324,7 @@ describe("getPaymentsCheckResponse", () => {
 describe("getNodoAttivaRPTInput", () => {
   it("should convert PaymentsActivationPostRequest to NodoAttivaRPTInput", () => {
     const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
+      MOCK_CLIENT_ID,
       MockedData.aConfig,
       MockedData.aPaymentActivationsPostRequest
     );
@@ -351,22 +337,22 @@ describe("getNodoAttivaRPTInput", () => {
 
     // Check input heading
     expect(errorOrNodoAttivaRPTInput.right.identificativoIntermediarioPSP).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_INTERMEDIARIO_PSP
     );
     expect(
       errorOrNodoAttivaRPTInput.right.identificativoIntermediarioPSPPagamento
-    ).toBe(MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_INTERMEDIARIO_PSP);
+    ).toBe(MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_INTERMEDIARIO_PSP);
     expect(errorOrNodoAttivaRPTInput.right.identificativoCanale).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_CANALE
     );
     expect(errorOrNodoAttivaRPTInput.right.identificativoCanalePagamento).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_CANALE_PAGAMENTO
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_CANALE_PAGAMENTO
     );
     expect(errorOrNodoAttivaRPTInput.right.identificativoPSP).toBe(
-      MockedData.aConfig.IDENTIFIER.IDENTIFICATIVO_PSP
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].IDENTIFICATIVO_PSP
     );
     expect(errorOrNodoAttivaRPTInput.right.password).toBe(
-      MockedData.aConfig.IDENTIFIER.PASSWORD
+      MockedData.aConfig.IDENTIFIERS[MOCK_CLIENT_ID].PASSWORD
     );
 
     // Check input content
@@ -585,6 +571,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     }
 
     const errorOrActivateIOPaymentInput = PaymentsConverter.getNodoActivateIOPaymentInput(
+      MOCK_CLIENT_ID,
       MockedData.aConfig,
       MockedData.aRptId1,
       12000 as ImportoEuroCents
