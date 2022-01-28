@@ -186,7 +186,7 @@ stages:
 
   - stage: DEV_to_UAT_promotion
     dependsOn:
-      - Deploy_DEV_pagoPA
+      - Swap_to_production_slot_DEV
     jobs:
       - job: Deploy_UAT_WaitForApproval
         displayName: Wait for UAT approval
