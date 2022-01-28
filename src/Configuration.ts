@@ -13,7 +13,8 @@ import { stPassword_type_ppt } from "../generated/PagamentiTelematiciPspNodoserv
 
 const localhost = "http://localhost";
 
-const NODE_CONNECTION_CONFIG_PATH = "./.node_config.json";
+const NODE_CONNECTION_CONFIG_PATH =
+  process.env.NODE_CONFIG_PATH || "./.node_config.json";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const getConfiguration = () => {
