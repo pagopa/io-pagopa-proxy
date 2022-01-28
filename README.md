@@ -38,7 +38,7 @@ https://github.com/vpulim/node-soap/pull/1009
 Those are all Environment variables needed by the application:
 
 | Variable name                              | Description                                                     | type    | default                                            |
-| ------------------------------------------ | --------------------------------------------------------------- | ------- | -------------------------------------------------- |
+|--------------------------------------------|-----------------------------------------------------------------|---------|----------------------------------------------------|
 | WINSTON_LOG_LEVEL                          | The log level used for Winston logger                           | logLev  | debug                                              |
 | PAGOPAPROXY_HOST                           | The hostname or IP address the Express server is listening to   | string  | localhost                                          |
 | PAGOPAPROXY_PORT                           | The HTTP port the Express server is listening to                | int     | 3000                                               |
@@ -49,19 +49,32 @@ Those are all Environment variables needed by the application:
 | PAGOPA_KEY                                 | The PagoPA SOAP Server client certificate private key in base64 | string  |                                                    |
 | PAGOPA_WS_URI                              | The PagoPA SAAP Server URI for SOAP WebService                  | string  | /webservices/pof/PagamentiTelematiciPspNodoservice |
 | PAGOPA_HOST_HEADER                         | The PagoPA SOAP Server Host option for HTTP header              | string  |                                                    |
-| PAGOPA_PASSWORD                            | The password used to authenticate to PagoPA SOAP Server         | string  |                                                    |
 | PAGOPA_TIMEOUT_MSEC                        | The PagoPA SOAP Client Timeout in milliseconds                  | int     | 60000                                              |
-| PAGOPA_ID_PSP                              | The IDENTIFICATIVO_PSP value provided to PagoPA                 | string  |                                                    |
-| PAGOPA_ID_INT_PSP                          | The IDENTIFICATIVO_INTERMEDIARIO_PSP value provided to PagoPA   | string  |                                                    |
-| PAGOPA_ID_CANALE                           | The IDENTIFICATIVO_CANALE value provided to PagoPA              | string  |                                                    |
-| PAGOPA_ID_CANALE_PAGAMENTO                 | The IDENTIFICATIVO_CANALE_PAGAMENTO value provided to PagoPA    | string  |                                                    |
+| NODE_CONFIG_PATH                           | Path to Node client parameters configuration file               | string  | .node_config.json                                  |
 | REDIS_DB_URL                               | The Redis DB Server URL                                         | string  | localhost                                          |
 | REDIS_DB_PORT                              | The Redis DB Server port                                        | int     | 6379                                               |
 | REDIS_DB_PASSWORD                          | The Redis DB Server password                                    | string  |                                                    |
 | REDIS_USE_CLUSTER                          | Enable Redis Cluster                                            | boolean | false                                              |
-| APPINSIGHTS_INSTRUMENTATIONKEY | Instrumentation key for application insights | string | |
+| APPINSIGHTS_INSTRUMENTATIONKEY             | Instrumentation key for application insights                    | string  |                                                    |
 
 logLev values: "error", "info", "debug"
+
+To find details on how to configure client connection parameters see the next section.
+
+### Node client parameters configuration
+
+Different clients may wish to connect to the Node via different parameters. These parameters are described in the `$NODE_CONFIG_PATH` file.
+This file is a JSON file containing a single object whose keys are client identifiers (see "X-Client-Id" header in the API documentation) and each value is an object containing the following keys:
+
+| Variable name                    | Description                                                   | type   | default |
+|----------------------------------|---------------------------------------------------------------|--------|---------|
+| IDENTIFICATIVO_PSP               | The IDENTIFICATIVO_PSP value provided to PagoPA               | string |         |
+| IDENTIFICATIVO_INTERMEDIARIO_PSP | The IDENTIFICATIVO_INTERMEDIARIO_PSP value provided to PagoPA | string |         |
+| IDENTIFICATIVO_CANALE            | The IDENTIFICATIVO_CANALE value provided to PagoPA            | string |         |
+| IDENTIFICATIVO_CANALE_PAGAMENTO  | The IDENTIFICATIVO_CANALE_PAGAMENTO value provided to PagoPA  | string |         |
+| PASSWORD                         | The password used to authenticate to PagoPA SOAP Server       | string |         |
+
+
 
 ## OpenAPI specs
 
@@ -97,6 +110,7 @@ More information about how the pagopa-proxy application communicates with PagoPA
 Create your environment typing :
 ```sh
 cp .env.example .env
+cp .node_config.json.example .node_config.json
 ``` 
 
 Then from current project directory run :
@@ -119,7 +133,8 @@ Then to verify connection typing :
 
 ```sh
 curl --location --request GET 'http://localhost:3000/payment-requests/01234567891010001234567890123' \
---data-raw ''
+--data-raw '' \
+-H "X-Client-Id: CLIENT_CHECKOUT"
 ```
 
 and you'd see the following response :
