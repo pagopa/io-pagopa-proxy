@@ -64,7 +64,7 @@ To find details on how to configure client connection parameters see the next se
 ### Node client parameters configuration
 
 Different clients may wish to connect to the Node via different parameters. These parameters are described in the `$NODE_CONFIG_PATH` file.
-This file is a JSON file containing a single object whose keys are client identifiers (see "X-Client-Id" header in the API documentation) and each value is an object containing the following keys:
+This file is a JSON file containing a single object whose keys are client identifiers (see "X-Client-Id" header in the API specification under `api_pagopa.yml`) and each value is an object containing the following keys:
 
 | Variable name                    | Description                                                   | type   | default |
 |----------------------------------|---------------------------------------------------------------|--------|---------|
