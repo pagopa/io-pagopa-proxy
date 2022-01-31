@@ -145,27 +145,6 @@ stages:
               deploymentMethod: 'auto'
             displayName: Deploy to DEV-pagoPA
 
-  - stage: API_tests_in_dev
-    dependsOn:
-      - Deploy_DEV_pagoPA
-    jobs:
-      - job: TestAPI
-        steps:
-          - script: |
-              yarn global add newman
-            displayName: 'newman installation'
-
-          - script: |
-              newman run api-tests/checkout-payments.tests.json --environment=api-tests/dev.envs.json --reporters cli,junit --reporter-junit-export Results/checkout-api-TEST.xml
-            displayName: 'Run api test'
-            continueOnError: true 
-
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '**/*-TEST.xml' 
-              searchFolder: '$(System.DefaultWorkingDirectory)'
-
   - stage: DEV_to_UAT_promotion
     dependsOn:
       - Deploy_DEV_pagoPA
