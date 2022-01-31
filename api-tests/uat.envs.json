@@ -4,7 +4,7 @@
     "values": [
         {
             "key": "CHECKOUT_HOST",
-            "value": "https://api.dev.platform.pagopa.it",
+            "value": "https://api.uat.platform.pagopa.it",
             "enabled": true
         },
         {
