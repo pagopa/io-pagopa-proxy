@@ -124,7 +124,7 @@ stages:
           - publish: $(System.DefaultWorkingDirectory)/bundle
             artifact: Bundle
             
-  - stage: Deploy_to_staging_slot_DEV
+  - stage: Deploy_DEV_pagoPA
     dependsOn:
       - Prepare_artifact
     jobs:
@@ -143,13 +143,11 @@ stages:
               appName: 'pagopa-d-app-pagopa-proxy'
               package: '$(Pipeline.Workspace)/Bundle'
               deploymentMethod: 'auto'
-              deployToSlotOrASE: true
-              slotName: 'staging'
-            displayName: Deploy pagopa-proxy to staging slot - DEV-pagoPA
+            displayName: Deploy to DEV-pagoPA
 
-  - stage: API_tests_in_staging_dev
+  - stage: API_tests_in_dev
     dependsOn:
-      - Deploy_to_staging_slot_DEV
+      - Deploy_DEV_pagoPA
     jobs:
       - job: TestAPI
         steps:
@@ -167,22 +165,6 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: '**/*-TEST.xml' 
               searchFolder: '$(System.DefaultWorkingDirectory)'
-
-  - stage: Swap_to_production_slot_DEV
-    dependsOn:
-      - API_tests_in_staging_dev
-    jobs:
-      - job: 'deply'       
-        steps:  
-          - checkout: none
-          - task: AzureAppServiceManage@0
-            inputs:
-              azureSubscription: '$(DEV_AZURE_SUBSCRIPTION)'
-              resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
-              webAppName: 'pagopa-d-app-pagopa-proxy'
-              sourceSlot: staging
-              swapWithProduction: true
-            displayName: Swap with production slot
 
   - stage: DEV_to_UAT_promotion
     dependsOn:
