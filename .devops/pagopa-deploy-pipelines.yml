@@ -93,7 +93,7 @@ stages:
             displayName: 'Build'
           - task: CopyFiles@2
             inputs:
-              SourceFolder: '$(System.DefaultWorkingDirectory)'
+              SourceFolder: '$(System.DefaultWorkingDirectory)/dist'
               TargetFolder: '$(System.DefaultWorkingDirectory)/bundle'
               Contents: |
                 **/*
