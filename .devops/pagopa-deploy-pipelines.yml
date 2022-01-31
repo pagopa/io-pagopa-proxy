@@ -168,7 +168,7 @@ stages:
 
   - stage: DEV_to_UAT_promotion
     dependsOn:
-      - API_tests_in_dev
+      - Deploy_DEV_pagoPA
     jobs:
       - job: Deploy_UAT_WaitForApproval
         displayName: Wait for UAT approval
