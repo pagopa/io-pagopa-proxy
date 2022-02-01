@@ -19,8 +19,6 @@ RUN sudo chmod -R 777 /usr/src/app \
 FROM node:14.16.0-alpine
 LABEL maintainer="https://teamdigitale.governo.it"
 
-ARG NODE_CONFIG_PATH
-
 # Install major CA certificates to cover
 # https://github.com/SparebankenVest/azure-key-vault-to-kubernetes integration
 RUN apk update && \
@@ -31,7 +29,6 @@ WORKDIR /usr/src/app
 COPY /package.json /usr/src/app/package.json
 COPY --from=builder /usr/src/app/dist /usr/src/app/dist
 COPY --from=builder /usr/src/app/node_modules /usr/src/app/node_modules
-COPY /$NODE_CONFIG_PATH /usr/src/app/$NODE_CONFIG_PATH
 
 EXPOSE 80
 

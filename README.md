@@ -50,7 +50,7 @@ Those are all Environment variables needed by the application:
 | PAGOPA_WS_URI                              | The PagoPA SAAP Server URI for SOAP WebService                  | string  | /webservices/pof/PagamentiTelematiciPspNodoservice |
 | PAGOPA_HOST_HEADER                         | The PagoPA SOAP Server Host option for HTTP header              | string  |                                                    |
 | PAGOPA_TIMEOUT_MSEC                        | The PagoPA SOAP Client Timeout in milliseconds                  | int     | 60000                                              |
-| NODE_CONFIG_PATH                           | Path to Node client parameters configuration file               | string  | .node_config.json                                  |
+| NODE_CONNECTIONS_CONFIG                    | Node client parameters configuration                            | JSON    | (see `.env.example`)                               |
 | REDIS_DB_URL                               | The Redis DB Server URL                                         | string  | localhost                                          |
 | REDIS_DB_PORT                              | The Redis DB Server port                                        | int     | 6379                                               |
 | REDIS_DB_PASSWORD                          | The Redis DB Server password                                    | string  |                                                    |
@@ -63,8 +63,8 @@ To find details on how to configure client connection parameters see the next se
 
 ### Node client parameters configuration
 
-Different clients may wish to connect to the Node via different parameters. These parameters are described in the `$NODE_CONFIG_PATH` file.
-This file is a JSON file containing a single object whose keys are client identifiers (see "X-Client-Id" header in the API specification under `api_pagopa.yml`) and each value is an object containing the following keys:
+Different clients may wish to connect to the Node via different parameters. These parameters are controlled by the `$NODE_CONNECTIONS_CONFIG` variable.
+This variable is a JSON object whose keys are client identifiers (see "X-Client-Id" header in the API specification under `api_pagopa.yml`) and each value is an object containing the following keys:
 
 | Variable name                    | Description                                                   | type   | default |
 |----------------------------------|---------------------------------------------------------------|--------|---------|

@@ -10,8 +10,6 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
-      args:
-        - NODE_CONFIG_PATH=$NODE_CONFIG_PATH
     networks:
       - io-fn
 
