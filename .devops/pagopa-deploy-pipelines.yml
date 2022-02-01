@@ -246,7 +246,6 @@ stages:
         steps:  
            - checkout: none
            - script: |
-               # fails if response status is not 2xx
                curl -f 'https://pagopa-p-app-pagopa-proxy-staging.azurewebsites.net/ping'
              displayName: 'Healthcheck'
 
