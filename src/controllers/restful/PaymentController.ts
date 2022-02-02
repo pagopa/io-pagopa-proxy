@@ -7,9 +7,11 @@
 import * as express from "express";
 import * as E from "fp-ts/lib/Either";
 import * as O from "fp-ts/lib/Option";
+import * as t from "io-ts";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
 import {
+  IResponseErrorValidation,
   ResponseErrorFromValidationErrors,
   ResponseErrorInternal,
   ResponseErrorNotFound,
@@ -39,7 +41,7 @@ import {
 import { cdInfoWisp_element_ppt } from "../../../generated/FespCdService/cdInfoWisp_element_ppt";
 import { cdInfoWispResponse_element_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_element_ppt";
 import { faultBean_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_type_ppt";
-import { PagoPAConfig } from "../../Configuration";
+import { CONFIG, PagoPAConfig } from "../../Configuration";
 import {
   nodoActivateIOPaymentService,
   nodoVerifyPaymentNoticeService
@@ -61,7 +63,31 @@ import {
   GeneralRptId,
   ResponsePaymentError
 } from "../../utils/types";
-import { RptIdFromString, RptId } from "../../utils/pagopa";
+import { RptId, RptIdFromString } from "../../utils/pagopa";
+
+const validClientId = (header: string): boolean =>
+  header in CONFIG.PAGOPA.IDENTIFIERS;
+
+interface IClientIdBrand {
+  readonly ClientId: unique symbol;
+}
+
+const ClientId = t.brand(
+  t.string,
+  (value: string): value is t.Branded<string, IClientIdBrand> =>
+    validClientId(value),
+  "ClientId"
+);
+
+type ClientId = t.TypeOf<typeof ClientId>;
+
+const headerValidationErrorHandler: (
+  e: ReadonlyArray<t.ValidationError>
+) => Promise<IResponseErrorValidation> = async e =>
+  ResponseErrorValidation(
+    "Invalid X-Client-Id",
+    e.map(err => err.message).join("\n")
+  );
 
 // 1. verificaCtrl
 const getGetPaymentInfoController: (
@@ -283,13 +309,20 @@ AsControllerFunction<GetPaymentInfoT> = (
   return ResponseSuccessJson(responseOrError.right);
 };
 
-function getClientId(req: express.Request): string {
-  const clientId = req.header("X-Client-Id");
+function getClientId(req: express.Request): t.Validation<string> {
+  const clientId = O.fromNullable(req.header("X-Client-Id"));
 
-  if (clientId === undefined) {
-    throw Error("Required 'X-Client-Id' header missing");
-  }
-  return clientId;
+  return pipe(
+    clientId,
+    E.fromOption(() => [
+      {
+        context: t.getDefaultContext(ClientId),
+        message: "Missing X-Client-Id header",
+        value: undefined
+      }
+    ]),
+    E.chain(ClientId.decode)
+  );
 }
 
 /**
@@ -317,10 +350,19 @@ export function getPaymentInfo(
   return async req => {
     const clientId = getClientId(req);
 
-    return controller({
-      rpt_id_from_string: req.params.rpt_id_from_string,
-      "x-Client-Id": clientId
-    });
+    type HandlerReturnType = Promise<
+      AsControllerResponseType<TypeofApiResponse<GetPaymentInfoT>>
+    >;
+    const responseHandler: (id: string) => HandlerReturnType = id =>
+      controller({
+        rpt_id_from_string: req.params.rpt_id_from_string,
+        "x-Client-Id": id
+      });
+
+    return pipe(
+      clientId,
+      E.fold(headerValidationErrorHandler, responseHandler)
+    );
   };
 }
 
@@ -575,10 +617,19 @@ export function activatePayment(
 
     const clientId = getClientId(req);
 
-    return controller({
-      body: paymentActivationsPostRequest,
-      "x-Client-Id": clientId
-    });
+    type HandlerReturnType = Promise<
+      AsControllerResponseType<TypeofApiResponse<ActivatePaymentT>>
+    >;
+    const responseHandler: (id: string) => HandlerReturnType = id =>
+      controller({
+        body: paymentActivationsPostRequest,
+        "x-Client-Id": id
+      });
+
+    return pipe(
+      clientId,
+      E.fold(headerValidationErrorHandler, responseHandler)
+    );
   };
 }
 
@@ -709,10 +760,19 @@ export function getActivationStatus(
 
     const clientId = getClientId(req);
 
-    return controller({
-      codice_contesto_pagamento: codiceContestoPagamento,
-      "x-Client-Id": clientId
-    });
+    type HandlerReturnType = Promise<
+      AsControllerResponseType<TypeofApiResponse<GetActivationStatusT>>
+    >;
+    const responseHandler: (id: string) => HandlerReturnType = id =>
+      controller({
+        codice_contesto_pagamento: codiceContestoPagamento,
+        "x-Client-Id": id
+      });
+
+    return pipe(
+      clientId,
+      E.fold(headerValidationErrorHandler, responseHandler)
+    );
   };
 }
 
