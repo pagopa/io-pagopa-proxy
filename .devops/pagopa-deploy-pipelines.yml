@@ -189,7 +189,7 @@ stages:
 
   - stage: Deploy_PROD_pagoPA
     dependsOn:
-      - DEV_to_PROD_promotion
+      - DEV_to_UAT_promotion
     jobs:
       - job: 'deploy'
         steps:
