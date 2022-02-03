@@ -28,6 +28,7 @@ export default function () {
     const headersParams = {
         headers: {
             'Content-Type': 'application/json',
+            'X-Client-Id' : 'CLIENT_CHECKOUT'
         },
     };
     

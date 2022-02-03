@@ -92,6 +92,8 @@ AsControllerFunction<GetPaymentInfoT> = (
 ) => async params => {
   const clientId = params["x-Client-Id"] as NodeClientType;
 
+  logger.info(`GetPaymentInfo|${clientId}|${params.rpt_id_from_string}`);
+
   // Validate rptId (payment identifier) provided by BackendApp
   const errorOrRptId = RptIdFromString.decode(params.rpt_id_from_string);
   if (E.isLeft(errorOrRptId)) {
@@ -385,6 +387,8 @@ AsControllerFunction<ActivatePaymentT> = (
     })
   );
   const clientId = params["x-Client-Id"] as NodeClientType;
+
+  logger.info(`ActivatePayment|${clientId}|${rptId}`);
 
   // Some static information will be obtained by PagoPAConfig, to identify this client.
   const nodeClientConfig =
