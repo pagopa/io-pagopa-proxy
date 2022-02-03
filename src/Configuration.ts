@@ -7,6 +7,7 @@ import * as t from "io-ts";
 import * as O from "fp-ts/lib/Option";
 import { pipe } from "fp-ts/lib/function";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { enumType } from "@pagopa/ts-commons/lib/types";
 import { stText35_type_ppt } from "../generated/PagamentiTelematiciPspNodoservice/stText35_type_ppt";
 import { stPassword_type_ppt } from "../generated/PagamentiTelematiciPspNodoservice/stPassword_type_ppt";
 
@@ -128,8 +129,23 @@ export const NodeClientConfig = t.interface({
 });
 export type NodeClientConfig = t.TypeOf<typeof NodeClientConfig>;
 
-export const NodeConnectionsConfig = t.record(t.string, NodeClientConfig);
+export const NodeConnectionsConfig = t.interface({
+  CLIENT_IO: NodeClientConfig,
+  CLIENT_CHECKOUT: NodeClientConfig
+});
+
 export type NodeConnectionsConfig = t.TypeOf<typeof NodeConnectionsConfig>;
+
+export enum NodeClientEnum {
+  "CLIENT_IO" = "CLIENT_IO",
+  "CLIENT_CHECKOUT" = "CLIENT_CHECKOUT"
+}
+
+export type NodeClientType = t.TypeOf<typeof NodeClientType>;
+export const NodeClientType = enumType<NodeClientEnum>(
+  NodeClientEnum,
+  "NodeClientType"
+);
 
 export const PagoPAConfig = t.intersection([
   ServerConfiguration,

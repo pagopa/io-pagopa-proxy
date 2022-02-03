@@ -10,7 +10,7 @@ import { MOCK_CLIENT_ID } from "./MockedData";
 
 describe("getNodoVerificaRPTInput", () => {
   it("should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
-    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MOCK_CLIENT_ID, MockedData.aConfig, MockedData.aRptId0, MockedData.aCodiceContestoPagamento);
+    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MockedData.aConfig.IDENTIFIERS.CLIENT_IO, MockedData.aRptId0, MockedData.aCodiceContestoPagamento);
 
     // Check if object is valid
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
@@ -52,7 +52,7 @@ describe("getNodoVerificaRPTInput", () => {
   });
 
   it("should return a correct NodoVerificaRPTInput with auxDigit=1", () => {
-    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MOCK_CLIENT_ID, MockedData.aConfig, MockedData.aRptId1, MockedData.aCodiceContestoPagamento);
+    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput( MockedData.aConfig.IDENTIFIERS.CLIENT_CHECKOUT, MockedData.aRptId1, MockedData.aCodiceContestoPagamento);
 
     // Check if object is valid
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
@@ -91,7 +91,7 @@ describe("getNodoVerificaRPTInput", () => {
   });
 
   it("should return a correct NodoVerificaRPTInput with auxDigit=2", () => {
-    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MOCK_CLIENT_ID, MockedData.aConfig, MockedData.aRptId2, MockedData.aCodiceContestoPagamento);
+    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput( MockedData.aConfig.IDENTIFIERS.CLIENT_CHECKOUT, MockedData.aRptId2, MockedData.aCodiceContestoPagamento);
 
     // Check if object is valid
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
@@ -132,7 +132,7 @@ describe("getNodoVerificaRPTInput", () => {
   });
 
   it("should return a correct NodoVerificaRPTInput with auxDigit=3", () => {
-    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MOCK_CLIENT_ID, MockedData.aConfig, MockedData.aRptId3, MockedData.aCodiceContestoPagamento);
+    const errorOrNodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(MockedData.aConfig.IDENTIFIERS.CLIENT_IO, MockedData.aRptId3, MockedData.aCodiceContestoPagamento);
 
     // Check if object is valid
     expect(isRight(errorOrNodoVerificaRPTInput)).toBeTruthy();
@@ -324,8 +324,7 @@ describe("getPaymentsCheckResponse", () => {
 describe("getNodoAttivaRPTInput", () => {
   it("should convert PaymentsActivationPostRequest to NodoAttivaRPTInput", () => {
     const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
-      MOCK_CLIENT_ID,
-      MockedData.aConfig,
+      MockedData.aConfig.IDENTIFIERS.CLIENT_IO,
       MockedData.aPaymentActivationsPostRequest
     );
 
@@ -571,8 +570,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     }
 
     const errorOrActivateIOPaymentInput = PaymentsConverter.getNodoActivateIOPaymentInput(
-      MOCK_CLIENT_ID,
-      MockedData.aConfig,
+      MockedData.aConfig.IDENTIFIERS.CLIENT_CHECKOUT,
       MockedData.aRptId1,
       12000 as ImportoEuroCents
     );

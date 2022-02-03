@@ -13,3 +13,4 @@ generated
 .DS_Store
 k6example/libs
 .eslintcache
+test_reports/pagopa-proxy-IT.xml
