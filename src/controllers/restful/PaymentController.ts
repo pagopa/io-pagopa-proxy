@@ -41,7 +41,13 @@ import {
 import { cdInfoWisp_element_ppt } from "../../../generated/FespCdService/cdInfoWisp_element_ppt";
 import { cdInfoWispResponse_element_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_element_ppt";
 import { faultBean_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_type_ppt";
-import { CONFIG, PagoPAConfig } from "../../Configuration";
+import {
+  CONFIG,
+  NodeClientConfig,
+  NodeClientEnum,
+  NodeClientType,
+  PagoPAConfig
+} from "../../Configuration";
 import {
   nodoActivateIOPaymentService,
   nodoVerifyPaymentNoticeService
@@ -99,9 +105,9 @@ AsControllerFunction<GetPaymentInfoT> = (
   pagoPAConfig,
   pagoPAClient,
   pagoPAClientNm3
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type,max-lines-per-function
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, max-lines-per-function
 ) => async params => {
-  const clientId = params["x-Client-Id"];
+  const clientId = params["x-Client-Id"] as NodeClientType;
 
   // Validate rptId (payment identifier) provided by BackendApp
   const errorOrRptId = RptIdFromString.decode(params.rpt_id_from_string);
@@ -133,11 +139,15 @@ AsControllerFunction<GetPaymentInfoT> = (
   // For the next messages, BackendApp will provide the same codiceContestoPagamento
   const codiceContestoPagamento = generateCodiceContestoPagamento();
 
-  // Convert the input provided by BackendApp (RESTful request) to a PagoPA request (SOAP request).
   // Some static information will be obtained by PagoPAConfig, to identify this client.
+  const nodeClientConfig: NodeClientConfig =
+    NodeClientEnum.CLIENT_CHECKOUT === clientId
+      ? pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT
+      : pagoPAConfig.IDENTIFIERS.CLIENT_IO;
+
+  // Convert the input provided by BackendApp (RESTful request) to a PagoPA request (SOAP request).
   const errorOrInodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
-    clientId,
-    pagoPAConfig,
+    nodeClientConfig,
     rptId,
     codiceContestoPagamento
   );
@@ -373,7 +383,8 @@ const getActivatePaymentController: (
   pagoPAClientNm3: NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient,
   redisClient: redis.RedisClient,
   redisTimeoutSecs: number
-) => AsControllerFunction<ActivatePaymentT> = (
+) => // eslint-disable-next-line max-lines-per-function
+AsControllerFunction<ActivatePaymentT> = (
   pagoPAConfig,
   pagoPAClient,
   pagoPAClientNm3,
@@ -390,14 +401,20 @@ const getActivatePaymentController: (
       throw Error("Cannot parse rptId");
     })
   );
-  const clientId: string = params["x-Client-Id"];
+  const clientId = params["x-Client-Id"] as NodeClientType;
+
+  // Some static information will be obtained by PagoPAConfig, to identify this client.
+  const nodeClientConfig =
+    NodeClientEnum.CLIENT_CHECKOUT === clientId
+      ? pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT
+      : pagoPAConfig.IDENTIFIERS.CLIENT_IO;
+
   // Convert the input provided by BackendApp (RESTful request)
   // to a PagoPA request (SOAP request), mapping useful information
   // Some static information will be obtained by PagoPAConfig, to identify this client
   // If something wrong into input will be detected during mapping, and error will be provided as response
   const errorOrNodoAttivaRPTInput = PaymentsConverter.getNodoAttivaRPTInput(
-    clientId,
-    pagoPAConfig,
+    nodeClientConfig,
     params.body
   );
   if (E.isLeft(errorOrNodoAttivaRPTInput)) {

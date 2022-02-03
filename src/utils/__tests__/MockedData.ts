@@ -340,7 +340,7 @@ export const aPaymentActivationsPostRequest = pipe(
   })
 );
 
-export const MOCK_CLIENT_ID = "MOCK_1";
+export const MOCK_CLIENT_ID = "CLIENT_CHECKOUT";
 
 // Define a PagoPA Configuration for tests
 export const aConfig = pipe(
@@ -358,11 +358,18 @@ export const aConfig = pipe(
       }
     },
     IDENTIFIERS: {
-      [MOCK_CLIENT_ID]: {
-        IDENTIFICATIVO_PSP: "AGID_01",
-        IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
-        IDENTIFICATIVO_CANALE: "97735020584_02",
-        IDENTIFICATIVO_CANALE_PAGAMENTO: "97735020584_xx",
+      CLIENT_IO: {
+        IDENTIFICATIVO_PSP: "TEST_01",
+        IDENTIFICATIVO_INTERMEDIARIO_PSP: "00735020584",
+        IDENTIFICATIVO_CANALE: "00735020584_02",
+        IDENTIFICATIVO_CANALE_PAGAMENTO: "00735020584_xx",
+        PASSWORD: process.env.PAGOPA_PASSWORD || "nopassword"
+      },
+      CLIENT_CHECKOUT: {
+        IDENTIFICATIVO_PSP: "TEST_01",
+        IDENTIFICATIVO_INTERMEDIARIO_PSP: "00735020584",
+        IDENTIFICATIVO_CANALE: "00735020584_02",
+        IDENTIFICATIVO_CANALE_PAGAMENTO: "00735020584_xx",
         PASSWORD: process.env.PAGOPA_PASSWORD || "nopassword"
       }
     },

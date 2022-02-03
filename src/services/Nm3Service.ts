@@ -14,7 +14,7 @@ import {
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentRequestsGetResponse } from "../../generated/api/PaymentRequestsGetResponse";
-import { PagoPAConfig } from "../Configuration";
+import { NodeClientEnum, NodeClientType, PagoPAConfig } from "../Configuration";
 import {
   getDetailV2FromFaultCode,
   getResponseErrorIfExists,
@@ -40,7 +40,7 @@ import * as PaymentsService from "./PaymentsService";
  * The goal of this function is to call verifyPaymentNotice service of pagoPA Node
  */
 export async function nodoVerifyPaymentNoticeService(
-  clientId: string,
+  clientId: NodeClientType,
   pagoPAConfig: PagoPAConfig,
   pagoPAClientNm3: PagamentiTelematiciPspNm3NodoAsyncClient,
   rptId: GeneralRptId,
@@ -52,9 +52,14 @@ export async function nodoVerifyPaymentNoticeService(
 > {
   logger.info(`GetNodoVerifyPaymentNotice|(nm3) for request|${rptId.asString}`);
 
+  // Some static information will be obtained by PagoPAConfig, to identify this client.
+  const nodeClientConfig =
+    NodeClientEnum.CLIENT_CHECKOUT === clientId
+      ? pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT
+      : pagoPAConfig.IDENTIFIERS.CLIENT_IO;
+
   const errorOrIverifyPaymentNoticeutput = PaymentsConverter.getNodoVerifyPaymentNoticeInput(
-    clientId,
-    pagoPAConfig,
+    nodeClientConfig,
     rptId.asObject
   );
 
@@ -221,7 +226,7 @@ export async function nodoVerifyPaymentNoticeService(
  */
 // eslint-disable-next-line max-params,  max-lines-per-function
 export async function nodoActivateIOPaymentService(
-  clientId: string,
+  clientId: NodeClientType,
   pagoPAConfig: PagoPAConfig,
   pagoPAClientNm3: PagamentiTelematiciPspNm3NodoAsyncClient,
   redisClient: redis.RedisClient,
@@ -238,9 +243,14 @@ export async function nodoActivateIOPaymentService(
     `ActivateIOPayment|(nm3) for codiceContestoPagamento ${codiceContestoPagamento}`
   );
 
+  // Some static information will be obtained by PagoPAConfig, to identify this client.
+  const nodeClientConfig =
+    NodeClientEnum.CLIENT_CHECKOUT === clientId
+      ? pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT
+      : pagoPAConfig.IDENTIFIERS.CLIENT_IO;
+
   const errorOrActivateIOPaymentInput = PaymentsConverter.getNodoActivateIOPaymentInput(
-    clientId,
-    pagoPAConfig,
+    nodeClientConfig,
     rptId.asObject,
     amount
   );
