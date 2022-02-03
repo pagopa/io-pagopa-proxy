@@ -10,9 +10,10 @@ variables:
   NODE_VERSION: '14.16.0'
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
 
-# Automatically triggered on PR
-# https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
-trigger: none
+pr:
+  branches:
+    include:
+      - master
 
 pool:
   vmImage: 'ubuntu-latest'
