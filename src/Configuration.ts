@@ -55,13 +55,7 @@ export const CONFIG = {
     CERT: process.env.PAGOPA_CERT,
     KEY: process.env.PAGOPA_KEY,
     // These information will identify our system when it will access to PagoPA
-    IDENTIFIER: {
-      IDENTIFICATIVO_CANALE: process.env.PAGOPA_ID_CANALE,
-      IDENTIFICATIVO_CANALE_PAGAMENTO: process.env.PAGOPA_ID_CANALE_PAGAMENTO,
-      IDENTIFICATIVO_INTERMEDIARIO_PSP: process.env.PAGOPA_ID_INT_PSP,
-      IDENTIFICATIVO_PSP: process.env.PAGOPA_ID_PSP,
-      PASSWORD: process.env.PAGOPA_PASSWORD
-    },
+    IDENTIFIERS: JSON.parse(process.env.NODE_CONNECTIONS_CONFIG || "{}"),
     PORT: process.env.PAGOPA_PORT || 3001,
     WS_SERVICES: {
       PAGAMENTI: {
@@ -125,17 +119,23 @@ const ControllerConfig = t.intersection([
 ]);
 export type ControllerConfig = t.TypeOf<typeof ControllerConfig>;
 
+export const NodeClientConfig = t.interface({
+  IDENTIFICATIVO_PSP: stText35_type_ppt,
+  IDENTIFICATIVO_INTERMEDIARIO_PSP: stText35_type_ppt,
+  IDENTIFICATIVO_CANALE: stText35_type_ppt,
+  IDENTIFICATIVO_CANALE_PAGAMENTO: stText35_type_ppt,
+  PASSWORD: stPassword_type_ppt
+});
+export type NodeClientConfig = t.TypeOf<typeof NodeClientConfig>;
+
+export const NodeConnectionsConfig = t.record(t.string, NodeClientConfig);
+export type NodeConnectionsConfig = t.TypeOf<typeof NodeConnectionsConfig>;
+
 export const PagoPAConfig = t.intersection([
   ServerConfiguration,
   t.interface({
     CLIENT_TIMEOUT_MSEC: t.number,
-    IDENTIFIER: t.interface({
-      IDENTIFICATIVO_CANALE: stText35_type_ppt,
-      IDENTIFICATIVO_CANALE_PAGAMENTO: stText35_type_ppt,
-      IDENTIFICATIVO_INTERMEDIARIO_PSP: stText35_type_ppt,
-      IDENTIFICATIVO_PSP: stText35_type_ppt,
-      PASSWORD: stPassword_type_ppt
-    }),
+    IDENTIFIERS: NodeConnectionsConfig,
     WS_SERVICES: t.interface({
       PAGAMENTI: t.interface({
         NODO_PER_PSP: NonEmptyString,

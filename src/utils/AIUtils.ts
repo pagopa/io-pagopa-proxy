@@ -8,6 +8,7 @@ import { CONFIG } from "../Configuration";
 const PaymentEvent = t.interface({
   name: t.string,
   properties: t.partial({
+    clientId: t.string,
     codiceContestoPagamento: t.string,
     detail: t.string,
     detail_v2: t.string,

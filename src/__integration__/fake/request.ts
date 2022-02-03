@@ -18,10 +18,17 @@ export default function mockReq(): any {
     is: jest.fn(),
     param: jest.fn(),
     range: jest.fn(),
-    reset: resetMock
+    reset: resetMock,
+    _headers: {} as Record<string, string | undefined>,
+    get headers() { return this._headers },
+    set headers(newHeaders) {
+      for(const k of Object.keys(newHeaders)) {
+        this._headers[k.toLowerCase()] = newHeaders[k]
+      }
+    }
   };
 
-  request.header.mockImplementation(() => request);
+  request.header.mockImplementation((k: string) => request.headers[k.toLowerCase()]);
   request.accepts.mockImplementation(() => request);
   request.acceptsEncodings.mockImplementation(() => request);
   request.acceptsEncoding.mockImplementation(() => request);
