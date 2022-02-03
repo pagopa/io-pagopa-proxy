@@ -246,7 +246,7 @@ stages:
         steps:  
            - checkout: none
            - script: |
-               curl -f 'https://pagopa-p-app-pagopa-proxy-staging.azurewebsites.net/ping'
+               curl -f https://pagopa-p-app-pagopa-proxy-staging.azurewebsites.net/ping
              displayName: 'Healthcheck'
 
   - stage: Swap_to_production_slot_PROD
