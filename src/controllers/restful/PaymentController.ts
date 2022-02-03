@@ -70,21 +70,6 @@ import {
 } from "../../utils/types";
 import { RptId, RptIdFromString } from "../../utils/pagopa";
 
-const validClientId = (header: string): boolean => header in NodeClientEnum;
-
-interface IClientIdBrand {
-  readonly ClientId: unique symbol;
-}
-
-const ClientId = t.brand(
-  t.string,
-  (value: string): value is t.Branded<string, IClientIdBrand> =>
-    validClientId(value),
-  "ClientId"
-);
-
-type ClientId = t.TypeOf<typeof ClientId>;
-
 const headerValidationErrorHandler: (
   e: ReadonlyArray<t.ValidationError>
 ) => Promise<IResponseErrorValidation> = async e =>
@@ -324,12 +309,12 @@ function getClientId(req: express.Request): t.Validation<string> {
     clientId,
     E.fromOption(() => [
       {
-        context: t.getDefaultContext(ClientId),
+        context: t.getDefaultContext(NodeClientType),
         message: "Missing X-Client-Id header",
         value: undefined
       }
     ]),
-    E.chain(ClientId.decode)
+    E.chain(NodeClientType.decode)
   );
 }
 
