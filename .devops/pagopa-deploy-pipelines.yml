@@ -242,12 +242,14 @@ stages:
     dependsOn:
       - Deploy_to_staging_slot_PROD
     jobs:
-      - job: 'do_healthcheck'       
+      - job: 'do_healthcheck'
+        continueOnError: true 
         steps:  
            - checkout: none
            - script: |
                curl -f https://pagopa-p-app-pagopa-proxy-staging.azurewebsites.net/ping
              displayName: 'Healthcheck'
+
 
   - stage: Swap_to_production_slot_PROD
     dependsOn:
