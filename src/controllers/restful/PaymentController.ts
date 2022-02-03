@@ -42,7 +42,6 @@ import { cdInfoWisp_element_ppt } from "../../../generated/FespCdService/cdInfoW
 import { cdInfoWispResponse_element_ppt } from "../../../generated/FespCdService/cdInfoWispResponse_element_ppt";
 import { faultBean_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/faultBean_type_ppt";
 import {
-  CONFIG,
   NodeClientConfig,
   NodeClientEnum,
   NodeClientType,
@@ -71,8 +70,7 @@ import {
 } from "../../utils/types";
 import { RptId, RptIdFromString } from "../../utils/pagopa";
 
-const validClientId = (header: string): boolean =>
-  header in CONFIG.PAGOPA.IDENTIFIERS;
+const validClientId = (header: string): boolean => header in NodeClientEnum;
 
 interface IClientIdBrand {
   readonly ClientId: unique symbol;
