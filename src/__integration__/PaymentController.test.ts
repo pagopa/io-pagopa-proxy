@@ -1,4 +1,4 @@
-import { NonEmptyString, OrganizationFiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { OrganizationFiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { isRight } from "fp-ts/lib/Either";
 
 import "jest-xml-matcher";
@@ -8,7 +8,7 @@ import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagam
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { cdInfoWisp_element_ppt } from "../../generated/FespCdService/cdInfoWisp_element_ppt";
 import { stText35_type_ppt } from "../../generated/FespCdService/stText35_type_ppt";
-import { PagoPAConfig } from "../Configuration";
+import { NodeClientEnum, PagoPAConfig } from "../Configuration";
 import {
   activatePayment,
   getActivationStatus,
@@ -28,7 +28,7 @@ import {
 } from "./fake/fakePagamentiTelematiciPspNodoNm3AsyncClient";
 import mockReq from "./fake/request";
 
-const TEST_CLIENT_ID = "TEST_1" as NonEmptyString;
+const TEST_CLIENT_ID = NodeClientEnum.CLIENT_CHECKOUT;
 
 const aConfig = {
   HOST: "http://localhost",
@@ -43,9 +43,9 @@ const aConfig = {
   // These information will identify our system when it will access to PagoPA
   IDENTIFIERS: {
     [TEST_CLIENT_ID]: {
-      IDENTIFICATIVO_PSP: "AGID_01",
-      IDENTIFICATIVO_INTERMEDIARIO_PSP: "97735020584",
-      IDENTIFICATIVO_CANALE: "97735020584_02",
+      IDENTIFICATIVO_PSP: "TEST_01",
+      IDENTIFICATIVO_INTERMEDIARIO_PSP: "00735020584",
+      IDENTIFICATIVO_CANALE: "00735020584_02",
       PASSWORD: "nopassword",
     }
   }
@@ -207,7 +207,7 @@ describe("activatePaymentToPagoPa", () => {
     expect(clientRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         body:
-          '<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:ppt="http://ws.pagamenti.telematici.gov/" xmlns:tns="http://PuntoAccessoPSP.spcoop.gov.it/servizi/PagamentiTelematiciPspNodo" xmlns:pay_i="http://www.digitpa.gov.it/schemas/2011/Pagamenti/" xmlns:qrc="http://PuntoAccessoPSP.spcoop.gov.it/QrCode"><soap:Body><ppt:nodoAttivaRPT xmlns:ppt="http://ws.pagamenti.telematici.gov/"><identificativoPSP>AGID_01</identificativoPSP><identificativoIntermediarioPSP>97735020584</identificativoIntermediarioPSP><identificativoCanale>97735020584_02</identificativoCanale><password>nopassword</password><codiceContestoPagamento>05245c90746811e8b9bf91897339427e</codiceContestoPagamento><identificativoIntermediarioPSPPagamento>97735020584</identificativoIntermediarioPSPPagamento><codificaInfrastrutturaPSP>QR-CODE</codificaInfrastrutturaPSP><codiceIdRPT><qrc:QrCode><qrc:CF>12345678901</qrc:CF><qrc:CodStazPA>12</qrc:CodStazPA><qrc:AuxDigit>0</qrc:AuxDigit><qrc:CodIUV>123456789012399</qrc:CodIUV></qrc:QrCode></codiceIdRPT><datiPagamentoPSP><importoSingoloVersamento>99.00</importoSingoloVersamento></datiPagamentoPSP></ppt:nodoAttivaRPT></soap:Body></soap:Envelope>'
+          '<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:ppt="http://ws.pagamenti.telematici.gov/" xmlns:tns="http://PuntoAccessoPSP.spcoop.gov.it/servizi/PagamentiTelematiciPspNodo" xmlns:pay_i="http://www.digitpa.gov.it/schemas/2011/Pagamenti/" xmlns:qrc="http://PuntoAccessoPSP.spcoop.gov.it/QrCode"><soap:Body><ppt:nodoAttivaRPT xmlns:ppt="http://ws.pagamenti.telematici.gov/"><identificativoPSP>TEST_01</identificativoPSP><identificativoIntermediarioPSP>00735020584</identificativoIntermediarioPSP><identificativoCanale>00735020584_02</identificativoCanale><password>nopassword</password><codiceContestoPagamento>05245c90746811e8b9bf91897339427e</codiceContestoPagamento><identificativoIntermediarioPSPPagamento>00735020584</identificativoIntermediarioPSPPagamento><codificaInfrastrutturaPSP>QR-CODE</codificaInfrastrutturaPSP><codiceIdRPT><qrc:QrCode><qrc:CF>12345678901</qrc:CF><qrc:CodStazPA>12</qrc:CodStazPA><qrc:AuxDigit>0</qrc:AuxDigit><qrc:CodIUV>123456789012399</qrc:CodIUV></qrc:QrCode></codiceIdRPT><datiPagamentoPSP><importoSingoloVersamento>99.00</importoSingoloVersamento></datiPagamentoPSP></ppt:nodoAttivaRPT></soap:Body></soap:Envelope>'
       }),
       expect.anything()
     );
