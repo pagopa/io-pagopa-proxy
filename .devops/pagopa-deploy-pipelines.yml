@@ -57,7 +57,7 @@ stages:
     jobs:
       - job: make_release
         steps:
-        - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release/pagopa-porting') }}:
+        - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release/pagopa\-porting') }}:
           - template: templates/node-github-release/template.yaml@pagopaCommons 
             parameters:
               semver: '${{ parameters.RELEASE_SEMVER }}'
