@@ -46,7 +46,7 @@ stages:
       and(
         succeeded(),
         or(
-          eq(variables['Build.SourceBranch'], variables['BRANCH_TARGET'],
+          eq(variables['Build.SourceBranch'], variables['BRANCH_TARGET']),
           and(
             startsWith(variables['Build.SourceBranch'], 'refs/tags'),
             endsWith(variables['Build.SourceBranch'], '-RELEASE')
