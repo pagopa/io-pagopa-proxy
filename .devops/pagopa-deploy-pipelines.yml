@@ -68,7 +68,7 @@ stages:
               pkg_cache_version_id: $(CACHE_VERSION_ID)
               pkg_cache_folder: $(YARN_CACHE_FOLDER)
 
-        - ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/release/pagopa-porting') }}:
+        - ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/release/pagopa\-porting') }}:
           - script: |
               echo "We assume this reference to be a valid release: $(Build.SourceBranch). Therefore, there is no need to bundle a new release."
             displayName: 'Skip release bundle'
@@ -186,9 +186,9 @@ stages:
     jobs:
       - job: TestAPI
         steps:
-          - task: Delay@1
-            inputs:
-              delayForMinutes: '2'
+          - script: |
+              sleep 60
+            displayName: 'Waiting App running'
  
           - script: |
               yarn global add newman
@@ -244,7 +244,7 @@ stages:
 
   - stage: Swap_to_production_slot_PROD
     dependsOn:
-      - Healthcheck_PROD
+      - Deploy_to_staging_slot_PROD
     jobs:
       - job: 'depoly'       
         steps:  
