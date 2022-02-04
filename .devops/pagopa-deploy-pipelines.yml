@@ -42,7 +42,7 @@ stages:
   # - is on branch release/pagopa-porting 
   # - is a tag in the form v{version}-RELEASE
   - stage: Release
-    condition:
+    # condition:
       # and(
       #   succeeded(),
       #   or(
