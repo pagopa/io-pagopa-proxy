@@ -209,7 +209,6 @@ export function getPaymentRequestsGetResponseNm3(
             identificativoUnivocoBeneficiario:
               verifyPaymentNoticeResponse.fiscalCodePA,
             denominazioneBeneficiario: verifyPaymentNoticeResponse.companyName,
-            codiceUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName,
             denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName
           }
         }
