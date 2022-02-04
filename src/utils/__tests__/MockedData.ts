@@ -8,6 +8,8 @@ import { esitoNodoVerificaRPTRisposta_type_ppt } from "../../../generated/Pagame
 import { PagoPAConfig } from "../../Configuration";
 import * as E from "fp-ts/Either";
 import { RptId } from "../pagopa";
+import { activateIOPaymentRes_element_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentRes_element_nfpsp";
+import { ValidationError } from "io-ts";
 
 // tslint:disable:no-identical-functions
 
@@ -427,3 +429,48 @@ export const aSpezzoniCausaleVersamentoStrutturatoForController = pipe(ctSpezzon
       throw Error(`Invalid configuration: ${reporters.readableReport(errors)}`);
     })
   );
+
+  export const activateIOPaymentResOutputWhitoutEnte = pipe(activateIOPaymentRes_element_nfpsp
+  .decode({
+    outcome: "OK",
+    totalAmount: 100,
+    paymentDescription: "Test causale senza ente"
+  }),
+  E.getOrElseW((errors: readonly ValidationError[]) => {
+    throw Error(
+      `Invalid activateIOPaymentRes_nfpsp to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  }));
+
+export const activateIOPaymentResOutputWhithInvalidEnte = pipe(activateIOPaymentRes_element_nfpsp
+  .decode({
+    outcome: "OK",
+    totalAmount: 100,
+    paymentDescription: "Test causale",
+    fiscalCodePA: "77777777777"
+  }),
+  E.getOrElseW((errors: readonly ValidationError[]) => {
+    throw Error(
+      `Invalid activateIOPaymentRes_nfpsp to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  }));
+
+export const activateIOPaymentResOutputWhithEnte = pipe(activateIOPaymentRes_element_nfpsp
+  .decode({
+    outcome: "OK",
+    totalAmount: 100,
+    paymentDescription: "Test causale",
+    fiscalCodePA: "77777777777",
+    companyName: "denominazione"
+  }),
+  E.getOrElseW((errors: readonly ValidationError[]) => {
+    throw Error(
+      `Invalid activateIOPaymentRes_nfpsp to decode: ${reporters.readableReport(
+        errors
+      )}`
+    );
+  }));
