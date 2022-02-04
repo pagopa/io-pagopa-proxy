@@ -38,26 +38,26 @@ stages:
 
   # Create a relase
   # Activated when ONE OF these are met:
-  # - is on branch master 
+  # - is on branch release/pagopa-porting 
   # - is a tag in the form v{version}-RELEASE
   - stage: Release
     condition:
-      # and(
-      #   succeeded(),
-      #   or(
-      #     eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-      #     and(
-      #       startsWith(variables['Build.SourceBranch'], 'refs/tags'),
-      #       endsWith(variables['Build.SourceBranch'], '-RELEASE')
-      #     )
-      #   )
-      # )
+      and(
+        succeeded(),
+        or(
+          eq(variables['Build.SourceBranch'], 'refs/heads/release/pagopa-porting'),
+          and(
+            startsWith(variables['Build.SourceBranch'], 'refs/tags'),
+            endsWith(variables['Build.SourceBranch'], '-RELEASE')
+          )
+        )
+      )
     pool:
       vmImage: 'ubuntu-latest'
     jobs:
       - job: make_release
         steps:
-        - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+        - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release/pagopa-porting') }}:
           - template: templates/node-github-release/template.yaml@pagopaCommons 
             parameters:
               semver: '${{ parameters.RELEASE_SEMVER }}'
@@ -68,7 +68,7 @@ stages:
               pkg_cache_version_id: $(CACHE_VERSION_ID)
               pkg_cache_folder: $(YARN_CACHE_FOLDER)
 
-        - ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+        - ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/release/pagopa-porting') }}:
           - script: |
               echo "We assume this reference to be a valid release: $(Build.SourceBranch). Therefore, there is no need to bundle a new release."
             displayName: 'Skip release bundle'
@@ -84,7 +84,7 @@ stages:
               # On the assumption that this stage is executed only when Relase stage is,
               #  with this parameter we set the reference the deploy script must pull changes from.
               # The branch/tag name is calculated from the source branch
-              #  ex: Build.SourceBranch=refs/heads/master --> master
+              #  ex: Build.SourceBranch=refs/heads/release/pagopa-porting --> release/pagopa-porting
               #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
               gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
 
@@ -186,6 +186,10 @@ stages:
     jobs:
       - job: TestAPI
         steps:
+          - task: Delay@1
+            inputs:
+              delayForMinutes: '2'
+ 
           - script: |
               yarn global add newman
             displayName: 'newman installation'
@@ -237,19 +241,6 @@ stages:
               deployToSlotOrASE: true
               slotName: 'staging'
             displayName: Deploy pagopa-proxy to staging slot - PROD-pagoPA
-
-  - stage: Healthcheck_PROD
-    dependsOn:
-      - Deploy_to_staging_slot_PROD
-    jobs:
-      - job: 'do_healthcheck'
-        continueOnError: true 
-        steps:  
-           - checkout: none
-           - script: |
-               curl -f https://pagopa-p-app-pagopa-proxy-staging.azurewebsites.net/ping
-             displayName: 'Healthcheck'
-
 
   - stage: Swap_to_production_slot_PROD
     dependsOn:
