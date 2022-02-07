@@ -4988,10 +4988,10 @@ node-fetch@^2.3.0, node-fetch@^2.6.0, node-fetch@^2.6.1:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-forge@^0.9.1:
-  version "0.9.2"
-  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.9.2.tgz#b35a44c28889b2ea55cabf8c79e3563f9676190a"
-  integrity sha512-naKSScof4Wn+aoHU6HBsifh92Zeicm1GDQKd1vp3Y/kOi8ub0DozCa9KpvYNCXslFHYRmLNiqRopGdTGwNLpNw==
+node-forge@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-1.0.0.tgz#a025e3beeeb90d9cee37dae34d25b968ec3e6f15"
+  integrity sha512-ShkiiAlzSsgH1IwGlA0jybk9vQTIOLyJ9nBd0JTuP+nzADJFLY0NoDijM2zvD/JaezooGu3G2p2FNxOAK6459g==
 
 node-int64@^0.4.0:
   version "0.4.0"
