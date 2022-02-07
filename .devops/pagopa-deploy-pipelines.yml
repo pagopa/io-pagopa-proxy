@@ -38,7 +38,7 @@ stages:
 
   # Create a relase
   # Activated when ONE OF these are met:
-  # - is on branch release/pagopa-porting 
+  # - is on branch main
   # - is a tag in the form v{version}-RELEASE
   - stage: Release
     condition:
@@ -84,7 +84,7 @@ stages:
               # On the assumption that this stage is executed only when Relase stage is,
               #  with this parameter we set the reference the deploy script must pull changes from.
               # The branch/tag name is calculated from the source branch
-              #  ex: Build.SourceBranch=refs/heads/release/pagopa-porting --> release/pagopa-porting
+              #  ex: Build.SourceBranch=refs/heads/main --> main
               #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
               gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
 
