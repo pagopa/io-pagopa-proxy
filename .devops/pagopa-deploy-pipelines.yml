@@ -13,7 +13,6 @@ parameters:
 variables:
   NODE_VERSION: '14.16.0'
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
-  BRANCH_TARGET: 'refs/heads/main'
 
 # Only manual activations are intended
 trigger: none
@@ -46,7 +45,7 @@ stages:
       and(
         succeeded(),
         or(
-          eq(variables['Build.SourceBranch'], variables['BRANCH_TARGET']),
+          eq(variables['Build.SourceBranch'], 'main'),
           and(
             startsWith(variables['Build.SourceBranch'], 'refs/tags'),
             endsWith(variables['Build.SourceBranch'], '-RELEASE')
@@ -58,7 +57,7 @@ stages:
     jobs:
       - job: make_release
         steps:
-        - ${{ if eq(variables['Build.SourceBranch'], variables['BRANCH_TARGET']) }}:
+        - ${{ if eq(variables['Build.SourceBranch'], 'main') }}:
           - template: templates/node-github-release/template.yaml@pagopaCommons 
             parameters:
               semver: '${{ parameters.RELEASE_SEMVER }}'
@@ -69,7 +68,7 @@ stages:
               pkg_cache_version_id: $(CACHE_VERSION_ID)
               pkg_cache_folder: $(YARN_CACHE_FOLDER)
 
-        - ${{ if ne(variables['Build.SourceBranch'], variables['BRANCH_TARGET']) }}:
+        - ${{ if ne(variables['Build.SourceBranch'], 'main') }}:
           - script: |
               echo "We assume this reference to be a valid release: $(Build.SourceBranch). Therefore, there is no need to bundle a new release."
             displayName: 'Skip release bundle'
