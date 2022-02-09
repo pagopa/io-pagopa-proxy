@@ -27,9 +27,9 @@ export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseErrorValidation
   : T extends IResponseType<404, ProblemJson>
   ? IResponseErrorNotFound
-  : T extends IResponseType<500, ProblemJson>
+  : T extends IResponseType<424, ProblemJson>
   ? IResponseErrorInternal
-  : T extends IResponseType<500, PaymentProblemJson>
+  : T extends IResponseType<424, PaymentProblemJson>
   ? IResponsePaymentInternalError
   : never;
 
@@ -40,7 +40,7 @@ export type AsControllerFunction<T> = (
 export type IResponsePaymentInternalError = IResponse<"IResponseErrorInternal">;
 
 /**
- * Returns a 500 with json response.
+ * Returns a 424 with json response.
  */
 export const ResponsePaymentError = (
   detail: PaymentFaultEnum,
@@ -50,18 +50,18 @@ export const ResponsePaymentError = (
     detail,
     detail_v2: detailV2,
     status: pipe(
-      WithinRangeInteger(100, 599).decode(HttpStatusCodeEnum.HTTP_STATUS_500),
+      WithinRangeInteger(100, 599).decode(HttpStatusCodeEnum.HTTP_STATUS_424),
       E.getOrElseW(() => {
         throw new Error("should never happen: invalid HTTP status code");
       })
-    ), // FIXME: Why doesn't direct usage of `HttpStatusCodeEnum.HTTP_STATUS_500` typecheck correctly?
-    title: "Internal server error"
+    ),
+    title: "Internal service error"
   };
   return {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     apply: res =>
       res
-        .status(HttpStatusCodeEnum.HTTP_STATUS_500)
+        .status(HttpStatusCodeEnum.HTTP_STATUS_424)
         .set("Content-Type", "application/problem+json")
         .json(problem),
     kind: "IResponseErrorInternal"

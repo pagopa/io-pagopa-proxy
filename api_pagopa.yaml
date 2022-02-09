@@ -29,7 +29,7 @@ paths:
           description: Invalid input or PagoPA response
           schema:
             $ref: "#/definitions/ProblemJson"
-        '500':
+        '424':
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
             $ref: "#/definitions/PaymentProblemJson"
@@ -63,8 +63,8 @@ paths:
           description: Invalid input or PagoPA response
           schema:
             $ref: "#/definitions/ProblemJson"
-        '500':
-          description: PagoPA services are not available
+        '424':
+          description: PagoPA services answered request with error
           schema:
             $ref: "#/definitions/PaymentProblemJson"
   '/payment-activations/{codice_contesto_pagamento}':
@@ -92,8 +92,8 @@ paths:
           description: Activation status not found
           schema:
             $ref: "#/definitions/ProblemJson"
-        '500':
-          description: Service unavailable
+        '424':
+          description: Service error
           schema:
             $ref: "#/definitions/ProblemJson"
 definitions:
