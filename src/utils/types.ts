@@ -13,8 +13,6 @@ import {
   IResponseSuccessJson,
   ProblemJson
 } from "@pagopa/ts-commons/lib/responses";
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/lib/function";
 import { WithinRangeInteger } from "@pagopa/ts-commons/lib/numbers";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
@@ -39,6 +37,8 @@ export type AsControllerFunction<T> = (
 
 export type IResponsePaymentInternalError = IResponse<"IResponseErrorInternal">;
 
+type HttpCode = number & WithinRangeInteger<100, 599>;
+
 /**
  * Returns a 424 with json response.
  */
@@ -49,12 +49,7 @@ export const ResponsePaymentError = (
   const problem: PaymentProblemJson = {
     detail,
     detail_v2: detailV2,
-    status: pipe(
-      WithinRangeInteger(100, 599).decode(HttpStatusCodeEnum.HTTP_STATUS_424),
-      E.getOrElseW(() => {
-        throw new Error("should never happen: invalid HTTP status code");
-      })
-    ),
+    status: HttpStatusCodeEnum.HTTP_STATUS_424 as HttpCode,
     title: "Internal service error"
   };
   return {
