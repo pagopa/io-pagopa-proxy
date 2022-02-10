@@ -27,7 +27,7 @@ export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseErrorValidation
   : T extends IResponseType<404, ProblemJson>
   ? IResponseErrorNotFound
-  : T extends IResponseType<424, ProblemJson>
+  : T extends IResponseType<500, ProblemJson>
   ? IResponseErrorInternal
   : T extends IResponseType<424, PaymentProblemJson>
   ? IResponsePaymentInternalError
