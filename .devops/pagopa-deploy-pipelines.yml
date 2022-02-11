@@ -11,7 +11,7 @@ parameters:
   - name: 'UAT_PROD_DEPLOY'
     displayName: 'Deploy on UAT then PROD environments'
     type: boolean
-    default: True
+    default: False
     values:
       - False
       - True
