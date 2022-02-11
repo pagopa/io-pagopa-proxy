@@ -52,7 +52,7 @@ resources:
 
 stages:
   - stage: Prepare_artifact_dev
-      condition: ${{parameters.DEV_DEPLOY}}
+      condition: eq(${{parameters.DEV_DEPLOY}}, true)
       dependsOn:
         - Release
       jobs:
@@ -132,7 +132,7 @@ stages:
     condition:
       and(
         succeeded(),
-        ${{parameters.UAT_PROD_DEPLOY}},
+        eq(${{parameters.UAT_PROD_DEPLOY}}, true),
         or(
           eq(variables['Build.SourceBranch'], variables['BRANCH_TARGET']),
           and(
