@@ -50,7 +50,7 @@ export const ResponsePaymentError = (
     detail,
     detail_v2: detailV2,
     status: HttpStatusCodeEnum.HTTP_STATUS_424 as HttpCode,
-    title: "Internal service error"
+    title: "pagoPA service error"
   };
   return {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
