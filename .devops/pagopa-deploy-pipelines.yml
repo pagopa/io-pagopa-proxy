@@ -1,14 +1,6 @@
 # Azure DevOps pipeline to release a new version and deploy to production.
 
 parameters:
-  - name: 'RELEASE_SEMVER'
-    displayName: 'When packing a release, define the version bump to apply'
-    type: string
-    values:
-      - major
-      - minor
-      - patch
-    default: minor
   - name: 'DEV_DEPLOY'
     displayName: 'Deploy on DEV environment'
     type: boolean
@@ -23,6 +15,14 @@ parameters:
     values:
       - False
       - True
+  - name: 'RELEASE_SEMVER'
+    displayName: 'When packing a release, define the version bump to apply (release is done automatically when deploying on UAT and skipped on DEV) '
+    type: string
+    values:
+      - major
+      - minor
+      - patch
+    default: minor
 
 
 variables:
