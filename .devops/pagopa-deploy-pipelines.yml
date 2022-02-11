@@ -52,7 +52,7 @@ resources:
 
 stages:
   - stage: Prepare_artifact_dev
-      condition: eq(${{parameters.DEV_DEPLOY}}, true)
+      condition: and(succeeded(), eq(${{parameters.DEV_DEPLOY}}, true))
       dependsOn:
         - Release
       jobs:
