@@ -9,6 +9,21 @@ parameters:
       - minor
       - patch
     default: minor
+  - name: 'DEV_DEPLOY'
+    displayName: 'Deploy on DEV environment'
+    type: boolean
+    default: True
+    values:
+      - False
+      - True
+  - name: 'UAT_PROD_DEPLOY'
+    displayName: 'Deploy on UAT then PROD environments'
+    type: boolean
+    default: True
+    values:
+      - False
+      - True
+
 
 variables:
   NODE_VERSION: '14.16.0'
@@ -36,6 +51,78 @@ resources:
       endpoint: 'io-azure-devops-github-ro'
 
 stages:
+  - stage: Prepare_artifact_dev
+      condition: variables['DEV_DEPLOY']
+      dependsOn:
+        - Release
+      jobs:
+        - job: make_build
+          steps:
+            - template: azure-templates/setup-project.yml
+              parameters:
+                # On the assumption that this stage is executed only when Relase stage is,
+                #  with this parameter we set the reference the deploy script must pull changes from.
+                # The branch/tag name is calculated from the source branch
+                #  ex: Build.SourceBranch=refs/heads/release/pagopa-porting --> release/pagopa-porting
+                #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
+                gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
+
+            - script: |
+                yarn build
+              displayName: 'Build'
+            - task: CopyFiles@2
+              inputs:
+                SourceFolder: '$(System.DefaultWorkingDirectory)'
+                TargetFolder: '$(System.DefaultWorkingDirectory)/bundle'
+                Contents: |
+                  **/*
+                  web.config
+                  !.git/**/*
+                  !**/*.js.map
+                  !**/*.ts
+                  !.vscode/**/*
+                  !.devops/**/*
+                  !.prettierrc
+                  !.gitignore
+                  !README.md
+                  !jest.integration.js
+                  !test
+                  !tsconfig.json
+                  !tslint.json
+                  !yarn.lock
+                  !Dangerfile.js
+                  !CODEOWNERS
+                  !Dockerfile
+                  !preview.hbs
+                  !.auto-changelog.json
+                  !api_pagopa.yaml
+                  !io-pagopa-node-mock/**/*
+                  !__*/**/*
+              displayName: 'Copy bundle files'
+
+            - publish: $(System.DefaultWorkingDirectory)/bundle
+              artifact: Bundle
+
+  - stage: Deploy_DEV_pagoPA
+      dependsOn:
+        - Prepare_artifact_dev
+      jobs:
+        - job: 'deploy'
+          steps:
+            - checkout: none
+
+            - download: current
+              artifact: Bundle
+
+            - task: AzureWebApp@1
+              inputs:
+                azureSubscription: '$(DEV_AZURE_SUBSCRIPTION)'
+                resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
+                appType: 'webApp'
+                appName: 'pagopa-d-app-pagopa-proxy'
+                package: '$(Pipeline.Workspace)/Bundle'
+                deploymentMethod: 'auto'
+              displayName: Deploy to DEV-pagoPA
 
   # Create a relase
   # Activated when ONE OF these are met:
@@ -45,6 +132,7 @@ stages:
     condition:
       and(
         succeeded(),
+        variables['UAT_PROD_DEPLOY'],
         or(
           eq(variables['Build.SourceBranch'], variables['BRANCH_TARGET']),
           and(
@@ -124,29 +212,8 @@ stages:
           
           - publish: $(System.DefaultWorkingDirectory)/bundle
             artifact: Bundle
-            
-  - stage: Deploy_DEV_pagoPA
-    dependsOn:
-      - Prepare_artifact
-    jobs:
-      - job: 'deploy'
-        steps:
-          - checkout: none
 
-          - download: current
-            artifact: Bundle
-
-          - task: AzureWebApp@1  
-            inputs:
-              azureSubscription: '$(DEV_AZURE_SUBSCRIPTION)'
-              resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
-              appType: 'webApp'
-              appName: 'pagopa-d-app-pagopa-proxy'
-              package: '$(Pipeline.Workspace)/Bundle'
-              deploymentMethod: 'auto'
-            displayName: Deploy to DEV-pagoPA
-
-  - stage: DEV_to_UAT_promotion
+  - stage: UAT_Deploy_approval
     dependsOn:
       - Prepare_artifact
     jobs:
@@ -162,7 +229,7 @@ stages:
 
   - stage: Deploy_UAT_pagoPA
     dependsOn:
-      - DEV_to_UAT_promotion
+      - UAT_Deploy_approval
     jobs:
       - job: 'deploy'
         steps:
