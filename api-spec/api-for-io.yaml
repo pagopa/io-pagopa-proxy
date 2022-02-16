@@ -1,20 +1,33 @@
 swagger: '2.0'
 info:
-  version: 1.0.0
-  title: Proxy pagoPA
-  description: Authenticated API to support payment activations on pagoPA platform
+  title: Checkout payment activations auth API
+  version: v1
+  description: Authenticated API to support payment activations
+host: api.dev.platform.pagopa.it
 basePath: /checkout/auth/payments/v1
 schemes:
   - https
+securityDefinitions:
+  apiKeyHeader:
+    type: apiKey
+    name: Ocp-Apim-Subscription-Key
+    in: header
+security:
+  - apiKeyHeader: []
 paths:
-  '/payment-requests/{rpt_id_from_string}':
-    x-swagger-router-controller: PaymentController
+  /payment-requests/{rpt_id_from_string}:
     get:
+      description: Retrieve information about a payment
       operationId: getPaymentInfo
       summary: Get Payment Info
-      description: Retrieve information about a payment
       parameters:
-        - $ref: '#/parameters/RptId'
+        - name: rpt_id_from_string
+          in: path
+          description: Unique identifier for payments
+          required: true
+          type: string
+      produces:
+        - application/json
       responses:
         '200':
           description: Payment information retrieved
@@ -23,32 +36,37 @@ paths:
           examples:
             application/json:
               importoSingoloVersamento: 200,
-              codiceContestoPagamento: 'ABC123'
+              codiceContestoPagamento: ABC123
         '400':
           description: Invalid input or PagoPA response
           schema:
-            $ref: "#/definitions/ProblemJson"
+            $ref: '#/definitions/ProblemJson'
         '500':
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
-            $ref: "#/definitions/PaymentProblemJson"
-  '/payment-activations':
-    x-swagger-router-controller: PaymentController
+            $ref: '#/definitions/PaymentProblemJson'
+          examples:
+            application/json:
+              type: about:blank
+              title: string
+              status: 0
+              detail: string
+              detail_v2: string
+              instance: string
+  /payment-activations:
     post:
+      description: Require a lock (activation) for a payment
       operationId: activatePayment
       summary: Activate Payment
-      description: Require a lock (activation) for a payment
       parameters:
-        - in: body
-          name: body
+        - name: paymentActivationsPostRequest
+          in: body
           schema:
             $ref: '#/definitions/PaymentActivationsPostRequest'
-          required: true
-          x-examples:
-            application/json:
-              rptId: '12345678901012123456789012345'
-              importoSingoloVersamento: 200
-              codiceContestoPagamento: 'ABC123'
+      consumes:
+        - application/json
+      produces:
+        - application/json
       responses:
         '200':
           description: Payment activation process started
@@ -60,19 +78,32 @@ paths:
         '400':
           description: Invalid input or PagoPA response
           schema:
-            $ref: "#/definitions/ProblemJson"
+            $ref: '#/definitions/ProblemJson'
         '500':
           description: PagoPA services are not available
           schema:
-            $ref: "#/definitions/PaymentProblemJson"
-  '/payment-activations/{codice_contesto_pagamento}':
-    x-swagger-router-controller: PaymentController
+            $ref: '#/definitions/PaymentProblemJson'
+          examples:
+            application/json:
+              type: about:blank
+              title: string
+              status: 0
+              detail: string
+              detail_v2: string
+              instance: string
+  /payment-activations/{codice_contesto_pagamento}:
     get:
+      description: Get the activation status and the paymentId
       operationId: getActivationStatus
       summary: Get the activation status
-      description: Get the activation status and the paymentId
       parameters:
-        - $ref: '#/parameters/CodiceContestoPagamento'
+        - name: codice_contesto_pagamento
+          in: path
+          description: Transaction Id used to identify the communication flow
+          required: true
+          type: string
+      produces:
+        - application/json
       responses:
         '200':
           description: Activation information
@@ -84,18 +115,18 @@ paths:
         '400':
           description: Invalid input
           schema:
-            $ref: "#/definitions/ProblemJson"
+            $ref: '#/definitions/ProblemJson'
         '404':
           description: Activation status not found
           schema:
-            $ref: "#/definitions/ProblemJson"
+            $ref: '#/definitions/ProblemJson'
         '500':
           description: Service unavailable
           schema:
-            $ref: "#/definitions/ProblemJson"
+            $ref: '#/definitions/ProblemJson'
 definitions:
   ProblemJson:
-    $ref: "https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
+    $ref: https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson
   PaymentProblemJson:
     description: A ProblemJson-like type specific for the GetPayment and ActivatePayment operations
     type: object
@@ -122,9 +153,9 @@ definitions:
         maximum: 600
         exclusiveMaximum: true
       detail:
-        $ref: "#/definitions/PaymentFault"
+        $ref: '#/definitions/PaymentFault'
       detail_v2:
-        $ref: "#/definitions/PaymentFaultV2"
+        $ref: '#/definitions/PaymentFaultV2'
       instance:
         type: string
         format: uri
@@ -202,7 +233,7 @@ definitions:
         minLength: 1
         maxLength: 36
     required:
-    - idPagamento
+      - idPagamento
   PaymentActivationsPostRequest:
     type: object
     description: Define the request received from CD App to require a payment activation
@@ -217,6 +248,10 @@ definitions:
       - rptId
       - importoSingoloVersamento
       - codiceContestoPagamento
+    example:
+      rptId: string
+      importoSingoloVersamento: 0
+      codiceContestoPagamento: string
   PaymentActivationsPostResponse:
     type: object
     description: Define the response to send to CD App containing activation information
@@ -234,7 +269,7 @@ definitions:
       spezzoniCausaleVersamento:
         $ref: '#/definitions/SpezzoniCausaleVersamento'
     required:
-    - importoSingoloVersamento
+      - importoSingoloVersamento
   PaymentRequestsGetResponse:
     type: object
     title: PaymentRequestsGetResponse
@@ -411,26 +446,4 @@ definitions:
       - PPT_MULTI_BENEFICIARIO
       - PPT_ERRORE
       - GENERIC_ERROR
-parameters:
-  CodiceContestoPagamento:
-    name: codice_contesto_pagamento
-    description: Transaction Id used to identify the communication flow
-    type: string
-    minLength: 32
-    maxLength: 32
-    required: true
-    in: path
-    x-example: A0123BC123124
-  RptId:
-    name: rpt_id_from_string
-    description: Unique identifier for payments
-    type: string
-    minLength: 1
-    maxLength: 35
-    required: true
-    in: path
-    x-example: A0123BC123124
-consumes:
-  - application/json
-produces:
-  - application/json
+tags: []
