@@ -118,7 +118,7 @@ stages:
               resourceGroupName: 'pagopa-d-pagopa-proxy-rg'
               appType: 'webApp'
               appName: 'pagopa-d-app-pagopa-proxy'
-              package: '$(Pipeline.Workspace)/Bundle'
+              package: '$(Pipeline.Workspace)/Bundle_DEV'
               deploymentMethod: 'auto'
             displayName: Deploy to DEV-pagoPA
 
