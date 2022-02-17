@@ -99,7 +99,7 @@ stages:
             displayName: 'Copy bundle files'
 
           - publish: $(System.DefaultWorkingDirectory)/bundle
-            artifact: Bundle
+            artifact: Bundle_DEV
 
   - stage: Deploy_DEV_pagoPA
     dependsOn:
@@ -110,7 +110,7 @@ stages:
           - checkout: none
 
           - download: current
-            artifact: Bundle
+            artifact: Bundle_DEV
 
           - task: AzureWebApp@1
             inputs:
