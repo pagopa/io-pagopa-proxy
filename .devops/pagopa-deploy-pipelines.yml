@@ -264,7 +264,16 @@ stages:
 
           - script: |
               newman run api-tests/checkout-payments.tests.json --environment=api-tests/uat.envs.json --reporters cli,junit --reporter-junit-export Results/checkout-api-TEST.xml
-            displayName: 'Run api test'
+            displayName: 'Run checkout api test'
+            continueOnError: true 
+
+          - script: |
+              echo "##vso[task.setvariable variable=CHECKOUT_APIM_SUBSCRIPTION_KEY;issecret=true]$(CHECKOUT_APIM_SUBSCRIPTION_KEY)"
+            name: SetSecret
+
+          - script: |
+              newman run api-tests/checkout-auth-payments.tests.json --environment=api-tests/uat.envs.json --env-var=SUBSCRIPTION_KEY=$(CHECKOUT_APIM_SUBSCRIPTION_KEY) --reporters cli,junit --reporter-junit-export Results/checkout-api-TEST.xml
+            displayName: 'Run checkout auth api test'
             continueOnError: true 
 
           - task: PublishTestResults@2
