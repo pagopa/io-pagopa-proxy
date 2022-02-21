@@ -64,7 +64,7 @@ To find details on how to configure client connection parameters see the next se
 ### Node client parameters configuration
 
 Different clients may wish to connect to the Node via different parameters. These parameters are controlled by the `$NODE_CONNECTIONS_CONFIG` variable.
-This variable is a JSON object whose keys are client identifiers (see "X-Client-Id" header in the API specification under `api_pagopa.yml`) and each value is an object containing the following keys:
+This variable is a JSON object whose keys are client identifiers (see "X-Client-Id" header in the API specification under `api-spec/api-pagopa-proxy.yml`) and each value is an object containing the following keys:
 
 | Variable name                    | Description                                                   | type   | default |
 |----------------------------------|---------------------------------------------------------------|--------|---------|
