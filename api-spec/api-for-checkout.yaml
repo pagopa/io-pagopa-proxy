@@ -1,13 +1,9 @@
 swagger: "2.0"
 info:
   version: 1.0.0
-  title: pagoPA checkout API
-  contact:
-    name: pagoPA checkout team
-    url: https://checkout.pagopa.it
-  description: >
-    Documentation of the pagoPA checkout API here.
-host: localhost
+  title: Checkout 2.0 payment activations API
+  description: API to support payment activations
+host: api.dev.platform.pagopa.it
 basePath: "/checkout/payments/v1"
 schemes:
   - https
