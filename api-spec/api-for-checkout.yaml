@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: 1.0.0
+  version: v1
   title: Checkout 2.0 payment activations API
   description: API to support payment activations
 host: api.dev.platform.pagopa.it
