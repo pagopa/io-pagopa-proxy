@@ -54,21 +54,19 @@ paths:
         - in: body
           name: body
           schema:
-            allOf:
-              - $ref: "#/definitions/PaymentActivationsPostRequest"
-              - type: object
-                required:
-                  - recaptchaResponse
-                properties:
-                  recaptchaResponse:
-                    type: string
+            "$ref": "#/definitions/PaymentActivationsPostRequest"
           required: true
           x-examples:
             application/json:
               rptId: "12345678901012123456789012345"
               importoSingoloVersamento: 200
               codiceContestoPagamento: "ABC123"
-              recaptchaResponse: ""
+        - name: recaptchaResponse
+          in: query
+          description: google recaptcha Response
+          type: string
+          required: true
+          example: ""
       responses:
         "200":
           description: Payment activation process started
