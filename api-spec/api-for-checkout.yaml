@@ -29,21 +29,23 @@ paths:
         "200":
           description: Payment information retrieved
           schema:
-            "$ref": "#/definitions/PaymentRequestsGetResponse"
+            $ref: "#/definitions/PaymentRequestsGetResponse"
           examples:
             application/json:
               importoSingoloVersamento: 200,
               codiceContestoPagamento: "ABC123"
         "400":
-          description: Bad request
+          description: Invalid input or PagoPA response
           schema:
             $ref: "#/definitions/ProblemJson"
-        "401":
-          description: Bearer token null or expired.
-        "500":
-          description: PagoPA services are not available or request is rejected
+        "424":
+          description: PagoPA services are not available or request is rejected by PagoPa
           schema:
             $ref: "#/definitions/PaymentProblemJson"
+        "500":
+          description: Generic server error
+          schema:
+            $ref: "#/definitions/ProblemJson"
   "/payment-activations":
     x-swagger-router-controller: PagoPAProxyController
     post:
@@ -70,20 +72,22 @@ paths:
         "200":
           description: Payment activation process started
           schema:
-            "$ref": "#/definitions/PaymentActivationsPostResponse"
+            $ref: "#/definitions/PaymentActivationsPostResponse"
           examples:
             application/json:
               importoSingoloVersamento: 200
         "400":
-          description: Bad request
+          description: Invalid input or PagoPA response
           schema:
             $ref: "#/definitions/ProblemJson"
-        "401":
-          description: Bearer token null or expired.
-        "500":
-          description: PagoPA services are not available or request is rejected
+        "424":
+          description: PagoPA services answered request with error
           schema:
             $ref: "#/definitions/PaymentProblemJson"
+        "500":
+          description: Generic server error
+          schema:
+            $ref: "#/definitions/ProblemJson"
   "/payment-activations/{codiceContestoPagamento}":
     x-swagger-router-controller: PagoPAProxyController
     parameters:
@@ -97,7 +101,7 @@ paths:
       summary: Get Activation status
       description: Check the activation status to retrieve the paymentId
       responses:
-        '200':
+        "200":
           description: Payment information
           schema:
             $ref: "#/definitions/PaymentActivationsGetResponse"
