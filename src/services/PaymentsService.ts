@@ -38,7 +38,7 @@ export async function sendNodoVerificaRPTInput(
     logger.error(
       `Exception catched sending VerificaRPTRequest to PagoPA: ${exception.message}|${exception.response}|${exception.body}`
     );
-    return left(Error(exception));
+    return left(exception);
   }
 }
 
@@ -55,7 +55,7 @@ export async function sendNodoVerifyPaymentNoticeInput(
     logger.error(
       `Exception catched sending verifyPaymentNoticeRequest to PagoPA: ${exception.message}|${exception.response}|${exception.body}`
     );
-    return left(Error(exception));
+    return left(exception);
   }
 }
 
@@ -72,7 +72,7 @@ export async function sendNodoActivateIOPaymentInput(
     logger.error(
       `Exception catched sending activateIOPaymentReq to PagoPA: ${exception.message}|${exception.response}|${exception.body}`
     );
-    return left(Error(exception));
+    return left(exception);
   }
 }
 /**
@@ -95,6 +95,6 @@ export async function sendNodoAttivaRPTInputToPagoPa(
     logger.error(
       `Exception catched sending AttivaRPTRequest to PagoPA: ${exception.message}|${exception.response}|${exception.body}`
     );
-    return left(Error(exception));
+    return left(exception);
   }
 }

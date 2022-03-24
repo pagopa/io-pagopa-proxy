@@ -46,6 +46,8 @@ paths:
           description: Generic server error
           schema:
             $ref: "#/definitions/ProblemJson"
+        "504":
+          description: Timeout from PagoPA services
   "/payment-activations":
     x-swagger-router-controller: PagoPAProxyController
     post:
@@ -88,6 +90,8 @@ paths:
           description: Generic server error
           schema:
             $ref: "#/definitions/ProblemJson"
+        "504":
+          description: Timeout from PagoPA services
   "/payment-activations/{codiceContestoPagamento}":
     x-swagger-router-controller: PagoPAProxyController
     parameters:
@@ -122,6 +126,8 @@ paths:
           description: Unavailable service
           schema:
             $ref: "#/definitions/ProblemJson"
+        "504":
+          description: Timeout from PagoPA services
 definitions:
   ProblemJson:
     $ref: "https://raw.githubusercontent.com/pagopa/io-functions-commons/v10.7.0/openapi/definitions.yaml#/ProblemJson"

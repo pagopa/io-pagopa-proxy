@@ -53,6 +53,8 @@ paths:
               detail: string
               detail_v2: string
               instance: string
+        '504':
+          description: Timeout from PagoPA services
   /payment-activations:
     post:
       description: Require a lock (activation) for a payment
@@ -91,6 +93,8 @@ paths:
               detail: string
               detail_v2: string
               instance: string
+        '504':
+          description: Timeout from PagoPA services
   /payment-activations/{codice_contesto_pagamento}:
     get:
       description: Get the activation status and the paymentId
@@ -124,6 +128,8 @@ paths:
           description: Service unavailable
           schema:
             $ref: '#/definitions/ProblemJson'
+        '504':
+          description: Timeout from PagoPA services
 definitions:
   ProblemJson:
     $ref: https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson

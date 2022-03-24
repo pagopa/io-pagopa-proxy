@@ -32,7 +32,12 @@ import {
   EventResultEnum,
   trackPaymentEvent
 } from "../utils/AIUtils";
-import { GeneralRptId, ResponsePaymentError } from "../utils/types";
+import {
+  GeneralRptId,
+  IResponseErrorGatewayTimeout,
+  ResponseErrorGatewayTimeout,
+  ResponsePaymentError
+} from "../utils/types";
 import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
 import * as PaymentsService from "./PaymentsService";
 
@@ -49,6 +54,7 @@ export async function nodoVerifyPaymentNoticeService(
   | IResponseErrorValidation
   | IResponseErrorInternal
   | IResponseSuccessJson<PaymentRequestsGetResponse>
+  | IResponseErrorGatewayTimeout
 > {
   logger.info(`GetNodoVerifyPaymentNotice|(nm3) for request|${rptId.asString}`);
 
@@ -110,10 +116,15 @@ export async function nodoVerifyPaymentNoticeService(
         rptId: rptId.asString
       }
     });
-    return ResponsePaymentError(
-      PaymentFaultEnum.GENERIC_ERROR,
-      PaymentFaultV2Enum.GENERIC_ERROR
-    );
+
+    if (error.message === "ESOCKETTIMEDOUT") {
+      return ResponseErrorGatewayTimeout;
+    } else {
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
+      );
+    }
   }
 
   const iverifyPaymentNoticeOutput = errorOrIverifyPaymentNoticeOutput.right;
@@ -238,6 +249,7 @@ export async function nodoActivateIOPaymentService(
   | IResponseErrorValidation
   | IResponseErrorInternal
   | IResponseSuccessJson<PaymentActivationsPostResponse>
+  | IResponseErrorGatewayTimeout
 > {
   logger.info(
     `ActivateIOPayment|(nm3) for codiceContestoPagamento ${codiceContestoPagamento}`
@@ -307,10 +319,15 @@ export async function nodoActivateIOPaymentService(
         rptId: rptId.asString
       }
     });
-    return ResponsePaymentError(
-      PaymentFaultEnum.GENERIC_ERROR,
-      PaymentFaultV2Enum.GENERIC_ERROR
-    );
+
+    if (error.message === "ESOCKETTIMEDOUT") {
+      return ResponseErrorGatewayTimeout;
+    } else {
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
+      );
+    }
   }
 
   const activateIOPaymentOutput = errorOrActivateIOPaymentOutput.right;

@@ -29,6 +29,8 @@ export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseErrorInternal
   : T extends IResponseType<424, PaymentProblemJson>
   ? IResponsePaymentInternalError
+  : T extends IResponseType<504, undefined>
+  ? IResponseErrorGatewayTimeout
   : never;
 
 export type AsControllerFunction<T> = (
@@ -61,6 +63,19 @@ export const ResponsePaymentError = (
         .json(problem),
     kind: "IResponseErrorInternal"
   };
+};
+
+export type IResponseErrorGatewayTimeout = IResponse<
+  "IResponseErrorGatewayTimeout"
+>;
+
+/**
+ * Returns a 504 response
+ */
+export const ResponseErrorGatewayTimeout: IResponseErrorGatewayTimeout = {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  apply: res => res.status(HttpStatusCodeEnum.HTTP_STATUS_504).send(),
+  kind: "IResponseErrorGatewayTimeout"
 };
 
 const GeneralRptId = t.interface({
