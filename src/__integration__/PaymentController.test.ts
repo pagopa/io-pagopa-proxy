@@ -33,6 +33,7 @@ const TEST_CLIENT_ID = NodeClientEnum.CLIENT_CHECKOUT;
 const aConfig = {
   HOST: "http://localhost",
   PORT: 3002,
+  CLIENT_TIMEOUT_MSEC: 60000,
   WS_SERVICES: {
     PAGAMENTI: {
       NODO_PER_PSP: "/api/nodo-per-psp/v1",
@@ -88,7 +89,8 @@ describe("checkPaymentToPagoPa", () => {
     const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const req = mockReq();
@@ -150,7 +152,8 @@ describe("checkPaymentToPagoPa", () => {
     const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const req = mockReq();
@@ -184,7 +187,8 @@ describe("activatePaymentToPagoPa", () => {
     const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const activateRequest = mockReq();
@@ -223,7 +227,8 @@ describe("activatePaymentToPagoPa", () => {
     const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const req = mockReq();
@@ -278,7 +283,8 @@ describe("activatePaymentToPagoPa", () => {
     const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const req = mockReq();

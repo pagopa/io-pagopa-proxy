@@ -47,8 +47,8 @@ const aVerifyPaymnentNoticeResOK = pipe(
 );
 
 export class FakePagamentiTelematiciPspNodoNm3PspAsyncClient extends NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient {
-  constructor(client: INm3PortSoap) {
-    super(client);
+  constructor(client: INm3PortSoap, timeout: number) {
+    super(client, timeout);
   }
   public readonly verifyPaymentNotice = (
     input: verifyPaymentNoticeReq_element_nfpsp

@@ -102,10 +102,7 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const pagoPAClient = new PPTPortClient.PagamentiTelematiciPspNodoAsyncClient(
     await PPTPortClient.createPagamentiTelematiciPspNodoClient(
       {
-        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI.NODO_PER_PSP}`,
-        wsdl_options: {
-          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
-        }
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI.NODO_PER_PSP}`
       },
       config.PAGOPA.CERT,
       config.PAGOPA.KEY,
@@ -116,29 +113,25 @@ export async function startApp(config: Configuration): Promise<http.Server> {
   const pagoPANm3PspClient = new NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient(
     await NodoNM3PortClient.createNm3NodoPspClient(
       {
-        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI.NODE_FOR_PSP}`,
-        wsdl_options: {
-          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
-        }
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI.NODE_FOR_PSP}`
       },
       config.PAGOPA.CERT,
       config.PAGOPA.KEY,
       config.PAGOPA.HOST_HEADER
-    )
+    ),
+    config.PAGOPA.CLIENT_TIMEOUT_MSEC
   );
 
   const pagoPANm3IoClient = new NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient(
     await NodoNM3PortClient.createNm3NodoIoClient(
       {
-        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI.NODE_FOR_IO}`,
-        wsdl_options: {
-          timeout: config.PAGOPA.CLIENT_TIMEOUT_MSEC
-        }
+        endpoint: `${config.PAGOPA.HOST}:${config.PAGOPA.PORT}${config.PAGOPA.WS_SERVICES.PAGAMENTI.NODE_FOR_IO}`
       },
       config.PAGOPA.CERT,
       config.PAGOPA.KEY,
       config.PAGOPA.HOST_HEADER
-    )
+    ),
+    config.PAGOPA.CLIENT_TIMEOUT_MSEC
   );
 
   // Define a redis client necessary to handle persistent data

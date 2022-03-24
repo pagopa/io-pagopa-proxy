@@ -68,7 +68,10 @@ export function createNm3NodoIoClient(
  * promise based methods.
  */
 export class PagamentiTelematiciPspNm3NodoAsyncClient {
-  constructor(private readonly client: INm3PortSoap) {}
+  constructor(
+    private readonly client: INm3PortSoap,
+    private readonly timeout: number
+  ) {}
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   public readonly verifyPaymentNotice: (
@@ -76,7 +79,8 @@ export class PagamentiTelematiciPspNm3NodoAsyncClient {
   ) => Promise<verifyPaymentNoticeRes_element_nfpsp> = input =>
     // eslint-disable-next-line no-invalid-this
     promisifySoapMethod(this.client.verifyPaymentNotice)(input, {
-      timeout: 9000
+      // eslint-disable-next-line no-invalid-this
+      timeout: this.timeout
     });
 
   public readonly activateIOPayment: (
@@ -87,6 +91,7 @@ export class PagamentiTelematiciPspNm3NodoAsyncClient {
     // eslint-disable-next-line no-invalid-this
     promisifySoapMethod(this.client.activateIOPayment)(input, {
       postProcess: fixAmountDigits,
-      timeout: 9000
+      // eslint-disable-next-line no-invalid-this
+      timeout: this.timeout
     });
 }
