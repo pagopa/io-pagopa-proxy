@@ -112,8 +112,6 @@ paths:
           description: Generic server error
           schema:
             $ref: "#/definitions/ProblemJson"
-        '504':
-          description: Timeout from PagoPA services
 definitions:
   ProblemJson:
     $ref: "https://raw.githubusercontent.com/teamdigitale/digital-citizenship-functions/v0.51.0/api/definitions.yaml#/ProblemJson"
