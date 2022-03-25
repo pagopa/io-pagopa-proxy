@@ -74,7 +74,19 @@ export type IResponseErrorGatewayTimeout = IResponse<
  */
 export const ResponseErrorGatewayTimeout: IResponseErrorGatewayTimeout = {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  apply: res => res.status(HttpStatusCodeEnum.HTTP_STATUS_504).send(),
+  apply: res => {
+    const problem: PaymentProblemJson = {
+      detail: PaymentFaultEnum.GENERIC_ERROR,
+      detail_v2: PaymentFaultV2Enum.GENERIC_ERROR,
+      status: HttpStatusCodeEnum.HTTP_STATUS_504 as HttpCode,
+      title: "pagoPA service error"
+    };
+
+    res
+      .status(HttpStatusCodeEnum.HTTP_STATUS_504)
+      .set("Content-Type", "application/problem+json")
+      .json(problem);
+  },
   kind: "IResponseErrorGatewayTimeout"
 };
 
