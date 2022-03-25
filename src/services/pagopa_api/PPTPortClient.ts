@@ -45,7 +45,10 @@ export function createPagamentiTelematiciPspNodoClient(
  * promise based methods.
  */
 export class PagamentiTelematiciPspNodoAsyncClient {
-  constructor(private readonly client: IPPTPortSoap) {}
+  constructor(
+    private readonly client: IPPTPortSoap,
+    private readonly timeout: number
+  ) {}
 
   public readonly nodoAttivaRPT: (
     input: nodoAttivaRPT_element_ppt
@@ -55,7 +58,8 @@ export class PagamentiTelematiciPspNodoAsyncClient {
     // eslint-disable-next-line no-invalid-this
     promisifySoapMethod(this.client.nodoAttivaRPT)(input, {
       postProcess: fixImportoSingoloVersamentoDigits,
-      timeout: 9000
+      // eslint-disable-next-line no-invalid-this
+      timeout: this.timeout
     });
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -64,6 +68,7 @@ export class PagamentiTelematiciPspNodoAsyncClient {
   ) => Promise<nodoVerificaRPTRisposta_element_ppt> = input =>
     // eslint-disable-next-line no-invalid-this
     promisifySoapMethod(this.client.nodoVerificaRPT)(input, {
-      timeout: 9000
+      // eslint-disable-next-line no-invalid-this
+      timeout: this.timeout
     });
 }

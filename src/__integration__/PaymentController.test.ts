@@ -83,7 +83,8 @@ describe("checkPaymentToPagoPa", () => {
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
@@ -146,7 +147,8 @@ describe("checkPaymentToPagoPa", () => {
     const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
@@ -181,7 +183,7 @@ describe("activatePaymentToPagoPa", () => {
     });
 
     const attivaRPTPagoPaClient = new PagamentiTelematiciPspNodoAsyncClient(
-      client
+      client, aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
@@ -221,7 +223,8 @@ describe("activatePaymentToPagoPa", () => {
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
 
     const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
@@ -278,7 +281,8 @@ describe("activatePaymentToPagoPa", () => {
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
         envelopeKey: "env"
-      })
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
     );
     const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({

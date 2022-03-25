@@ -107,7 +107,8 @@ export async function startApp(config: Configuration): Promise<http.Server> {
       config.PAGOPA.CERT,
       config.PAGOPA.KEY,
       config.PAGOPA.HOST_HEADER
-    )
+    ),
+    config.PAGOPA.CLIENT_TIMEOUT_MSEC
   );
 
   const pagoPANm3PspClient = new NodoNM3PortClient.PagamentiTelematiciPspNm3NodoAsyncClient(
