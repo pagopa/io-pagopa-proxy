@@ -55,6 +55,8 @@ paths:
               instance: string
         '504':
           description: Timeout from PagoPA services
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"
   /payment-activations:
     post:
       description: Require a lock (activation) for a payment
@@ -95,6 +97,8 @@ paths:
               instance: string
         '504':
           description: Timeout from PagoPA services
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"
   /payment-activations/{codice_contesto_pagamento}:
     get:
       description: Get the activation status and the paymentId

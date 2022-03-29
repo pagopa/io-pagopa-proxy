@@ -48,6 +48,8 @@ paths:
             $ref: "#/definitions/ProblemJson"
         "504":
           description: Timeout from PagoPA services
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"
   "/payment-activations":
     x-swagger-router-controller: PagoPAProxyController
     post:
@@ -92,6 +94,8 @@ paths:
             $ref: "#/definitions/ProblemJson"
         "504":
           description: Timeout from PagoPA services
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"
   "/payment-activations/{codiceContestoPagamento}":
     x-swagger-router-controller: PagoPAProxyController
     parameters:
