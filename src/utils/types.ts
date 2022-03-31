@@ -29,7 +29,7 @@ export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseErrorInternal
   : T extends IResponseType<424, PaymentProblemJson>
   ? IResponsePaymentInternalError
-  : T extends IResponseType<504, undefined>
+  : T extends IResponseType<504, PaymentProblemJson>
   ? IResponseErrorGatewayTimeout
   : never;
 
