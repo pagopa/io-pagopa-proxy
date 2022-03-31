@@ -37,10 +37,6 @@ paths:
         "400":
           description: Invalid input or PagoPA response
           schema:
-            $ref: "#/definitions/ProblemJson"
-        "424":
-          description: PagoPA services are not available or request is rejected by PagoPa
-          schema:
             $ref: "#/definitions/PaymentProblemJson"
         "500":
           description: Generic server error
@@ -82,10 +78,6 @@ paths:
               importoSingoloVersamento: 200
         "400":
           description: Invalid input or PagoPA response
-          schema:
-            $ref: "#/definitions/ProblemJson"
-        "424":
-          description: PagoPA services answered request with error
           schema:
             $ref: "#/definitions/PaymentProblemJson"
         "500":

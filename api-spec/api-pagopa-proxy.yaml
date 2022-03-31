@@ -26,9 +26,13 @@ paths:
               importoSingoloVersamento: 200,
               codiceContestoPagamento: 'ABC123'
         '400':
-          description: Invalid input or PagoPA response
+          description: Invalid input
           schema:
-            $ref: "#/definitions/PaymentProblemJson"
+            $ref: "#/definitions/ProblemJson"
+        "424":
+          description: PagoPA services are not available or request is rejected by PagoPa
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"   
         '500':
           description: Generic server error
           schema:
@@ -64,7 +68,11 @@ paths:
             application/json:
               importoSingoloVersamento: 200
         '400':
-          description: Invalid input or PagoPA response
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/ProblemJson"
+        "424":
+          description: PagoPA services are not available or request is rejected by PagoPa
           schema:
             $ref: "#/definitions/PaymentProblemJson"
         '500':
