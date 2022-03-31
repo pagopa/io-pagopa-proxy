@@ -66,6 +66,7 @@ import {
   AsControllerFunction,
   AsControllerResponseType,
   GeneralRptId,
+  ResponseErrorGatewayTimeout,
   ResponsePaymentError
 } from "../../utils/types";
 import { RptId, RptIdFromString } from "../../utils/pagopa";
@@ -180,10 +181,15 @@ AsControllerFunction<GetPaymentInfoT> = (
         rptId: params.rpt_id_from_string
       }
     });
-    return ResponsePaymentError(
-      PaymentFaultEnum.GENERIC_ERROR,
-      PaymentFaultV2Enum.GENERIC_ERROR
-    );
+
+    if (error.message === "ESOCKETTIMEDOUT") {
+      return ResponseErrorGatewayTimeout;
+    } else {
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
+      );
+    }
   }
   const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.right;
 
@@ -375,7 +381,7 @@ AsControllerFunction<ActivatePaymentT> = (
   pagoPAClientNm3,
   redisClient,
   redisTimeoutSecs
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, max-lines-per-function
 ) => async params => {
   const ccp: CodiceContestoPagamento = params.body.codiceContestoPagamento;
   const amount: ImportoEuroCents = params.body.importoSingoloVersamento;
@@ -450,10 +456,15 @@ AsControllerFunction<ActivatePaymentT> = (
         rptId
       }
     });
-    return ResponsePaymentError(
-      PaymentFaultEnum.GENERIC_ERROR,
-      PaymentFaultV2Enum.GENERIC_ERROR
-    );
+
+    if (error.message === "ESOCKETTIMEDOUT") {
+      return ResponseErrorGatewayTimeout;
+    } else {
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultV2Enum.GENERIC_ERROR
+      );
+    }
   }
   const iNodoAttivaRPTOutput = errorOrInodoAttivaRPTOutput.right;
 

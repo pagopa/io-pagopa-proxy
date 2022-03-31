@@ -50,7 +50,7 @@ export const CONFIG = {
   // These values are the same for test and production environment
   // Used to communicate with PagoPA
   PAGOPA: {
-    CLIENT_TIMEOUT_MSEC: Number(process.env.PAGOPA_TIMEOUT_MSEC) || 60000,
+    CLIENT_TIMEOUT_MSEC: Number(process.env.PAGOPA_TIMEOUT_MSEC) || 10000,
     HOST: process.env.PAGOPA_HOST || localhost,
     HOST_HEADER: process.env.PAGOPA_HOST_HEADER,
     CERT: process.env.PAGOPA_CERT,

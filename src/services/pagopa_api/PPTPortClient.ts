@@ -11,6 +11,8 @@ import {
   fixImportoSingoloVersamentoDigits,
   promisifySoapMethod
 } from "../../utils/SoapUtils";
+import { nodoVerificaRPT_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_element_ppt";
+import { nodoVerificaRPTRisposta_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPTRisposta_element_ppt";
 import { IPPTPortSoap } from "./IPPTPortSoap";
 
 // WSDL path for PagamentiTelematiciPspNodo
@@ -43,7 +45,10 @@ export function createPagamentiTelematiciPspNodoClient(
  * promise based methods.
  */
 export class PagamentiTelematiciPspNodoAsyncClient {
-  constructor(private readonly client: IPPTPortSoap) {}
+  constructor(
+    private readonly client: IPPTPortSoap,
+    private readonly timeout: number
+  ) {}
 
   public readonly nodoAttivaRPT: (
     input: nodoAttivaRPT_element_ppt
@@ -52,12 +57,18 @@ export class PagamentiTelematiciPspNodoAsyncClient {
   ) =>
     // eslint-disable-next-line no-invalid-this
     promisifySoapMethod(this.client.nodoAttivaRPT)(input, {
-      postProcess: fixImportoSingoloVersamentoDigits
+      postProcess: fixImportoSingoloVersamentoDigits,
+      // eslint-disable-next-line no-invalid-this
+      timeout: this.timeout
     });
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  public readonly nodoVerificaRPT = promisifySoapMethod(
+  public readonly nodoVerificaRPT: (
+    input: nodoVerificaRPT_element_ppt
+  ) => Promise<nodoVerificaRPTRisposta_element_ppt> = input =>
     // eslint-disable-next-line no-invalid-this
-    this.client.nodoVerificaRPT
-  );
+    promisifySoapMethod(this.client.nodoVerificaRPT)(input, {
+      // eslint-disable-next-line no-invalid-this
+      timeout: this.timeout
+    });
 }

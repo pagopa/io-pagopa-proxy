@@ -33,6 +33,10 @@ paths:
           description: Generic server error
           schema:
             $ref: "#/definitions/ProblemJson"
+        '504':
+          description: Timeout from PagoPA services
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"
   '/payment-activations':
     x-swagger-router-controller: PaymentController
     post:
@@ -67,6 +71,10 @@ paths:
           description: Generic server error
           schema:
             $ref: "#/definitions/ProblemJson"
+        '504':
+          description: Timeout from PagoPA services
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"
   '/payment-activations/{codice_contesto_pagamento}':
     x-swagger-router-controller: PaymentController
     get:

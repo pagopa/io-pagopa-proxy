@@ -38,6 +38,10 @@ export function createClient<T>(
   });
 }
 
+type SoapMethodCBOptions = Pick<soap.ISecurity, "postProcess"> & {
+  readonly timeout?: number;
+};
+
 // type signature for callback based async soap methods
 export type SoapMethodCB<I, O> = (
   input: I,
@@ -47,7 +51,7 @@ export type SoapMethodCB<I, O> = (
     raw: string,
     soapHeader: { readonly [k: string]: any }
   ) => any,
-  options?: Pick<soap.ISecurity, "postProcess">
+  options?: SoapMethodCBOptions
 ) => void;
 
 /**
@@ -55,7 +59,7 @@ export type SoapMethodCB<I, O> = (
  */
 export const promisifySoapMethod = <I, O>(f: SoapMethodCB<I, O>) => (
   input: I,
-  options?: Pick<soap.ISecurity, "postProcess">
+  options?: SoapMethodCBOptions
 ) =>
   new Promise<O>((resolve, reject) => {
     f(input, (err, result) => (err ? reject(err) : resolve(result)), options);

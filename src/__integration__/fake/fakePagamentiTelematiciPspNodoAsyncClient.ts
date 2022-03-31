@@ -93,8 +93,8 @@ const aNodoAttivaRPTRispostaOK = pipe(
 );
 
 export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.PagamentiTelematiciPspNodoAsyncClient {
-  constructor(client: IPPTPortSoap) {
-    super(client);
+  constructor(client: IPPTPortSoap, timeout: number) {
+    super(client, timeout);
   }
   public readonly nodoVerificaRPT = (input: nodoVerificaRPT_element_ppt) => {
     return new Promise<nodoVerificaRPTRisposta_element_ppt>((resolve, reject) => {
