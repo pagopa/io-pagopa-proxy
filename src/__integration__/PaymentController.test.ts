@@ -33,7 +33,7 @@ const TEST_CLIENT_ID = NodeClientEnum.CLIENT_CHECKOUT;
 const aConfig = {
   HOST: "http://localhost",
   PORT: 3002,
-  CLIENT_TIMEOUT_MSEC: 60000,
+  CLIENT_TIMEOUT_MSEC: 10000,
   WS_SERVICES: {
     PAGAMENTI: {
       NODO_PER_PSP: "/api/nodo-per-psp/v1",

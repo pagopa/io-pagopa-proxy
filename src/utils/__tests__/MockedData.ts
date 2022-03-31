@@ -351,7 +351,7 @@ export const aConfig = pipe(
     PORT: process.env.PAGOPA_PORT || 3001,
     CERT: process.env.PAGOPA_CERT || "fakecert",
     KEY: process.env.PAGOPA_KEY || "fakekey",
-    CLIENT_TIMEOUT_MSEC: process.env.PAGOPA_TIMEOUT_MSEC || 60000,
+    CLIENT_TIMEOUT_MSEC: process.env.PAGOPA_TIMEOUT_MSEC || 10000,
     WS_SERVICES: {
       PAGAMENTI: {
         NODO_PER_PSP: "/api/nodo-per-psp/v1",
