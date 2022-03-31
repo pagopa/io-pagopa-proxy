@@ -6,6 +6,8 @@
  */
 import * as express from "express";
 import * as E from "fp-ts/lib/Either";
+import * as T from "fp-ts/lib/Task";
+import * as TE from "fp-ts/lib/TaskEither";
 import * as O from "fp-ts/lib/Option";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/lib/PathReporter";
@@ -69,6 +71,8 @@ import {
   ResponsePaymentError
 } from "../../utils/types";
 import { RptId, RptIdFromString } from "../../utils/pagopa";
+import { nodoVerificaRPT_element_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/nodoVerificaRPT_element_ppt";
+import { esitoNodoVerificaRPTRisposta_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_type_ppt";
 
 const headerValidationErrorHandler: (
   e: ReadonlyArray<t.ValidationError>
@@ -91,31 +95,33 @@ AsControllerFunction<GetPaymentInfoT> = (
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, max-lines-per-function
 ) => async params => {
   const clientId = params["x-Client-Id"] as NodeClientType;
+  type ControllerResponseType = AsControllerResponseType<
+    TypeofApiResponse<GetPaymentInfoT>
+  >;
 
   logger.info(`GetPaymentInfo|${clientId}|${params.rpt_id_from_string}`);
 
-  // Validate rptId (payment identifier) provided by BackendApp
-  const errorOrRptId = RptIdFromString.decode(params.rpt_id_from_string);
-  if (E.isLeft(errorOrRptId)) {
-    const error = errorOrRptId.left;
+  const rptId: E.Either<ControllerResponseType, RptIdFromString> = pipe(
+    params.rpt_id_from_string,
+    RptIdFromString.decode,
+    E.mapLeft(error => {
+      const errorDetail = `GetPaymentInfo|Cannot decode rptid|${clientId}|${
+        params.rpt_id_from_string
+      }|${PathReporter.report(E.left(error))}`;
+      logger.error(errorDetail);
 
-    const errorDetail = `GetPaymentInfo|Cannot decode rptid|${clientId}|${
-      params.rpt_id_from_string
-    }|${PathReporter.report(errorOrRptId)}`;
-    logger.error(errorDetail);
-
-    trackPaymentEvent({
-      name: EventNameEnum.PAYMENT_VERIFY,
-      properties: {
-        clientId,
-        detail: errorDetail,
-        result: EventResultEnum.INVALID_INPUT,
-        rptId: params.rpt_id_from_string
-      }
-    });
-    return ResponseErrorFromValidationErrors(RptId)(error);
-  }
-  const rptId = errorOrRptId.right;
+      trackPaymentEvent({
+        name: EventNameEnum.PAYMENT_VERIFY,
+        properties: {
+          clientId,
+          detail: errorDetail,
+          result: EventResultEnum.INVALID_INPUT,
+          rptId: params.rpt_id_from_string
+        }
+      });
+      return ResponseErrorFromValidationErrors(RptId)(error);
+    })
+  );
 
   // Generate a Transaction ID called CodiceContestoPagamento
   // to follow a stream of requests with PagoPA.
@@ -131,177 +137,239 @@ AsControllerFunction<GetPaymentInfoT> = (
       : pagoPAConfig.IDENTIFIERS.CLIENT_IO;
 
   // Convert the input provided by BackendApp (RESTful request) to a PagoPA request (SOAP request).
-  const errorOrInodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
-    nodeClientConfig,
+  const verificaRPTInput: E.Either<
+    ControllerResponseType,
+    nodoVerificaRPT_element_ppt
+  > = pipe(
     rptId,
-    codiceContestoPagamento
+    E.chain(
+      (
+        rptIdentifier: RptIdFromString
+      ): E.Either<ControllerResponseType, nodoVerificaRPT_element_ppt> =>
+        pipe(
+          PaymentsConverter.getNodoVerificaRPTInput(
+            nodeClientConfig,
+            rptIdentifier,
+            codiceContestoPagamento
+          ),
+          E.mapLeft(error => {
+            const errorDetail = `GetPaymentInfo|Cannot construct request|${clientId}|${params.rpt_id_from_string}|${error.message}`;
+            logger.error(errorDetail);
+
+            trackPaymentEvent({
+              name: EventNameEnum.PAYMENT_VERIFY,
+              properties: {
+                clientId,
+                codiceContestoPagamento,
+                detail: errorDetail,
+                result: EventResultEnum.INVALID_INPUT,
+                rptId: params.rpt_id_from_string
+              }
+            });
+            return ResponseErrorValidation(
+              "Invalid PagoPA check Request",
+              error.message
+            );
+          })
+        )
+    )
   );
-  if (E.isLeft(errorOrInodoVerificaRPTInput)) {
-    const error = errorOrInodoVerificaRPTInput.left;
 
-    const errorDetail = `GetPaymentInfo|Cannot construct request|${clientId}|${params.rpt_id_from_string}|${error.message}`;
-    logger.error(errorDetail);
+  const iNodoVerificaRPTOutput: TE.TaskEither<
+    ControllerResponseType,
+    esitoNodoVerificaRPTRisposta_type_ppt
+  > = pipe(
+    verificaRPTInput,
+    TE.fromEither,
+    TE.chain(
+      (
+        iNodoVerificaRPTInput: nodoVerificaRPT_element_ppt
+      ): TE.TaskEither<
+        ControllerResponseType,
+        esitoNodoVerificaRPTRisposta_type_ppt
+      > =>
+        pipe(
+          () =>
+            // Send the SOAP request to PagoPA (VerificaRPT message)
+            PaymentsService.sendNodoVerificaRPTInput(
+              iNodoVerificaRPTInput,
+              pagoPAClient
+            ),
+          TE.mapLeft(error => {
+            const errorDetail = `GetPaymentInfo|Error while calling pagopa|${clientId}|${params.rpt_id_from_string}|${error.message}`;
+            logger.error(errorDetail);
 
-    trackPaymentEvent({
-      name: EventNameEnum.PAYMENT_VERIFY,
-      properties: {
-        clientId,
-        codiceContestoPagamento,
-        detail: errorDetail,
-        result: EventResultEnum.INVALID_INPUT,
-        rptId: params.rpt_id_from_string
-      }
-    });
-    return ResponseErrorValidation(
-      "Invalid PagoPA check Request",
-      error.message
-    );
-  }
-  const iNodoVerificaRPTInput = errorOrInodoVerificaRPTInput.right;
+            trackPaymentEvent({
+              name: EventNameEnum.PAYMENT_VERIFY,
+              properties: {
+                clientId,
+                codiceContestoPagamento,
+                detail: errorDetail,
+                result: EventResultEnum.CONNECTION_NODE,
+                rptId: params.rpt_id_from_string
+              }
+            });
 
-  // Send the SOAP request to PagoPA (VerificaRPT message)
-  const errorOrInodoVerificaRPTOutput = await PaymentsService.sendNodoVerificaRPTInput(
-    iNodoVerificaRPTInput,
-    pagoPAClient
+            return ResponsePaymentError(
+              PaymentFaultEnum.GENERIC_ERROR,
+              PaymentFaultV2Enum.GENERIC_ERROR
+            );
+          })
+        )
+    )
   );
-  if (E.isLeft(errorOrInodoVerificaRPTOutput)) {
-    const error = errorOrInodoVerificaRPTOutput.left;
 
-    const errorDetail = `GetPaymentInfo|Error while calling pagopa|${clientId}|${params.rpt_id_from_string}|${error.message}`;
-    logger.error(errorDetail);
+  const response: TE.TaskEither<
+    ControllerResponseType,
+    ControllerResponseType
+  > = pipe(
+    TE.Do,
+    TE.bind("rptIdentifier", () => TE.fromEither(rptId)),
+    TE.bind("verificaOutput", () => iNodoVerificaRPTOutput),
+    TE.chain(
+      ({
+        rptIdentifier,
+        verificaOutput
+      }): TE.TaskEither<ControllerResponseType, ControllerResponseType> => {
+        // Check PagoPA response content
+        if (verificaOutput.esito !== "OK") {
+          // If it contains a functional error, an HTTP error will be provided to BackendApp
+          const responseError = getResponseErrorIfExists(verificaOutput.fault);
 
-    trackPaymentEvent({
-      name: EventNameEnum.PAYMENT_VERIFY,
-      properties: {
-        clientId,
-        codiceContestoPagamento,
-        detail: errorDetail,
-        result: EventResultEnum.CONNECTION_NODE,
-        rptId: params.rpt_id_from_string
-      }
-    });
-    return ResponsePaymentError(
-      PaymentFaultEnum.GENERIC_ERROR,
-      PaymentFaultV2Enum.GENERIC_ERROR
-    );
-  }
-  const iNodoVerificaRPTOutput = errorOrInodoVerificaRPTOutput.right;
+          if (
+            responseError === undefined ||
+            verificaOutput.fault === undefined
+          ) {
+            const errorDetail = `GetPaymentInfo|Error during payment check: esito === KO|${clientId}|${
+              params.rpt_id_from_string
+            }|${responseError}|${JSON.stringify(verificaOutput.fault)}`;
+            logger.error(errorDetail);
 
-  // Check PagoPA response content
-  if (iNodoVerificaRPTOutput.esito !== "OK") {
-    // If it contains a functional error, an HTTP error will be provided to BackendApp
-    const responseError = getResponseErrorIfExists(
-      iNodoVerificaRPTOutput.fault
-    );
+            trackPaymentEvent({
+              name: EventNameEnum.PAYMENT_VERIFY,
+              properties: {
+                clientId,
+                codiceContestoPagamento,
+                detail: errorDetail,
+                result: EventResultEnum.CONNECTION_NODE,
+                rptId: params.rpt_id_from_string
+              }
+            });
+            // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+            return async () =>
+              E.left(
+                ResponsePaymentError(
+                  PaymentFaultEnum.GENERIC_ERROR,
+                  PaymentFaultV2Enum.GENERIC_ERROR
+                )
+              );
+          } else if (
+            responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO
+          ) {
+            logger.error(
+              `GetPaymentInfo|Error from pagopa|${clientId}|${
+                params.rpt_id_from_string
+              }|${responseError}|${JSON.stringify(verificaOutput.fault)}`
+            );
 
-    if (
-      responseError === undefined ||
-      iNodoVerificaRPTOutput.fault === undefined
-    ) {
-      const errorDetail = `GetPaymentInfo|Error during payment check: esito === KO|${clientId}|${
-        params.rpt_id_from_string
-      }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`;
-      logger.error(errorDetail);
+            const detailV2 = getDetailV2FromFaultCode(verificaOutput.fault);
 
-      trackPaymentEvent({
-        name: EventNameEnum.PAYMENT_VERIFY,
-        properties: {
-          clientId,
-          codiceContestoPagamento,
-          detail: errorDetail,
-          result: EventResultEnum.CONNECTION_NODE,
-          rptId: params.rpt_id_from_string
+            const errorDetail = `GetPaymentInfo|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
+            logger.warn(errorDetail);
+
+            trackPaymentEvent({
+              name: EventNameEnum.PAYMENT_VERIFY,
+              properties: {
+                clientId,
+                codiceContestoPagamento,
+                detail: errorDetail,
+                detail_v2: detailV2,
+                result: EventResultEnum.ERROR_NODE,
+                rptId: params.rpt_id_from_string
+              }
+            });
+
+            return TE.of(ResponsePaymentError(responseError, detailV2));
+          } else {
+            /**
+             * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
+             */
+            const geralRptId: GeneralRptId = {
+              asObject: rptIdentifier,
+              asString: params.rpt_id_from_string
+            };
+            // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+            return pipe(
+              () =>
+                nodoVerifyPaymentNoticeService(
+                  clientId,
+                  pagoPAConfig,
+                  pagoPAClientNm3,
+                  geralRptId,
+                  codiceContestoPagamento
+                ),
+              T.map(v => E.left(v))
+            );
+          }
+        } else {
+          return pipe(
+            // Convert the output provided by PagoPA (SOAP response)
+            // to a BackendApp response (RESTful response), mapping the result information.
+            // Send a response to BackendApp
+            PaymentsConverter.getPaymentRequestsGetResponse(
+              verificaOutput,
+              codiceContestoPagamento
+            ),
+            TE.fromEither,
+            TE.fold(
+              (
+                error: t.Errors
+              ): TE.TaskEither<
+                ControllerResponseType,
+                ControllerResponseType
+              > => {
+                const errorDetail = `GetPaymentInfo|Cannot construct valid response|${clientId}|${
+                  params.rpt_id_from_string
+                }|${PathReporter.report(E.left(error))}`;
+
+                logger.error(errorDetail);
+
+                trackPaymentEvent({
+                  name: EventNameEnum.PAYMENT_VERIFY,
+                  properties: {
+                    clientId,
+                    codiceContestoPagamento,
+                    detail: errorDetail,
+                    result: EventResultEnum.ERROR_NODE,
+                    rptId: params.rpt_id_from_string
+                  }
+                });
+                return TE.of(
+                  ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
+                    error
+                  )
+                );
+              },
+              paymentResponse => {
+                trackPaymentEvent({
+                  name: EventNameEnum.PAYMENT_VERIFY,
+                  properties: {
+                    clientId,
+                    codiceContestoPagamento,
+                    result: EventResultEnum.OK,
+                    rptId: params.rpt_id_from_string
+                  }
+                });
+                return TE.of(ResponseSuccessJson(paymentResponse));
+              }
+            )
+          );
         }
-      });
-      return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
-      );
-    }
-
-    if (responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO) {
-      logger.error(
-        `GetPaymentInfo|Error from pagopa|${clientId}|${
-          params.rpt_id_from_string
-        }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
-      );
-
-      const detailV2 = getDetailV2FromFaultCode(iNodoVerificaRPTOutput.fault);
-
-      const errorDetail = `GetPaymentInfo|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
-      logger.warn(errorDetail);
-
-      trackPaymentEvent({
-        name: EventNameEnum.PAYMENT_VERIFY,
-        properties: {
-          clientId,
-          codiceContestoPagamento,
-          detail: errorDetail,
-          detail_v2: detailV2,
-          result: EventResultEnum.ERROR_NODE,
-          rptId: params.rpt_id_from_string
-        }
-      });
-
-      return ResponsePaymentError(responseError, detailV2);
-    } else {
-      /**
-       * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
-       */
-      const geralRptId: GeneralRptId = {
-        asObject: rptId,
-        asString: params.rpt_id_from_string
-      };
-      return await nodoVerifyPaymentNoticeService(
-        clientId,
-        pagoPAConfig,
-        pagoPAClientNm3,
-        geralRptId,
-        codiceContestoPagamento
-      );
-    }
-  }
-
-  // Convert the output provided by PagoPA (SOAP response)
-  // to a BackendApp response (RESTful response), mapping the result information.
-  // Send a response to BackendApp
-  const responseOrError = PaymentsConverter.getPaymentRequestsGetResponse(
-    iNodoVerificaRPTOutput,
-    codiceContestoPagamento
+      }
+    )
   );
 
-  if (E.isLeft(responseOrError)) {
-    const errorDetail = `GetPaymentInfo|Cannot construct valid response|${clientId}|${
-      params.rpt_id_from_string
-    }|${PathReporter.report(responseOrError)}`;
-
-    logger.error(errorDetail);
-
-    trackPaymentEvent({
-      name: EventNameEnum.PAYMENT_VERIFY,
-      properties: {
-        clientId,
-        codiceContestoPagamento,
-        detail: errorDetail,
-        result: EventResultEnum.ERROR_NODE,
-        rptId: params.rpt_id_from_string
-      }
-    });
-    return ResponseErrorFromValidationErrors(PaymentRequestsGetResponse)(
-      responseOrError.left
-    );
-  }
-
-  trackPaymentEvent({
-    name: EventNameEnum.PAYMENT_VERIFY,
-    properties: {
-      clientId,
-      codiceContestoPagamento,
-      result: EventResultEnum.OK,
-      rptId: params.rpt_id_from_string
-    }
-  });
-  return ResponseSuccessJson(responseOrError.right);
+  return pipe(await response(), E.fold(t.identity, t.identity));
 };
 
 function getClientId(req: express.Request): t.Validation<string> {
