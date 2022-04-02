@@ -174,6 +174,37 @@ describe("checkPaymentToPagoPa", () => {
   });
 });
 
+it("should return error invalid client header)", async () => {
+
+  const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
+    await createPagamentiTelematiciPspNodoClient({
+      envelopeKey: "env"
+    }),
+    aConfig.CLIENT_TIMEOUT_MSEC
+  );
+
+  const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+    await createPagamentiTelematiciPspNm3NodoClient({
+      envelopeKey: "env"
+    }),
+    aConfig.CLIENT_TIMEOUT_MSEC
+  );
+
+  const req = mockReq();
+
+  // tslint:disable-next-line:no-object-mutation
+  req.params = aRptIdString;
+  req.headers = { "X-Client-Id": "invalid_client" };
+
+  const errorOrPaymentCheckResponse = await getPaymentInfo(
+    aConfig,
+    verificaRPTPagoPaClient,
+    verifyPaymentNoticePaClientNm3
+  )(req);
+
+  expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
+});
+
 describe("activatePaymentToPagoPa", () => {
   it("should correctly format amounts", async () => {
     const clientRequest = jest.fn((_, __, cb) => cb());
