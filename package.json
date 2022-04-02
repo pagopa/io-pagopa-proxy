@@ -26,7 +26,7 @@
     "prettify": "prettier --write \"./**/*.ts\"",
     "start": "node dist/src/index.js",
     "test:coverage": "jest --runInBand --coverage",
-    "test:integration": "jest --config=jest.integration.js --runInBand",
+    "test:integration": "jest --config=jest.integration.js --runInBand --coverage",
     "test": "npm-run-all -s test:*",
     "lint": "eslint . -c .eslintrc.js --ext .ts,.tsx --cache",
     "postversion": "git push && git push --tags",
