@@ -9,7 +9,7 @@ module.exports = {
     "^.+\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
   },
   "testMatch": [
-    "**/__integration__/*.ts"
+    "**/__integration__/*.ts","**/__tests__/*.ts"
   ],
   "reporters": [
     "default",
@@ -18,4 +18,5 @@ module.exports = {
       "outputName": "pagopa-proxy-IT.xml"
     } ]
   ],
+  coverageReporters: ["cobertura"],
 }
