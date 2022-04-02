@@ -22,6 +22,10 @@ module.exports = {
   "coverageReporters": ["cobertura"],
   "coverageDirectory": "./coverage/",
   "coveragePathIgnorePatterns": [
-    "MockedData.ts"
+    "MockedData.ts",
+    "fakePagamentiTelematiciPspNodoAsyncClient.ts",
+    "fakePagamentiTelematiciPspNodoNm3AsyncClient.ts", 
+    "request.ts", 
+    "response.ts"
   ],
 }
