@@ -172,38 +172,40 @@ describe("checkPaymentToPagoPa", () => {
 
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
   });
+
+  it("should return error invalid client header", async () => {
+
+    const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
+      await createPagamentiTelematiciPspNodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+  
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+  
+    const req = mockReq();
+  
+    // tslint:disable-next-line:no-object-mutation
+    req.params = aRptIdString;
+    req.headers = { "X-Client-Id": "invalid_client" };
+  
+    const errorOrPaymentCheckResponse = await getPaymentInfo(
+      aConfig,
+      verificaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3
+    )(req);
+  
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
+  });
 });
 
-it("should return error invalid client header)", async () => {
 
-  const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
-    await createPagamentiTelematiciPspNodoClient({
-      envelopeKey: "env"
-    }),
-    aConfig.CLIENT_TIMEOUT_MSEC
-  );
-
-  const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
-    await createPagamentiTelematiciPspNm3NodoClient({
-      envelopeKey: "env"
-    }),
-    aConfig.CLIENT_TIMEOUT_MSEC
-  );
-
-  const req = mockReq();
-
-  // tslint:disable-next-line:no-object-mutation
-  req.params = aRptIdString;
-  req.headers = { "X-Client-Id": "invalid_client" };
-
-  const errorOrPaymentCheckResponse = await getPaymentInfo(
-    aConfig,
-    verificaRPTPagoPaClient,
-    verifyPaymentNoticePaClientNm3
-  )(req);
-
-  expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
-});
 
 describe("activatePaymentToPagoPa", () => {
   it("should correctly format amounts", async () => {
@@ -323,6 +325,41 @@ describe("activatePaymentToPagoPa", () => {
     );
 
     const req = mockReq();
+
+    // tslint:disable-next-line:no-object-mutation
+    req.params = aPaymentActivationRequest;
+
+    const errorOrPaymentActivationResponse = await activatePayment(
+      aConfig,
+      attivaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3,
+      aMockedRedisClient,
+      0
+    )(req);
+
+    expect(errorOrPaymentActivationResponse.kind).toBe(
+      "IResponseErrorValidation"
+    );
+  });
+
+  it("should return error invalid client header", async () => {
+   
+    const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
+      await createPagamentiTelematiciPspNodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+
+    const req = mockReq();
+
+    req.headers = { "X-Client-Id": "Invalid_Client" };
 
     // tslint:disable-next-line:no-object-mutation
     req.params = aPaymentActivationRequest;
