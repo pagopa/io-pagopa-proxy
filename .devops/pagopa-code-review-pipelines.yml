@@ -72,10 +72,6 @@ stages:
               yarn test:coverage
             displayName: 'Unit tests'
 
-          - bash: |
-              bash <(curl -s https://codecov.io/bash)
-            displayName: 'Code coverage'
-
   - stage: Integration_Tests
     pool:
       vmImage: 'ubuntu-latest'
@@ -96,5 +92,15 @@ stages:
           - script: |
               yarn test:integration
             displayName: 'Unit tests integration'
+ 
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'test_reports/*.xml' 
+              searchFolder: '$(System.DefaultWorkingDirectory)'
 
-
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: 'coverage/cobertura-coverage.xml'
+            displayName: 'Publish Code Coverage'

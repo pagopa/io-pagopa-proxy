@@ -15,11 +15,13 @@ module.exports = {
     "default",
     [ "jest-junit", {
       "outputDirectory": "./test_reports",
-      "outputName": "pagopa-proxy-IT.xml"
+      "outputName": "pagopa-proxy-tests.xml"
     } ]
   ],
-  coverageReporters: ["cobertura"],
-  coveragePathIgnorePatterns: [
+  "collectCoverage": true,
+  "coverageReporters": ["cobertura"],
+  "coverageDirectory": "./coverage/",
+  "coveragePathIgnorePatterns": [
     "MockedData.ts"
-  ]
+  ],
 }
