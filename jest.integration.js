@@ -19,4 +19,7 @@ module.exports = {
     } ]
   ],
   coverageReporters: ["cobertura"],
+  coveragePathIgnorePatterns: [
+    "MockedData.ts"
+  ]
 }
