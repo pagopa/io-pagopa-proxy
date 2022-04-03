@@ -4,6 +4,7 @@ import { ImportoEuroCents } from "../../../generated/api/ImportoEuroCents";
 import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
 import { esitoNodoVerificaRPTRisposta_type_ppt } from "../../../generated/PagamentiTelematiciPspNodoservice/esitoNodoVerificaRPTRisposta_type_ppt";
 import * as PaymentController from "../../controllers/restful/PaymentController";
+import { ApplicationCode, AuxDigit, CheckDigit, IUV13, IUV15, IUV17, PaymentNoticeNumber } from "../pagopa";
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
 import { MOCK_CLIENT_ID } from "./MockedData";
@@ -686,5 +687,68 @@ describe("getActivateIOPaymentResponse", () => {
             .identificativoUnivocoBeneficiario
         : undefined
     ).toBeUndefined();
+  });
+});
+
+describe("getPaymentNoticeNumberAsString", () => {
+  it("should convert paymentNoticeNumber as string with auxDigit 0", () => {
+    const noticeNumber =  {
+      applicationCode: "12" as ApplicationCode,
+      auxDigit: "0" as AuxDigit,
+      checkDigit: "00" as CheckDigit,
+      iuv13: "1234567890123" as IUV13
+    } as PaymentNoticeNumber
+
+    const noticeNumberAsString = PaymentsConverter.getPaymentNoticeNumberAsString(
+      noticeNumber
+    );
+   
+    expect(noticeNumberAsString).toBe("012123456789012300");
+  });
+
+  it("should convert paymentNoticeNumber as string with auxDigit 1", () => {
+    const noticeNumber =  {
+      applicationCode: "12" as ApplicationCode,
+      auxDigit: "1" as AuxDigit,
+      checkDigit: "00" as CheckDigit,
+      iuv17: "1234567890123" as IUV17
+    } as PaymentNoticeNumber
+
+    const noticeNumberAsString = PaymentsConverter.getPaymentNoticeNumberAsString(
+      noticeNumber
+    );
+   
+    expect(noticeNumberAsString).toBe("11234567890123");
+  });
+
+  it("should convert paymentNoticeNumber as string with auxDigit 3", () => {
+    const noticeNumber =  {
+      applicationCode: "12" as ApplicationCode,
+      auxDigit: "2" as AuxDigit,
+      checkDigit: "00" as CheckDigit,
+      iuv15: "1234567890123" as IUV15
+    } as PaymentNoticeNumber
+
+    const noticeNumberAsString = PaymentsConverter.getPaymentNoticeNumberAsString(
+      noticeNumber
+    );
+   
+    expect(noticeNumberAsString).toBe("2123456789012300");
+  });
+
+  it("should convert paymentNoticeNumber as string with auxDigit 3", () => {
+    const noticeNumber =  {
+      applicationCode: "12" as ApplicationCode,
+      auxDigit: "3" as AuxDigit,
+      checkDigit: "00" as CheckDigit,
+      iuv13: "1234567890123" as IUV13,
+      segregationCode: 0
+    } as PaymentNoticeNumber
+
+    const noticeNumberAsString = PaymentsConverter.getPaymentNoticeNumberAsString(
+      noticeNumber
+    );
+   
+    expect(noticeNumberAsString).toBe("30123456789012300");
   });
 });

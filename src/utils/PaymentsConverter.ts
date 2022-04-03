@@ -481,7 +481,7 @@ export function getCodiceContestoPagamentoForPagoPaApi(
  * @param paymentNoticeNumber as PaymentNoticeNumber
  * @returns paymentNoticeNumber as string
  */
-function getPaymentNoticeNumberAsString(
+export function getPaymentNoticeNumberAsString(
   paymentNoticeNumber: PaymentNoticeNumber
 ): string {
   // eslint-disable-next-line default-case
