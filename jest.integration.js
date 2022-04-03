@@ -26,6 +26,7 @@ module.exports = {
     "fakePagamentiTelematiciPspNodoAsyncClient.ts",
     "fakePagamentiTelematiciPspNodoNm3AsyncClient.ts", 
     "request.ts", 
-    "response.ts"
+    "response.ts",
+    "pagopa.ts"
   ],
 }
