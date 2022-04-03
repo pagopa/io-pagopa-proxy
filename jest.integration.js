@@ -27,6 +27,7 @@ module.exports = {
     "fakePagamentiTelematiciPspNodoNm3AsyncClient.ts", 
     "request.ts", 
     "response.ts",
-    "pagopa.ts"
+    "pagopa.ts",
+    "SoapUtils.ts"
   ],
 }
