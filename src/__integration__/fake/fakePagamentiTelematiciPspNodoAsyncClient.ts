@@ -210,23 +210,6 @@ const aNodoAttivaRPTNM3 = pipe(
   })
 );
 
-const aNodoAttivaRPTInvalidNM3 = pipe(
-  esitoNodoVerificaRPTRisposta_type_ppt.decode({
-    esito: "KO",
-    fault:{ 
-      faultCode: "PPT_MULTI_BENEFICIARIO",
-      faultString: "Pagamento nm3", 
-      id: "PPT_MULTI_BENEFICIARIO" 
-    }
-    }),
-  E.getOrElseW(errors => {
-    throw Error(
-      `Invalid esitoNodoVerificaRPTRisposta_type_ppt to decode: ${reporters.readableReport(
-        errors
-      )}`
-    );
-  })
-);
 
 export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.PagamentiTelematiciPspNodoAsyncClient {
   constructor(client: IPPTPortSoap, timeout: number) {
@@ -269,6 +252,7 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.Pag
   public readonly nodoAttivaRPT = (input: nodoAttivaRPT_element_ppt) => {
     return new Promise<nodoAttivaRPTRisposta_element_ppt>((resolve, reject) => {
       const iuv = input.codiceIdRPT["qrc:QrCode"]["qrc:CodIUV"];
+      
       if ( iuv.endsWith(endTimeoutIuvInvalidResponse) ) {
         reject(timeoutResponse);
       } else if (iuv.endsWith(endIuvInvalidResponse)) {
@@ -281,13 +265,9 @@ export class FakePagamentiTelematiciPspNodoAsyncClient extends PPTPortClient.Pag
         resolve({
           nodoAttivaRPTRisposta: aNodoAttivaRPTRispostaPagamentoInCorso
         });
-      } else if (iuv.endsWith(endNM3Response) || iuv.endsWith(endNM3timeoutResponse) || iuv.endsWith(endNM3PagamentoInCorsoResponse)) {
+      } else if (iuv.endsWith(endNM3InvalidResponse) || iuv.endsWith(endNM3Response) || iuv.endsWith(endNM3timeoutResponse) || iuv.endsWith(endNM3PagamentoInCorsoResponse)) {
         resolve({
           nodoAttivaRPTRisposta: aNodoAttivaRPTNM3
-        });
-      } else if (iuv.endsWith(endNM3InvalidResponse)) {
-        resolve({
-          nodoAttivaRPTRisposta: aNodoAttivaRPTInvalidNM3
         });
       } else if (input !== undefined) {
         resolve({
