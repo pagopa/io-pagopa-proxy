@@ -28,6 +28,7 @@ module.exports = {
     "request.ts", 
     "response.ts",
     "pagopa.ts",
-    "SoapUtils.ts"
+    "SoapUtils.ts",
+    "PaymentsConverter.ts"
   ],
 }
