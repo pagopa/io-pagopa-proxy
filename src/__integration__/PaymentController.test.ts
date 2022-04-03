@@ -16,6 +16,7 @@ import { FakePagamentiTelematiciPspNodoAsyncClient, createPagamentiTelematiciPsp
 import { FakePagamentiTelematiciPspNodoNm3PspAsyncClient, createPagamentiTelematiciPspNm3NodoClient } from "./fake/fakePagamentiTelematiciPspNodoNm3AsyncClient";
 import mockReq from "./fake/request";
 
+
 const TEST_CLIENT_ID = NodeClientEnum.CLIENT_CHECKOUT;
 
 const aConfig = {
@@ -979,5 +980,22 @@ describe("setActivationStatus and getActivationStatus", () => {
       expect(errorOrPaymentActivationGet.value.idPagamento).toBe("id1234");
     }
     aMockedRedisClient.quit();
+  });
+
+  it("should fail store payment without redis connection", async () => {
+    const req = mockReq();
+
+    // tslint:disable-next-line:no-object-mutation
+    req.params = aPaymentActivationRequest;
+    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
+
+    await setActivationStatus(aCdInfoWispPpt, 5000, aMockedRedisClient);
+
+    const errorOrPaymentActivationGet = await getActivationStatus(
+      aMockedRedisClient
+    )(req);
+
+    expect(errorOrPaymentActivationGet.kind).toBe("IResponseErrorInternal");
+    
   });
 });
