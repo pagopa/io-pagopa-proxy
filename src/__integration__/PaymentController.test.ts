@@ -943,7 +943,7 @@ describe("activatePaymentToPagoPa", () => {
     expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorGatewayTimeout");
   });
 
-  it("should return detail error due to nodo PAA_PAGAMENTO_IN_CORSO for NM3", async () => {
+  it("should return detail for activate due to nodo PAA_PAGAMENTO_IN_CORSO for NM3", async () => {
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
