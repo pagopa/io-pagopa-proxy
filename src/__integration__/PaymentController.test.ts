@@ -122,6 +122,21 @@ const aPaymentActivationRequestForNM3Response = {
   codiceContestoPagamento: aCodiceContestoPagamento
 };
 
+const aPaymentActivationRequestForInvalidNM3Response = {
+  rptId: RptIdFromString.encode({
+    organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
+    paymentNoticeNumber: {
+      applicationCode: "12" as ApplicationCode,
+      auxDigit: "0" as AuxDigit,
+      checkDigit: "55" as CheckDigit,
+      iuv13: "1234567890123" as IUV13
+    } as PaymentNoticeNumber
+  }),
+
+  importoSingoloVersamento: 9905 as ImportoEuroCents,
+  codiceContestoPagamento: aCodiceContestoPagamento
+};
+
 const aPaymentActivationRequestForNM3TimeoutResponse = {
   rptId: RptIdFromString.encode({
     organizationFiscalCode: "12345678901" as OrganizationFiscalCode,
@@ -931,6 +946,37 @@ describe("activatePaymentToPagoPa", () => {
 
     const req = mockReq();
     req.body = aPaymentActivationRequestForNM3PagamentoInCorsoResponse;
+    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
+
+    const errorOrPaymentActivationResponse = await activatePayment(
+      aConfig,
+      attivaRPTPagoPaClient,
+      activeIoPaymentClientNm3,
+      aMockedRedisClient,
+      10000
+    )(req);
+  
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorInternal");
+  });
+
+  it("should return invalid response for PPT_MULTI_BENEFICIARIO", async () => {
+
+    const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
+      await createPagamentiTelematiciPspNodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+
+    const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+
+    const req = mockReq();
+    req.body = aPaymentActivationRequestForInvalidNM3Response;
     req.headers = { "X-Client-Id": TEST_CLIENT_ID };
 
     const errorOrPaymentActivationResponse = await activatePayment(
