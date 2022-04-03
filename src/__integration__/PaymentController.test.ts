@@ -879,39 +879,8 @@ describe("activatePaymentToPagoPa", () => {
 
     expect(errorOrPaymentActivationResponse.kind).toBe("IResponseSuccessJson");
 
-    aMockedRedisClient.quit();
   });
   
-  it("should return detail error due to nodo PPT_MULTI_BENEFICIARIO", async () => {
-
-    const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
-      await createPagamentiTelematiciPspNodoClient({
-        envelopeKey: "env"
-      }),
-      aConfig.CLIENT_TIMEOUT_MSEC
-    );
-
-    const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
-      await createPagamentiTelematiciPspNm3NodoClient({
-        envelopeKey: "env"
-      }),
-      aConfig.CLIENT_TIMEOUT_MSEC
-    );
-
-    const req = mockReq();
-    req.body = aPaymentActivationRequestForNM3Response;
-    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
-
-    const errorOrPaymentActivationResponse = await activatePayment(
-      aConfig,
-      attivaRPTPagoPaClient,
-      activeIoPaymentClientNm3,
-      aMockedRedisClient,
-      10000
-    )(req);
-  
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorInternal");
-  });
   it("should return timeout due to timeout PPT_MULTI_BENEFICIARIO", async () => {
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
