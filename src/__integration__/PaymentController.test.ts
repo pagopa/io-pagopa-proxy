@@ -42,6 +42,21 @@ const aConfig = {
   NM3_ENABLED: true
 } as PagoPAConfig;
 
+const aConfigInvalid = {
+  HOST: "http://localhost",
+  PORT: 3002,
+  CLIENT_TIMEOUT_MSEC: 10000,
+  // These information will identify our system when it will access to PagoPA
+  IDENTIFIERS: {
+    [TEST_CLIENT_ID]: {
+      IDENTIFICATIVO_INTERMEDIARIO_PSP: "00735020584",
+      IDENTIFICATIVO_CANALE: "00735020584_02",
+      PASSWORD: "nopassword",
+    }
+  },
+  NM3_ENABLED: true
+} as PagoPAConfig;
+
 const aRptIdString = "12345678901012123456789012399";
 const aRptIdStringForInvalidNodoResponse = "12345678901012123456789012300";
 const aRptIdStringForTimeoutNodoResponse = "12345678901012123456789012311";
@@ -562,6 +577,36 @@ describe("checkPaymentToPagoPa", () => {
     )(req);
     expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorInternal");
   });
+
+  it("should return error with invalid nodo configuration", async () => {
+
+    const verificaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
+      await createPagamentiTelematiciPspNodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+  
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+  
+    const req = mockReq();
+  
+    // tslint:disable-next-line:no-object-mutation
+    req.params = { rpt_id_from_string: aRptIdStringForNM3Response };;
+    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
+  
+    const errorOrPaymentCheckResponse = await getPaymentInfo(
+      aConfigInvalid,
+      verificaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3
+    )(req);
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
+  });
 });
 
 describe("activatePaymentToPagoPa", () => {
@@ -897,6 +942,45 @@ describe("activatePaymentToPagoPa", () => {
 
   });
   
+  it("should return error response with invalid configuration", async () => {
+
+    const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
+      await createPagamentiTelematiciPspNodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+
+    const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+
+    const req = mockReq();
+    req.body = aPaymentActivationRequestForNM3Response;
+    req.headers = { "X-Client-Id": TEST_CLIENT_ID };
+
+    aMockedRedisClient.on("connect", () => {
+      return logger.info("Mocked Redis connected!");
+    });
+
+
+    const errorOrPaymentActivationResponse = await activatePayment(
+      aConfigInvalid,
+      attivaRPTPagoPaClient,
+      activeIoPaymentClientNm3,
+      aMockedRedisClient,
+      10000
+    )(req);
+  
+    expect(aMockedRedisClient.connected).toBeTruthy();
+
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorValidation");
+
+  });
+
   it("should return timeout due to timeout PPT_MULTI_BENEFICIARIO", async () => {
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
