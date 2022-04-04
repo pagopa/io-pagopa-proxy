@@ -37,7 +37,7 @@ paths:
         "400":
           description: Invalid input or PagoPA response
           schema:
-            $ref: "#/definitions/PaymentProblemJson"
+            $ref: "#/definitions/ProblemJson"
         "500":
           description: Generic server error
           schema:
@@ -79,7 +79,7 @@ paths:
         "400":
           description: Invalid input or PagoPA response
           schema:
-            $ref: "#/definitions/PaymentProblemJson"
+            $ref: "#/definitions/ProblemJson"
         "500":
           description: Generic server error
           schema:
