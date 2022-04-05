@@ -120,6 +120,12 @@
 						"payments",
 						"v1",
 						"payment-activations"
+					],
+					"query": [
+						{
+							"key": "recaptchaResponse",
+							"value": "token"
+						}
 					]
 				}
 			},
