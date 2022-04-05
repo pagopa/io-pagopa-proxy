@@ -111,7 +111,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{CHECKOUT_HOST}}/checkout/payments/v1/payment-activations",
+					"raw": "{{CHECKOUT_HOST}}/checkout/payments/v1/payment-activations?recaptchaResponse=token",
 					"host": [
 						"{{CHECKOUT_HOST}}"
 					],
