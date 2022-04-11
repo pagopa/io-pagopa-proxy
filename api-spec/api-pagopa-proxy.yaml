@@ -29,14 +29,14 @@ paths:
           description: Invalid input
           schema:
             $ref: "#/definitions/ProblemJson"
-        "424":
-          description: PagoPA services are not available or request is rejected by PagoPa
-          schema:
-            $ref: "#/definitions/PaymentProblemJson"   
         '500':
           description: Generic server error
           schema:
             $ref: "#/definitions/ProblemJson"
+        "502":
+          description: PagoPA services are not available or request is rejected by PagoPa
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"
         '504':
           description: Timeout from PagoPA services
           schema:
@@ -71,14 +71,14 @@ paths:
           description: Invalid input
           schema:
             $ref: "#/definitions/ProblemJson"
-        "424":
-          description: PagoPA services are not available or request is rejected by PagoPa
-          schema:
-            $ref: "#/definitions/PaymentProblemJson"
         '500':
           description: Generic server error
           schema:
             $ref: "#/definitions/ProblemJson"
+        "502":
+          description: PagoPA services are not available or request is rejected by PagoPa
+          schema:
+            $ref: "#/definitions/PaymentProblemJson"
         '504':
           description: Timeout from PagoPA services
           schema:
@@ -108,12 +108,12 @@ paths:
           description: Activation status not found
           schema:
             $ref: "#/definitions/ProblemJson"
-        '424':
-          description: PagoPA services answered request with error
-          schema:
-            $ref: "#/definitions/ProblemJson"
         '500':
           description: Generic server error
+          schema:
+            $ref: "#/definitions/ProblemJson"
+        '502':
+          description: PagoPA services answered request with error
           schema:
             $ref: "#/definitions/ProblemJson"
 definitions:

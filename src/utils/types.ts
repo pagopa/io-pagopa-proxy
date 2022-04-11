@@ -27,7 +27,7 @@ export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseErrorNotFound
   : T extends IResponseType<500, ProblemJson>
   ? IResponseErrorInternal
-  : T extends IResponseType<424, PaymentProblemJson>
+  : T extends IResponseType<502, PaymentProblemJson>
   ? IResponsePaymentInternalError
   : T extends IResponseType<504, PaymentProblemJson>
   ? IResponseErrorGatewayTimeout
@@ -42,7 +42,7 @@ export type IResponsePaymentInternalError = IResponse<"IResponseErrorInternal">;
 type HttpCode = number & WithinRangeInteger<100, 599>;
 
 /**
- * Returns a 424 with json response.
+ * Returns a 502 with json response.
  */
 export const ResponsePaymentError = (
   detail: PaymentFaultEnum,
@@ -51,14 +51,14 @@ export const ResponsePaymentError = (
   const problem: PaymentProblemJson = {
     detail,
     detail_v2: detailV2,
-    status: HttpStatusCodeEnum.HTTP_STATUS_424 as HttpCode,
+    status: HttpStatusCodeEnum.HTTP_STATUS_502 as HttpCode,
     title: "pagoPA service error"
   };
   return {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     apply: res =>
       res
-        .status(HttpStatusCodeEnum.HTTP_STATUS_424)
+        .status(HttpStatusCodeEnum.HTTP_STATUS_502)
         .set("Content-Type", "application/problem+json")
         .json(problem),
     kind: "IResponseErrorInternal"
