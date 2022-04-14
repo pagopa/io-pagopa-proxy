@@ -779,6 +779,70 @@ describe("activatePaymentToPagoPa", () => {
     );
   });
 
+  // TODO
+  it.only("Should correctly receive response with PN as client", async () => {
+   
+    const clientPNId = "CLIENT_PN";
+    const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
+      await createPagamentiTelematiciPspNodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+
+    const req = mockReq();
+
+    req.headers = { "X-Client-Id": clientPNId };
+
+    // tslint:disable-next-line:no-object-mutation
+    req.params = aPaymentActivationRequest;
+
+    const errorOrPaymentActivationResponse = await activatePayment(
+      aConfig,
+      attivaRPTPagoPaClient,
+      verifyPaymentNoticePaClientNm3,
+      aMockedRedisClient,
+      0
+    )(req);
+
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseSuccessJson");
+    if (errorOrPaymentActivationResponse.kind === "IResponseSuccessJson") {
+      expect(errorOrPaymentActivationResponse.value).toHaveProperty(
+        "importoSingoloVersamento",
+        9905
+      );
+      expect(errorOrPaymentActivationResponse.value).toHaveProperty(
+        "ibanAccredito",
+        "IT17X0605502100000001234567"
+      );
+      expect(errorOrPaymentActivationResponse.value).toHaveProperty(
+        "causaleVersamento",
+        "CAUSALE01"
+      );
+      expect(errorOrPaymentActivationResponse.value).toMatchObject({
+        enteBeneficiario: {
+          capBeneficiario: "00000",
+          civicoBeneficiario: "01",
+          codiceUnitOperBeneficiario: "01",
+          denomUnitOperBeneficiario: "DENOM01",
+          denominazioneBeneficiario: "BANCA01",
+          identificativoUnivocoBeneficiario: "001",
+          indirizzoBeneficiario: "VIAROMA",
+          localitaBeneficiario: "ROMA",
+          nazioneBeneficiario: "IT",
+          provinciaBeneficiario: "ROMA"
+        }
+      });
+    }
+  });
+
+
   it("should return generic error due to invalid nodo response", async () => {
 
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
