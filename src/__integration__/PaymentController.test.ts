@@ -18,6 +18,7 @@ import mockReq from "./fake/request";
 
 
 const TEST_CLIENT_ID = NodeClientEnum.CLIENT_CHECKOUT;
+const TEST_CLIENT_PN = "CLIENT_PN";
 
 const aConfig = {
   HOST: "http://localhost",
@@ -779,10 +780,8 @@ describe("activatePaymentToPagoPa", () => {
     );
   });
 
-  // TODO
   it.only("Should correctly receive response with PN as client", async () => {
-   
-    const clientPNId = "CLIENT_PN";
+
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
         envelopeKey: "env"
@@ -798,7 +797,7 @@ describe("activatePaymentToPagoPa", () => {
 
     const req = mockReq();
 
-    req.headers = { "X-Client-Id": clientPNId };
+    req.headers = { "X-Client-Id": TEST_CLIENT_PN };
 
     // tslint:disable-next-line:no-object-mutation
     req.params = aPaymentActivationRequest;
