@@ -18,7 +18,7 @@ import mockReq from "./fake/request";
 
 
 const TEST_CLIENT_ID = NodeClientEnum.CLIENT_CHECKOUT;
-const TEST_CLIENT_PN = "CLIENT_PN";
+const TEST_CLIENT_PN = NodeClientEnum.CLIENT_PN;
 
 const aConfig = {
   HOST: "http://localhost",
@@ -780,15 +780,15 @@ describe("activatePaymentToPagoPa", () => {
     );
   });
 
-  it.only("Should correctly receive response with PN as client", async () => {
-
+  it("Should correctly receive response with PN as client", async () => {
     const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
       await createPagamentiTelematiciPspNodoClient({
         envelopeKey: "env"
       }),
       aConfig.CLIENT_TIMEOUT_MSEC
     );
-    const verifyPaymentNoticePaClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+
+    const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
       await createPagamentiTelematiciPspNm3NodoClient({
         envelopeKey: "env"
       }),
@@ -796,16 +796,13 @@ describe("activatePaymentToPagoPa", () => {
     );
 
     const req = mockReq();
-
+    req.body = aPaymentActivationRequest;
     req.headers = { "X-Client-Id": TEST_CLIENT_PN };
-
-    // tslint:disable-next-line:no-object-mutation
-    req.params = aPaymentActivationRequest;
 
     const errorOrPaymentActivationResponse = await activatePayment(
       aConfig,
       attivaRPTPagoPaClient,
-      verifyPaymentNoticePaClientNm3,
+      activeIoPaymentClientNm3,
       aMockedRedisClient,
       0
     )(req);
@@ -840,7 +837,6 @@ describe("activatePaymentToPagoPa", () => {
       });
     }
   });
-
 
   it("should return generic error due to invalid nodo response", async () => {
 
