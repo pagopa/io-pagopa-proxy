@@ -257,9 +257,9 @@ export async function nodoActivateIOPaymentService(
 
   // Some static information will be obtained by PagoPAConfig, to identify this client.
   const nodeClientConfig =
-    NodeClientEnum.CLIENT_CHECKOUT === clientId
-      ? pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT
-      : pagoPAConfig.IDENTIFIERS.CLIENT_IO;
+    NodeClientEnum.CLIENT_IO === clientId
+      ? pagoPAConfig.IDENTIFIERS.CLIENT_IO
+      : pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT;
 
   const errorOrActivateIOPaymentInput = PaymentsConverter.getNodoActivateIOPaymentInput(
     nodeClientConfig,
