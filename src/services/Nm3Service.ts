@@ -118,7 +118,7 @@ export async function nodoVerifyPaymentNoticeService(
     });
 
     if (error.message === "ESOCKETTIMEDOUT") {
-      return ResponseErrorGatewayTimeout;
+      return ResponseErrorGatewayTimeout();
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
@@ -321,7 +321,7 @@ export async function nodoActivateIOPaymentService(
     });
 
     if (error.message === "ESOCKETTIMEDOUT") {
-      return ResponseErrorGatewayTimeout;
+      return ResponseErrorGatewayTimeout();
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,

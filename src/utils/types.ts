@@ -7,7 +7,6 @@ import {
 import {
   HttpStatusCodeEnum,
   IResponse,
-  IResponseErrorInternal,
   IResponseErrorNotFound,
   IResponseErrorValidation,
   IResponseSuccessJson,
@@ -17,19 +16,27 @@ import { WithinRangeInteger } from "@pagopa/ts-commons/lib/numbers";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";
+import {
+  PartyTimeoutFault,
+  PartyTimeoutFaultEnum
+} from "../../generated/api/PartyTimeoutFault";
+import { PartyTimeoutFaultPaymentProblemJson } from "../../generated/api/PartyTimeoutFaultPaymentProblemJson";
+import { PartyConfigurationFaultPaymentProblemJson } from "../../generated/api/PartyConfigurationFaultPaymentProblemJson";
+import { GatewayFaultPaymentProblemJson } from "../../generated/api/GatewayFaultPaymentProblemJson";
+import { PartyConnectionFaultPaymentProblemJson } from "../../generated/api/PartyConnectionFaultPaymentProblemJson";
 import { RptId } from "./pagopa";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
-  : T extends IResponseType<400, ProblemJson>
+  : T extends IResponseType<400, PartyConfigurationFaultPaymentProblemJson>
   ? IResponseErrorValidation
   : T extends IResponseType<404, ProblemJson>
   ? IResponseErrorNotFound
-  : T extends IResponseType<500, ProblemJson>
-  ? IResponseErrorInternal
-  : T extends IResponseType<502, PaymentProblemJson>
+  : T extends IResponseType<502, GatewayFaultPaymentProblemJson>
   ? IResponsePaymentInternalError
-  : T extends IResponseType<504, PaymentProblemJson>
+  : T extends IResponseType<504, PartyTimeoutFaultPaymentProblemJson>
+  ? IResponseErrorGatewayTimeout
+  : T extends IResponseType<598, PartyConnectionFaultPaymentProblemJson>
   ? IResponseErrorGatewayTimeout
   : never;
 
@@ -72,12 +79,14 @@ export type IResponseErrorGatewayTimeout = IResponse<
 /**
  * Returns a 504 response
  */
-export const ResponseErrorGatewayTimeout: IResponseErrorGatewayTimeout = {
+export const ResponseErrorGatewayTimeout: (
+  detail?: PartyTimeoutFault
+) => IResponseErrorGatewayTimeout = detail => ({
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   apply: res => {
-    const problem: PaymentProblemJson = {
+    const problem: PartyTimeoutFaultPaymentProblemJson = {
       detail: PaymentFaultEnum.GENERIC_ERROR,
-      detail_v2: PaymentFaultV2Enum.GENERIC_ERROR,
+      detail_v2: detail ?? PartyTimeoutFaultEnum.PPT_STAZIONE_INT_PA_TIMEOUT,
       status: HttpStatusCodeEnum.HTTP_STATUS_504 as HttpCode,
       title: "pagoPA service error"
     };
@@ -88,7 +97,7 @@ export const ResponseErrorGatewayTimeout: IResponseErrorGatewayTimeout = {
       .json(problem);
   },
   kind: "IResponseErrorGatewayTimeout"
-};
+});
 
 const GeneralRptId = t.interface({
   asObject: RptId,

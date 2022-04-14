@@ -12,10 +12,8 @@ import { PathReporter } from "io-ts/lib/PathReporter";
 import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
 import {
   IResponseErrorValidation,
-  ResponseErrorFromValidationErrors,
   ResponseErrorInternal,
   ResponseErrorNotFound,
-  ResponseErrorValidation,
   ResponseSuccessJson
 } from "@pagopa/ts-commons/lib/responses";
 import * as redis from "redis";
@@ -70,6 +68,10 @@ import {
   ResponsePaymentError
 } from "../../utils/types";
 import { RptId, RptIdFromString } from "../../utils/pagopa";
+import {
+  ResponseErrorFromValidationErrors,
+  ResponseErrorValidation
+} from "../../utils/responses";
 
 const headerValidationErrorHandler: (
   e: ReadonlyArray<t.ValidationError>
@@ -183,7 +185,7 @@ AsControllerFunction<GetPaymentInfoT> = (
     });
 
     if (error.message === "ESOCKETTIMEDOUT") {
-      return ResponseErrorGatewayTimeout;
+      return ResponseErrorGatewayTimeout();
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
@@ -458,7 +460,7 @@ AsControllerFunction<ActivatePaymentT> = (
     });
 
     if (error.message === "ESOCKETTIMEDOUT") {
-      return ResponseErrorGatewayTimeout;
+      return ResponseErrorGatewayTimeout();
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
