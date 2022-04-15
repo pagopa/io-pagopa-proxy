@@ -8,14 +8,11 @@ import {
   HttpStatusCodeEnum,
   IResponse,
   IResponseErrorNotFound,
-  IResponseErrorValidation,
   IResponseSuccessJson,
   ProblemJson
 } from "@pagopa/ts-commons/lib/responses";
 import { WithinRangeInteger } from "@pagopa/ts-commons/lib/numbers";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
-import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
-import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";
 import {
   PartyTimeoutFault,
   PartyTimeoutFaultEnum
@@ -24,38 +21,44 @@ import { PartyTimeoutFaultPaymentProblemJson } from "../../generated/api/PartyTi
 import { PartyConfigurationFaultPaymentProblemJson } from "../../generated/api/PartyConfigurationFaultPaymentProblemJson";
 import { GatewayFaultPaymentProblemJson } from "../../generated/api/GatewayFaultPaymentProblemJson";
 import { PartyConnectionFaultPaymentProblemJson } from "../../generated/api/PartyConnectionFaultPaymentProblemJson";
+import { PartyConnectionFault } from "../../generated/api/PartyConnectionFault";
+import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
 import { RptId } from "./pagopa";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
   : T extends IResponseType<400, PartyConfigurationFaultPaymentProblemJson>
-  ? IResponseErrorValidation
+  ? IResponsePartyConfigurationError
   : T extends IResponseType<404, ProblemJson>
   ? IResponseErrorNotFound
   : T extends IResponseType<502, GatewayFaultPaymentProblemJson>
-  ? IResponsePaymentInternalError
+  ? IResponseGatewayError
   : T extends IResponseType<504, PartyTimeoutFaultPaymentProblemJson>
-  ? IResponseErrorGatewayTimeout
+  ? IResponseGatewayTimeout
   : T extends IResponseType<598, PartyConnectionFaultPaymentProblemJson>
-  ? IResponseErrorGatewayTimeout
+  ? IResponseProxyConnectionError
   : never;
 
 export type AsControllerFunction<T> = (
   params: TypeofApiParams<T>
 ) => Promise<AsControllerResponseType<TypeofApiResponse<T>>>;
 
-export type IResponsePaymentInternalError = IResponse<"IResponseErrorInternal">;
-
 type HttpCode = number & WithinRangeInteger<100, 599>;
+
+export type IResponsePartyConfigurationError = IResponse<
+  "IResponsePartyConfigurationError"
+>;
+
+export type IResponseGatewayError = IResponse<"IResponseGatewayError">;
 
 /**
  * Returns a 502 with json response.
  */
 export const ResponsePaymentError = (
   detail: PaymentFaultEnum,
-  detailV2: PaymentFaultV2Enum
-): IResponsePaymentInternalError => {
-  const problem: PaymentProblemJson = {
+  detailV2: GatewayFaultEnum
+): IResponseGatewayError => {
+  const problem: GatewayFaultPaymentProblemJson = {
     detail,
     detail_v2: detailV2,
     status: HttpStatusCodeEnum.HTTP_STATUS_502 as HttpCode,
@@ -66,27 +69,26 @@ export const ResponsePaymentError = (
     apply: res =>
       res
         .status(HttpStatusCodeEnum.HTTP_STATUS_502)
+        // eslint-disable-next-line sonarjs/no-duplicate-string
         .set("Content-Type", "application/problem+json")
         .json(problem),
-    kind: "IResponseErrorInternal"
+    kind: "IResponseGatewayError"
   };
 };
 
-export type IResponseErrorGatewayTimeout = IResponse<
-  "IResponseErrorGatewayTimeout"
->;
+export type IResponseGatewayTimeout = IResponse<"IResponseErrorGatewayTimeout">;
 
 /**
  * Returns a 504 response
  */
-export const ResponseErrorGatewayTimeout: (
+export const ResponseGatewayTimeout: (
   detail?: PartyTimeoutFault
-) => IResponseErrorGatewayTimeout = detail => ({
+) => IResponseGatewayTimeout = detail => ({
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   apply: res => {
     const problem: PartyTimeoutFaultPaymentProblemJson = {
       detail: PaymentFaultEnum.GENERIC_ERROR,
-      detail_v2: detail ?? PartyTimeoutFaultEnum.PPT_STAZIONE_INT_PA_TIMEOUT,
+      detail_v2: detail ?? PartyTimeoutFaultEnum.GENERIC_ERROR,
       status: HttpStatusCodeEnum.HTTP_STATUS_504 as HttpCode,
       title: "pagoPA service error"
     };
@@ -97,6 +99,33 @@ export const ResponseErrorGatewayTimeout: (
       .json(problem);
   },
   kind: "IResponseErrorGatewayTimeout"
+});
+
+export type IResponseProxyConnectionError = IResponse<
+  "IResponseProxyConnectionError"
+>;
+
+/**
+ * Returns a 598 response
+ */
+export const ResponseProxyConnectionError: (
+  detail: PartyConnectionFault
+) => IResponseProxyConnectionError = detail => ({
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  apply: res => {
+    const problem: PartyConnectionFaultPaymentProblemJson = {
+      detail: PaymentFaultEnum.GENERIC_ERROR,
+      detail_v2: detail,
+      status: HttpStatusCodeEnum.HTTP_STATUS_504 as HttpCode,
+      title: "pagoPA connection error"
+    };
+
+    res
+      .status(HttpStatusCodeEnum.HTTP_STATUS_504)
+      .set("Content-Type", "application/problem+json")
+      .json(problem);
+  },
+  kind: "IResponseProxyConnectionError"
 });
 
 const GeneralRptId = t.interface({

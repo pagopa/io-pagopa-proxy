@@ -472,6 +472,7 @@ definitions:
     description: TODO - mapped to 502
     type: string
     x-extensible-enum:
+      - GENERIC_ERROR
       - PPT_SINTASSI_EXTRAXSD
       - PPT_SINTASSI_XSD
       - PPT_PSP_SCONOSCIUTO
