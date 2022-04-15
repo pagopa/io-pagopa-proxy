@@ -62,7 +62,7 @@ import {
   AsControllerFunction,
   AsControllerResponseType,
   GeneralRptId,
-  IResponsePartyConfigurationError,
+  IResponseValidationError,
   ResponseGatewayTimeout,
   ResponsePaymentError
 } from "../../utils/types";
@@ -76,7 +76,7 @@ import { GatewayFaultEnum } from "../../../generated/api/GatewayFault";
 
 const headerValidationErrorHandler: (
   e: ReadonlyArray<t.ValidationError>
-) => Promise<IResponsePartyConfigurationError> = async e =>
+) => Promise<IResponseValidationError> = async e =>
   ResponseErrorValidation(
     "Invalid X-Client-Id",
     e.map(err => err.message).join("\n")

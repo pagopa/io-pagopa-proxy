@@ -28,11 +28,15 @@ paths:
         '400':
           description: Invalid input
           schema:
-            $ref: "#/definitions/PartyConfigurationFaultPaymentProblemJson"
+            $ref: "#/definitions/ValidationFaultPaymentProblemJson"
         "502":
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
             $ref: "#/definitions/GatewayFaultPaymentProblemJson"
+        "503":
+          description: EC services are not available
+          schema:
+            $ref: "#/definitions/PartyConfigurationFaultPaymentProblemJson"
         '504':
           description: Timeout from PagoPA services
           schema:
@@ -70,11 +74,15 @@ paths:
         '400':
           description: Invalid input
           schema:
-            $ref: "#/definitions/PartyConfigurationFaultPaymentProblemJson"
+            $ref: "#/definitions/ValidationFaultPaymentProblemJson"
         "502":
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
             $ref: "#/definitions/GatewayFaultPaymentProblemJson"
+        "503":
+          description: EC services are not available
+          schema:
+            $ref: "#/definitions/PartyConfigurationFaultPaymentProblemJson"
         '504':
           description: Timeout from PagoPA services
           schema:
@@ -103,7 +111,7 @@ paths:
         '400':
           description: Invalid input
           schema:
-            $ref: "#/definitions/PartyConfigurationFaultPaymentProblemJson"
+            $ref: "#/definitions/ValidationFaultPaymentProblemJson"
         '404':
           description: Activation status not found
           schema:
@@ -153,8 +161,50 @@ definitions:
     required:
       - detail
       - detail_v2
+  ValidationFaultPaymentProblemJson:
+    description: |-
+      A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.
+      Possible values of `detail_v2` are limited to faults pertaining to validation errors.
+    type: object
+    properties:
+      type:
+        type: string
+        format: uri
+        description: |-
+          An absolute URI that identifies the problem type. When dereferenced,
+          it SHOULD provide human-readable documentation for the problem type
+          (e.g., using HTML).
+        default: about:blank
+        example: https://example.com/problem/constraint-violation
+      title:
+        type: string
+        description: |-
+          A short, summary of the problem type. Written in english and readable
+          for engineers (usually not suited for non technical stakeholders and
+          not localized); example: Service Unavailable
+      status:
+        type: integer
+        format: int32
+        minimum: 100
+        maximum: 600
+        exclusiveMaximum: true
+      detail:
+        $ref: "#/definitions/PaymentFault"
+      detail_v2:
+        $ref: "#/definitions/ValidationFault"
+      instance:
+        type: string
+        format: uri
+        description: |-
+          An absolute URI that identifies the specific occurrence of the problem.
+          It may or may not yield further information if dereferenced.
+    required:
+      - detail
+      - detail_v2
   GatewayFaultPaymentProblemJson:
-    description: TODO - A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations
+    description: |-
+      A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.
+      Possible values of `detail_v2` are limited to faults pertaining to Nodo errors.
     type: object
     properties:
       type:
@@ -192,7 +242,9 @@ definitions:
       - detail
       - detail_v2
   PartyConfigurationFaultPaymentProblemJson:
-    description: TODO - A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations
+    description: |-
+      A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.
+      Possible values of `detail_v2` are limited to faults pertaining to EC non-fatal errors.
     type: object
     properties:
       type:
@@ -468,11 +520,20 @@ definitions:
       - DOMAIN_UNKNOWN
       - PPT_MULTI_BENEFICIARIO
       - GENERIC_ERROR
+  ValidationFault:
+    description: TODO - mapped to 400
+    type: string
+    x-extensible-enum:
+      - PPT_DOMINIO_SCONOSCIUTO
+      - PPT_INTERMEDIARIO_PA_SCONOSCIUTO
+      - PPT_STAZIONE_INT_PA_SCONOSCIUTA
   GatewayFault:
     description: TODO - mapped to 502
     type: string
     x-extensible-enum:
       - GENERIC_ERROR
+      - PPT_PAGAMENTO_IN_CORSO
+      - PPT_PAGAMENTO_DUPLICATO
       - PPT_SINTASSI_EXTRAXSD
       - PPT_SINTASSI_XSD
       - PPT_PSP_SCONOSCIUTO
@@ -483,26 +544,21 @@ definitions:
       - PPT_CANALE_DISABILITATO
       - PPT_AUTENTICAZIONE
       - PPT_AUTORIZZAZIONE
+      - PPT_CODIFICA_PSP_SCONOSCIUTA
+      - PPT_SEMANTICA
+      - PPT_SYSTEM_ERROR
+  PartyConfigurationFault:
+    description: TODO - mapped to 503
+    type: string
+    x-extensible-enum:
       - PPT_DOMINIO_DISABILITATO
       - PPT_INTERMEDIARIO_PA_DISABILITATO
       - PPT_STAZIONE_INT_PA_DISABILITATA
-      - PPT_CODIFICA_PSP_SCONOSCIUTA
-      - PPT_SEMANTICA
       - PPT_ERRORE_EMESSO_DA_PAA
       - PPT_STAZIONE_INT_PA_ERRORE_RESPONSE
       - PPT_IBAN_NON_CENSITO
-      - PPT_SYSTEM_ERROR
-  PartyConfigurationFault:
-    description: TODO - mapped to 400
-    type: string
-    x-extensible-enum:
-      - PPT_DOMINIO_SCONOSCIUTO
-      - PPT_INTERMEDIARIO_PA_SCONOSCIUTO
-      - PPT_STAZIONE_INT_PA_SCONOSCIUTA
-      - PPT_PAGAMENTO_IN_CORSO
-      - PPT_PAGAMENTO_DUPLICATO
   PartyConnectionFault:
-    description: TODO - mapped to 598?
+    description: TODO - mapped to 598
     type: string
     x-extensible-enum:
       - PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE

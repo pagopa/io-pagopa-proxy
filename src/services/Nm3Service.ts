@@ -32,6 +32,8 @@ import {
   IResponseGatewayError,
   IResponseGatewayTimeout,
   IResponsePartyConfigurationError,
+  IResponseProxyConnectionError,
+  IResponseValidationError,
   ResponseGatewayTimeout,
   ResponsePaymentError
 } from "../utils/types";
@@ -54,10 +56,12 @@ export async function nodoVerifyPaymentNoticeService(
   rptId: GeneralRptId,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Promise<
+  | IResponseValidationError
   | IResponseGatewayError
   | IResponsePartyConfigurationError
-  | IResponseSuccessJson<PaymentRequestsGetResponse>
   | IResponseGatewayTimeout
+  | IResponseProxyConnectionError
+  | IResponseSuccessJson<PaymentRequestsGetResponse>
 > {
   logger.info(`GetNodoVerifyPaymentNotice|(nm3) for request|${rptId.asString}`);
 
@@ -188,10 +192,12 @@ export async function nodoVerifyPaymentNoticeService(
       PaymentFaultEnum.GENERIC_ERROR,
       detailV2
     ) as
+      | IResponseValidationError
       | IResponseGatewayError
       | IResponsePartyConfigurationError
-      | IResponseSuccessJson<PaymentRequestsGetResponse>
-      | IResponseGatewayTimeout;
+      | IResponseGatewayTimeout
+      | IResponseProxyConnectionError
+      | IResponseSuccessJson<PaymentRequestsGetResponse>;
   } else {
     const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
       iverifyPaymentNoticeOutput,
@@ -256,8 +262,8 @@ export async function nodoActivateIOPaymentService(
   rptId: GeneralRptId,
   amount: ImportoEuroCents
 ): Promise<
+  | IResponseValidationError
   | IResponseGatewayError
-  | IResponsePartyConfigurationError
   | IResponseSuccessJson<PaymentActivationsPostResponse>
   | IResponseGatewayTimeout
 > {
@@ -399,7 +405,7 @@ export async function nodoActivateIOPaymentService(
       detailV2
     ) as
       | IResponseGatewayError
-      | IResponsePartyConfigurationError
+      | IResponseValidationError
       | IResponseGatewayTimeout;
   } else {
     const isIdPaymentSaved: boolean = await setNm3PaymentOption(

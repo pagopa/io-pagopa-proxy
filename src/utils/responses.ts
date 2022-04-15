@@ -5,25 +5,29 @@ import {
   ResponseErrorGeneric
 } from "@pagopa/ts-commons/lib/responses";
 import { PartyConfigurationFaultEnum } from "../../generated/api/PartyConfigurationFault";
-import { PartyTimeoutFault } from "../../generated/api/PartyTimeoutFault";
+import { PartyTimeoutFaultEnum } from "../../generated/api/PartyTimeoutFault";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
 import { PartyConnectionFaultEnum } from "../../generated/api/PartyConnectionFault";
+import { ValidationFaultEnum } from "../../generated/api/ValidationFault";
 import {
   IResponseGatewayError,
   IResponseGatewayTimeout,
   IResponsePartyConfigurationError,
   IResponseProxyConnectionError,
+  IResponseValidationError,
   ResponseGatewayTimeout,
+  ResponsePartyConfigurationError,
   ResponsePaymentError,
   ResponseProxyConnectionError
 } from "./types";
+import { logger } from "./Logger";
 
 export const ResponseErrorValidation: (
   title: string,
   detail: string | PartyConfigurationFaultEnum
-) => IResponsePartyConfigurationError = (title, detail) => {
+) => IResponseValidationError = (title, detail) => {
   // eslint-disable-next-line functional/no-let
   let responseDetail;
   if (typeof detail === "string") {
@@ -34,7 +38,7 @@ export const ResponseErrorValidation: (
   return {
     ...ResponseErrorGeneric(HttpStatusCodeEnum.HTTP_STATUS_400, title, detail),
     detail: responseDetail,
-    kind: "IResponsePartyConfigurationError"
+    kind: "IResponseValidationError"
   };
 };
 
@@ -43,7 +47,7 @@ export const ResponseErrorFromValidationErrors: <S, A>(
 ) => (
   errors: ReadonlyArray<t.ValidationError>
 ) => // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-IResponsePartyConfigurationError = type => errors => {
+IResponseValidationError = type => errors => {
   const detail = errorsToReadableMessages(errors).join("\n");
   return ResponseErrorValidation(`Invalid ${type.name}`, detail);
 };
@@ -53,6 +57,7 @@ export const responseFromPaymentFault: (
   detail_v2: PaymentFaultV2Enum
 ) =>
   | IResponsePartyConfigurationError
+  | IResponseValidationError
   | IResponseGatewayError
   | IResponseGatewayTimeout
   | IResponseProxyConnectionError = (detail, detail_v2) => {
@@ -61,9 +66,18 @@ export const responseFromPaymentFault: (
       (detail_v2 as unknown) as PartyConfigurationFaultEnum
     )
   ) {
-    return ResponseErrorValidation(
+    return ResponsePartyConfigurationError(
       detail,
       (detail_v2 as unknown) as PartyConfigurationFaultEnum
+    );
+  } else if (
+    Object.values(ValidationFaultEnum).includes(
+      (detail_v2 as unknown) as ValidationFaultEnum
+    )
+  ) {
+    return ResponseErrorValidation(
+      detail,
+      (detail_v2 as unknown) as GatewayFaultEnum
     );
   } else if (
     Object.values(GatewayFaultEnum).includes(
@@ -75,11 +89,13 @@ export const responseFromPaymentFault: (
       (detail_v2 as unknown) as GatewayFaultEnum
     );
   } else if (
-    Object.values(PartyTimeoutFault).includes(
-      (detail_v2 as unknown) as PartyTimeoutFault
+    Object.values(PartyTimeoutFaultEnum).includes(
+      (detail_v2 as unknown) as PartyTimeoutFaultEnum
     )
   ) {
-    return ResponseGatewayTimeout((detail_v2 as unknown) as PartyTimeoutFault);
+    return ResponseGatewayTimeout(
+      (detail_v2 as unknown) as PartyTimeoutFaultEnum
+    );
   } else if (
     Object.values(PartyConnectionFaultEnum).includes(
       (detail_v2 as unknown) as PartyConnectionFaultEnum
@@ -89,6 +105,7 @@ export const responseFromPaymentFault: (
       (detail_v2 as unknown) as PartyConnectionFaultEnum
     );
   } else {
-    throw new Error("unmapped payment fault v2");
+    logger.error(`unmapped detail_v2: ${detail_v2}`);
+    throw new Error(`unmapped detail_v2: ${detail_v2}`);
   }
 };
