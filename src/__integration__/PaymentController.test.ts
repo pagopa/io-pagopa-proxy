@@ -18,6 +18,7 @@ import mockReq from "./fake/request";
 
 
 const TEST_CLIENT_ID = NodeClientEnum.CLIENT_CHECKOUT;
+const TEST_CLIENT_PN = NodeClientEnum.CLIENT_PN;
 
 const aConfig = {
   HOST: "http://localhost",
@@ -777,6 +778,64 @@ describe("activatePaymentToPagoPa", () => {
     expect(errorOrPaymentActivationResponse.kind).toBe(
       "IResponseErrorValidation"
     );
+  });
+
+  it("Should correctly receive response with PN as client", async () => {
+    const attivaRPTPagoPaClient = new FakePagamentiTelematiciPspNodoAsyncClient(
+      await createPagamentiTelematiciPspNodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+
+    const activeIoPaymentClientNm3 = new FakePagamentiTelematiciPspNodoNm3PspAsyncClient(
+      await createPagamentiTelematiciPspNm3NodoClient({
+        envelopeKey: "env"
+      }),
+      aConfig.CLIENT_TIMEOUT_MSEC
+    );
+
+    const req = mockReq();
+    req.body = aPaymentActivationRequest;
+    req.headers = { "X-Client-Id": TEST_CLIENT_PN };
+
+    const errorOrPaymentActivationResponse = await activatePayment(
+      aConfig,
+      attivaRPTPagoPaClient,
+      activeIoPaymentClientNm3,
+      aMockedRedisClient,
+      0
+    )(req);
+
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseSuccessJson");
+    if (errorOrPaymentActivationResponse.kind === "IResponseSuccessJson") {
+      expect(errorOrPaymentActivationResponse.value).toHaveProperty(
+        "importoSingoloVersamento",
+        9905
+      );
+      expect(errorOrPaymentActivationResponse.value).toHaveProperty(
+        "ibanAccredito",
+        "IT17X0605502100000001234567"
+      );
+      expect(errorOrPaymentActivationResponse.value).toHaveProperty(
+        "causaleVersamento",
+        "CAUSALE01"
+      );
+      expect(errorOrPaymentActivationResponse.value).toMatchObject({
+        enteBeneficiario: {
+          capBeneficiario: "00000",
+          civicoBeneficiario: "01",
+          codiceUnitOperBeneficiario: "01",
+          denomUnitOperBeneficiario: "DENOM01",
+          denominazioneBeneficiario: "BANCA01",
+          identificativoUnivocoBeneficiario: "001",
+          indirizzoBeneficiario: "VIAROMA",
+          localitaBeneficiario: "ROMA",
+          nazioneBeneficiario: "IT",
+          provinciaBeneficiario: "ROMA"
+        }
+      });
+    }
   });
 
   it("should return generic error due to invalid nodo response", async () => {

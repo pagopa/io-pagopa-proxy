@@ -138,7 +138,8 @@ export type NodeConnectionsConfig = t.TypeOf<typeof NodeConnectionsConfig>;
 
 export enum NodeClientEnum {
   "CLIENT_IO" = "CLIENT_IO",
-  "CLIENT_CHECKOUT" = "CLIENT_CHECKOUT"
+  "CLIENT_CHECKOUT" = "CLIENT_CHECKOUT",
+  "CLIENT_PN" = "CLIENT_PM"
 }
 
 export type NodeClientType = t.TypeOf<typeof NodeClientType>;

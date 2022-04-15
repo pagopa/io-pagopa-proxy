@@ -127,9 +127,9 @@ AsControllerFunction<GetPaymentInfoT> = (
 
   // Some static information will be obtained by PagoPAConfig, to identify this client.
   const nodeClientConfig: NodeClientConfig =
-    NodeClientEnum.CLIENT_CHECKOUT === clientId
-      ? pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT
-      : pagoPAConfig.IDENTIFIERS.CLIENT_IO;
+    NodeClientEnum.CLIENT_IO === clientId
+      ? pagoPAConfig.IDENTIFIERS.CLIENT_IO
+      : pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT;
 
   // Convert the input provided by BackendApp (RESTful request) to a PagoPA request (SOAP request).
   const errorOrInodoVerificaRPTInput = PaymentsConverter.getNodoVerificaRPTInput(
@@ -398,9 +398,9 @@ AsControllerFunction<ActivatePaymentT> = (
 
   // Some static information will be obtained by PagoPAConfig, to identify this client.
   const nodeClientConfig =
-    NodeClientEnum.CLIENT_CHECKOUT === clientId
-      ? pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT
-      : pagoPAConfig.IDENTIFIERS.CLIENT_IO;
+    NodeClientEnum.CLIENT_IO === clientId
+      ? pagoPAConfig.IDENTIFIERS.CLIENT_IO
+      : pagoPAConfig.IDENTIFIERS.CLIENT_CHECKOUT;
 
   // Convert the input provided by BackendApp (RESTful request)
   // to a PagoPA request (SOAP request), mapping useful information
