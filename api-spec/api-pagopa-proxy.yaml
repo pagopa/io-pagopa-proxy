@@ -552,7 +552,7 @@ definitions:
       - PPT_SEMANTICA
       - PPT_SYSTEM_ERROR
   PartyConfigurationFault:
-    description: Fault codes for , should be mapped to 503 HTTP status code.
+    description: Fault codes for fatal errors from ECs, should be mapped to 503 HTTP status code.
     type: string
     x-extensible-enum:
       - PPT_DOMINIO_DISABILITATO
@@ -562,13 +562,13 @@ definitions:
       - PPT_STAZIONE_INT_PA_ERRORE_RESPONSE
       - PPT_IBAN_NON_CENSITO
   PartyConnectionFault:
-    description: TODO - mapped to 598
+    description: Fault codes for connection errors to ECs, should be mapped to 598 HTTP status code.
     type: string
     x-extensible-enum:
       - PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE
       - PPT_STAZIONE_INT_PA_SERVIZIO_NONATTIVO
   PartyTimeoutFault:
-    description: TODO - mapped to 504
+    description: Fault codes for timeout errors, should be mapped to 504 HTTP status code.
     type: string
     x-extensible-enum:
       - PPT_STAZIONE_INT_PA_TIMEOUT
