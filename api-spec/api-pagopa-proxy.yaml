@@ -244,7 +244,7 @@ definitions:
   PartyConfigurationFaultPaymentProblemJson:
     description: |-
       A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.
-      Possible values of `detail_v2` are limited to faults pertaining to EC non-fatal errors.
+      Possible values of `detail_v2` are limited to faults pertaining to EC fatal errors.
     type: object
     properties:
       type:
@@ -282,7 +282,9 @@ definitions:
       - detail
       - detail_v2
   PartyConnectionFaultPaymentProblemJson:
-    description: TODO - A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations
+    description: |-
+      A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.
+      Possible values of `detail_v2` are limited to faults pertaining to connection errors towards ECs.
     type: object
     properties:
       type:
@@ -320,7 +322,9 @@ definitions:
       - detail
       - detail_v2
   PartyTimeoutFaultPaymentProblemJson:
-    description: TODO - A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations
+    description: |-
+      A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.
+      Possible values of `detail_v2` are limited to faults pertaining to EC timeouts.
     type: object
     properties:
       type:
@@ -521,14 +525,14 @@ definitions:
       - PPT_MULTI_BENEFICIARIO
       - GENERIC_ERROR
   ValidationFault:
-    description: TODO - mapped to 400
+    description: Fault codes for validation/syntactical errors, should be mapped to 400 HTTP status code.
     type: string
     x-extensible-enum:
       - PPT_DOMINIO_SCONOSCIUTO
       - PPT_INTERMEDIARIO_PA_SCONOSCIUTO
       - PPT_STAZIONE_INT_PA_SCONOSCIUTA
   GatewayFault:
-    description: TODO - mapped to 502
+    description: Fault codes for generic downstream services errors, should be mapped to 502 HTTP status code.
     type: string
     x-extensible-enum:
       - GENERIC_ERROR
@@ -548,7 +552,7 @@ definitions:
       - PPT_SEMANTICA
       - PPT_SYSTEM_ERROR
   PartyConfigurationFault:
-    description: TODO - mapped to 503
+    description: Fault codes for , should be mapped to 503 HTTP status code.
     type: string
     x-extensible-enum:
       - PPT_DOMINIO_DISABILITATO
@@ -569,7 +573,6 @@ definitions:
     x-extensible-enum:
       - PPT_STAZIONE_INT_PA_TIMEOUT
       - GENERIC_ERROR
-
   PaymentFaultV2:
     description: Fault codes for the PagoPA/Controparte Verifica and Attiva operations
     type: string
