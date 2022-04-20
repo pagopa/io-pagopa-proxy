@@ -26,7 +26,7 @@ import { logger } from "./Logger";
 
 export const ResponseErrorValidation: (
   title: string,
-  detail: string | PartyConfigurationFaultEnum
+  detail: string | ValidationFaultEnum
 ) => IResponseValidationError = (title, detail) => {
   // eslint-disable-next-line functional/no-let
   let responseDetail;
@@ -77,7 +77,7 @@ export const responseFromPaymentFault: (
   ) {
     return ResponseErrorValidation(
       detail,
-      (detail_v2 as unknown) as GatewayFaultEnum
+      (detail_v2 as unknown) as ValidationFaultEnum
     );
   } else if (
     Object.values(GatewayFaultEnum).includes(

@@ -220,7 +220,10 @@ AsControllerFunction<GetPaymentInfoT> = (
           rptId: params.rpt_id_from_string
         }
       });
-      return ResponseGatewayTimeout();
+      return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
+        GatewayFaultEnum.GENERIC_ERROR
+      );
     }
 
     if (responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO) {

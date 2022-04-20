@@ -303,7 +303,7 @@ describe("checkPaymentToPagoPa", () => {
       verifyPaymentNoticePaClientNm3
     )(req);
 
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseValidationError");
   });
 
   it("should return error invalid client header", async () => {
@@ -334,7 +334,7 @@ describe("checkPaymentToPagoPa", () => {
       verifyPaymentNoticePaClientNm3
     )(req);
   
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseValidationError");
   });
 
   it("should return generic error due to invalid nodo response", async () => {
@@ -364,7 +364,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseGatewayError");
   });
 
   it("should return timeout error due to nodo timeout", async () => {
@@ -416,7 +416,7 @@ describe("checkPaymentToPagoPa", () => {
     const req = mockReq();
   
     // tslint:disable-next-line:no-object-mutation
-    req.params = { rpt_id_from_string: aRptIdStringForKoWithoutDeatilsResponse };;
+    req.params = { rpt_id_from_string: aRptIdStringForKoWithoutDeatilsResponse };
     req.headers = { "X-Client-Id": TEST_CLIENT_ID };
   
     const errorOrPaymentCheckResponse = await getPaymentInfo(
@@ -424,7 +424,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseGatewayError");
   });
 
   it("should return detail error due to nodo PAA_PAGAMENTO_IN_CORSO", async () => {
@@ -454,7 +454,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseGatewayError");
   });
 
   it("should return right response for PPT_MULTI_BENEFICIARIO", async () => {
@@ -514,7 +514,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseGatewayError");
   
   
   });
@@ -575,7 +575,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseGatewayError");
   });
 
   it("should return error with invalid nodo configuration", async () => {
@@ -605,7 +605,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseValidationError");
   });
 });
 
@@ -740,7 +740,7 @@ describe("activatePaymentToPagoPa", () => {
     )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe(
-      "IResponseErrorValidation"
+      "IResponseValidationError"
     );
   });
 
@@ -775,7 +775,7 @@ describe("activatePaymentToPagoPa", () => {
     )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe(
-      "IResponseErrorValidation"
+      "IResponseValidationError"
     );
   });
 
@@ -807,7 +807,7 @@ describe("activatePaymentToPagoPa", () => {
       0
     )(req);
   
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseGatewayError");
   });
 
   it("should return timeout error due to nodo timeout", async () => {
@@ -869,7 +869,7 @@ describe("activatePaymentToPagoPa", () => {
       0
     )(req);
   
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseGatewayError");
   });
 
   it("should return detail error due to nodo PAA_PAGAMENTO_IN_CORSO", async () => {
@@ -900,7 +900,7 @@ describe("activatePaymentToPagoPa", () => {
       0
     )(req);
   
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseGatewayError");
   });
 
   it("should return right response for PPT_MULTI_BENEFICIARIO", async () => {
@@ -977,7 +977,7 @@ describe("activatePaymentToPagoPa", () => {
   
     expect(aMockedRedisClient.connected).toBeTruthy();
 
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorValidation");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseValidationError");
 
   });
 
@@ -1040,7 +1040,7 @@ describe("activatePaymentToPagoPa", () => {
       10000
     )(req);
   
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseGatewayError");
   });
 
   it("should return invalid response for PPT_MULTI_BENEFICIARIO", async () => {
@@ -1071,7 +1071,7 @@ describe("activatePaymentToPagoPa", () => {
       10000
     )(req);
   
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseGatewayError");
   });
 });
 
@@ -1125,7 +1125,7 @@ describe("setActivationStatus and getActivationStatus", () => {
       aMockedRedisClient
     )(req);
 
-    expect(errorOrPaymentActivationGet.kind).toBe("IResponseErrorInternal");
+    expect(errorOrPaymentActivationGet.kind).toBe("IResponseGatewayError");
     
   });
 });

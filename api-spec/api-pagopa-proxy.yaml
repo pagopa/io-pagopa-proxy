@@ -537,6 +537,7 @@ definitions:
     x-extensible-enum:
       - GENERIC_ERROR
       - PPT_PAGAMENTO_IN_CORSO
+      - PAA_PAGAMENTO_IN_CORSO
       - PPT_PAGAMENTO_DUPLICATO
       - PPT_SINTASSI_EXTRAXSD
       - PPT_SINTASSI_XSD
