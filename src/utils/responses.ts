@@ -1,5 +1,3 @@
-import { errorsToReadableMessages } from "@pagopa/ts-commons/lib/reporters";
-import * as t from "io-ts";
 import {
   HttpStatusCodeEnum,
   ResponseErrorGeneric
@@ -14,17 +12,17 @@ import {
   IResponseGatewayError,
   IResponseGatewayTimeout,
   IResponsePartyConfigurationError,
-  IResponseValidationError,
+  IResponseErrorValidationFault,
   ResponseGatewayTimeout,
   ResponsePartyConfigurationError,
   ResponsePaymentError
 } from "./types";
 import { logger } from "./Logger";
 
-export const ResponseErrorValidation: (
+export const ResponseErrorValidationFault: (
   title: string,
-  detail: string | ValidationFaultEnum
-) => IResponseValidationError = (title, detail) => {
+  detail: ValidationFaultEnum
+) => IResponseErrorValidationFault = (title, detail) => {
   // eslint-disable-next-line functional/no-let
   let responseDetail;
   if (typeof detail === "string") {
@@ -33,20 +31,10 @@ export const ResponseErrorValidation: (
     responseDetail = detail;
   }
   return {
-    ...ResponseErrorGeneric(HttpStatusCodeEnum.HTTP_STATUS_400, title, detail),
+    ...ResponseErrorGeneric(HttpStatusCodeEnum.HTTP_STATUS_404, title, detail),
     detail: responseDetail,
-    kind: "IResponseValidationError"
+    kind: "IResponseErrorValidationFault"
   };
-};
-
-export const ResponseErrorFromValidationErrors: <S, A>(
-  type: t.Type<A, S, unknown>
-) => (
-  errors: ReadonlyArray<t.ValidationError>
-) => // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-IResponseValidationError = type => errors => {
-  const detail = errorsToReadableMessages(errors).join("\n");
-  return ResponseErrorValidation(`Invalid ${type.name}`, detail);
 };
 
 export const responseFromPaymentFault: (
@@ -54,7 +42,7 @@ export const responseFromPaymentFault: (
   detail_v2: PaymentFaultV2Enum
 ) =>
   | IResponsePartyConfigurationError
-  | IResponseValidationError
+  | IResponseErrorValidationFault
   | IResponseGatewayError
   | IResponseGatewayTimeout = (detail, detail_v2) => {
   if (
@@ -71,7 +59,7 @@ export const responseFromPaymentFault: (
       (detail_v2 as unknown) as ValidationFaultEnum
     )
   ) {
-    return ResponseErrorValidation(
+    return ResponseErrorValidationFault(
       detail,
       (detail_v2 as unknown) as ValidationFaultEnum
     );

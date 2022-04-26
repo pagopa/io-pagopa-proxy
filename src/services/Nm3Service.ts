@@ -4,7 +4,10 @@ import { PathReporter } from "io-ts/lib/PathReporter";
 
 import * as redis from "redis";
 import {
+  IResponseErrorValidation,
   IResponseSuccessJson,
+  ResponseErrorFromValidationErrors,
+  ResponseErrorValidation,
   ResponseSuccessJson
 } from "@pagopa/ts-commons/lib/responses";
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
@@ -32,16 +35,12 @@ import {
   IResponseGatewayError,
   IResponseGatewayTimeout,
   IResponsePartyConfigurationError,
-  IResponseValidationError,
+  IResponseErrorValidationFault,
   ResponseGatewayTimeout,
   ResponsePaymentError
 } from "../utils/types";
 import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
-import {
-  ResponseErrorFromValidationErrors,
-  ResponseErrorValidation,
-  responseFromPaymentFault
-} from "../utils/responses";
+import { responseFromPaymentFault } from "../utils/responses";
 import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
 import * as PaymentsService from "./PaymentsService";
 
@@ -55,7 +54,8 @@ export async function nodoVerifyPaymentNoticeService(
   rptId: GeneralRptId,
   codiceContestoPagamento: CodiceContestoPagamento
 ): Promise<
-  | IResponseValidationError
+  | IResponseErrorValidation
+  | IResponseErrorValidationFault
   | IResponseGatewayError
   | IResponsePartyConfigurationError
   | IResponseGatewayTimeout
@@ -190,7 +190,7 @@ export async function nodoVerifyPaymentNoticeService(
       PaymentFaultEnum.GENERIC_ERROR,
       detailV2
     ) as
-      | IResponseValidationError
+      | IResponseErrorValidationFault
       | IResponseGatewayError
       | IResponsePartyConfigurationError
       | IResponseGatewayTimeout
@@ -259,7 +259,8 @@ export async function nodoActivateIOPaymentService(
   rptId: GeneralRptId,
   amount: ImportoEuroCents
 ): Promise<
-  | IResponseValidationError
+  | IResponseErrorValidation
+  | IResponseErrorValidationFault
   | IResponseGatewayError
   | IResponseSuccessJson<PaymentActivationsPostResponse>
   | IResponseGatewayTimeout
@@ -402,7 +403,7 @@ export async function nodoActivateIOPaymentService(
       detailV2
     ) as
       | IResponseGatewayError
-      | IResponseValidationError
+      | IResponseErrorValidationFault
       | IResponseGatewayTimeout;
   } else {
     const isIdPaymentSaved: boolean = await setNm3PaymentOption(

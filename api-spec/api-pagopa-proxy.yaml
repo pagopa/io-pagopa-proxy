@@ -25,6 +25,10 @@ paths:
             application/json:
               importoSingoloVersamento: 200,
               codiceContestoPagamento: 'ABC123'
+        '400':
+          description: Formally invalid input
+          schema:
+            $ref: "#/definitions/ProblemJson"
         '404':
           description: Invalid input
           schema:
@@ -67,6 +71,10 @@ paths:
           examples:
             application/json:
               importoSingoloVersamento: 200
+        '400':
+          description: Formally invalid input
+          schema:
+            $ref: "#/definitions/ProblemJson"
         '404':
           description: Invalid input
           schema:

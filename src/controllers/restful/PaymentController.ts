@@ -10,7 +10,12 @@ import * as O from "fp-ts/lib/Option";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
-import { ResponseSuccessJson } from "@pagopa/ts-commons/lib/responses";
+import {
+  IResponseErrorValidation,
+  ResponseErrorFromValidationErrors,
+  ResponseErrorValidation,
+  ResponseSuccessJson
+} from "@pagopa/ts-commons/lib/responses";
 import * as redis from "redis";
 import * as uuid from "uuid";
 
@@ -59,21 +64,16 @@ import {
   AsControllerFunction,
   AsControllerResponseType,
   GeneralRptId,
-  IResponseValidationError,
   ResponseGatewayTimeout,
   ResponsePaymentError
 } from "../../utils/types";
 import { RptId, RptIdFromString } from "../../utils/pagopa";
-import {
-  ResponseErrorFromValidationErrors,
-  ResponseErrorValidation,
-  responseFromPaymentFault
-} from "../../utils/responses";
+import { responseFromPaymentFault } from "../../utils/responses";
 import { GatewayFaultEnum } from "../../../generated/api/GatewayFault";
 
 const headerValidationErrorHandler: (
   e: ReadonlyArray<t.ValidationError>
-) => Promise<IResponseValidationError> = async e =>
+) => Promise<IResponseErrorValidation> = async e =>
   ResponseErrorValidation(
     "Invalid X-Client-Id",
     e.map(err => err.message).join("\n")

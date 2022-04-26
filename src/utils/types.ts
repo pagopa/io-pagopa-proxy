@@ -8,6 +8,7 @@ import {
   HttpStatusCodeEnum,
   IResponse,
   IResponseErrorNotFound,
+  IResponseErrorValidation,
   IResponseSuccessJson,
   ProblemJson
 } from "@pagopa/ts-commons/lib/responses";
@@ -27,8 +28,10 @@ import { RptId } from "./pagopa";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
+  : T extends IResponseType<400, ProblemJson>
+  ? IResponseErrorValidation
   : T extends IResponseType<404, ValidationFaultPaymentProblemJson>
-  ? IResponseValidationError
+  ? IResponseErrorValidationFault
   : T extends IResponseType<404, ProblemJson>
   ? IResponseErrorNotFound
   : T extends IResponseType<502, GatewayFaultPaymentProblemJson>
@@ -74,7 +77,9 @@ export const ResponsePartyConfigurationError = (
   };
 };
 
-export type IResponseValidationError = IResponse<"IResponseValidationError">;
+export type IResponseErrorValidationFault = IResponse<
+  "IResponseErrorValidationFault"
+>;
 
 export type IResponseGatewayError = IResponse<"IResponseGatewayError">;
 
