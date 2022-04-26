@@ -25,7 +25,7 @@ paths:
             application/json:
               importoSingoloVersamento: 200,
               codiceContestoPagamento: 'ABC123'
-        '400':
+        '404':
           description: Invalid input
           schema:
             $ref: "#/definitions/ValidationFaultPaymentProblemJson"
@@ -71,7 +71,7 @@ paths:
           examples:
             application/json:
               importoSingoloVersamento: 200
-        '400':
+        '404':
           description: Invalid input
           schema:
             $ref: "#/definitions/ValidationFaultPaymentProblemJson"
@@ -111,11 +111,11 @@ paths:
         '400':
           description: Invalid input
           schema:
-            $ref: "#/definitions/ValidationFaultPaymentProblemJson"
+            $ref: "#/definitions/ProblemJson"
         '404':
           description: Activation status not found
           schema:
-            $ref: "#/definitions/ProblemJson"
+            $ref: "#/definitions/ValidationFaultPaymentProblemJson"
         "502":
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
@@ -525,7 +525,9 @@ definitions:
       - PPT_MULTI_BENEFICIARIO
       - GENERIC_ERROR
   ValidationFault:
-    description: Fault codes for validation/syntactical errors, should be mapped to 400 HTTP status code.
+    description: |-
+      Fault codes for errors related to well-formed requests to ECs not present inside Nodo, should be mapped to 404 HTTP status code.
+      Most of the time these are generated when users input a wrong fiscal code or notice number.
     type: string
     x-extensible-enum:
       - PPT_DOMINIO_SCONOSCIUTO
@@ -539,6 +541,7 @@ definitions:
       - PPT_PAGAMENTO_IN_CORSO
       - PAA_PAGAMENTO_IN_CORSO
       - PPT_PAGAMENTO_DUPLICATO
+      - PAA_PAGAMENTO_DUPLICATO
       - PPT_SINTASSI_EXTRAXSD
       - PPT_SINTASSI_XSD
       - PPT_PSP_SCONOSCIUTO

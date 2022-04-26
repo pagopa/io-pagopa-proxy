@@ -29,7 +29,7 @@ import { RptId } from "./pagopa";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
-  : T extends IResponseType<400, ValidationFaultPaymentProblemJson>
+  : T extends IResponseType<404, ValidationFaultPaymentProblemJson>
   ? IResponseValidationError
   : T extends IResponseType<404, ProblemJson>
   ? IResponseErrorNotFound

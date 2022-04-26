@@ -10,10 +10,7 @@ import * as O from "fp-ts/lib/Option";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
-import {
-  ResponseErrorNotFound,
-  ResponseSuccessJson
-} from "@pagopa/ts-commons/lib/responses";
+import { ResponseSuccessJson } from "@pagopa/ts-commons/lib/responses";
 import * as redis from "redis";
 import * as uuid from "uuid";
 
@@ -731,7 +728,7 @@ const getGetActivationStatusController: (
   const maybeIdPayment = maybeIdPaymentOrError.right;
 
   if (O.isNone(maybeIdPayment)) {
-    return ResponseErrorNotFound("Not found", "getActivationStatus");
+    return ResponseErrorValidation("Not found", "getActivationStatus");
   }
 
   const idPayment = maybeIdPayment.value;
