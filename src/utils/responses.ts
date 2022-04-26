@@ -9,18 +9,15 @@ import { PartyTimeoutFaultEnum } from "../../generated/api/PartyTimeoutFault";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
-import { PartyConnectionFaultEnum } from "../../generated/api/PartyConnectionFault";
 import { ValidationFaultEnum } from "../../generated/api/ValidationFault";
 import {
   IResponseGatewayError,
   IResponseGatewayTimeout,
   IResponsePartyConfigurationError,
-  IResponseProxyConnectionError,
   IResponseValidationError,
   ResponseGatewayTimeout,
   ResponsePartyConfigurationError,
-  ResponsePaymentError,
-  ResponseProxyConnectionError
+  ResponsePaymentError
 } from "./types";
 import { logger } from "./Logger";
 
@@ -59,8 +56,7 @@ export const responseFromPaymentFault: (
   | IResponsePartyConfigurationError
   | IResponseValidationError
   | IResponseGatewayError
-  | IResponseGatewayTimeout
-  | IResponseProxyConnectionError = (detail, detail_v2) => {
+  | IResponseGatewayTimeout = (detail, detail_v2) => {
   if (
     Object.values(PartyConfigurationFaultEnum).includes(
       (detail_v2 as unknown) as PartyConfigurationFaultEnum
@@ -95,14 +91,6 @@ export const responseFromPaymentFault: (
   ) {
     return ResponseGatewayTimeout(
       (detail_v2 as unknown) as PartyTimeoutFaultEnum
-    );
-  } else if (
-    Object.values(PartyConnectionFaultEnum).includes(
-      (detail_v2 as unknown) as PartyConnectionFaultEnum
-    )
-  ) {
-    return ResponseProxyConnectionError(
-      (detail_v2 as unknown) as PartyConnectionFaultEnum
     );
   } else {
     logger.error(`unmapped detail_v2: ${detail_v2}`);

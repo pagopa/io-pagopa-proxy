@@ -32,7 +32,6 @@ import {
   IResponseGatewayError,
   IResponseGatewayTimeout,
   IResponsePartyConfigurationError,
-  IResponseProxyConnectionError,
   IResponseValidationError,
   ResponseGatewayTimeout,
   ResponsePaymentError
@@ -60,7 +59,6 @@ export async function nodoVerifyPaymentNoticeService(
   | IResponseGatewayError
   | IResponsePartyConfigurationError
   | IResponseGatewayTimeout
-  | IResponseProxyConnectionError
   | IResponseSuccessJson<PaymentRequestsGetResponse>
 > {
   logger.info(`GetNodoVerifyPaymentNotice|(nm3) for request|${rptId.asString}`);
@@ -196,7 +194,6 @@ export async function nodoVerifyPaymentNoticeService(
       | IResponseGatewayError
       | IResponsePartyConfigurationError
       | IResponseGatewayTimeout
-      | IResponseProxyConnectionError
       | IResponseSuccessJson<PaymentRequestsGetResponse>;
   } else {
     const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(

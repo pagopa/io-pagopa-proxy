@@ -41,10 +41,6 @@ paths:
           description: Timeout from PagoPA services
           schema:
             $ref: "#/definitions/PartyTimeoutFaultPaymentProblemJson"
-        '598':
-          description: Service connection error while connecting to PagoPA services
-          schema:
-            $ref: "#/definitions/PartyConnectionFaultPaymentProblemJson"
   '/payment-activations':
     x-swagger-router-controller: PaymentController
     post:
@@ -87,10 +83,6 @@ paths:
           description: Timeout from PagoPA services
           schema:
             $ref: "#/definitions/PartyTimeoutFaultPaymentProblemJson"
-        '598':
-          description: Service connection error while connecting to PagoPA services
-          schema:
-            $ref: "#/definitions/PartyConnectionFaultPaymentProblemJson"
   '/payment-activations/{codice_contesto_pagamento}':
     x-swagger-router-controller: PaymentController
     get:
@@ -272,46 +264,6 @@ definitions:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
         $ref: "#/definitions/PartyConfigurationFault"
-      instance:
-        type: string
-        format: uri
-        description: |-
-          An absolute URI that identifies the specific occurrence of the problem.
-          It may or may not yield further information if dereferenced.
-    required:
-      - detail
-      - detail_v2
-  PartyConnectionFaultPaymentProblemJson:
-    description: |-
-      A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.
-      Possible values of `detail_v2` are limited to faults pertaining to connection errors towards ECs.
-    type: object
-    properties:
-      type:
-        type: string
-        format: uri
-        description: |-
-          An absolute URI that identifies the problem type. When dereferenced,
-          it SHOULD provide human-readable documentation for the problem type
-          (e.g., using HTML).
-        default: about:blank
-        example: https://example.com/problem/constraint-violation
-      title:
-        type: string
-        description: |-
-          A short, summary of the problem type. Written in english and readable
-          for engineers (usually not suited for non technical stakeholders and
-          not localized); example: Service Unavailable
-      status:
-        type: integer
-        format: int32
-        minimum: 100
-        maximum: 600
-        exclusiveMaximum: true
-      detail:
-        $ref: "#/definitions/PaymentFault"
-      detail_v2:
-        $ref: "#/definitions/PartyConnectionFault"
       instance:
         type: string
         format: uri
@@ -565,17 +517,13 @@ definitions:
       - PPT_ERRORE_EMESSO_DA_PAA
       - PPT_STAZIONE_INT_PA_ERRORE_RESPONSE
       - PPT_IBAN_NON_CENSITO
-  PartyConnectionFault:
-    description: Fault codes for connection errors to ECs, should be mapped to 598 HTTP status code.
-    type: string
-    x-extensible-enum:
-      - PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE
-      - PPT_STAZIONE_INT_PA_SERVIZIO_NONATTIVO
   PartyTimeoutFault:
     description: Fault codes for timeout errors, should be mapped to 504 HTTP status code.
     type: string
     x-extensible-enum:
       - PPT_STAZIONE_INT_PA_TIMEOUT
+      - PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE
+      - PPT_STAZIONE_INT_PA_SERVIZIO_NONATTIVO
       - GENERIC_ERROR
   PaymentFaultV2:
     description: Fault codes for the PagoPA/Controparte Verifica and Attiva operations

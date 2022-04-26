@@ -20,8 +20,6 @@ import {
 import { PartyTimeoutFaultPaymentProblemJson } from "../../generated/api/PartyTimeoutFaultPaymentProblemJson";
 import { PartyConfigurationFaultPaymentProblemJson } from "../../generated/api/PartyConfigurationFaultPaymentProblemJson";
 import { GatewayFaultPaymentProblemJson } from "../../generated/api/GatewayFaultPaymentProblemJson";
-import { PartyConnectionFaultPaymentProblemJson } from "../../generated/api/PartyConnectionFaultPaymentProblemJson";
-import { PartyConnectionFault } from "../../generated/api/PartyConnectionFault";
 import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
 import { ValidationFaultPaymentProblemJson } from "../../generated/api/ValidationFaultPaymentProblemJson";
 import { PartyConfigurationFaultEnum } from "../../generated/api/PartyConfigurationFault";
@@ -39,8 +37,6 @@ export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponsePartyConfigurationError
   : T extends IResponseType<504, PartyTimeoutFaultPaymentProblemJson>
   ? IResponseGatewayTimeout
-  : T extends IResponseType<598, PartyConnectionFaultPaymentProblemJson>
-  ? IResponseProxyConnectionError
   : never;
 
 export type AsControllerFunction<T> = (
@@ -130,33 +126,6 @@ export const ResponseGatewayTimeout: (
       .json(problem);
   },
   kind: "IResponseErrorGatewayTimeout"
-});
-
-export type IResponseProxyConnectionError = IResponse<
-  "IResponseProxyConnectionError"
->;
-
-/**
- * Returns a 598 response
- */
-export const ResponseProxyConnectionError: (
-  detail: PartyConnectionFault
-) => IResponseProxyConnectionError = detail => ({
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  apply: res => {
-    const problem: PartyConnectionFaultPaymentProblemJson = {
-      detail: PaymentFaultEnum.GENERIC_ERROR,
-      detail_v2: detail,
-      status: 598 as HttpCode,
-      title: "pagoPA connection error"
-    };
-
-    res
-      .status(598)
-      .set("Content-Type", "application/problem+json")
-      .json(problem);
-  },
-  kind: "IResponseProxyConnectionError"
 });
 
 const GeneralRptId = t.interface({
