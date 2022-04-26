@@ -8,6 +8,7 @@ import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
 import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
 import { ValidationFaultEnum } from "../../generated/api/ValidationFault";
+import { PaymentStatusFaultEnum } from "../../generated/api/PaymentStatusFault";
 import {
   IResponseGatewayError,
   IResponseGatewayTimeout,
@@ -15,7 +16,9 @@ import {
   IResponseErrorValidationFault,
   ResponseGatewayTimeout,
   ResponsePartyConfigurationError,
-  ResponsePaymentError
+  ResponsePaymentError,
+  IResponsePaymentStatusFaultError,
+  ResponsePaymentStatusFaultError
 } from "./types";
 import { logger } from "./Logger";
 
@@ -41,6 +44,7 @@ export const responseFromPaymentFault: (
   detail: PaymentFaultEnum,
   detail_v2: PaymentFaultV2Enum
 ) =>
+  | IResponsePaymentStatusFaultError
   | IResponsePartyConfigurationError
   | IResponseErrorValidationFault
   | IResponseGatewayError
@@ -62,6 +66,15 @@ export const responseFromPaymentFault: (
     return ResponseErrorValidationFault(
       detail,
       (detail_v2 as unknown) as ValidationFaultEnum
+    );
+  } else if (
+    Object.values(PaymentStatusFaultEnum).includes(
+      (detail_v2 as unknown) as PaymentStatusFaultEnum
+    )
+  ) {
+    return ResponsePaymentStatusFaultError(
+      detail,
+      (detail_v2 as unknown) as PaymentStatusFaultEnum
     );
   } else if (
     Object.values(GatewayFaultEnum).includes(

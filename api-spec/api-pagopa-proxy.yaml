@@ -33,6 +33,10 @@ paths:
           description: Invalid input
           schema:
             $ref: "#/definitions/ValidationFaultPaymentProblemJson"
+        '409':
+          description: Conflict on payment status
+          schema:
+            $ref: "#/definitions/PaymentStatusFaultPaymentProblemJson"
         "502":
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
@@ -79,6 +83,10 @@ paths:
           description: Invalid input
           schema:
             $ref: "#/definitions/ValidationFaultPaymentProblemJson"
+        '409':
+          description: Conflict on payment status
+          schema:
+            $ref: "#/definitions/PaymentStatusFaultPaymentProblemJson"
         "502":
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
@@ -192,6 +200,46 @@ definitions:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
         $ref: "#/definitions/ValidationFault"
+      instance:
+        type: string
+        format: uri
+        description: |-
+          An absolute URI that identifies the specific occurrence of the problem.
+          It may or may not yield further information if dereferenced.
+    required:
+      - detail
+      - detail_v2
+  PaymentStatusFaultPaymentProblemJson:
+    description: |-
+      A PaymentProblemJson-like type specific for the GetPayment and ActivatePayment operations.
+      Possible values of `detail_v2` are limited to faults pertaining to Nodo errors related to payment status conflicts.
+    type: object
+    properties:
+      type:
+        type: string
+        format: uri
+        description: |-
+          An absolute URI that identifies the problem type. When dereferenced,
+          it SHOULD provide human-readable documentation for the problem type
+          (e.g., using HTML).
+        default: about:blank
+        example: https://example.com/problem/constraint-violation
+      title:
+        type: string
+        description: |-
+          A short, summary of the problem type. Written in english and readable
+          for engineers (usually not suited for non technical stakeholders and
+          not localized); example: Service Unavailable
+      status:
+        type: integer
+        format: int32
+        minimum: 100
+        maximum: 600
+        exclusiveMaximum: true
+      detail:
+        $ref: "#/definitions/PaymentFault"
+      detail_v2:
+        $ref: "#/definitions/PaymentStatusFault"
       instance:
         type: string
         format: uri
@@ -484,6 +532,17 @@ definitions:
       - DOMAIN_UNKNOWN
       - PPT_MULTI_BENEFICIARIO
       - GENERIC_ERROR
+  PaymentStatusFault:
+    description: |-
+      Fault codes for errors related to payment attempts that cause conflict with the current payment status,
+      such as a duplicated payment attempt or a payment attempt made while another attempt is still being processed.
+      Should be mapped to 409 HTTP status code.
+    type: string
+    x-extensible-enum:
+      - PPT_PAGAMENTO_IN_CORSO
+      - PAA_PAGAMENTO_IN_CORSO
+      - PPT_PAGAMENTO_DUPLICATO
+      - PAA_PAGAMENTO_DUPLICATO
   ValidationFault:
     description: |-
       Fault codes for errors related to well-formed requests to ECs not present inside Nodo, should be mapped to 404 HTTP status code.
@@ -498,10 +557,6 @@ definitions:
     type: string
     x-extensible-enum:
       - GENERIC_ERROR
-      - PPT_PAGAMENTO_IN_CORSO
-      - PAA_PAGAMENTO_IN_CORSO
-      - PPT_PAGAMENTO_DUPLICATO
-      - PAA_PAGAMENTO_DUPLICATO
       - PPT_SINTASSI_EXTRAXSD
       - PPT_SINTASSI_XSD
       - PPT_PSP_SCONOSCIUTO

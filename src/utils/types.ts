@@ -24,6 +24,8 @@ import { GatewayFaultPaymentProblemJson } from "../../generated/api/GatewayFault
 import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
 import { ValidationFaultPaymentProblemJson } from "../../generated/api/ValidationFaultPaymentProblemJson";
 import { PartyConfigurationFaultEnum } from "../../generated/api/PartyConfigurationFault";
+import { PaymentStatusFaultPaymentProblemJson } from "../../generated/api/PaymentStatusFaultPaymentProblemJson";
+import { PaymentStatusFault } from "../../generated/api/PaymentStatusFault";
 import { RptId } from "./pagopa";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
@@ -32,6 +34,8 @@ export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseErrorValidation
   : T extends IResponseType<404, ValidationFaultPaymentProblemJson>
   ? IResponseErrorValidationFault
+  : T extends IResponseType<409, PaymentStatusFaultPaymentProblemJson>
+  ? IResponsePaymentStatusFaultError
   : T extends IResponseType<404, ProblemJson>
   ? IResponseErrorNotFound
   : T extends IResponseType<502, GatewayFaultPaymentProblemJson>
@@ -47,6 +51,35 @@ export type AsControllerFunction<T> = (
 ) => Promise<AsControllerResponseType<TypeofApiResponse<T>>>;
 
 type HttpCode = number & WithinRangeInteger<100, 599>;
+
+export type IResponsePaymentStatusFaultError = IResponse<
+  "IResponsePaymentStatusFaultError"
+>;
+
+/**
+ * Returns a 409 with json response.
+ */
+export const ResponsePaymentStatusFaultError = (
+  detail: PaymentFaultEnum,
+  detailV2: PaymentStatusFault
+): IResponsePaymentStatusFaultError => {
+  const problem: PaymentStatusFaultPaymentProblemJson = {
+    detail,
+    detail_v2: detailV2,
+    status: HttpStatusCodeEnum.HTTP_STATUS_409 as HttpCode,
+    title: "Conflicting payment status"
+  };
+  return {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    apply: res =>
+      res
+        .status(HttpStatusCodeEnum.HTTP_STATUS_409)
+        // eslint-disable-next-line sonarjs/no-duplicate-string
+        .set("Content-Type", "application/problem+json")
+        .json(problem),
+    kind: "IResponsePaymentStatusFaultError"
+  };
+};
 
 export type IResponsePartyConfigurationError = IResponse<
   "IResponsePartyConfigurationError"
