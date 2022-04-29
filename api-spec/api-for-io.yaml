@@ -354,6 +354,7 @@ definitions:
   PaymentFaultV2:
     description: |-
       This enumeration includes all possible fault codes for the PagoPA/Controparte Verifica ([`getPaymentInfo`](#/default/getPaymentInfo)) and Attiva ([`activatePayment`](#/default/activatePayment)) operations.
+      For further information visit https://docs.pagopa.it/gestionedeglierrori/struttura-degli-errori/fault-code.
       Possible fault codes are:
         - `PPT_SYSTEM_ERROR`
         - `PPT_AUTORIZZAZIONE`
