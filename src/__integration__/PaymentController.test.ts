@@ -303,7 +303,7 @@ describe("checkPaymentToPagoPa", () => {
       verifyPaymentNoticePaClientNm3
     )(req);
 
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseValidationError");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
   });
 
   it("should return error invalid client header", async () => {
@@ -334,7 +334,7 @@ describe("checkPaymentToPagoPa", () => {
       verifyPaymentNoticePaClientNm3
     )(req);
   
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseValidationError");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
   });
 
   it("should return generic error due to invalid nodo response", async () => {
@@ -454,7 +454,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseGatewayError");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponsePaymentStatusFaultError");
   });
 
   it("should return right response for PPT_MULTI_BENEFICIARIO", async () => {
@@ -575,7 +575,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseGatewayError");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponsePaymentStatusFaultError");
   });
 
   it("should return error with invalid nodo configuration", async () => {
@@ -605,7 +605,7 @@ describe("checkPaymentToPagoPa", () => {
       verificaRPTPagoPaClient,
       verifyPaymentNoticePaClientNm3
     )(req);
-    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseValidationError");
+    expect(errorOrPaymentCheckResponse.kind).toBe("IResponseErrorValidation");
   });
 });
 
@@ -740,7 +740,7 @@ describe("activatePaymentToPagoPa", () => {
     )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe(
-      "IResponseValidationError"
+      "IResponseErrorValidation"
     );
   });
 
@@ -775,7 +775,7 @@ describe("activatePaymentToPagoPa", () => {
     )(req);
 
     expect(errorOrPaymentActivationResponse.kind).toBe(
-      "IResponseValidationError"
+      "IResponseErrorValidation"
     );
   });
 
@@ -900,7 +900,7 @@ describe("activatePaymentToPagoPa", () => {
       0
     )(req);
   
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseGatewayError");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponsePaymentStatusFaultError");
   });
 
   it("should return right response for PPT_MULTI_BENEFICIARIO", async () => {
@@ -977,7 +977,7 @@ describe("activatePaymentToPagoPa", () => {
   
     expect(aMockedRedisClient.connected).toBeTruthy();
 
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseValidationError");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseErrorValidation");
 
   });
 
@@ -1040,7 +1040,7 @@ describe("activatePaymentToPagoPa", () => {
       10000
     )(req);
   
-    expect(errorOrPaymentActivationResponse.kind).toBe("IResponseGatewayError");
+    expect(errorOrPaymentActivationResponse.kind).toBe("IResponsePaymentStatusFaultError");
   });
 
   it("should return invalid response for PPT_MULTI_BENEFICIARIO", async () => {
