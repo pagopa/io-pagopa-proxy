@@ -7,7 +7,6 @@ import {
 import {
   HttpStatusCodeEnum,
   IResponse,
-  IResponseErrorInternal,
   IResponseErrorNotFound,
   IResponseErrorValidation,
   IResponseSuccessJson,
@@ -15,69 +14,146 @@ import {
 } from "@pagopa/ts-commons/lib/responses";
 import { WithinRangeInteger } from "@pagopa/ts-commons/lib/numbers";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
-import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
-import { PaymentProblemJson } from "../../generated/api/PaymentProblemJson";
+import {
+  PartyTimeoutFault,
+  PartyTimeoutFaultEnum
+} from "../../generated/api/PartyTimeoutFault";
+import { PartyTimeoutFaultPaymentProblemJson } from "../../generated/api/PartyTimeoutFaultPaymentProblemJson";
+import { PartyConfigurationFaultPaymentProblemJson } from "../../generated/api/PartyConfigurationFaultPaymentProblemJson";
+import { GatewayFaultPaymentProblemJson } from "../../generated/api/GatewayFaultPaymentProblemJson";
+import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
+import { ValidationFaultPaymentProblemJson } from "../../generated/api/ValidationFaultPaymentProblemJson";
+import { PartyConfigurationFaultEnum } from "../../generated/api/PartyConfigurationFault";
+import { PaymentStatusFaultPaymentProblemJson } from "../../generated/api/PaymentStatusFaultPaymentProblemJson";
+import { PaymentStatusFault } from "../../generated/api/PaymentStatusFault";
 import { RptId } from "./pagopa";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
   : T extends IResponseType<400, ProblemJson>
   ? IResponseErrorValidation
+  : T extends IResponseType<404, ValidationFaultPaymentProblemJson>
+  ? IResponseErrorValidationFault
+  : T extends IResponseType<409, PaymentStatusFaultPaymentProblemJson>
+  ? IResponsePaymentStatusFaultError
   : T extends IResponseType<404, ProblemJson>
   ? IResponseErrorNotFound
-  : T extends IResponseType<500, ProblemJson>
-  ? IResponseErrorInternal
-  : T extends IResponseType<424, PaymentProblemJson>
-  ? IResponsePaymentInternalError
-  : T extends IResponseType<504, PaymentProblemJson>
-  ? IResponseErrorGatewayTimeout
+  : T extends IResponseType<502, GatewayFaultPaymentProblemJson>
+  ? IResponseGatewayError
+  : T extends IResponseType<503, PartyConfigurationFaultPaymentProblemJson>
+  ? IResponsePartyConfigurationError
+  : T extends IResponseType<504, PartyTimeoutFaultPaymentProblemJson>
+  ? IResponseGatewayTimeout
   : never;
 
 export type AsControllerFunction<T> = (
   params: TypeofApiParams<T>
 ) => Promise<AsControllerResponseType<TypeofApiResponse<T>>>;
 
-export type IResponsePaymentInternalError = IResponse<"IResponseErrorInternal">;
-
 type HttpCode = number & WithinRangeInteger<100, 599>;
 
+export type IResponsePaymentStatusFaultError = IResponse<
+  "IResponsePaymentStatusFaultError"
+>;
+
 /**
- * Returns a 424 with json response.
+ * Returns a 409 with json response.
+ */
+export const ResponsePaymentStatusFaultError = (
+  detail: PaymentFaultEnum,
+  detailV2: PaymentStatusFault
+): IResponsePaymentStatusFaultError => {
+  const problem: PaymentStatusFaultPaymentProblemJson = {
+    detail,
+    detail_v2: detailV2,
+    status: HttpStatusCodeEnum.HTTP_STATUS_409 as HttpCode,
+    title: "Conflicting payment status"
+  };
+  return {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    apply: res =>
+      res
+        .status(HttpStatusCodeEnum.HTTP_STATUS_409)
+        // eslint-disable-next-line sonarjs/no-duplicate-string
+        .set("Content-Type", "application/problem+json")
+        .json(problem),
+    kind: "IResponsePaymentStatusFaultError"
+  };
+};
+
+export type IResponsePartyConfigurationError = IResponse<
+  "IResponsePartyConfigurationError"
+>;
+
+/**
+ * Returns a 503 with json response.
+ */
+export const ResponsePartyConfigurationError = (
+  detail: PaymentFaultEnum,
+  detailV2: PartyConfigurationFaultEnum
+): IResponsePartyConfigurationError => {
+  const problem: PartyConfigurationFaultPaymentProblemJson = {
+    detail,
+    detail_v2: detailV2,
+    status: HttpStatusCodeEnum.HTTP_STATUS_503 as HttpCode,
+    title: "EC service error"
+  };
+  return {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    apply: res =>
+      res
+        .status(HttpStatusCodeEnum.HTTP_STATUS_503)
+        // eslint-disable-next-line sonarjs/no-duplicate-string
+        .set("Content-Type", "application/problem+json")
+        .json(problem),
+    kind: "IResponsePartyConfigurationError"
+  };
+};
+
+export type IResponseErrorValidationFault = IResponse<
+  "IResponseErrorValidationFault"
+>;
+
+export type IResponseGatewayError = IResponse<"IResponseGatewayError">;
+
+/**
+ * Returns a 502 with json response.
  */
 export const ResponsePaymentError = (
   detail: PaymentFaultEnum,
-  detailV2: PaymentFaultV2Enum
-): IResponsePaymentInternalError => {
-  const problem: PaymentProblemJson = {
+  detailV2: GatewayFaultEnum
+): IResponseGatewayError => {
+  const problem: GatewayFaultPaymentProblemJson = {
     detail,
     detail_v2: detailV2,
-    status: HttpStatusCodeEnum.HTTP_STATUS_424 as HttpCode,
+    status: HttpStatusCodeEnum.HTTP_STATUS_502 as HttpCode,
     title: "pagoPA service error"
   };
   return {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     apply: res =>
       res
-        .status(HttpStatusCodeEnum.HTTP_STATUS_424)
+        .status(HttpStatusCodeEnum.HTTP_STATUS_502)
+        // eslint-disable-next-line sonarjs/no-duplicate-string
         .set("Content-Type", "application/problem+json")
         .json(problem),
-    kind: "IResponseErrorInternal"
+    kind: "IResponseGatewayError"
   };
 };
 
-export type IResponseErrorGatewayTimeout = IResponse<
-  "IResponseErrorGatewayTimeout"
->;
+export type IResponseGatewayTimeout = IResponse<"IResponseErrorGatewayTimeout">;
 
 /**
  * Returns a 504 response
  */
-export const ResponseErrorGatewayTimeout: IResponseErrorGatewayTimeout = {
+export const ResponseGatewayTimeout: (
+  detail?: PartyTimeoutFault
+) => IResponseGatewayTimeout = detail => ({
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   apply: res => {
-    const problem: PaymentProblemJson = {
+    const problem: PartyTimeoutFaultPaymentProblemJson = {
       detail: PaymentFaultEnum.GENERIC_ERROR,
-      detail_v2: PaymentFaultV2Enum.GENERIC_ERROR,
+      detail_v2: detail ?? PartyTimeoutFaultEnum.GENERIC_ERROR,
       status: HttpStatusCodeEnum.HTTP_STATUS_504 as HttpCode,
       title: "pagoPA service error"
     };
@@ -88,7 +164,7 @@ export const ResponseErrorGatewayTimeout: IResponseErrorGatewayTimeout = {
       .json(problem);
   },
   kind: "IResponseErrorGatewayTimeout"
-};
+});
 
 const GeneralRptId = t.interface({
   asObject: RptId,

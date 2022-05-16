@@ -13,8 +13,6 @@ import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
 import {
   IResponseErrorValidation,
   ResponseErrorFromValidationErrors,
-  ResponseErrorInternal,
-  ResponseErrorNotFound,
   ResponseErrorValidation,
   ResponseSuccessJson
 } from "@pagopa/ts-commons/lib/responses";
@@ -66,10 +64,12 @@ import {
   AsControllerFunction,
   AsControllerResponseType,
   GeneralRptId,
-  ResponseErrorGatewayTimeout,
+  ResponseGatewayTimeout,
   ResponsePaymentError
 } from "../../utils/types";
 import { RptId, RptIdFromString } from "../../utils/pagopa";
+import { responseFromPaymentFault } from "../../utils/responses";
+import { GatewayFaultEnum } from "../../../generated/api/GatewayFault";
 
 const headerValidationErrorHandler: (
   e: ReadonlyArray<t.ValidationError>
@@ -90,7 +90,9 @@ AsControllerFunction<GetPaymentInfoT> = (
   pagoPAClient,
   pagoPAClientNm3
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, max-lines-per-function
-) => async params => {
+) => async (
+  params
+): Promise<AsControllerResponseType<TypeofApiResponse<GetPaymentInfoT>>> => {
   const clientId = params["x-Client-Id"] as NodeClientType;
 
   logger.info(`GetPaymentInfo|${clientId}|${params.rpt_id_from_string}`);
@@ -183,11 +185,11 @@ AsControllerFunction<GetPaymentInfoT> = (
     });
 
     if (error.message === "ESOCKETTIMEDOUT") {
-      return ResponseErrorGatewayTimeout;
+      return ResponseGatewayTimeout();
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
   }
@@ -196,17 +198,13 @@ AsControllerFunction<GetPaymentInfoT> = (
   // Check PagoPA response content
   if (iNodoVerificaRPTOutput.esito !== "OK") {
     // If it contains a functional error, an HTTP error will be provided to BackendApp
-    const responseError = getResponseErrorIfExists(
-      iNodoVerificaRPTOutput.fault
-    );
+    const faultBean = iNodoVerificaRPTOutput.fault;
+    const responseError = getResponseErrorIfExists(faultBean);
 
-    if (
-      responseError === undefined ||
-      iNodoVerificaRPTOutput.fault === undefined
-    ) {
+    if (responseError === undefined || faultBean === undefined) {
       const errorDetail = `GetPaymentInfo|Error during payment check: esito === KO|${clientId}|${
         params.rpt_id_from_string
-      }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`;
+      }|${responseError}|${JSON.stringify(faultBean)}`;
       logger.error(errorDetail);
 
       trackPaymentEvent({
@@ -221,7 +219,7 @@ AsControllerFunction<GetPaymentInfoT> = (
       });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
 
@@ -229,10 +227,10 @@ AsControllerFunction<GetPaymentInfoT> = (
       logger.error(
         `GetPaymentInfo|Error from pagopa|${clientId}|${
           params.rpt_id_from_string
-        }|${responseError}|${JSON.stringify(iNodoVerificaRPTOutput.fault)}`
+        }|${responseError}|${JSON.stringify(faultBean)}`
       );
 
-      const detailV2 = getDetailV2FromFaultCode(iNodoVerificaRPTOutput.fault);
+      const detailV2 = getDetailV2FromFaultCode(faultBean);
 
       const errorDetail = `GetPaymentInfo|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
       logger.warn(errorDetail);
@@ -249,7 +247,7 @@ AsControllerFunction<GetPaymentInfoT> = (
         }
       });
 
-      return ResponsePaymentError(responseError, detailV2);
+      return responseFromPaymentFault(responseError, detailV2);
     } else {
       /**
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
@@ -382,7 +380,9 @@ AsControllerFunction<ActivatePaymentT> = (
   redisClient,
   redisTimeoutSecs
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, max-lines-per-function
-) => async params => {
+) => async (
+  params
+): Promise<AsControllerResponseType<TypeofApiResponse<ActivatePaymentT>>> => {
   const ccp: CodiceContestoPagamento = params.body.codiceContestoPagamento;
   const amount: ImportoEuroCents = params.body.importoSingoloVersamento;
   const rptId: string = params.body.rptId;
@@ -458,11 +458,11 @@ AsControllerFunction<ActivatePaymentT> = (
     });
 
     if (error.message === "ESOCKETTIMEDOUT") {
-      return ResponseErrorGatewayTimeout;
+      return ResponseGatewayTimeout();
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
   }
@@ -495,7 +495,7 @@ AsControllerFunction<ActivatePaymentT> = (
       });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
 
@@ -522,7 +522,7 @@ AsControllerFunction<ActivatePaymentT> = (
           rptId
         }
       });
-      return ResponsePaymentError(responseError, detailV2);
+      return responseFromPaymentFault(responseError, detailV2);
     } else {
       /**
        * Handler of Nuovo Modello 3 (nm3 - PPT_MULTI_BENEFICIARIO)
@@ -719,15 +719,16 @@ const getGetActivationStatusController: (
   );
 
   if (E.isLeft(maybeIdPaymentOrError)) {
-    return ResponseErrorInternal(
-      `getActivationStatus: ${maybeIdPaymentOrError.left}`
+    return ResponsePaymentError(
+      PaymentFaultEnum.GENERIC_ERROR,
+      GatewayFaultEnum.GENERIC_ERROR
     );
   }
 
   const maybeIdPayment = maybeIdPaymentOrError.right;
 
   if (O.isNone(maybeIdPayment)) {
-    return ResponseErrorNotFound("Not found", "getActivationStatus");
+    return ResponseErrorValidation("Not found", "getActivationStatus");
   }
 
   const idPayment = maybeIdPayment.value;

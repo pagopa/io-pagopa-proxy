@@ -4,7 +4,6 @@ import { PathReporter } from "io-ts/lib/PathReporter";
 
 import * as redis from "redis";
 import {
-  IResponseErrorInternal,
   IResponseErrorValidation,
   IResponseSuccessJson,
   ResponseErrorFromValidationErrors,
@@ -26,7 +25,6 @@ import * as PaymentsConverter from "../utils/PaymentsConverter";
 
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { PaymentActivationsPostResponse } from "../../generated/api/PaymentActivationsPostResponse";
-import { PaymentFaultV2Enum } from "../../generated/api/PaymentFaultV2";
 import {
   EventNameEnum,
   EventResultEnum,
@@ -34,10 +32,15 @@ import {
 } from "../utils/AIUtils";
 import {
   GeneralRptId,
-  IResponseErrorGatewayTimeout,
-  ResponseErrorGatewayTimeout,
+  IResponseGatewayError,
+  IResponseGatewayTimeout,
+  IResponsePartyConfigurationError,
+  IResponseErrorValidationFault,
+  ResponseGatewayTimeout,
   ResponsePaymentError
 } from "../utils/types";
+import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
+import { responseFromPaymentFault } from "../utils/responses";
 import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
 import * as PaymentsService from "./PaymentsService";
 
@@ -52,9 +55,11 @@ export async function nodoVerifyPaymentNoticeService(
   codiceContestoPagamento: CodiceContestoPagamento
 ): Promise<
   | IResponseErrorValidation
-  | IResponseErrorInternal
+  | IResponseErrorValidationFault
+  | IResponseGatewayError
+  | IResponsePartyConfigurationError
+  | IResponseGatewayTimeout
   | IResponseSuccessJson<PaymentRequestsGetResponse>
-  | IResponseErrorGatewayTimeout
 > {
   logger.info(`GetNodoVerifyPaymentNotice|(nm3) for request|${rptId.asString}`);
 
@@ -118,11 +123,11 @@ export async function nodoVerifyPaymentNoticeService(
     });
 
     if (error.message === "ESOCKETTIMEDOUT") {
-      return ResponseErrorGatewayTimeout;
+      return ResponseGatewayTimeout();
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
   }
@@ -157,7 +162,7 @@ export async function nodoVerifyPaymentNoticeService(
 
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
 
@@ -181,7 +186,15 @@ export async function nodoVerifyPaymentNoticeService(
       }
     });
 
-    return ResponsePaymentError(responseErrorVerifyPaymentNotice, detailV2);
+    return responseFromPaymentFault(
+      PaymentFaultEnum.GENERIC_ERROR,
+      detailV2
+    ) as
+      | IResponseErrorValidationFault
+      | IResponseGatewayError
+      | IResponsePartyConfigurationError
+      | IResponseGatewayTimeout
+      | IResponseSuccessJson<PaymentRequestsGetResponse>;
   } else {
     const responseOrErrorNm3 = PaymentsConverter.getPaymentRequestsGetResponseNm3(
       iverifyPaymentNoticeOutput,
@@ -225,7 +238,7 @@ export async function nodoVerifyPaymentNoticeService(
       ? ResponseSuccessJson(responseOrErrorNm3.right)
       : ResponsePaymentError(
           PaymentFaultEnum.GENERIC_ERROR,
-          PaymentFaultV2Enum.PPT_AUTORIZZAZIONE
+          GatewayFaultEnum.PPT_AUTORIZZAZIONE
         );
   }
 }
@@ -247,9 +260,10 @@ export async function nodoActivateIOPaymentService(
   amount: ImportoEuroCents
 ): Promise<
   | IResponseErrorValidation
-  | IResponseErrorInternal
+  | IResponseErrorValidationFault
+  | IResponseGatewayError
   | IResponseSuccessJson<PaymentActivationsPostResponse>
-  | IResponseErrorGatewayTimeout
+  | IResponseGatewayTimeout
 > {
   logger.info(
     `ActivateIOPayment|(nm3) for codiceContestoPagamento ${codiceContestoPagamento}`
@@ -321,11 +335,11 @@ export async function nodoActivateIOPaymentService(
     });
 
     if (error.message === "ESOCKETTIMEDOUT") {
-      return ResponseErrorGatewayTimeout;
+      return ResponseGatewayTimeout();
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
   }
@@ -360,7 +374,7 @@ export async function nodoActivateIOPaymentService(
       });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
 
@@ -384,7 +398,13 @@ export async function nodoActivateIOPaymentService(
         rptId: rptId.asString
       }
     });
-    return ResponsePaymentError(responseErrorActivateIOPayment, detailV2);
+    return responseFromPaymentFault(
+      responseErrorActivateIOPayment,
+      detailV2
+    ) as
+      | IResponseGatewayError
+      | IResponseErrorValidationFault
+      | IResponseGatewayTimeout;
   } else {
     const isIdPaymentSaved: boolean = await setNm3PaymentOption(
       codiceContestoPagamento,
@@ -451,7 +471,7 @@ export async function nodoActivateIOPaymentService(
       });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
-        PaymentFaultV2Enum.GENERIC_ERROR
+        GatewayFaultEnum.GENERIC_ERROR
       );
     }
   }
