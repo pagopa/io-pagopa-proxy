@@ -543,7 +543,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
+    expect(errorMsg).toEqual(PaymentFaultEnum.GENERIC_ERROR);
     expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
   });
   it("should convert a KO Generic Error", () => {
@@ -559,7 +559,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
+    expect(errorMsg).toEqual(PaymentFaultEnum.GENERIC_ERROR);
     expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
   });
 

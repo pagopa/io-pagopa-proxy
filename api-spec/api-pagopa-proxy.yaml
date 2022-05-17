@@ -521,12 +521,13 @@ definitions:
         $ref: '#/definitions/ImportoEuroCents'
   PaymentFault:
     description: |-
-      DEPRECATED. Fault codes for the PagoPA Verifica and Attiva operations.
+      Fault codes for the PagoPA Verifica and Attiva operations.
       Possible fault codes are:
       - `PAYMENT_DUPLICATED`
       - `INVALID_AMOUNT`
       - `PAYMENT_ONGOING`
       - `PAYMENT_EXPIRED`
+      - `PAYMENT_CANCELED`
       - `PAYMENT_UNAVAILABLE`
       - `PAYMENT_UNKNOWN`
       - `DOMAIN_UNKNOWN`
@@ -538,6 +539,7 @@ definitions:
       - INVALID_AMOUNT
       - PAYMENT_ONGOING
       - PAYMENT_EXPIRED
+      - PAYMENT_CANCELED
       - PAYMENT_UNAVAILABLE
       - PAYMENT_UNKNOWN
       - DOMAIN_UNKNOWN

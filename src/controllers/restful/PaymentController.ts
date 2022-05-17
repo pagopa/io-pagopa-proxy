@@ -836,46 +836,87 @@ export function getResponseErrorIfExists(
  * @param {string} faultCode - Error code provided by PagoPa
  * @return {PaymentFaultEnum} Error code to send to BackendApp
  */
+// eslint-disable-next-line complexity
 export function getErrorMessageCtrlFromPagoPaError(
   faultCode: string,
   faultDescription: string | undefined,
   originalFaultCode?: string
 ): PaymentFaultEnum {
+  const fallbackUnhandledVariant: (
+    fallbackVariant: PaymentFaultEnum
+  ) => PaymentFaultEnum = fallbackVariant => {
+    if (originalFaultCode !== undefined) {
+      return getErrorMessageCtrlFromPagoPaError(originalFaultCode, undefined);
+    }
+    if (faultDescription !== undefined) {
+      // if there's a description, try to look for a fault code in the
+      // description
+      const extractedFaultCode = faultDescription.match(/(PAA|PPT)_\S+/);
+      if (extractedFaultCode !== null) {
+        return getErrorMessageCtrlFromPagoPaError(
+          extractedFaultCode[0],
+          undefined
+        );
+      }
+    }
+    logger.warn(
+      `Retrieved a generic PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
+    );
+
+    return fallbackVariant;
+  };
+
   switch (faultCode) {
-    case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
-      return PaymentFaultEnum.INVALID_AMOUNT;
+    case "PPT_PSP_SCONOSCIUTO":
+    case "PPT_PSP_DISABILITATO":
+    case "PPT_INTERMEDIARIO_PSP_SCONOSCIUTO":
+    case "PPT_INTERMEDIARIO_PSP_DISABILITATO":
+    case "PPT_CANALE_SCONOSCIUTO":
+    case "PPT_CANALE_DISABILITATO":
+    case "PPT_AUTENTICAZIONE":
+    case "PPT_AUTORIZZAZIONE":
+    case "PPT_DOMINIO_DISABILITATO":
+    case "PPT_INTERMEDIARIO_PA_DISABILITATO":
+    case "PPT_STAZIONE_INT_PA_DISABILITATA":
+    case "PPT_CODIFICA_PSP_SCONOSCIUTA":
+    case "PPT_SEMANTICA":
+    case "PPT_SYSTEM_ERROR":
+    case "PAA_SEMANTICA":
+      return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
     case "PAA_PAGAMENTO_DUPLICATO":
+    case "PPT_PAGAMENTO_DUPLICATO":
       return PaymentFaultEnum.PAYMENT_DUPLICATED;
     case "PAA_PAGAMENTO_IN_CORSO":
+    case "PPT_PAGAMENTO_IN_CORSO":
       return PaymentFaultEnum.PAYMENT_ONGOING;
     case "PAA_PAGAMENTO_SCADUTO":
       return PaymentFaultEnum.PAYMENT_EXPIRED;
+    case "PPT_SINTASSI_EXTRAXSD":
+    case "PPT_SINTASSI_XSD":
+    case "PPT_DOMINIO_SCONOSCIUTO":
+    case "PPT_STAZIONE_INT_PA_SCONOSCIUTA":
     case "PAA_PAGAMENTO_SCONOSCIUTO":
       return PaymentFaultEnum.PAYMENT_UNKNOWN;
-    case "PPT_DOMINIO_SCONOSCIUTO":
+    case "PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE":
+    case "PPT_STAZIONE_INT_PA_TIMEOUT":
+    case "PPT_STAZIONE_INT_PA_ERRORE_RESPONSE":
+    case "PPT_IBAN_NON_CENSITO":
+    case "PAA_SINTASSI_EXTRAXSD":
+    case "PAA_SINTASSI_XSD":
+    case "PAA_ID_DOMINIO_ERRATO":
+    case "PAA_ID_INTERMEDIARIO_ERRATO":
+    case "PAA_STAZIONE_INT_ERRATA":
+    case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
+    case "PAA_SYSTEM_ERROR":
       return PaymentFaultEnum.DOMAIN_UNKNOWN;
+    case "PAA_PAGAMENTO_ANNULLATO":
+      return PaymentFaultEnum.PAYMENT_CANCELED;
     case "PPT_MULTI_BENEFICIARIO":
       return PaymentFaultEnum.PPT_MULTI_BENEFICIARIO;
+    case "PPT_ERRORE_EMESSO_DA_PAA":
+      return fallbackUnhandledVariant(PaymentFaultEnum.DOMAIN_UNKNOWN);
     default:
-      // if originalFaultCode exists
-      if (originalFaultCode !== undefined) {
-        return getErrorMessageCtrlFromPagoPaError(originalFaultCode, undefined);
-      }
-      if (faultDescription !== undefined) {
-        // if there's a description, try to look for a fault code in the
-        // description
-        const extractedFaultCode = faultDescription.match(/(PAA|PPT)_\S+/);
-        if (extractedFaultCode !== null) {
-          return getErrorMessageCtrlFromPagoPaError(
-            extractedFaultCode[0],
-            undefined
-          );
-        }
-      }
-      logger.warn(
-        `Retrieved a generic PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
-      );
-      return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
+      return fallbackUnhandledVariant(PaymentFaultEnum.GENERIC_ERROR);
   }
 }
 

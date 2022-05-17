@@ -187,7 +187,7 @@ export async function nodoVerifyPaymentNoticeService(
     });
 
     return responseFromPaymentFault(
-      PaymentFaultEnum.GENERIC_ERROR,
+      responseErrorVerifyPaymentNotice,
       detailV2
     ) as
       | IResponseErrorValidationFault
