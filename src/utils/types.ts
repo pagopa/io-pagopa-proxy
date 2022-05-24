@@ -26,6 +26,7 @@ import { ValidationFaultPaymentProblemJson } from "../../generated/api/Validatio
 import { PartyConfigurationFaultEnum } from "../../generated/api/PartyConfigurationFault";
 import { PaymentStatusFaultPaymentProblemJson } from "../../generated/api/PaymentStatusFaultPaymentProblemJson";
 import { PaymentStatusFault } from "../../generated/api/PaymentStatusFault";
+import { ValidationFaultEnum } from "../../generated/api/ValidationFault";
 import { RptId } from "./pagopa";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
@@ -60,10 +61,12 @@ export type IResponsePaymentStatusFaultError = IResponse<
  * Returns a 409 with json response.
  */
 export const ResponsePaymentStatusFaultError = (
+  category: PaymentFaultEnum,
   detail: PaymentFaultEnum,
   detailV2: PaymentStatusFault
 ): IResponsePaymentStatusFaultError => {
   const problem: PaymentStatusFaultPaymentProblemJson = {
+    category,
     detail,
     detail_v2: detailV2,
     status: HttpStatusCodeEnum.HTTP_STATUS_409 as HttpCode,
@@ -89,10 +92,12 @@ export type IResponsePartyConfigurationError = IResponse<
  * Returns a 503 with json response.
  */
 export const ResponsePartyConfigurationError = (
+  category: PaymentFaultEnum,
   detail: PaymentFaultEnum,
   detailV2: PartyConfigurationFaultEnum
 ): IResponsePartyConfigurationError => {
   const problem: PartyConfigurationFaultPaymentProblemJson = {
+    category,
     detail,
     detail_v2: detailV2,
     status: HttpStatusCodeEnum.HTTP_STATUS_503 as HttpCode,
@@ -114,16 +119,44 @@ export type IResponseErrorValidationFault = IResponse<
   "IResponseErrorValidationFault"
 >;
 
+export const ResponseErrorValidationFault: (
+  category: PaymentFaultEnum,
+  detail: PaymentFaultEnum,
+  detail_v2: ValidationFaultEnum
+) => IResponseErrorValidationFault = (category, detail, detailV2) => {
+  const problem: ValidationFaultPaymentProblemJson = {
+    category,
+    detail,
+    detail_v2: detailV2,
+    status: HttpStatusCodeEnum.HTTP_STATUS_404 as HttpCode,
+    // eslint-disable-next-line sonarjs/no-duplicate-string
+    title: "pagoPA service error"
+  };
+
+  return {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    apply: res =>
+      res
+        .status(HttpStatusCodeEnum.HTTP_STATUS_404)
+        // eslint-disable-next-line sonarjs/no-duplicate-string
+        .set("Content-Type", "application/problem+json")
+        .json(problem),
+    kind: "IResponseErrorValidationFault"
+  };
+};
+
 export type IResponseGatewayError = IResponse<"IResponseGatewayError">;
 
 /**
  * Returns a 502 with json response.
  */
 export const ResponsePaymentError = (
+  category: PaymentFaultEnum,
   detail: PaymentFaultEnum,
   detailV2: GatewayFaultEnum
 ): IResponseGatewayError => {
   const problem: GatewayFaultPaymentProblemJson = {
+    category,
     detail,
     detail_v2: detailV2,
     status: HttpStatusCodeEnum.HTTP_STATUS_502 as HttpCode,
@@ -152,6 +185,7 @@ export const ResponseGatewayTimeout: (
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   apply: res => {
     const problem: PartyTimeoutFaultPaymentProblemJson = {
+      category: PaymentFaultEnum.GENERIC_ERROR,
       detail: PaymentFaultEnum.GENERIC_ERROR,
       detail_v2: detail ?? PartyTimeoutFaultEnum.GENERIC_ERROR,
       status: HttpStatusCodeEnum.HTTP_STATUS_504 as HttpCode,

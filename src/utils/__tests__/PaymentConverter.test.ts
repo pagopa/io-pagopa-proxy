@@ -415,7 +415,10 @@ describe("getResponseErrorIfExists", () => {
       MockedData.aVerificaRPTOutputKOCompleted.fault
     );
     expect(responseError).toBeDefined();
-    expect(responseError).toEqual(PaymentFaultEnum.PAYMENT_DUPLICATED);
+    expect(responseError).toEqual({
+      category: PaymentFaultEnum.PAYMENT_DUPLICATED,
+      detail: PaymentFaultEnum.PAYMENT_DUPLICATED
+    });
   });
 });
 
@@ -543,7 +546,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       fault.originalFaultCode
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(PaymentFaultEnum.GENERIC_ERROR);
+    expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
     expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
   });
   it("should convert a KO Generic Error", () => {
@@ -559,7 +562,7 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
       } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
     );
     expect(errorMsg).toBeDefined();
-    expect(errorMsg).toEqual(PaymentFaultEnum.GENERIC_ERROR);
+    expect(errorMsg).toEqual(PaymentFaultEnum.PAYMENT_UNAVAILABLE);
     expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
   });
 

@@ -127,6 +127,7 @@ export async function nodoVerifyPaymentNoticeService(
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
     }
@@ -162,6 +163,7 @@ export async function nodoVerifyPaymentNoticeService(
 
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
     }
@@ -171,7 +173,7 @@ export async function nodoVerifyPaymentNoticeService(
       pagoPAConfig.NM3_ENABLED
     );
 
-    const detailError = `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorVerifyPaymentNotice} - detail_v2: ${detailV2})`;
+    const detailError = `GetNodoVerifyPaymentNotice|ResponsePaymentError (detail: ${responseErrorVerifyPaymentNotice.detail} - detail_v2: ${detailV2})`;
 
     logger.warn(detailError);
 
@@ -237,6 +239,7 @@ export async function nodoVerifyPaymentNoticeService(
     return pagoPAConfig.NM3_ENABLED === true
       ? ResponseSuccessJson(responseOrErrorNm3.right)
       : ResponsePaymentError(
+          PaymentFaultEnum.GENERIC_ERROR,
           PaymentFaultEnum.GENERIC_ERROR,
           GatewayFaultEnum.PPT_AUTORIZZAZIONE
         );
@@ -339,6 +342,7 @@ export async function nodoActivateIOPaymentService(
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
     }
@@ -374,6 +378,7 @@ export async function nodoActivateIOPaymentService(
       });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
     }
@@ -383,7 +388,7 @@ export async function nodoActivateIOPaymentService(
       pagoPAConfig.NM3_ENABLED
     );
 
-    const errorDetail = `GetNodoAcitvatePaymentNotice|ResponsePaymentError (detail: ${responseErrorActivateIOPayment} - detail_v2: ${detailV2})`;
+    const errorDetail = `GetNodoAcitvatePaymentNotice|ResponsePaymentError (detail: ${responseErrorActivateIOPayment.detail} - detail_v2: ${detailV2})`;
 
     logger.warn(errorDetail);
 
@@ -470,6 +475,7 @@ export async function nodoActivateIOPaymentService(
         }
       });
       return ResponsePaymentError(
+        PaymentFaultEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );

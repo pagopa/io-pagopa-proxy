@@ -25,7 +25,10 @@ import { ImportoEuroCents } from "../../../generated/api/ImportoEuroCents";
 import { PaymentActivationsGetResponse } from "../../../generated/api/PaymentActivationsGetResponse";
 import { PaymentActivationsPostRequest } from "../../../generated/api/PaymentActivationsPostRequest";
 import { PaymentActivationsPostResponse } from "../../../generated/api/PaymentActivationsPostResponse";
-import { PaymentFaultEnum } from "../../../generated/api/PaymentFault";
+import {
+  PaymentFault,
+  PaymentFaultEnum
+} from "../../../generated/api/PaymentFault";
 import {
   PaymentFaultV2,
   PaymentFaultV2Enum
@@ -189,6 +192,7 @@ AsControllerFunction<GetPaymentInfoT> = (
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
     }
@@ -204,7 +208,7 @@ AsControllerFunction<GetPaymentInfoT> = (
     if (responseError === undefined || faultBean === undefined) {
       const errorDetail = `GetPaymentInfo|Error during payment check: esito === KO|${clientId}|${
         params.rpt_id_from_string
-      }|${responseError}|${JSON.stringify(faultBean)}`;
+      }|${responseError?.detail}|${JSON.stringify(faultBean)}`;
       logger.error(errorDetail);
 
       trackPaymentEvent({
@@ -219,20 +223,24 @@ AsControllerFunction<GetPaymentInfoT> = (
       });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
     }
 
-    if (responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO) {
+    if (
+      responseError.detail.toString() !==
+      PaymentFaultEnum.PPT_MULTI_BENEFICIARIO
+    ) {
       logger.error(
         `GetPaymentInfo|Error from pagopa|${clientId}|${
           params.rpt_id_from_string
-        }|${responseError}|${JSON.stringify(faultBean)}`
+        }|${responseError.detail}|${JSON.stringify(faultBean)}`
       );
 
       const detailV2 = getDetailV2FromFaultCode(faultBean);
 
-      const errorDetail = `GetPaymentInfo|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
+      const errorDetail = `GetPaymentInfo|ResponseError (detail: ${responseError.detail} - detail_v2: ${detailV2})`;
       logger.warn(errorDetail);
 
       trackPaymentEvent({
@@ -462,6 +470,7 @@ AsControllerFunction<ActivatePaymentT> = (
     } else {
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
     }
@@ -495,20 +504,24 @@ AsControllerFunction<ActivatePaymentT> = (
       });
       return ResponsePaymentError(
         PaymentFaultEnum.GENERIC_ERROR,
+        PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
     }
 
-    if (responseError.toString() !== PaymentFaultEnum.PPT_MULTI_BENEFICIARIO) {
+    if (
+      responseError.detail.toString() !==
+      PaymentFaultEnum.PPT_MULTI_BENEFICIARIO
+    ) {
       logger.error(
-        `ActivatePayment|Error from pagopa|${clientId}|${rptId}|${responseError}|${JSON.stringify(
-          iNodoAttivaRPTOutput.fault
-        )}`
+        `ActivatePayment|Error from pagopa|${clientId}|${rptId}|${
+          responseError.detail
+        }|${JSON.stringify(iNodoAttivaRPTOutput.fault)}`
       );
 
       const detailV2 = getDetailV2FromFaultCode(iNodoAttivaRPTOutput.fault);
 
-      const errorDetail = `ActivatePayment|ResponseError (detail: ${responseError} - detail_v2: ${detailV2})`;
+      const errorDetail = `ActivatePayment|ResponseError (detail: ${responseError.detail} - detail_v2: ${detailV2})`;
       logger.error(errorDetail);
 
       trackPaymentEvent({
@@ -721,6 +734,7 @@ const getGetActivationStatusController: (
   if (E.isLeft(maybeIdPaymentOrError)) {
     return ResponsePaymentError(
       PaymentFaultEnum.GENERIC_ERROR,
+      PaymentFaultEnum.GENERIC_ERROR,
       GatewayFaultEnum.GENERIC_ERROR
     );
   }
@@ -805,26 +819,53 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
   return uuid.v1().replace(/-/g, "") as CodiceContestoPagamento;
 }
 
+export const PagopaErrorMetadata = t.interface({
+  category: PaymentFault,
+  detail: PaymentFault
+});
+
+export type PagopaErrorMetadata = t.TypeOf<typeof PagopaErrorMetadata>;
+
 /**
  * Parse a PagoPa response to check if it contains functional errors.
- * If error is found, it is mapped into a controller response for BackendApp
+ * If error is found, it is mapped into a controller response for BackendApp and an error category for third party clients
  *
- * @param {string} esito - The esito (OK or KO) provided by PagoPa
  * @param {string} faultBean - Optional information provided by PagoPa in case of error
- * @return {IResponseErrorGeneric | IResponsePaymentError} A controller response or undefined if no errors exist
+ * @return {PagopaErrorMetadata | undefined} An error metadata object or undefined if no errors exist
  */
 export function getResponseErrorIfExists(
   faultBean: faultBean_type_ppt | undefined
-): PaymentFaultEnum | undefined {
+): PagopaErrorMetadata | undefined {
   // Response is FAILED but no additional information are provided by PagoPa
   if (faultBean === undefined) {
     return undefined;
   }
   // Response is FAILED and additional information are provided by PagoPa
-  return getErrorMessageCtrlFromPagoPaError(
-    faultBean.faultCode,
-    faultBean.description,
-    faultBean.originalFaultCode
+  const errorDetail = O.fromNullable(
+    getErrorMessageCtrlFromPagoPaError(
+      faultBean.faultCode,
+      faultBean.description,
+      faultBean.originalFaultCode
+    )
+  );
+
+  const errorCategory = O.fromNullable(
+    getFaultCodeCategory(
+      faultBean.faultCode,
+      faultBean.description,
+      faultBean.originalFaultCode
+    )
+  );
+
+  return pipe(
+    O.Do,
+    O.bind("detail", () => errorDetail),
+    O.bind("category", () => errorCategory),
+    O.map(({ detail, category }) => ({
+      category,
+      detail
+    })),
+    O.getOrElse<PagopaErrorMetadata | undefined>(() => undefined)
   );
 }
 
@@ -836,8 +877,59 @@ export function getResponseErrorIfExists(
  * @param {string} faultCode - Error code provided by PagoPa
  * @return {PaymentFaultEnum} Error code to send to BackendApp
  */
-// eslint-disable-next-line complexity
 export function getErrorMessageCtrlFromPagoPaError(
+  faultCode: string,
+  faultDescription: string | undefined,
+  originalFaultCode?: string
+): PaymentFaultEnum {
+  switch (faultCode) {
+    case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
+      return PaymentFaultEnum.INVALID_AMOUNT;
+    case "PAA_PAGAMENTO_DUPLICATO":
+      return PaymentFaultEnum.PAYMENT_DUPLICATED;
+    case "PAA_PAGAMENTO_IN_CORSO":
+      return PaymentFaultEnum.PAYMENT_ONGOING;
+    case "PAA_PAGAMENTO_SCADUTO":
+      return PaymentFaultEnum.PAYMENT_EXPIRED;
+    case "PAA_PAGAMENTO_SCONOSCIUTO":
+      return PaymentFaultEnum.PAYMENT_UNKNOWN;
+    case "PPT_DOMINIO_SCONOSCIUTO":
+      return PaymentFaultEnum.DOMAIN_UNKNOWN;
+    case "PPT_MULTI_BENEFICIARIO":
+      return PaymentFaultEnum.PPT_MULTI_BENEFICIARIO;
+    default:
+      // if originalFaultCode exists
+      if (originalFaultCode !== undefined) {
+        return getErrorMessageCtrlFromPagoPaError(originalFaultCode, undefined);
+      }
+      if (faultDescription !== undefined) {
+        // if there's a description, try to look for a fault code in the
+        // description
+        const extractedFaultCode = faultDescription.match(/(PAA|PPT)_\S+/);
+        if (extractedFaultCode !== null) {
+          return getErrorMessageCtrlFromPagoPaError(
+            extractedFaultCode[0],
+            undefined
+          );
+        }
+      }
+      logger.warn(
+        `Retrieved a generic PagoPA error response: (FaultCode: ${faultCode} - Description: ${faultDescription})`
+      );
+      return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
+  }
+}
+
+/**
+ * Convert PagoPa message error (faultCode) to an error category (PaymentFaultEnum) to send to third party clients
+ * A complete list of faultCode provided by PagoPa is available at
+ * https://www.agid.gov.it/sites/default/files/repository_files/specifiche_attuative_nodo_2_1_0.pdf
+ *
+ * @param {string} faultCode - Error code provided by PagoPa
+ * @return {PaymentFaultEnum} Error category to send to third party clients
+ */
+// eslint-disable-next-line complexity
+export function getFaultCodeCategory(
   faultCode: string,
   faultDescription: string | undefined,
   originalFaultCode?: string
@@ -846,17 +938,14 @@ export function getErrorMessageCtrlFromPagoPaError(
     fallbackVariant: PaymentFaultEnum
   ) => PaymentFaultEnum = fallbackVariant => {
     if (originalFaultCode !== undefined) {
-      return getErrorMessageCtrlFromPagoPaError(originalFaultCode, undefined);
+      return getFaultCodeCategory(originalFaultCode, undefined);
     }
     if (faultDescription !== undefined) {
       // if there's a description, try to look for a fault code in the
       // description
       const extractedFaultCode = faultDescription.match(/(PAA|PPT)_\S+/);
       if (extractedFaultCode !== null) {
-        return getErrorMessageCtrlFromPagoPaError(
-          extractedFaultCode[0],
-          undefined
-        );
+        return getFaultCodeCategory(extractedFaultCode[0], undefined);
       }
     }
     logger.warn(
