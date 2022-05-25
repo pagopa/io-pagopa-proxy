@@ -8,6 +8,7 @@ import { ApplicationCode, AuxDigit, CheckDigit, IUV13, IUV15, IUV17, PaymentNoti
 import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
 import { MOCK_CLIENT_ID } from "./MockedData";
+import { FaultCategoryEnum } from "../../../generated/api/FaultCategory";
 
 describe("getNodoVerificaRPTInput", () => {
   it("should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
@@ -615,6 +616,151 @@ describe("getErrorMessageCtrlFromPagoPaError", () => {
     expect(errorMsg).toEqual("PPT_ERRORE_EMESSO_DA_PAA");
   });
 });
+
+describe("getFaultCodeCategory", () => {
+  it("should convert a KO Short Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOShort.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      fault.faultCode,
+      fault.description,
+      fault.originalFaultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.PAYMENT_DUPLICATED);
+  });
+
+  it("should convert a KO Completed Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOCompleted.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      fault.faultCode,
+      fault.description,
+      fault.originalFaultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.PAYMENT_DUPLICATED);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_DUPLICATO");
+  });
+
+  it("should convert a KO Completed Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOCompleted.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      "",
+      `FaultCode PA: ${
+        fault.originalFaultCode
+      } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.PAYMENT_DUPLICATED);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_DUPLICATO");
+  });
+
+  it("should convert a KO Expired Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOExpired.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      fault.faultCode,
+      fault.description,
+      fault.originalFaultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.PAYMENT_EXPIRED);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_SCADUTO");
+  });
+  it("should convert a KO Expired Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOExpired.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      "",
+      `FaultCode PA: ${
+        fault.originalFaultCode
+      } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.PAYMENT_EXPIRED);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_SCADUTO");
+  });
+
+  it("should convert a KO OnGoing Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      fault.faultCode,
+      fault.description,
+      fault.originalFaultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.PAYMENT_ONGOING);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_IN_CORSO");
+  });
+  it("should convert a KO OnGoing Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOOnGoing.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      "",
+      `FaultCode PA:  ${
+        fault.originalFaultCode
+      } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.PAYMENT_ONGOING);
+    expect(fault.originalFaultCode).toEqual("PAA_PAGAMENTO_IN_CORSO");
+  });
+  it("should convert a KO Generic Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOGeneric.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      fault.faultCode,
+      fault.description,
+      fault.originalFaultCode
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.GENERIC_ERROR);
+    expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
+  });
+  it("should convert a KO Generic Error", () => {
+    const fault = MockedData.aVerificaRPTOutputKOGeneric.fault;
+    expect(fault).toBeDefined();
+    if (fault === undefined) {
+      return;
+    }
+    const errorMsg = PaymentController.getFaultCodeCategory(
+      "",
+      `FaultCode PA:  ${
+        fault.originalFaultCode
+      } FaultString PA: Pagamento in attesa risulta in corso all’Ente Creditore. Description PA: `
+    );
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toEqual(FaultCategoryEnum.GENERIC_ERROR);
+    expect(fault.originalFaultCode).toEqual("PAA_CANALE_RICHIEDENTE_ERRATO");
+  });
+})
 
 describe("getActivateIOPaymentResponse", () => {
   it("should convert activateIOPaymentRes_nfpsp with valid Ente in PaymentActivationsPostResponse", () => {
