@@ -41,6 +41,7 @@ import {
 } from "../utils/types";
 import { GatewayFaultEnum } from "../../generated/api/GatewayFault";
 import { responseFromPaymentFault } from "../utils/responses";
+import { FaultCategoryEnum } from "../../generated/api/FaultCategory";
 import { PagamentiTelematiciPspNm3NodoAsyncClient } from "./pagopa_api/NodoNM3PortClient";
 import * as PaymentsService from "./PaymentsService";
 
@@ -126,7 +127,7 @@ export async function nodoVerifyPaymentNoticeService(
       return ResponseGatewayTimeout();
     } else {
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
@@ -162,7 +163,7 @@ export async function nodoVerifyPaymentNoticeService(
       });
 
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
@@ -239,7 +240,7 @@ export async function nodoVerifyPaymentNoticeService(
     return pagoPAConfig.NM3_ENABLED === true
       ? ResponseSuccessJson(responseOrErrorNm3.right)
       : ResponsePaymentError(
-          PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
           PaymentFaultEnum.GENERIC_ERROR,
           GatewayFaultEnum.PPT_AUTORIZZAZIONE
         );
@@ -341,7 +342,7 @@ export async function nodoActivateIOPaymentService(
       return ResponseGatewayTimeout();
     } else {
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
@@ -377,7 +378,7 @@ export async function nodoActivateIOPaymentService(
         }
       });
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
@@ -475,7 +476,7 @@ export async function nodoActivateIOPaymentService(
         }
       });
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );

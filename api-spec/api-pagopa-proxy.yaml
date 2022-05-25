@@ -157,7 +157,7 @@ definitions:
         maximum: 600
         exclusiveMaximum: true
       category:
-        $ref: "#/definitions/PaymentFault"
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -200,7 +200,7 @@ definitions:
         maximum: 600
         exclusiveMaximum: true
       category:
-        $ref: "#/definitions/PaymentFault"
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -243,7 +243,7 @@ definitions:
         maximum: 600
         exclusiveMaximum: true
       category:
-        $ref: "#/definitions/PaymentFault"
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -286,7 +286,7 @@ definitions:
         maximum: 600
         exclusiveMaximum: true
       category:
-        $ref: "#/definitions/PaymentFault"
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -329,7 +329,7 @@ definitions:
         maximum: 600
         exclusiveMaximum: true
       category:
-        $ref: "#/definitions/PaymentFault"
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -372,7 +372,7 @@ definitions:
         maximum: 600
         exclusiveMaximum: true
       category:
-        $ref: "#/definitions/PaymentFault"
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -539,13 +539,13 @@ definitions:
         $ref: '#/definitions/ImportoEuroCents'
   PaymentFault:
     description: |-
+      DEPRECATED: Use `FaultCategory` instead.
       Fault codes for the PagoPA Verifica and Attiva operations.
       Possible fault codes are:
       - `PAYMENT_DUPLICATED`
       - `INVALID_AMOUNT`
       - `PAYMENT_ONGOING`
       - `PAYMENT_EXPIRED`
-      - `PAYMENT_CANCELED`
       - `PAYMENT_UNAVAILABLE`
       - `PAYMENT_UNKNOWN`
       - `DOMAIN_UNKNOWN`
@@ -557,11 +557,32 @@ definitions:
       - INVALID_AMOUNT
       - PAYMENT_ONGOING
       - PAYMENT_EXPIRED
-      - PAYMENT_CANCELED
       - PAYMENT_UNAVAILABLE
       - PAYMENT_UNKNOWN
       - DOMAIN_UNKNOWN
       - PPT_MULTI_BENEFICIARIO
+      - GENERIC_ERROR
+  FaultCategory:
+    description: |-
+      Fault code categorization for the PagoPA Verifica and Attiva operations.
+      Possible categories are:
+      - `PAYMENT_DUPLICATED`
+      - `PAYMENT_ONGOING`
+      - `PAYMENT_EXPIRED`
+      - `PAYMENT_UNAVAILABLE`
+      - `PAYMENT_UNKNOWN`
+      - `DOMAIN_UNKNOWN`
+      - `PAYMENT_CANCELED`
+      - `GENERIC_ERROR`
+    type: string
+    x-extensible-enum:
+      - PAYMENT_DUPLICATED
+      - PAYMENT_ONGOING
+      - PAYMENT_EXPIRED
+      - PAYMENT_UNAVAILABLE
+      - PAYMENT_UNKNOWN
+      - DOMAIN_UNKNOWN
+      - PAYMENT_CANCELED
       - GENERIC_ERROR
   PaymentStatusFault:
     description: |-

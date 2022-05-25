@@ -73,6 +73,10 @@ import {
 import { RptId, RptIdFromString } from "../../utils/pagopa";
 import { responseFromPaymentFault } from "../../utils/responses";
 import { GatewayFaultEnum } from "../../../generated/api/GatewayFault";
+import {
+  FaultCategory,
+  FaultCategoryEnum
+} from "../../../generated/api/FaultCategory";
 
 const headerValidationErrorHandler: (
   e: ReadonlyArray<t.ValidationError>
@@ -191,7 +195,7 @@ AsControllerFunction<GetPaymentInfoT> = (
       return ResponseGatewayTimeout();
     } else {
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
@@ -222,7 +226,7 @@ AsControllerFunction<GetPaymentInfoT> = (
         }
       });
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
@@ -469,7 +473,7 @@ AsControllerFunction<ActivatePaymentT> = (
       return ResponseGatewayTimeout();
     } else {
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
@@ -503,7 +507,7 @@ AsControllerFunction<ActivatePaymentT> = (
         }
       });
       return ResponsePaymentError(
-        PaymentFaultEnum.GENERIC_ERROR,
+        FaultCategoryEnum.GENERIC_ERROR,
         PaymentFaultEnum.GENERIC_ERROR,
         GatewayFaultEnum.GENERIC_ERROR
       );
@@ -733,7 +737,7 @@ const getGetActivationStatusController: (
 
   if (E.isLeft(maybeIdPaymentOrError)) {
     return ResponsePaymentError(
-      PaymentFaultEnum.GENERIC_ERROR,
+      FaultCategoryEnum.GENERIC_ERROR,
       PaymentFaultEnum.GENERIC_ERROR,
       GatewayFaultEnum.GENERIC_ERROR
     );
@@ -820,7 +824,7 @@ function generateCodiceContestoPagamento(): CodiceContestoPagamento {
 }
 
 export const PagopaErrorMetadata = t.interface({
-  category: PaymentFault,
+  category: FaultCategory,
   detail: PaymentFault
 });
 
@@ -921,22 +925,22 @@ export function getErrorMessageCtrlFromPagoPaError(
 }
 
 /**
- * Convert PagoPa message error (faultCode) to an error category (PaymentFaultEnum) to send to third party clients
+ * Convert PagoPa message error (faultCode) to an error category (FaultCategory) to send to third party clients
  * A complete list of faultCode provided by PagoPa is available at
  * https://www.agid.gov.it/sites/default/files/repository_files/specifiche_attuative_nodo_2_1_0.pdf
  *
  * @param {string} faultCode - Error code provided by PagoPa
- * @return {PaymentFaultEnum} Error category to send to third party clients
+ * @return {FaultCategory} Error category to send to third party clients
  */
 // eslint-disable-next-line complexity
 export function getFaultCodeCategory(
   faultCode: string,
   faultDescription: string | undefined,
   originalFaultCode?: string
-): PaymentFaultEnum {
+): FaultCategory {
   const fallbackUnhandledVariant: (
-    fallbackVariant: PaymentFaultEnum
-  ) => PaymentFaultEnum = fallbackVariant => {
+    fallbackVariant: FaultCategory
+  ) => FaultCategory = fallbackVariant => {
     if (originalFaultCode !== undefined) {
       return getFaultCodeCategory(originalFaultCode, undefined);
     }
@@ -971,21 +975,21 @@ export function getFaultCodeCategory(
     case "PPT_SEMANTICA":
     case "PPT_SYSTEM_ERROR":
     case "PAA_SEMANTICA":
-      return PaymentFaultEnum.PAYMENT_UNAVAILABLE;
+      return FaultCategoryEnum.PAYMENT_UNAVAILABLE;
     case "PAA_PAGAMENTO_DUPLICATO":
     case "PPT_PAGAMENTO_DUPLICATO":
-      return PaymentFaultEnum.PAYMENT_DUPLICATED;
+      return FaultCategoryEnum.PAYMENT_DUPLICATED;
     case "PAA_PAGAMENTO_IN_CORSO":
     case "PPT_PAGAMENTO_IN_CORSO":
-      return PaymentFaultEnum.PAYMENT_ONGOING;
+      return FaultCategoryEnum.PAYMENT_ONGOING;
     case "PAA_PAGAMENTO_SCADUTO":
-      return PaymentFaultEnum.PAYMENT_EXPIRED;
+      return FaultCategoryEnum.PAYMENT_EXPIRED;
     case "PPT_SINTASSI_EXTRAXSD":
     case "PPT_SINTASSI_XSD":
     case "PPT_DOMINIO_SCONOSCIUTO":
     case "PPT_STAZIONE_INT_PA_SCONOSCIUTA":
     case "PAA_PAGAMENTO_SCONOSCIUTO":
-      return PaymentFaultEnum.PAYMENT_UNKNOWN;
+      return FaultCategoryEnum.PAYMENT_UNKNOWN;
     case "PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE":
     case "PPT_STAZIONE_INT_PA_TIMEOUT":
     case "PPT_STAZIONE_INT_PA_ERRORE_RESPONSE":
@@ -997,15 +1001,13 @@ export function getFaultCodeCategory(
     case "PAA_STAZIONE_INT_ERRATA":
     case "PAA_ATTIVA_RPT_IMPORTO_NON_VALIDO":
     case "PAA_SYSTEM_ERROR":
-      return PaymentFaultEnum.DOMAIN_UNKNOWN;
+      return FaultCategoryEnum.DOMAIN_UNKNOWN;
     case "PAA_PAGAMENTO_ANNULLATO":
-      return PaymentFaultEnum.PAYMENT_CANCELED;
-    case "PPT_MULTI_BENEFICIARIO":
-      return PaymentFaultEnum.PPT_MULTI_BENEFICIARIO;
+      return FaultCategoryEnum.PAYMENT_CANCELED;
     case "PPT_ERRORE_EMESSO_DA_PAA":
-      return fallbackUnhandledVariant(PaymentFaultEnum.DOMAIN_UNKNOWN);
+      return fallbackUnhandledVariant(FaultCategoryEnum.DOMAIN_UNKNOWN);
     default:
-      return fallbackUnhandledVariant(PaymentFaultEnum.GENERIC_ERROR);
+      return fallbackUnhandledVariant(FaultCategoryEnum.GENERIC_ERROR);
   }
 }
 

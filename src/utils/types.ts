@@ -28,6 +28,7 @@ import { PaymentStatusFaultPaymentProblemJson } from "../../generated/api/Paymen
 import { PaymentStatusFault } from "../../generated/api/PaymentStatusFault";
 import { ValidationFaultEnum } from "../../generated/api/ValidationFault";
 import { RptId } from "./pagopa";
+import { FaultCategory, FaultCategoryEnum } from "../../generated/api/FaultCategory";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
@@ -61,7 +62,7 @@ export type IResponsePaymentStatusFaultError = IResponse<
  * Returns a 409 with json response.
  */
 export const ResponsePaymentStatusFaultError = (
-  category: PaymentFaultEnum,
+  category: FaultCategory,
   detail: PaymentFaultEnum,
   detailV2: PaymentStatusFault
 ): IResponsePaymentStatusFaultError => {
@@ -92,7 +93,7 @@ export type IResponsePartyConfigurationError = IResponse<
  * Returns a 503 with json response.
  */
 export const ResponsePartyConfigurationError = (
-  category: PaymentFaultEnum,
+  category: FaultCategoryEnum,
   detail: PaymentFaultEnum,
   detailV2: PartyConfigurationFaultEnum
 ): IResponsePartyConfigurationError => {
@@ -120,7 +121,7 @@ export type IResponseErrorValidationFault = IResponse<
 >;
 
 export const ResponseErrorValidationFault: (
-  category: PaymentFaultEnum,
+  category: FaultCategoryEnum,
   detail: PaymentFaultEnum,
   detail_v2: ValidationFaultEnum
 ) => IResponseErrorValidationFault = (category, detail, detailV2) => {
@@ -151,7 +152,7 @@ export type IResponseGatewayError = IResponse<"IResponseGatewayError">;
  * Returns a 502 with json response.
  */
 export const ResponsePaymentError = (
-  category: PaymentFaultEnum,
+  category: FaultCategoryEnum,
   detail: PaymentFaultEnum,
   detailV2: GatewayFaultEnum
 ): IResponseGatewayError => {
@@ -185,7 +186,7 @@ export const ResponseGatewayTimeout: (
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   apply: res => {
     const problem: PartyTimeoutFaultPaymentProblemJson = {
-      category: PaymentFaultEnum.GENERIC_ERROR,
+      category: FaultCategoryEnum.GENERIC_ERROR,
       detail: PaymentFaultEnum.GENERIC_ERROR,
       detail_v2: detail ?? PartyTimeoutFaultEnum.GENERIC_ERROR,
       status: HttpStatusCodeEnum.HTTP_STATUS_504 as HttpCode,
