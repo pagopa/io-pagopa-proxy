@@ -240,7 +240,7 @@ export async function nodoVerifyPaymentNoticeService(
     return pagoPAConfig.NM3_ENABLED === true
       ? ResponseSuccessJson(responseOrErrorNm3.right)
       : ResponsePaymentError(
-        FaultCategoryEnum.GENERIC_ERROR,
+          FaultCategoryEnum.GENERIC_ERROR,
           PaymentFaultEnum.GENERIC_ERROR,
           GatewayFaultEnum.PPT_AUTORIZZAZIONE
         );

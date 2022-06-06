@@ -27,8 +27,11 @@ import { PartyConfigurationFaultEnum } from "../../generated/api/PartyConfigurat
 import { PaymentStatusFaultPaymentProblemJson } from "../../generated/api/PaymentStatusFaultPaymentProblemJson";
 import { PaymentStatusFault } from "../../generated/api/PaymentStatusFault";
 import { ValidationFaultEnum } from "../../generated/api/ValidationFault";
+import {
+  FaultCategory,
+  FaultCategoryEnum
+} from "../../generated/api/FaultCategory";
 import { RptId } from "./pagopa";
-import { FaultCategory, FaultCategoryEnum } from "../../generated/api/FaultCategory";
 
 export type AsControllerResponseType<T> = T extends IResponseType<200, infer R>
   ? IResponseSuccessJson<R>
