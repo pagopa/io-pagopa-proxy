@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 1.1.0
+  version: 1.1.1
   title: Proxy PagoPA
   description: Proxy for PagoPA payment services
 basePath: /api/v1
@@ -156,6 +156,8 @@ definitions:
         minimum: 100
         maximum: 600
         exclusiveMaximum: true
+      category:
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -167,6 +169,7 @@ definitions:
           An absolute URI that identifies the specific occurrence of the problem.
           It may or may not yield further information if dereferenced.
     required:
+      - category
       - detail
       - detail_v2
   ValidationFaultPaymentProblemJson:
@@ -196,6 +199,8 @@ definitions:
         minimum: 100
         maximum: 600
         exclusiveMaximum: true
+      category:
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -207,6 +212,7 @@ definitions:
           An absolute URI that identifies the specific occurrence of the problem.
           It may or may not yield further information if dereferenced.
     required:
+      - category
       - detail
       - detail_v2
   PaymentStatusFaultPaymentProblemJson:
@@ -236,6 +242,8 @@ definitions:
         minimum: 100
         maximum: 600
         exclusiveMaximum: true
+      category:
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -247,6 +255,7 @@ definitions:
           An absolute URI that identifies the specific occurrence of the problem.
           It may or may not yield further information if dereferenced.
     required:
+      - category
       - detail
       - detail_v2
   GatewayFaultPaymentProblemJson:
@@ -276,6 +285,8 @@ definitions:
         minimum: 100
         maximum: 600
         exclusiveMaximum: true
+      category:
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -287,6 +298,7 @@ definitions:
           An absolute URI that identifies the specific occurrence of the problem.
           It may or may not yield further information if dereferenced.
     required:
+      - category
       - detail
       - detail_v2
   PartyConfigurationFaultPaymentProblemJson:
@@ -316,6 +328,8 @@ definitions:
         minimum: 100
         maximum: 600
         exclusiveMaximum: true
+      category:
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -327,6 +341,7 @@ definitions:
           An absolute URI that identifies the specific occurrence of the problem.
           It may or may not yield further information if dereferenced.
     required:
+      - category
       - detail
       - detail_v2
   PartyTimeoutFaultPaymentProblemJson:
@@ -356,6 +371,8 @@ definitions:
         minimum: 100
         maximum: 600
         exclusiveMaximum: true
+      category:
+        $ref: "#/definitions/FaultCategory"
       detail:
         $ref: "#/definitions/PaymentFault"
       detail_v2:
@@ -367,6 +384,7 @@ definitions:
           An absolute URI that identifies the specific occurrence of the problem.
           It may or may not yield further information if dereferenced.
     required:
+      - category
       - detail
       - detail_v2
   CodiceContestoPagamento:
@@ -521,7 +539,8 @@ definitions:
         $ref: '#/definitions/ImportoEuroCents'
   PaymentFault:
     description: |-
-      DEPRECATED. Fault codes for the PagoPA Verifica and Attiva operations.
+      DEPRECATED: Use `FaultCategory` instead.
+      Fault codes for the PagoPA Verifica and Attiva operations.
       Possible fault codes are:
       - `PAYMENT_DUPLICATED`
       - `INVALID_AMOUNT`
@@ -542,6 +561,28 @@ definitions:
       - PAYMENT_UNKNOWN
       - DOMAIN_UNKNOWN
       - PPT_MULTI_BENEFICIARIO
+      - GENERIC_ERROR
+  FaultCategory:
+    description: |-
+      Fault code categorization for the PagoPA Verifica and Attiva operations.
+      Possible categories are:
+      - `PAYMENT_DUPLICATED`
+      - `PAYMENT_ONGOING`
+      - `PAYMENT_EXPIRED`
+      - `PAYMENT_UNAVAILABLE`
+      - `PAYMENT_UNKNOWN`
+      - `DOMAIN_UNKNOWN`
+      - `PAYMENT_CANCELED`
+      - `GENERIC_ERROR`
+    type: string
+    x-extensible-enum:
+      - PAYMENT_DUPLICATED
+      - PAYMENT_ONGOING
+      - PAYMENT_EXPIRED
+      - PAYMENT_UNAVAILABLE
+      - PAYMENT_UNKNOWN
+      - DOMAIN_UNKNOWN
+      - PAYMENT_CANCELED
       - GENERIC_ERROR
   PaymentStatusFault:
     description: |-
