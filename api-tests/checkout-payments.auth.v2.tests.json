@@ -323,7 +323,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Activation Polling - Succes",
+			"name": "Payment Activation Polling - Success",
 			"event": [
 				{
 					"listen": "test",
