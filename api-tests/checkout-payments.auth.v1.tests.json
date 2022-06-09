@@ -33,7 +33,7 @@
 					"script": {
 						"exec": [
 							"pm.environment.set(\"VALID_NOTICE_CODE\", _.random(302001000000000000, 302001999999999999));",
-							"postman.setNextRequest(\"Payment Activation - Succes\");"
+							"postman.setNextRequest(\"Payment Activation - Success\");"
 						],
 						"type": "text/javascript"
 					}
