@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "Payment Verify - Success",
+			"name": "Payment Verify - Success - Mock PA",
 			"event": [
 				{
 					"listen": "test",
@@ -74,7 +74,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Verify - Succes - CM PA",
+			"name": "Payment Verify - Succes - TEST PA",
 			"event": [
 				{
 					"listen": "test",
@@ -139,7 +139,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Verify - Unauthorized",
+			"name": "Payment Verify - Unauthorized - Mock PA",
 			"event": [
 				{
 					"listen": "test",
@@ -199,7 +199,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Activation - Succes",
+			"name": "Payment Activation - Succes - Mock PA",
 			"event": [
 				{
 					"listen": "test",
@@ -261,7 +261,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Activation - Unauthorized",
+			"name": "Payment Activation - Unauthorized - Mock PA",
 			"event": [
 				{
 					"listen": "test",
@@ -323,7 +323,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Activation Polling - Success",
+			"name": "Payment Activation Polling - Success - Mock PA",
 			"event": [
 				{
 					"listen": "test",
@@ -382,7 +382,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Activation Polling - Unauthorized",
+			"name": "Payment Activation Polling - Unauthorized - Mock PA",
 			"event": [
 				{
 					"listen": "test",
@@ -441,7 +441,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Verify - PPT_PAGAMENTO_IN_CORSO",
+			"name": "Payment Verify - PPT_PAGAMENTO_IN_CORSO - Mock PA",
 			"event": [
 				{
 					"listen": "test",
@@ -702,7 +702,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Verify - PAA_PAGAMENTO_DUPLICATO",
+			"name": "Payment Verify - PAA_PAGAMENTO_DUPLICATO - Mock PA",
 			"event": [
 				{
 					"listen": "test",
