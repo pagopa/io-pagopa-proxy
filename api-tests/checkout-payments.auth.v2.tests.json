@@ -217,7 +217,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"postman.setNextRequest(\"Payment Activation Polling - Succes\")"
+							"postman.setNextRequest(\"Payment Activation Polling - Success\")"
 						],
 						"type": "text/javascript"
 					}
