@@ -86,6 +86,11 @@
 			"key": "CM_DUPLICATED_NOTICE_CODE",
 			"value": "002720356510529106",
 			"enabled": true
+		},
+		{
+			"key": "SUBSCRIPTION_KEY",
+			"value": null,
+			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
