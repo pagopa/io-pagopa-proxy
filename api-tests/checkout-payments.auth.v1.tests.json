@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "Payment Verify - Succes",
+			"name": "Payment Verify - Success",
 			"event": [
 				{
 					"listen": "test",
