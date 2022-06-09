@@ -1,0 +1,770 @@
+{
+	"info": {
+		"_postman_id": "0a133663-7c5c-4f8f-8bda-d3218490f411",
+		"name": "Checkout auth API v1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Payment Verify - Succes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 200 with valid json response\", function(){",
+							"    ",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.environment.set(\"CODICE_CONTESTO_PAGAMENTO\", responseJson.codiceContestoPagamento);",
+							"",
+							"    pm.expect(responseJson.importoSingoloVersamento).greaterThan(0);",
+							"    pm.expect(responseJson.causaleVersamento).not.null;",
+							"    pm.expect(responseJson.codiceContestoPagamento).not.null;",
+							"",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"VALID_NOTICE_CODE\", _.random(302001000000000000, 302001999999999999));",
+							"postman.setNextRequest(\"Payment Activation - Succes\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Verify - Succes - CM PA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 200 with valid json response\", function(){",
+							"    ",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.importoSingoloVersamento).greaterThan(0);",
+							"    pm.expect(responseJson.causaleVersamento).not.null;",
+							"    pm.expect(responseJson.codiceContestoPagamento).not.null;",
+							"",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{CM_FISCAL_CODE}}{{CM_VALID_NOTICE_CODE}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{CM_FISCAL_CODE}}{{CM_VALID_NOTICE_CODE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Verify - Unauthorized",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 401 due to invalid subscription key\", function(){",
+							"    ",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"VALID_NOTICE_CODE\", _.random(302001000000000000, 302001999999999999));",
+							"postman.setNextRequest(\"Payment Activation - Succes\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"type": "text",
+						"value": "invalid"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Activation - Succes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Activation - Status code is 200 with valid json response\", function(){",
+							"",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"postman.setNextRequest(\"Payment Activation Polling - Succes\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"rptId\" : \"{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}\",\n\"importoSingoloVersamento\" : 120000,\n\"codiceContestoPagamento\" : \"{{CODICE_CONTESTO_PAGAMENTO}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-activations",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-activations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Activation - Unauthorized",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Activation - Status code is 401\", function(){",
+							"",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"postman.setNextRequest(\"Payment Activation Polling - Succes\")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "invalid",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"rptId\" : \"{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}\",\n\"importoSingoloVersamento\" : 120000,\n\"codiceContestoPagamento\" : \"{{CODICE_CONTESTO_PAGAMENTO}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-activations",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-activations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Activation Polling - Succes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Activation Polling - Status code is 200 with valid json response\", function(){",
+							"    ",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-activations/{{CODICE_CONTESTO_PAGAMENTO}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-activations",
+						"{{CODICE_CONTESTO_PAGAMENTO}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Activation Polling - Unauthorized",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Activation Polling - Status code is 200 with valid json response\", function(){",
+							"    ",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"type": "text",
+						"value": "{{SUBSCRIPTION_KEY}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-activations/{{CODICE_CONTESTO_PAGAMENTO}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-activations",
+						"{{CODICE_CONTESTO_PAGAMENTO}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Verify - PPT_PAGAMENTO_IN_CORSO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 400 with detail equals to PPT_PAGAMENTO_IN_CORSO\", function(){",
+							"    ",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.detail_v2).equals(\"PPT_PAGAMENTO_IN_CORSO\");",
+							"    pm.expect(responseJson.detail).equals(\"PAYMENT_UNAVAILABLE\");",
+							"",
+							"    pm.response.to.have.status(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{VALID_FISCAL_CODE_PA}}{{VALID_NOTICE_CODE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Verify - PPT_STAZIONE_INT_PA_SCONOSCIUTA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 400 with detail equals to PPT_STAZIONE_INT_PA_SCONOSCIUTA\", function(){",
+							"    ",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.detail_v2).equals(\"PPT_STAZIONE_INT_PA_SCONOSCIUTA\");",
+							"    pm.expect(responseJson.detail).equals(\"PAYMENT_UNAVAILABLE\");",
+							"",
+							"    pm.response.to.have.status(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{UNKNOWN_STAZIONE_FISCAL_CODE_PA}}{{UNKNOWN_STAZIONE_NOTICE_CODE}}?recaptchaResponse=token",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{UNKNOWN_STAZIONE_FISCAL_CODE_PA}}{{UNKNOWN_STAZIONE_NOTICE_CODE}}"
+					],
+					"query": [
+						{
+							"key": "recaptchaResponse",
+							"value": "token"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Verify - PPT_DOMINIO_SCONOSCIUTO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 400 with detail equals to PPT_DOMINIO_SCONOSCIUTO\", function(){",
+							"    ",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.detail_v2).to.include(\"PPT_DOMINIO_SCONOSCIUTO\");",
+							"    pm.expect(responseJson.detail).to.include(\"DOMAIN_UNKNOWN\");",
+							"",
+							"    pm.response.to.have.status(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{UNKNOWN_FISCAL_CODE_PA}}{{UNKNOWN_NOTICE_CODE}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{UNKNOWN_FISCAL_CODE_PA}}{{UNKNOWN_NOTICE_CODE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Verify - PPT_STAZIONE_INT_PA_SCONOSCIUTA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 500 with detail equals to PPT_STAZIONE_INT_PA_SCONOSCIUTA\", function(){",
+							"    ",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.detail_v2).to.include(\"PPT_STAZIONE_INT_PA_SCONOSCIUTA\");",
+							"    pm.expect(responseJson.detail).to.include(\"PAYMENT_UNAVAILABLE\");",
+							"",
+							"    pm.response.to.have.status(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{VALID_FISCAL_CODE_PA}}{{UNKNOWN_NOTICE_CODE}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{VALID_FISCAL_CODE_PA}}{{UNKNOWN_NOTICE_CODE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Verify - PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 500 with detail equals to PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE\", function(){",
+							"    ",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.detail_v2).to.include(\"PPT_STAZIONE_INT_PA_IRRAGGIUNGIBILE\");",
+							"    pm.expect(responseJson.detail).to.include(\"GENERIC_ERROR\");",
+							"",
+							"    pm.response.to.have.status(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{VALID_FISCAL_CODE_PA}}{{INVALID_NOTICE_CODE}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{VALID_FISCAL_CODE_PA}}{{INVALID_NOTICE_CODE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payment Verify - PAA_PAGAMENTO_DUPLICATO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Payment Verify - Status code is 500 with detail_v2 equals to PAA_PAGAMENTO_DUPLICATO\", function(){",
+							"    ",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.detail_v2).to.include(\"PAA_PAGAMENTO_DUPLICATO\");",
+							"    pm.expect(responseJson.detail).to.include(\"PAYMENT_DUPLICATED\");",
+							"",
+							"    pm.response.to.have.status(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "ocp-apim-subscription-key",
+						"value": "{{SUBSCRIPTION_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{CHECKOUT_HOST}}/checkout/auth/payments/v1/payment-requests/{{CM_FISCAL_CODE}}{{CM_DUPLICATED_NOTICE_CODE}}",
+					"host": [
+						"{{CHECKOUT_HOST}}"
+					],
+					"path": [
+						"checkout",
+						"auth",
+						"payments",
+						"v1",
+						"payment-requests",
+						"{{CM_FISCAL_CODE}}{{CM_DUPLICATED_NOTICE_CODE}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

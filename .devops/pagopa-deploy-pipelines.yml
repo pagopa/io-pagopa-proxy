@@ -267,6 +267,16 @@ stages:
             displayName: 'Run api test'
             continueOnError: true 
 
+          - script: |
+              newman run api-tests/checkout-payments.auth.v1.tests.json --environment=api-tests/uat.envs.auth.v1.json --reporters cli,junit --reporter-junit-export Results/checkout-auth-v1-api-TEST.xml
+            displayName: 'Run api test Auth V1'
+            continueOnError: true 
+
+          - script: |
+              newman run api-tests/checkout-payments.auth.v2.tests.json --environment=api-tests/uat.envs.auth.v2.json --reporters cli,junit --reporter-junit-export Results/checkout-auth-v2-api-TEST.xml
+            displayName: 'Run api test Auth V2'
+            continueOnError: true 
+
           - task: PublishTestResults@2
             inputs:
               testResultsFormat: 'JUnit'
