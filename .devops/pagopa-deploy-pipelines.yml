@@ -249,8 +249,8 @@ stages:
             displayName: Deploy to UAT-pagoPA
 
   - stage: API_Tests_UAT_pagoPA
-    dependsOn:
-      - Deploy_UAT_pagoPA
+    # dependsOn:
+    #   - Deploy_UAT_pagoPA
     jobs:
       - job: TestAPI
         steps:
