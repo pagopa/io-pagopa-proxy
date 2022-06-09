@@ -1,6 +1,6 @@
 {
 	"id": "a57730f0-a144-44d2-b709-0166e5106195",
-	"name": "UAT checkouta auth v2",
+	"name": "UAT checkout auth v2",
 	"values": [
 		{
 			"key": "CHECKOUT_HOST",
