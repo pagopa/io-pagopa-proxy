@@ -74,7 +74,7 @@
 			"response": []
 		},
 		{
-			"name": "Payment Verify - Succes - CM PA",
+			"name": "Payment Verify - Success - CM PA",
 			"event": [
 				{
 					"listen": "test",
