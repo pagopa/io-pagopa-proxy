@@ -204,7 +204,7 @@ export function getPaymentRequestsGetResponseNm3(
             paymentOptionDescription.amount
           ),
           codiceContestoPagamento: codiceContestoPagamentoApi,
-          causaleVersamento: paymentOptionDescription.paymentNote,
+          causaleVersamento: verifyPaymentNoticeResponse.paymentDescription,
           enteBeneficiario: {
             identificativoUnivocoBeneficiario:
               verifyPaymentNoticeResponse.fiscalCodePA,
