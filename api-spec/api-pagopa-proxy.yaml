@@ -123,7 +123,7 @@ paths:
         '404':
           description: Activation status not found
           schema:
-            $ref: "#/definitions/ValidationFaultPaymentProblemJson"
+            $ref: "#/definitions/ProblemJson"
         "502":
           description: PagoPA services are not available or request is rejected by PagoPa
           schema:
