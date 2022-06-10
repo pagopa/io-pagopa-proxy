@@ -656,8 +656,8 @@ definitions:
       - PPT_AUTENTICAZIONE
       - PPT_AUTORIZZAZIONE
       - PPT_CODIFICA_PSP_SCONOSCIUTA
-      - PPT_SEMANTICA
       - PAA_SEMANTICA
+      - PPT_SEMANTICA
       - PPT_SYSTEM_ERROR
       - PAA_SYSTEM_ERROR
   PartyConfigurationFault:
