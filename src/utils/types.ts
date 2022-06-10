@@ -14,10 +14,7 @@ import {
 } from "@pagopa/ts-commons/lib/responses";
 import { WithinRangeInteger } from "@pagopa/ts-commons/lib/numbers";
 import { PaymentFaultEnum } from "../../generated/api/PaymentFault";
-import {
-  PartyTimeoutFault,
-  PartyTimeoutFaultEnum
-} from "../../generated/api/PartyTimeoutFault";
+import { PartyTimeoutFaultEnum } from "../../generated/api/PartyTimeoutFault";
 import { PartyTimeoutFaultPaymentProblemJson } from "../../generated/api/PartyTimeoutFaultPaymentProblemJson";
 import { PartyConfigurationFaultPaymentProblemJson } from "../../generated/api/PartyConfigurationFaultPaymentProblemJson";
 import { GatewayFaultPaymentProblemJson } from "../../generated/api/GatewayFaultPaymentProblemJson";
@@ -184,14 +181,16 @@ export type IResponseGatewayTimeout = IResponse<"IResponseErrorGatewayTimeout">;
  * Returns a 504 response
  */
 export const ResponseGatewayTimeout: (
-  detail?: PartyTimeoutFault
-) => IResponseGatewayTimeout = detail => ({
+  category?: FaultCategoryEnum,
+  detail?: PaymentFaultEnum,
+  detailV2?: PartyTimeoutFaultEnum
+) => IResponseGatewayTimeout = (category, detail, detailV2) => ({
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   apply: res => {
     const problem: PartyTimeoutFaultPaymentProblemJson = {
-      category: FaultCategoryEnum.GENERIC_ERROR,
-      detail: PaymentFaultEnum.GENERIC_ERROR,
-      detail_v2: detail ?? PartyTimeoutFaultEnum.GENERIC_ERROR,
+      category: category ?? FaultCategoryEnum.GENERIC_ERROR,
+      detail: detail ?? PaymentFaultEnum.DOMAIN_UNKNOWN,
+      detail_v2: detailV2 ?? PartyTimeoutFaultEnum.GENERIC_ERROR,
       status: HttpStatusCodeEnum.HTTP_STATUS_504 as HttpCode,
       title: "pagoPA service error"
     };

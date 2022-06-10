@@ -54,7 +54,7 @@ export const responseFromPaymentFault: (
     ),
     flow(
       PartyTimeoutFault.decode,
-      E.map(v => ResponseGatewayTimeout(v))
+      E.map(v => ResponseGatewayTimeout(category, detail, v))
     )
   ];
 
