@@ -1,6 +1,6 @@
 {
   "name": "italia-pagopa-proxy",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Proxy that handles interactions with pagoPA",
   "main": "index.ts",
   "repository": "https://github.com/teamdigitale/italia-pagopa-proxy",
