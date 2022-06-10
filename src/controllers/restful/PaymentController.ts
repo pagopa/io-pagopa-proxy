@@ -13,6 +13,7 @@ import { TypeofApiResponse } from "@pagopa/ts-commons/lib/requests";
 import {
   IResponseErrorValidation,
   ResponseErrorFromValidationErrors,
+  ResponseErrorNotFound,
   ResponseErrorValidation,
   ResponseSuccessJson
 } from "@pagopa/ts-commons/lib/responses";
@@ -746,7 +747,7 @@ const getGetActivationStatusController: (
   const maybeIdPayment = maybeIdPaymentOrError.right;
 
   if (O.isNone(maybeIdPayment)) {
-    return ResponseErrorValidation("Not found", "getActivationStatus");
+    return ResponseErrorNotFound("Not found", "getActivationStatus");
   }
 
   const idPayment = maybeIdPayment.value;
