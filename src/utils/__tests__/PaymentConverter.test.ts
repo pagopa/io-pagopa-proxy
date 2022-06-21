@@ -837,6 +837,24 @@ describe("getActivateIOPaymentResponse", () => {
         : undefined
     ).toBeUndefined();
   });
+
+  it("should convert activateIOPaymentRes_nfpsp with DenomiazioneEnte greater than 70 in getActivateIOPaymentResponse", () => {
+    const errorOrPaymentActivationsPostResponse = PaymentsConverter.getActivateIOPaymentResponse(
+      MockedData.activateIOPaymentResOutputWhithEnteGreater70Chars
+    );
+    expect(isRight(errorOrPaymentActivationsPostResponse)).toBeTruthy();
+    if (!isRight(errorOrPaymentActivationsPostResponse)) {
+      return;
+    }
+
+    const denominazione : string = errorOrPaymentActivationsPostResponse.right.enteBeneficiario
+    ? errorOrPaymentActivationsPostResponse.right.enteBeneficiario
+        .denominazioneBeneficiario : undefined;
+
+    expect(
+      denominazione?.length
+    ).toBe(70);
+   });
 });
 
 describe("getPaymentNoticeNumberAsString", () => {

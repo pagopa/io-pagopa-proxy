@@ -208,7 +208,10 @@ export function getPaymentRequestsGetResponseNm3(
           enteBeneficiario: {
             identificativoUnivocoBeneficiario:
               verifyPaymentNoticeResponse.fiscalCodePA,
-            denominazioneBeneficiario: verifyPaymentNoticeResponse.companyName,
+            denominazioneBeneficiario: verifyPaymentNoticeResponse.companyName?.substring(
+              0,
+              70
+            ),
             denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName
           }
         }
@@ -332,7 +335,10 @@ export function getActivateIOPaymentResponse(
               ? {
                   identificativoUnivocoBeneficiario:
                     activateIOPaymentRes.fiscalCodePA,
-                  denominazioneBeneficiario: activateIOPaymentRes.companyName
+                  denominazioneBeneficiario: activateIOPaymentRes.companyName.substring(
+                    0,
+                    70
+                  )
                 }
               : undefined
         }
