@@ -474,3 +474,19 @@ export const activateIOPaymentResOutputWhithEnte = pipe(activateIOPaymentRes_ele
       )}`
     );
   }));
+
+  export const activateIOPaymentResOutputWhithEnteGreater70Chars = pipe(activateIOPaymentRes_element_nfpsp
+    .decode({
+      outcome: "OK",
+      totalAmount: 100,
+      paymentDescription: "Test causale",
+      fiscalCodePA: "77777777777",
+      companyName: "denominazione dell'ente maggiore di 70 caratteri, in accordo alle nuove primitive verifyPayment e ActivateIoPayment"
+    }),
+    E.getOrElseW((errors: readonly ValidationError[]) => {
+      throw Error(
+        `Invalid activateIOPaymentRes_nfpsp to decode: ${reporters.readableReport(
+          errors
+        )}`
+      );
+    }));
