@@ -403,7 +403,7 @@ definitions:
       denominazioneBeneficiario:
         type: string
         minLength: 1
-        maxLength: 70
+        maxLength: 140
       codiceUnitOperBeneficiario:
         type: string
         minLength: 1
