@@ -10,6 +10,7 @@ import * as E from "fp-ts/Either";
 import { RptId } from "../pagopa";
 import { activateIOPaymentRes_element_nfpsp } from "../../../generated/nodeNm3io/activateIOPaymentRes_element_nfpsp";
 import { ValidationError } from "io-ts";
+import { verifyPaymentNoticeRes_element_nfpsp } from "../../../generated/nodeNm3psp/verifyPaymentNoticeRes_element_nfpsp";
 
 // tslint:disable:no-identical-functions
 
@@ -490,3 +491,49 @@ export const activateIOPaymentResOutputWhithEnte = pipe(activateIOPaymentRes_ele
         )}`
       );
     }));
+
+    export const verifyPaymentNoticeWithDueDate = pipe(verifyPaymentNoticeRes_element_nfpsp
+      .decode({
+        outcome: "OK",
+        paymentDescription: "Test causale",
+        fiscalCodePA: "77777777777",
+        companyName: "Company Name",
+        paymentList : {
+          paymentOptionDescription : [
+            { "amount" : 100,
+              "options" : "EQ",
+              "dueDate" : "2021-07-31"}
+          ]
+        }
+      }),
+      E.getOrElseW((errors: readonly ValidationError[]) => {
+        throw Error(
+          `Invalid verifyPaymentNoticeRes_element_nfpsp to decode: ${reporters.readableReport(
+            errors
+          )}`
+        );
+      }));
+    
+    export const verifyPaymentNoticeWithoutDueDate = pipe(verifyPaymentNoticeRes_element_nfpsp
+      .decode({
+        outcome: "OK",
+        paymentDescription: "Test causale",
+        fiscalCodePA: "77777777777",
+        companyName: "Company Name",
+        paymentList : {
+          paymentOptionDescription : [
+            { 
+              "amount" : 100,
+              "options" : "EQ"
+            }
+          ]
+        }
+      }),
+      E.getOrElseW((errors: readonly ValidationError[]) => {
+        throw Error(
+          `Invalid verifyPaymentNoticeRes_element_nfpsp to decode: ${reporters.readableReport(
+            errors
+          )}`
+        );
+      }));      
+  

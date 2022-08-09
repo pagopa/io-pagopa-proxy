@@ -9,6 +9,7 @@ import * as PaymentsConverter from "../PaymentsConverter";
 import * as MockedData from "./MockedData";
 import { MOCK_CLIENT_ID } from "./MockedData";
 import { FaultCategoryEnum } from "../../../generated/api/FaultCategory";
+import { CodiceContestoPagamento } from "../../../generated/api/CodiceContestoPagamento";
 
 describe("getNodoVerificaRPTInput", () => {
   it("should return a correct NodoVerificaRPTInput with auxDigit=0", () => {
@@ -918,4 +919,45 @@ describe("getPaymentNoticeNumberAsString", () => {
    
     expect(noticeNumberAsString).toBe("30123456789012300");
   });
+});
+
+describe("getVerifyPaymentNoticeResponse", () => {
+
+  it("should convert verifyPaymentNoticeRes_element_nfpsp with dueDate in getPaymentRequestsGetResponseNm3", () => {
+
+    const errorOrVerifyPaymentNoticeResponse = PaymentsConverter.getPaymentRequestsGetResponseNm3(
+      MockedData.verifyPaymentNoticeWithDueDate, 
+      "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento
+    );
+    expect(isRight(errorOrVerifyPaymentNoticeResponse)).toBeTruthy();
+    if (!isRight(errorOrVerifyPaymentNoticeResponse)) {
+      return;
+    }
+
+    const dueDate : Date | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
+    ? errorOrVerifyPaymentNoticeResponse.right.dueDate : undefined;
+
+    expect(
+      dueDate?.toISOString()
+    ).toBe("2021-07-31T00:00:00.000Z");
+   });
+
+   it("should convert verifyPaymentNoticeRes_element_nfpsp without dueDate in getPaymentRequestsGetResponseNm3", () => {
+
+    const errorOrVerifyPaymentNoticeResponse = PaymentsConverter.getPaymentRequestsGetResponseNm3(
+      MockedData.verifyPaymentNoticeWithoutDueDate, 
+      "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento
+    );
+    expect(isRight(errorOrVerifyPaymentNoticeResponse)).toBeTruthy();
+    if (!isRight(errorOrVerifyPaymentNoticeResponse)) {
+      return;
+    }
+
+    const dueDate : Date | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
+    ? errorOrVerifyPaymentNoticeResponse.right.dueDate : undefined;
+
+    expect(
+      dueDate?.toISOString()
+    ).toBeUndefined();
+   });
 });
