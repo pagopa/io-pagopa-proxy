@@ -20,6 +20,10 @@
 							"",
 							"    pm.expect(responseJson.importoSingoloVersamento).greaterThan(0);",
 							"",
+							"    pm.expect(responseJson.dueDate).not.eql(null);",
+							"",
+							"    pm.expect(responseJson.dueDate).not.eql(undefined);",
+							"",
 							"    pm.response.to.have.status(200);",
 							"});"
 						],
