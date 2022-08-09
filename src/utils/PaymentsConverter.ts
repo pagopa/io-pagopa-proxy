@@ -213,7 +213,8 @@ export function getPaymentRequestsGetResponseNm3(
               70
             ),
             denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName
-          }
+          },
+          dueDate: paymentOptionDescription.dueDate
         }
       : undefined
   );
