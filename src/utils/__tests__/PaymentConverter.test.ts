@@ -934,12 +934,12 @@ describe("getVerifyPaymentNoticeResponse", () => {
       return;
     }
 
-    const dueDate : Date | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
+    const dueDate : String | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
     ? errorOrVerifyPaymentNoticeResponse.right.dueDate : undefined;
 
     expect(
-      dueDate?.toISOString()
-    ).toBe("2021-07-31T00:00:00.000Z");
+      dueDate
+    ).toBe("2021-07-31");
    });
 
    it("should convert verifyPaymentNoticeRes_element_nfpsp without dueDate in getPaymentRequestsGetResponseNm3", () => {
@@ -953,11 +953,11 @@ describe("getVerifyPaymentNoticeResponse", () => {
       return;
     }
 
-    const dueDate : Date | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
+    const dueDate : String | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
     ? errorOrVerifyPaymentNoticeResponse.right.dueDate : undefined;
 
     expect(
-      dueDate?.toISOString()
+      dueDate
     ).toBeUndefined();
    });
 });
