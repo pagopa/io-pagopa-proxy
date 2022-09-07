@@ -852,9 +852,11 @@ describe("getActivateIOPaymentResponse", () => {
     ? errorOrPaymentActivationsPostResponse.right.enteBeneficiario
         .denominazioneBeneficiario : undefined;
 
+    
+    // Should get the entire string without substring
     expect(
       denominazione?.length
-    ).toBe(70);
+    ).toBe(MockedData.activateIOPaymentResOutputWhithEnteGreater70Chars.companyName?.length);
    });
 });
 
