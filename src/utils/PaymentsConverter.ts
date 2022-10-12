@@ -9,6 +9,7 @@
 import * as E from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/function";
+import moment = require("moment");
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
@@ -30,6 +31,7 @@ import { nodoVerificaRPT_element_ppt } from "../../generated/PagamentiTelematici
 import { stText140_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText140_type_ppt";
 import { stText35_type_ppt } from "../../generated/PagamentiTelematiciPspNodoservice/stText35_type_ppt";
 import { NodeClientConfig } from "../Configuration";
+import { logger } from "../utils/Logger";
 import { exactConvertToCents } from "./money";
 import { PaymentNoticeNumber, RptId, RptIdFromString } from "./pagopa";
 
@@ -197,6 +199,15 @@ export function getPaymentRequestsGetResponseNm3(
       ? verifyPaymentNoticeResponse.paymentList.paymentOptionDescription
       : undefined;
 
+  if (
+    paymentOptionDescription?.dueDate &&
+    paymentOptionDescription.dueDate?.length > 10
+  ) {
+    logger.info(
+      `getPaymentRequestsGetResponseNm3 | dueDate with length greater than 10 | ${paymentOptionDescription.dueDate} | ccp ${codiceContestoPagamento}`
+    );
+  }
+
   return PaymentRequestsGetResponse.decode(
     paymentOptionDescription
       ? {
@@ -215,7 +226,9 @@ export function getPaymentRequestsGetResponseNm3(
             denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName
           },
           dueDate: paymentOptionDescription.dueDate
-            ? paymentOptionDescription.dueDate
+            ? moment(paymentOptionDescription.dueDate?.substring(0, 10)).format(
+                "YYYY-MM-DD"
+              )
             : undefined
         }
       : undefined

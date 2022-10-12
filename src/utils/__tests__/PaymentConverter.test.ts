@@ -979,7 +979,7 @@ describe("getVerifyPaymentNoticeResponse", () => {
     console.log(dueDate)
     expect(
       dueDate
-    ).toBe("2021-07-31+01:00");
+    ).toBe("2021-07-31");
    });
 
    it("should convert verifyPaymentNoticeRes_element_nfpsp with Z dueDate in getPaymentRequestsGetResponseNm3", () => {
@@ -997,9 +997,8 @@ describe("getVerifyPaymentNoticeResponse", () => {
     const dueDate : String | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
     ? errorOrVerifyPaymentNoticeResponse.right.dueDate : undefined;
 
-    console.log(dueDate)
     expect(
       dueDate
-    ).toBe("2021-07-31Z");
+    ).toBe("2021-07-31");
    });
 });
