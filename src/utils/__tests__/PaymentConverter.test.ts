@@ -960,4 +960,46 @@ describe("getVerifyPaymentNoticeResponse", () => {
       dueDate
     ).toBeUndefined();
    });
+
+   it("should convert verifyPaymentNoticeRes_element_nfpsp with offset dueDate in getPaymentRequestsGetResponseNm3", () => {
+
+    const errorOrVerifyPaymentNoticeResponse = PaymentsConverter.getPaymentRequestsGetResponseNm3(
+      MockedData.verifyPaymentNoticeWithOffsetDueDate, 
+      "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento
+    );
+
+    expect(isRight(errorOrVerifyPaymentNoticeResponse)).toBeTruthy();
+    if (!isRight(errorOrVerifyPaymentNoticeResponse)) {
+      return;
+    }
+
+    const dueDate : String | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
+    ? errorOrVerifyPaymentNoticeResponse.right.dueDate : undefined;
+
+    console.log(dueDate)
+    expect(
+      dueDate
+    ).toBe("2021-07-31+01:00");
+   });
+
+   it("should convert verifyPaymentNoticeRes_element_nfpsp with Z dueDate in getPaymentRequestsGetResponseNm3", () => {
+
+    const errorOrVerifyPaymentNoticeResponse = PaymentsConverter.getPaymentRequestsGetResponseNm3(
+      MockedData.verifyPaymentNoticeWithZDueDate, 
+      "8447a9f0746811e89a8d5d4209060ab0" as CodiceContestoPagamento
+    );
+
+    expect(isRight(errorOrVerifyPaymentNoticeResponse)).toBeTruthy();
+    if (!isRight(errorOrVerifyPaymentNoticeResponse)) {
+      return;
+    }
+
+    const dueDate : String | undefined = errorOrVerifyPaymentNoticeResponse.right.dueDate
+    ? errorOrVerifyPaymentNoticeResponse.right.dueDate : undefined;
+
+    console.log(dueDate)
+    expect(
+      dueDate
+    ).toBe("2021-07-31Z");
+   });
 });

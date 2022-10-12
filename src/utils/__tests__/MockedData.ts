@@ -537,3 +537,47 @@ export const activateIOPaymentResOutputWhithEnte = pipe(activateIOPaymentRes_ele
         );
       }));      
   
+    export const verifyPaymentNoticeWithOffsetDueDate = pipe(verifyPaymentNoticeRes_element_nfpsp
+      .decode({
+        outcome: "OK",
+        paymentDescription: "Test causale",
+        fiscalCodePA: "77777777777",
+        companyName: "Company Name",
+        paymentList : {
+          paymentOptionDescription : [
+            { "amount" : 100,
+              "options" : "EQ",
+              "dueDate" : "2021-07-31+01:00"}
+          ]
+        }
+      }),
+      E.getOrElseW((errors: readonly ValidationError[]) => {
+        throw Error(
+          `Invalid verifyPaymentNoticeRes_element_nfpsp to decode: ${reporters.readableReport(
+            errors
+          )}`
+        );
+      }));
+      
+    export const verifyPaymentNoticeWithZDueDate = pipe(verifyPaymentNoticeRes_element_nfpsp
+      .decode({
+        outcome: "OK",
+        paymentDescription: "Test causale",
+        fiscalCodePA: "77777777777",
+        companyName: "Company Name",
+        paymentList : {
+          paymentOptionDescription : [
+            { "amount" : 100,
+              "options" : "EQ",
+              "dueDate" : "2021-07-31Z"}
+          ]
+        }
+      }),
+      E.getOrElseW((errors: readonly ValidationError[]) => {
+        throw Error(
+          `Invalid verifyPaymentNoticeRes_element_nfpsp to decode: ${reporters.readableReport(
+            errors
+          )}`
+        );
+      }));
+  

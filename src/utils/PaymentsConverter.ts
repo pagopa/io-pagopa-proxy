@@ -9,7 +9,6 @@
 import * as E from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/function";
-import moment = require("moment");
 import { CodiceContestoPagamento } from "../../generated/api/CodiceContestoPagamento";
 import { ImportoEuroCents } from "../../generated/api/ImportoEuroCents";
 import { PaymentActivationsPostRequest } from "../../generated/api/PaymentActivationsPostRequest";
@@ -216,7 +215,7 @@ export function getPaymentRequestsGetResponseNm3(
             denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName
           },
           dueDate: paymentOptionDescription.dueDate
-            ? moment(paymentOptionDescription.dueDate).format("YYYY-MM-DD")
+            ? paymentOptionDescription.dueDate
             : undefined
         }
       : undefined
