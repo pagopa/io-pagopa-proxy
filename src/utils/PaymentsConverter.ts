@@ -224,9 +224,9 @@ export function getPaymentRequestsGetResponseNm3(
               70
             ),
             denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName?.substring(
-               0,
-               70
-             ),
+              0,
+              70
+            )
           },
           dueDate: paymentOptionDescription.dueDate
             ? moment(paymentOptionDescription.dueDate?.substring(0, 10)).format(
