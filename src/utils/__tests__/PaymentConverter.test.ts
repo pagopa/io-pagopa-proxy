@@ -856,6 +856,25 @@ describe("getActivateIOPaymentResponse", () => {
       denominazione?.length
     ).toBe(70);
    });
+
+     it("should convert activateIOPaymentRes_nfpsp with denomUnitOperBeneficiario greater than 70 in getActivateIOPaymentResponse", () => {
+       const errorOrPaymentActivationsPostResponse = PaymentsConverter.getActivateIOPaymentResponse(
+         MockedData.activateIOPaymentResOutputWhithOfficeNameGreater70Chars
+       );
+       expect(isRight(errorOrPaymentActivationsPostResponse)).toBeTruthy();
+       if (!isRight(errorOrPaymentActivationsPostResponse)) {
+         return;
+       }
+
+       const denominazioneUnitOperBeneficiario : string = errorOrPaymentActivationsPostResponse.right.enteBeneficiario
+       ? errorOrPaymentActivationsPostResponse.right.enteBeneficiario
+           .denomUnitOperBeneficiario : undefined;
+
+       expect(
+         denominazioneUnitOperBeneficiario?.length
+       ).toBe(70);
+      });
+
 });
 
 describe("getPaymentNoticeNumberAsString", () => {

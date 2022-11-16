@@ -492,6 +492,23 @@ export const activateIOPaymentResOutputWhithEnte = pipe(activateIOPaymentRes_ele
       );
     }));
 
+     export const activateIOPaymentResOutputWhithOfficeNameGreater70Chars = pipe(activateIOPaymentRes_element_nfpsp
+        .decode({
+          outcome: "OK",
+          totalAmount: 100,
+          paymentDescription: "Test causale",
+          fiscalCodePA: "77777777777",
+          companyName: "denominazione dell'ente minore di 70 caratteri",
+          officeName:  "OfficeName denomUnitOperBeneficiario maggiore di 70 caratteri, in accordo alle nuove primitive verifyPayment e ActivateIoPayment"
+        }),
+        E.getOrElseW((errors: readonly ValidationError[]) => {
+          throw Error(
+            `Invalid activateIOPaymentRes_nfpsp to decode: ${reporters.readableReport(
+              errors
+            )}`
+          );
+        }));
+
     export const verifyPaymentNoticeWithDueDate = pipe(verifyPaymentNoticeRes_element_nfpsp
       .decode({
         outcome: "OK",

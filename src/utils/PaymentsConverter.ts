@@ -223,7 +223,10 @@ export function getPaymentRequestsGetResponseNm3(
               0,
               70
             ),
-            denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName
+            denomUnitOperBeneficiario: verifyPaymentNoticeResponse.officeName?.substring(
+              0,
+              70
+            )
           },
           dueDate: paymentOptionDescription.dueDate
             ? moment(paymentOptionDescription.dueDate?.substring(0, 10)).format(
@@ -352,6 +355,10 @@ export function getActivateIOPaymentResponse(
                   identificativoUnivocoBeneficiario:
                     activateIOPaymentRes.fiscalCodePA,
                   denominazioneBeneficiario: activateIOPaymentRes.companyName.substring(
+                    0,
+                    70
+                  ),
+                  denomUnitOperBeneficiario: activateIOPaymentRes.officeName?.substring(
                     0,
                     70
                   )
