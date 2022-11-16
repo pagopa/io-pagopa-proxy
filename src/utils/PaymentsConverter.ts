@@ -357,6 +357,10 @@ export function getActivateIOPaymentResponse(
                   denominazioneBeneficiario: activateIOPaymentRes.companyName.substring(
                     0,
                     70
+                  ),
+                  denomUnitOperBeneficiario: activateIOPaymentRes.officeName?.substring(
+                    0,
+                    70
                   )
                 }
               : undefined
