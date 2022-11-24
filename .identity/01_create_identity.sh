@@ -19,7 +19,7 @@ fi
 
 source "${ENV_FILE}"
 
-APP_NAME="github-${GITHUB_REPO_ORG}-${GITHUB_REPO_NAME}-${GITHUB_REPO_ENVIRONMENT}-sp"
+APP_NAME="github-${GITHUB_REPO_ORG}-${GITHUB_REPO_NAME}-${GITHUB_REPO_BRANCH}-sp"
 
 echo "[INFO] Create enterprise application APP_NAME: ${APP_NAME}"
 SP_CREDENTIAL_VALUES=$(az ad app create --display-name "${APP_NAME}" -o json)

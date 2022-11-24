@@ -21,7 +21,7 @@ az account set -s "${SUBSCRIPTION_NAME}"
 ACCOUNT_INFO=$(az account show 2> /dev/null)
 SUBSCRIPTION_ID=$(echo "$ACCOUNT_INFO" | jq ".id" -r)
 
-APP_NAME="github-${GITHUB_REPO_ORG}-${GITHUB_REPO_NAME}-${GITHUB_REPO_ENVIRONMENT}-sp"
+APP_NAME="github-${GITHUB_REPO_ORG}-${GITHUB_REPO_NAME}-${GITHUB_REPO_BRANCH}-sp"
 
 echo "[INFO] Get service principal APP_NAME: ${APP_NAME}"
 SP_OBJECT_ID=$(az ad sp list --all -o tsv --query "[?contains(displayName,'$APP_NAME')].{Name:id}")
@@ -36,5 +36,11 @@ az role assignment create \
   --subscription "${SUBSCRIPTION_ID}" \
   --assignee-object-id "${SP_OBJECT_ID}" \
   --assignee-principal-type ServicePrincipal \
-  --scope "/subscriptions/${SUBSCRIPTION_ID}"
+  --scope "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/io-infra-rg"
 
+az role assignment create \
+  --role contributor \
+  --subscription "${SUBSCRIPTION_ID}" \
+  --assignee-object-id "${SP_OBJECT_ID}" \
+  --assignee-principal-type ServicePrincipal \
+  --scope "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/dashboards"

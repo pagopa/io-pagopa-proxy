@@ -24,7 +24,7 @@ ACCOUNT_INFO=$(az account show 2> /dev/null)
 AZURE_SUBSCRIPTION_ID=$(echo "$ACCOUNT_INFO" | jq ".id" -r)
 AZURE_TENANT_ID=$(echo "$ACCOUNT_INFO" | jq ".homeTenantId" -r)
 
-AZURE_APP_NAME="github-${GITHUB_REPO_ORG}-${GITHUB_REPO_NAME}-${GITHUB_REPO_ENVIRONMENT}-sp"
+AZURE_APP_NAME="github-${GITHUB_REPO_ORG}-${GITHUB_REPO_NAME}-${GITHUB_REPO_BRANCH}-sp"
 AZURE_CLIENT_ID=$(az ad sp list --all -o tsv --query "[?contains(displayName,'${AZURE_APP_NAME}')].{Name:appId}")
 
 echo "[INFO] APP_NAME: ${AZURE_APP_NAME}"
