@@ -8,5 +8,5 @@ action_groups:
   - /subscriptions/BBE47AD4-08B3-4925-94C5-1278E5819B86/resourceGroups/pagopa-d-monitor-rg/providers/microsoft.insights/actionGroups/SlackPagoPA
 overrides:
   hosts: # Use these hosts instead of those inside the OpenApi spec
-    - https://api.dev.platform.pagopa.it
+    - api.dev.platform.pagopa.it
 
