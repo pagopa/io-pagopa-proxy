@@ -44,3 +44,11 @@ az role assignment create \
   --assignee-object-id "${SP_OBJECT_ID}" \
   --assignee-principal-type ServicePrincipal \
   --scope "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/dashboards"
+
+az role assignment create \
+  --role reader \
+  --subscription "${SUBSCRIPTION_ID}" \
+  --assignee-object-id "${SP_OBJECT_ID}" \
+  --assignee-principal-type ServicePrincipal \
+  --scope "/subscriptions/${SUBSCRIPTION_ID}"
+
