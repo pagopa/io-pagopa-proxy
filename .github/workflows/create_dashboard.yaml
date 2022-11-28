@@ -48,7 +48,8 @@ jobs:
 
       - run: |
           cd ./azure-dashboard
-          sh terraform.sh plan prod
+          chmod +x ./terraform.sh
+          ./terraform.sh plan prod
         shell: bash
 
 
