@@ -52,14 +52,9 @@ jobs:
           export ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
           export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
           export ARM_USE_OIDC=true
-          
-          az account show --query id --output tsv
-          az account show --query tenantId --output tsv
-          az account list
-          az redis list
 
           chmod +x ./terraform.sh
-          ./terraform.sh plan prod
+          ./terraform.sh apply prod -auto-approve
         shell: bash
 
 
