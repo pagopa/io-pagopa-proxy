@@ -55,9 +55,7 @@ jobs:
       - name: Create dashboard
         uses: pagopa/opex-dashboard-action@main
         with:
-          template_name: 'azure-dashboard'
-          config_file: 'myfolder/monitor/config-prod.yaml'
-          package: 'myfolder'
+          command: 'generate --template-name azure-dashboard --config-file myfolder/monitor/config-prod.yaml --package myfolder'
 
       - run: |
           cd ./azure-dashboard
