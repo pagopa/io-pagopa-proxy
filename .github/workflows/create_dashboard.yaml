@@ -53,7 +53,7 @@ jobs:
 #            --config-file myfolder/monitor/config-prod.yaml \
 #            --package myfolder
       - name: Create dashboard
-        uses: pagopa/opex-dashboard-action
+        uses: pagopa/opex-dashboard-action@main
         with:
           template_name: 'azure-dashboard'
           config_file: 'myfolder/monitor/config-prod.yaml'
