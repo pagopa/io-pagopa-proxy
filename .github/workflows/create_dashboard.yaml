@@ -47,8 +47,10 @@ jobs:
           subscription-id: b9fc9419-6097-45fe-9f74-ba0641c91912
 
       - run: |
-          docker run -v $(pwd):/home/nonroot/myfolder:Z \
-            --user 1000 \
+          docker run \
+            -e "PYTHONPATH=.local/lib/python3.9/site-packages" \
+            -v $(pwd):/home/nonroot/myfolder:Z \
+            --user root \
             ghcr.io/pagopa/opex-dashboard:v1.4.6 generate \
             --template-name azure-dashboard \
             --config-file myfolder/monitor/config-prod.yaml \
