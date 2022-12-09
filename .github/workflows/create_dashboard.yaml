@@ -14,7 +14,9 @@ on:
   workflow_dispatch:
 
 
-permissions: write-all
+permissions:
+  id-token: write
+  contents: read
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -45,15 +47,12 @@ jobs:
           subscription-id: b9fc9419-6097-45fe-9f74-ba0641c91912
 
       - run: |
-          docker run -v $(pwd):/home/nonroot/myfolder:Z \
+          docker run -u root -v $(pwd):/home/nonroot/myfolder:Z \
             ghcr.io/pagopa/opex-dashboard:v1.4.6 generate \
             --template-name azure-dashboard \
             --config-file myfolder/monitor/config-prod.yaml \
             --package myfolder
-#      - name: Create dashboard
-#        uses: pagopa/opex-dashboard-action@main
-#        with:
-#          command: 'generate --template-name azure-dashboard --config-file myfolder/monitor/config-prod.yaml --package myfolder'
+
 
       - run: |
           cd ./azure-dashboard
