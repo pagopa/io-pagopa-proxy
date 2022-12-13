@@ -9,6 +9,7 @@ on:
     paths:
       - 'api-spec/api-for-io.yaml'
       - '.github/workflows/create-dashboard.yaml'
+      - 'monitor/*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -64,8 +65,7 @@ jobs:
           export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
           export ARM_USE_OIDC=true
 
-          chmod +x ./terraform.sh
-          ./terraform.sh apply prod -auto-approve
+          bash ./terraform.sh apply prod -auto-approve
         shell: bash
 
 
