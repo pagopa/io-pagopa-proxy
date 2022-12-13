@@ -66,7 +66,7 @@ jobs:
           tenant-id: 7788edaf-0346-4068-9d79-c868aed15b3d
           subscription-id: ${{ env.SUBSCRIPTION_ID }}
 
-      # this action create a folder named /azure-dashboard
+      # this action create a folder named /azure-dashboard with the terraform files
       - uses: pagopa/opex-dashboard-action@main
         with:
           template: azure-dashboard
