@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'api-spec/api-for-io.yaml'
+      - 'api-spec/api-for-checkout.yaml'
       - '.github/workflows/create_dashboard.yaml'
       - 'monitor/**'
 
