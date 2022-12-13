@@ -67,7 +67,7 @@ jobs:
           subscription-id: ${{ env.SUBSCRIPTION_ID }}
 
       # this action create a folder named /azure-dashboard with the terraform files
-      - uses: pagopa/opex-dashboard-action@main
+      - uses: pagopa/opex-dashboard-action@b6d6fc399df3d7b9f2072504b02650bdc4c019b5
         with:
           template: azure-dashboard
           config: ./monitor/config-${{ matrix.environment }}.yaml
