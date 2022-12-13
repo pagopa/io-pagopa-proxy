@@ -14,3 +14,4 @@ generated
 k6example/libs
 .eslintcache
 test_reports/pagopa-proxy-IT.xml
+**/.terraform/

@@ -2,15 +2,22 @@ name: Create Dashboard
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
+  pull_request:
     branches:
-      - monitor-opexd
+      - main
+    types: [ closed ]
     paths:
       - 'api-spec/api-for-io.yaml'
+      - '.github/workflows/create-dashboard.yaml'
+      - 'monitor/*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+
+permissions:
+  id-token: write
+  contents: read
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -41,8 +48,25 @@ jobs:
           subscription-id: b9fc9419-6097-45fe-9f74-ba0641c91912
 
       - run: |
+          docker run \
+            -e "PYTHONPATH=.local/lib/python3.9/site-packages" \
+            -v $(pwd):/home/nonroot/myfolder:Z \
+            --user root \
+            ghcr.io/pagopa/opex-dashboard:v1.4.6 generate \
+            --template-name azure-dashboard \
+            --config-file myfolder/monitor/config-prod.yaml \
+            --package myfolder
+
+
+      - run: |
           cd ./azure-dashboard
-          sh terraform.sh plan prod
+          export ARM_CLIENT_ID="8c8a2814-0b5b-4f2a-8b40-59437c9bbdfd"
+          export ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+          export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
+          export ARM_USE_OIDC=true
+
+          bash ./terraform.sh apply prod -auto-approve
+        shell: bash
 
 
 
