@@ -177,5 +177,3 @@ definitions:
     $ref: "https://raw.githubusercontent.com/pagopa/io-pagopa-proxy/v1.1.1/api_pagopa.yaml#/definitions/SpezzoniCausaleVersamento"
   SpezzoniCausaleVersamentoItem:
     $ref: "https://raw.githubusercontent.com/pagopa/io-pagopa-proxy/v1.1.1/api_pagopa.yaml#/definitions/SpezzoniCausaleVersamentoItem"
-
-
