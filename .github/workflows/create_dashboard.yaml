@@ -24,6 +24,10 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
+    strategy:
+      matrix:
+        environment: [dev, uat, prod]
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout
@@ -46,25 +50,27 @@ jobs:
           tenant-id: 7788edaf-0346-4068-9d79-c868aed15b3d
           subscription-id: b9fc9419-6097-45fe-9f74-ba0641c91912
 
-      - run: |
-          docker run \
-            -e "PYTHONPATH=.local/lib/python3.9/site-packages" \
-            -v $(pwd):/home/nonroot/myfolder:Z \
-            --user root \
-            ghcr.io/pagopa/opex-dashboard:v1.4.6 generate \
-            --template-name azure-dashboard \
-            --config-file myfolder/monitor/config-prod.yaml \
-            --package myfolder
+      # this action create a folder named /azure-dashboard
+      - uses: pagopa/opex-dashboard-action@main
+        with:
+          template: azure-dashboard
+          config: ./monitor/config-${{ matrix.environment }}.yaml
 
+      # we need to set env variables in the folder /azure-dashboard
+      - name: Copy Environments
+        run: |
+          cp -R ./monitor/env ./azure-dashboard     
 
-      - run: |
+      # now is possible to launch the command: terraform apply
+      - name: Terraform Apply
+        run: |
           cd ./azure-dashboard
           export ARM_CLIENT_ID="b5ef2cb1-c20f-4413-a9b7-11d01b99c7fa"
           export ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
           export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
           export ARM_USE_OIDC=true
 
-          bash ./terraform.sh apply prod -auto-approve
+          bash ./terraform.sh apply  ${{ matrix.environment }} -auto-approve
         shell: bash
 
 
