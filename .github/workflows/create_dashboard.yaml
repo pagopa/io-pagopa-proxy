@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - 'api-spec/api-for-io.yaml'
-      - '.github/workflows/create-dashboard.yaml'
+      - '.github/workflows/create_dashboard.yaml'
       - 'monitor/*'
 
   # Allows you to run this workflow manually from the Actions tab
@@ -59,7 +59,7 @@ jobs:
 
       - run: |
           cd ./azure-dashboard
-          export ARM_CLIENT_ID="8c8a2814-0b5b-4f2a-8b40-59437c9bbdfd"
+          export ARM_CLIENT_ID="b5ef2cb1-c20f-4413-a9b7-11d01b99c7fa"
           export ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
           export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
           export ARM_USE_OIDC=true
