@@ -12,7 +12,11 @@ resource "azuread_application_federated_identity_credential" "master" {
   description           = "github-federated"
   audiences             = ["api://AzureADTokenExchange"]
   issuer                = "https://token.actions.githubusercontent.com"
+<<<<<<< HEAD
   subject               = "repo:${local.github.org}/${local.github.repository}:ref:refs/heads/main"
+=======
+  subject               = "repo:${local.github.org}/${local.github.repository}:ref:refs/heads/opex-action"
+>>>>>>> 7a2fd65 (new version)
 }
 
 output "azure_master_client_id" {

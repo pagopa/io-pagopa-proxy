@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - main
+<<<<<<< HEAD
+=======
+      - opex-action
+>>>>>>> 7a2fd65 (new version)
     paths:
       - 'api-spec/api-auth-v2.yaml'
       - '.github/workflows/opex_api-auth-v2.yml'
