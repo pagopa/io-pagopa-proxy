@@ -4,7 +4,7 @@ name: Opex Dashboard api-for-io
 on:
   push:
     branches:
-      - main
+      - add-opex-dashboard
     paths:
       - 'api-spec/api-for-io.yaml'
       - '.github/workflows/opex_api-for-io.yml'
