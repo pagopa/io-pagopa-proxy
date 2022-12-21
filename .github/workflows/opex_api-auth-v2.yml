@@ -6,9 +6,12 @@ on:
     branches:
       - main
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
       - opex-action
 >>>>>>> 7a2fd65 (new version)
+=======
+>>>>>>> 862a488 (add api-pagopa-proxy)
     paths:
       - 'api-spec/api-auth-v2.yaml'
       - '.github/workflows/opex_api-auth-v2.yml'

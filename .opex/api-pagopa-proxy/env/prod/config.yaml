@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <<<<<<< HEAD:.opex/api-pagopa-proxy/env/prod/config.yaml
 oa3_spec: api-spec/api-pagopa-proxy.yaml # If start with http the file would be downloaded from the internet
 name: opex_api-pagopa-proxy
@@ -5,6 +6,10 @@ name: opex_api-pagopa-proxy
 oa3_spec: ./api-spec/api-for-checkout.yaml # If start with http the file would be downloaded from the internet
 name: pagopa-proxy-dashboard
 >>>>>>> c353635 (refactor(monitoring): change default spec for auto dashboard generation (#378)):monitor/config-prod.yaml
+=======
+oa3_spec: api-spec/api-pagopa-proxy.yaml # If start with http the file would be downloaded from the internet
+name: opex_api-pagopa-proxy
+>>>>>>> 862a488 (add api-pagopa-proxy)
 location: West Europe
 timespan: 5m # Default, a number or a timespan https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/timespan
 data_source: /subscriptions/b9fc9419-6097-45fe-9f74-ba0641c91912/resourceGroups/pagopa-p-vnet-rg/providers/Microsoft.Network/applicationGateways/pagopa-p-app-gw
