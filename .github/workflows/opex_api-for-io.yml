@@ -1,4 +1,4 @@
-name: Opex Dashboard api-auth-v2
+name: Opex Dashboard api-for-io
 
 # Controls when the workflow will run
 on:
@@ -7,16 +7,16 @@ on:
       - main
       - opex-action
     paths:
-      - 'api-spec/api-auth-v2.yaml'
-      - '.github/workflows/opex_api-auth-v2.yml'
-      - '.opex/api-auth-v2/**'
+      - 'api-spec/api-for-io.yaml'
+      - '.github/workflows/opex_api-for-io.yml'
+      - '.opex/api-for-io/**'
 
 env:
   TEMPLATE_DIR: azure-dashboard
   CLIENT_ID: 59f62d45-597c-48ff-99ea-40f4b3518946
   TENANT_ID: 7788edaf-0346-4068-9d79-c868aed15b3d
   SUBSCRIPTION_ID: b9fc9419-6097-45fe-9f74-ba0641c91912
-  API_NAME: api-auth-v2
+  API_NAME: api-for-io
 
 permissions:
   id-token: write
