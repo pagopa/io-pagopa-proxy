@@ -4,7 +4,7 @@ name: Opex Dashboard api-for-checkout
 on:
   push:
     branches:
-      - add-opex-dashboard
+      - main
     paths:
       - 'api-spec/api-for-checkout.yaml'
       - '.github/workflows/opex_api-for-checkout.yml'

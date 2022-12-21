@@ -4,7 +4,7 @@ name: Opex Dashboard api-pagopa-proxy
 on:
   push:
     branches:
-      - add-opex-dashboard
+      - main
     paths:
       - 'api-spec/api-pagopa-proxy.yaml'
       - '.github/workflows/opex_api-pagopa-proxy.yml'
