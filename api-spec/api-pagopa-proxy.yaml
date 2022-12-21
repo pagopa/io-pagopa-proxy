@@ -4,6 +4,7 @@ info:
   title: Proxy PagoPA
   description: Proxy for PagoPA payment services
 basePath: /api/v1
+host: api.dev.platform.pagopa.it
 schemes:
   - https
 paths:
