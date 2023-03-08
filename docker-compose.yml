@@ -11,7 +11,7 @@ services:
       context: ./
       dockerfile: ./Dockerfile
     networks:
-      - io-fn
+      - pagopa-ecommerce-net
 
   redis:
     container_name: redis
@@ -23,7 +23,7 @@ services:
       REDIS_TCP_KEEPALIVE: 60
       REDIS_MAXMEMORY: 182m
     networks:
-      - io-fn
+      - pagopa-ecommerce-net
 
   #pagopa-node-mock:
   #  ports:
@@ -36,19 +36,19 @@ services:
   #  networks:
   #    - io-fn
       
-  pagopa-node-mock:
-    build:
-      context: ../
-      dockerfile: io-pagopa-proxy/io-pagopa-node-mock/DockerfileTMP
-    env_file:
-        - io-pagopa-node-mock/env.io-pagopa-node-mock
-    ports:
-        - 3002:3002
-    networks:
-        - io-fn
+  #pagopa-node-mock:
+  #  build:
+  #    context: ../
+  #    dockerfile: io-pagopa-proxy/io-pagopa-node-mock/DockerfileTMP
+  #  env_file:
+  #      - io-pagopa-node-mock/env.io-pagopa-node-mock
+  #  ports:
+  #      - 3002:3002
+  #  networks:
+  #      - io-fn
 
 networks:
-  io-fn:
+  pagopa-ecommerce-net:
     driver: bridge
     driver_opts:
       com.docker.network.driver.mtu: 1450
