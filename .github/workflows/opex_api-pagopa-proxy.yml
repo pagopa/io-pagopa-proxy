@@ -9,6 +9,7 @@ on:
       - 'api-spec/api-pagopa-proxy.yaml'
       - '.github/workflows/opex_api-pagopa-proxy.yml'
       - '.opex/api-pagopa-proxy/**'
+  workflow_dispatch:
 
 env:
   TEMPLATE_DIR: azure-dashboard
