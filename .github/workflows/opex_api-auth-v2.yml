@@ -9,6 +9,7 @@ on:
       - 'api-spec/api-auth-v2.yaml'
       - '.github/workflows/opex_api-auth-v2.yml'
       - '.opex/api-auth-v2/**'
+  workflow_dispatch:
 
 env:
   TEMPLATE_DIR: azure-dashboard

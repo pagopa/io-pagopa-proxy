@@ -9,6 +9,7 @@ on:
       - 'api-spec/api-for-checkout.yaml'
       - '.github/workflows/opex_api-for-checkout.yml'
       - '.opex/api-for-checkout/**'
+  workflow_dispatch:
 
 env:
   TEMPLATE_DIR: azure-dashboard

@@ -9,6 +9,7 @@ on:
       - 'api-spec/api-for-io.yaml'
       - '.github/workflows/opex_api-for-io.yml'
       - '.opex/api-for-io/**'
+  workflow_dispatch:
 
 env:
   TEMPLATE_DIR: azure-dashboard
