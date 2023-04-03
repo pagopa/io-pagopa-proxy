@@ -14,4 +14,4 @@ overrides:
       response_time_threshold: 7
       availability_threshold: 0.25
     /checkout/auth/payments/v1/payment-activations:
-      response_time_threshold: 5
+      response_time_threshold: 7
