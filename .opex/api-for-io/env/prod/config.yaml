@@ -1,7 +1,7 @@
 oa3_spec: api-spec/api-for-io.yaml # If start with http the file would be downloaded from the internet
 name: opex_api-for-io
 location: West Europe
-timespan: 5m # Default, a number or a timespan https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/timespan
+timespan: 10m # Default, a number or a timespan https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/timespan
 data_source: /subscriptions/b9fc9419-6097-45fe-9f74-ba0641c91912/resourceGroups/pagopa-p-vnet-rg/providers/Microsoft.Network/applicationGateways/pagopa-p-app-gw
 action_groups:
   - /subscriptions/b9fc9419-6097-45fe-9f74-ba0641c91912/resourceGroups/pagopa-p-monitor-rg/providers/microsoft.insights/actionGroups/PagoPA
@@ -11,7 +11,7 @@ overrides:
     - api.platform.pagopa.it
   endpoints:
     /checkout/auth/payments/v1/payment-requests/{rpt_id_from_string}:
-      response_time_threshold: 7
+      response_time_threshold: 5
       availability_threshold: 0.25
     /checkout/auth/payments/v1/payment-activations:
-      response_time_threshold: 7
+      response_time_threshold: 5
