@@ -11,6 +11,8 @@ overrides:
     - api.platform.pagopa.it
   endpoints:
     /checkout/payments/v1/payment-requests/{rptId}:
-      response_time_threshold: 5
+      response_time_threshold: 15
+      availability_threshold: 0
     /checkout/payments/v1/payment-activations:
-      response_time_threshold: 5
+      response_time_threshold: 15
+      availability_threshold: 0
