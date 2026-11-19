@@ -15,7 +15,7 @@ services:
 
   redis:
     container_name: pagopa-proxy-redis
-    image: redis:4.0.14-alpine
+    image: redis:4.0.14-alpine@sha256:aaf7c123077a5e45ab2328b5ef7e201b5720616efac498d55e65a7afbb96ae20
     command: ["sh", "-c", 'exec redis-server']
     ports:
       - "6379:6379"
@@ -24,7 +24,7 @@ services:
 
   redis-insight:
     container_name: pagopa-proxy-redis-insight
-    image: redislabs/redisinsight
+    image: redislabs/redisinsight@sha256:7aea9c96ee8e34518d7d692c02a081f6e46ff9230e7779212aa10a65c423c18a
     ports:
       - "8001:8001"
     networks:
