@@ -1,4 +1,4 @@
-FROM node:18.16.0 as builder
+FROM node:18.16.0@sha256:4a55308cc855cba1a925d19ae4e45838741dad2fd7bb8949a93b2a0f2ae339e3 as builder
 
 RUN addgroup --system user && adduser --ingroup user --system user
 
@@ -22,7 +22,7 @@ USER user:user
 RUN yarn install \
   && yarn build
 
-FROM node:18.16.0-alpine
+FROM node:18.16.0-alpine@sha256:9036ddb8252ba7089c2c83eb2b0dcaf74ff1069e8ddf86fe2bd6dc5fecc9492d
 LABEL maintainer="https://teamdigitale.governo.it"
 
 # Install major CA certificates to cover

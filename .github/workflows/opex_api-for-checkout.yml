@@ -64,7 +64,7 @@ jobs:
           subscription-id: ${{ env.SUBSCRIPTION_ID }}
 
       # this action create a folder named /azure-dashboard
-      - uses: pagopa/opex-dashboard-action@main
+      - uses: pagopa/opex-dashboard-action@f39cecdd530f46451057c599fcf57c1fc3fa345e # main
         with:
           template: ${{ env.TEMPLATE_DIR }}
           config: .opex/${{ env.API_NAME }}/env/${{ matrix.environment }}/config.yaml
